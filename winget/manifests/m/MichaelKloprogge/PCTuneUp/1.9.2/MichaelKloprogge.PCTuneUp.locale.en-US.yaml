@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
 PackageIdentifier: MichaelKloprogge.PCTuneUp
-PackageVersion: 1.9.1
+PackageVersion: 1.9.2
 PackageLocale: en-US
 Publisher: Michael Kloprogge
 PublisherUrl: https://github.com/michaelkloprogge-gif
@@ -18,6 +18,6 @@ Tags:
 - maintenance
 - privacy
 - uninstaller
-ReleaseNotesUrl: https://github.com/michaelkloprogge-gif/pc-tuneup/releases/tag/v1.9.1
+ReleaseNotesUrl: https://github.com/michaelkloprogge-gif/pc-tuneup/releases/tag/v1.9.2
 ManifestType: defaultLocale
 ManifestVersion: 1.12.0

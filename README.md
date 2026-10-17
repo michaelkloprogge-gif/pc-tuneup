@@ -1,5 +1,7 @@
 # PC Tune-Up
 
+**Website: https://michaelkloprogge-gif.github.io/pc-tuneup/**
+
 **Check, clean and speed up any Windows 10/11 PC - whatever the brand - with one click, and undo anything.**
 
 ![Clean page](docs/screenshots/clean.png)
@@ -31,13 +33,14 @@ you can undo.
 | **Browsers** | extensions in Chrome, Edge, Brave, Vivaldi and Firefox, search engine, home page and settings forced by "policies" - the usual places adware hides |
 | **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with one-click fixes (turn off NVIDIA nView, repair Visual C++, reset Windows Update, repair system files, check the drive...) |
 | **Network** | Wi-Fi signal and band, delays to the router and the internet, DNS speed, dropped connections, flush DNS and network reset |
+| **Gaming** | which graphics card a running game really uses, what else is busy, power mode, Game Mode, background recording and GPU settings - with one-click fixes |
 | **Battery** | (laptops) how much charge the battery still holds, a graph of its wear over the years, runtime, and where your PC maker hides the 80% charge limit |
 | **Backup** | are Desktop, Documents and Pictures in OneDrive/Dropbox/iCloud, File History, backup programs and restore points - warns when nothing backs up your files |
 | **Upgrades** | which memory, drive and battery upgrades fit, the exact specification to buy, and whether it is worth it |
 | **History** | every change, with Undo |
 
 Security software, VPNs, drivers and databases are never touched, and you can add your own programs
-to a keep list. English and Dutch, light and dark theme.
+to a keep list. Search everything with Ctrl+F. English and Dutch, light and dark theme.
 
 **Automatic maintenance** (Settings): every week or every 4 weeks PC Tune-Up cleans junk files and checks the PC
 by itself when the PC is idle, and shows a notification when it finds something new. It never changes startup apps, services or programs on its own.

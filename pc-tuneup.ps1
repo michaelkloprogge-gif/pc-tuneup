@@ -12,6 +12,8 @@
 #   Drivers   - devices with problems, and the age of the drivers that matter most
 #   Browsers  - extensions, search engine, home page and forced policies (adware) in Chrome/Edge/Brave/Vivaldi/Firefox
 #   Network   - Wi-Fi signal, delays, DNS speed, dropped connections, network reset
+#   Gaming    - which graphics card a running game uses, what else is busy, Game Mode / recording / GPU settings
+#   Search    - Ctrl+F finds pages, settings and rows on every page
 #   Battery   - wear, wear speed, runtime, charge-limit advice (laptops only)
 #   Space savers - hibernation file, reserved storage, OneDrive copies, Compact OS, Storage Sense (with undo)
 #   Disk      - find the folders eating your drive
@@ -58,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.11.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.12.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1456,6 +1458,65 @@ Device problem: {0}	Probleem met apparaat: {0}
 More often: {0} (+{1})	Vaker: {0} (+{1})
 freed {0}, {1} new thing(s)	{0} vrijgemaakt, {1} nieuw(e) punt(en)
 freed {0}, nothing new	{0} vrijgemaakt, niets nieuws
+Gaming	Gamen
+Start your game, then click Check again: which graphics card it really uses, what else is busy, and the Windows settings that cost frames. Recommended fixes are pre-checked and can be undone from History.	Start je game en klik dan op Opnieuw controleren: welke videokaart hij echt gebruikt, wat er verder bezig is, en de Windows-instellingen die frames kosten. Aanbevolen oplossingen zijn al aangevinkt en kun je terugdraaien via Geschiedenis.
+Apply checked fixes	Aangevinkte oplossingen toepassen
+Graphics settings	Grafische instellingen
+Game Mode settings	Instellingen voor Spelmodus
+Checking for gaming	Controleren voor gamen
+Measuring (about 5 seconds)...	Meten (ongeveer 5 seconden)...
+measuring graphics and processor use	gebruik van videokaart en processor meten
+Game	Game
+No game running right now	Er draait nu geen game
+Start your game, switch back here (Alt+Tab) and click "Check again" to see which graphics card it uses and what else is busy. The Windows settings below are checked either way.	Start je game, schakel terug naar hier (Alt+Tab) en klik op "Opnieuw controleren" om te zien welke videokaart hij gebruikt en wat er verder bezig is. De Windows-instellingen hieronder worden hoe dan ook gecontroleerd.
+Game: {0}	Game: {0}
+runs, but not drawing anything at the moment	draait, maar tekent op dit moment niets
+Switch to the game for a moment (so it draws), then come back and click "Check again".	Schakel even naar de game (zodat hij tekent), kom dan terug en klik op "Opnieuw controleren".
+runs on {0} - the slower, built-in graphics	draait op {0} - de tragere, ingebouwde graphics
+Set it to use the fast graphics card (fix below), then restart the game. Same as Settings > System > Display > Graphics > (the game) > High performance.	Laat hem de snelle videokaart gebruiken (oplossing hieronder) en start de game opnieuw. Hetzelfde als Instellingen > Systeem > Beeldscherm > Graphics > (de game) > Hoge prestaties.
+runs on {0} ({1}% busy)	draait op {0} ({1}% bezig)
+The graphics card is the limit (fully busy) - lower the graphics settings or the resolution in the game for more frames.	De videokaart is de beperking (volledig bezig) - verlaag de grafische instellingen of de resolutie in de game voor meer frames.
+Busy: {0}	Bezig: {0}
+uses {0}% of the processor	gebruikt {0}% van de processor
+uses {0}% of {1}	gebruikt {0}% van {1}
+a graphics card	een videokaart
+Close {0} while you play, if you don't need it. (It may also be Windows doing updates or a virus scan - those finish by themselves.)	Sluit {0} tijdens het spelen als je het niet nodig hebt. (Het kan ook Windows zijn dat updates of een virusscan doet - die stoppen vanzelf.)
+Close {0} (videos, animated wallpapers and browser tabs use the graphics card too) while you play.	Sluit {0} tijdens het spelen (video's, bewegende achtergronden en browsertabbladen gebruiken ook de videokaart).
+on battery	op de accu
+Plug in the charger: on battery, laptops slow the processor and graphics card down a lot.	Sluit de lader aan: op de accu vertragen laptops de processor en videokaart flink.
+Power mode	Energiemodus
+Set Power mode to "Best performance" while gaming (Settings > System > Power & battery) - the button opens it.	Zet Energiemodus op "Beste prestaties" tijdens het gamen (Instellingen > Systeem > Energie en accu) - de knop opent het.
+plugged in	aan de lader
+plugged in, {0}	aan de lader, {0}
+only {0}% free	maar {0}% vrij
+Close browsers and other big programs before playing - when memory is full, games stutter.	Sluit browsers en andere grote programma's voor het spelen - als het geheugen vol is, haperen games.
+Game Mode	Spelmodus
+Game Mode gives the game priority and pauses Windows Update installs while you play. Turn it on (fix below).	Spelmodus geeft de game voorrang en pauzeert installaties van Windows Update tijdens het spelen. Zet hem aan (oplossing hieronder).
+Background recording	Opnemen op de achtergrond
+on ("Record what happened")	aan ("Opnemen wat er is gebeurd")
+Windows keeps recording the last minutes of every game, which costs frames. Turn it off (fix below); you can still record by hand with Win+Alt+R.	Windows neemt steeds de laatste minuten van elke game op, en dat kost frames. Zet het uit (oplossing hieronder); met de hand opnemen kan nog steeds met Win+Alt+R.
+Optimizations for windowed games	Optimalisaties voor games in een venster
+Lowers delay and allows Auto HDR / variable refresh rate for games in a window or borderless window. Turn it on (fix below).	Verlaagt de vertraging en maakt Auto HDR / variabele vernieuwingsfrequentie mogelijk voor games in een (randloos) venster. Zet het aan (oplossing hieronder).
+Hardware-accelerated GPU scheduling	Hardwareversnelde GPU-planning
+Windows default	Windows-standaard
+Lets the graphics card schedule its own work - often a little smoother, and needed for DLSS frame generation. Needs administrator and a restart (fix below). If games stutter afterwards, undo it.	Laat de videokaart zijn eigen werk plannen - vaak iets soepeler, en nodig voor DLSS-framegeneratie. Vereist beheerdersrechten en een herstart (oplossing hieronder). Haperen games daarna, draai het dan terug.
+Overlays	Overlays
+Overlays draw on top of the game. Usually fine; if a game stutters or crashes, switch its overlay off first.	Overlays tekenen over de game heen. Meestal prima; hapert of crasht een game, zet dan eerst de overlay uit.
+Graphics driver	Grafisch stuurprogramma
+Check one or more rows that have a fix first.	Vink eerst een of meer rijen met een oplossing aan.
+Hardware-accelerated GPU scheduling needs administrator rights - click "Restart as admin" first, or uncheck it.	Hardwareversnelde GPU-planning vereist beheerdersrechten - klik eerst op "Opnieuw als beheerder", of vink het uit.
+Couldn't change {0}: {1}	Kon {0} niet wijzigen: {1}
+Done: {0}. Restart the PC for GPU scheduling to take effect. Restart the game to feel the difference. Undo from the History page.	Klaar: {0}. Start de pc opnieuw om GPU-planning te laten werken. Start de game opnieuw om het verschil te merken. Terugdraaien via Geschiedenis.
+Done: {0}. Restart the game to feel the difference. Undo from the History page.	Klaar: {0}. Start de game opnieuw om het verschil te merken. Terugdraaien via Geschiedenis.
+turned on	aangezet
+set to use the fast graphics card	ingesteld op de snelle videokaart
+turned on (after a restart)	aangezet (na een herstart)
+Search  (Ctrl+F)	Zoeken  (Ctrl+F)
+Everything that matches, on every page. Double-click a result (or select it and press Enter) to go there.	Alles wat overeenkomt, op elke pagina. Dubbelklik op een resultaat (of selecteer het en druk op Enter) om erheen te gaan.
+Found	Gevonden
+Page	Pagina
+{0} result(s) for "{1}".	{0} resultaat/resultaten voor "{1}".
+Nothing found for "{0}". Pages still loading are searched once they are ready.	Niets gevonden voor "{0}". Pagina's die nog laden worden doorzocht zodra ze klaar zijn.
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -5061,6 +5122,228 @@ $btnSpaceSense.Add_Click({ Start-Process 'ms-settings:storagesense' })
 $btnSpaceReload.Add_Click({ Update-Space })
 
 # ===========================================================================
+# Gaming: what slows a game down on this PC - best checked while the game is running
+# ===========================================================================
+$pgGame = New-Page 'Gaming' 'Start your game, then click Check again: which graphics card it really uses, what else is busy, and the Windows settings that cost frames. Recommended fixes are pre-checked and can be undone from History.'
+$btnGameScan = New-Button 'Check again'
+$btnGameFix = New-Button 'Apply checked fixes'
+$btnGameGfx = New-Button 'Graphics settings'
+$btnGameMode = New-Button 'Game Mode settings'
+$lvGame = New-ListView $true @('Check', 210, 'Status', 80, 'Result', 380, 'What to do', 520)
+$txtGame = New-DetailBox 104
+Set-PageLayout $pgGame $lvGame @((New-ButtonBar @($btnGameFix, $btnGameScan, $btnGameGfx, $btnGameMode))) $txtGame
+$GpuPrefKey = 'HKCU:\Software\Microsoft\DirectX\UserGpuPreferences'
+$GamingWork = {
+    param($cfg)
+    $rows = New-Object System.Collections.ArrayList
+    function Add-G($Check, $Level, $Result, $Todo, $Fix = $null, $Rec = $false) { [void]$rows.Add([pscustomobject]@{ Check = $Check; Level = $Level; Result = $Result; Todo = $Todo; Fix = $Fix; Rec = $Rec }) }
+    # Graphics cards, with the IDs Windows' GPU counters use
+    $gpus = @{}
+    foreach ($k in Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\DirectX' -ErrorAction SilentlyContinue) {
+        $p = Get-ItemProperty $k.PSPath -ErrorAction SilentlyContinue
+        if (-not $p.Description -or $p.Description -match 'Basic Render' -or -not $p.AdapterLuid) { continue }
+        $l = [int64]$p.AdapterLuid
+        $gpus[('0x{0:x8}_0x{1:x8}' -f ($l -shr 32), ($l -band 0xFFFFFFFFL))] = [pscustomobject]@{ Name = "$($p.Description)"; Discrete = ([int]$p.VendorId -eq 0x10DE -or ($p.Description -match 'Radeon RX|Radeon Pro|Arc A')) }
+    }
+    $hybrid = @($gpus.Values | Where-Object Discrete).Count -and @($gpus.Values | Where-Object { -not $_.Discrete }).Count
+    # Who uses the 3D engine of which card (averaged over two seconds), and who uses the processor
+    Set-JobProgress 'measuring graphics and processor use'
+    # The WMI copy of the GPU counters has the same (English) names on every Windows language, unlike Get-Counter.
+    $use = @{}
+    $sample = { try { @(Get-CimInstance Win32_PerfFormattedData_GPUPerformanceCounters_GPUEngine -Filter "Name LIKE '%engtype_3D'" -OperationTimeoutSec 15 -ErrorAction Stop) } catch { @() } }
+    [void](& $sample); Start-Sleep -Milliseconds 1000   # the first read only starts the measurement
+    foreach ($s in & $sample) {
+        if ("$($s.Name)" -match '^pid_(\d+)_luid_(0x[0-9a-f]+_0x[0-9a-f]+)_') { $key = "$($Matches[1])|$($Matches[2].ToLower())"; $use[$key] = [Math]::Min([double]100, [double]$use[$key] + [double]$s.UtilizationPercentage) }
+    }
+    $cpu1 = @{}; foreach ($p in Get-Process -ErrorAction SilentlyContinue) { try { $cpu1[$p.Id] = $p.TotalProcessorTime.TotalMilliseconds } catch { } }
+    Start-Sleep -Milliseconds 1500
+    $cores = [Environment]::ProcessorCount
+    $cpu = foreach ($p in Get-Process -ErrorAction SilentlyContinue) {
+        try { if ($cpu1.ContainsKey($p.Id)) { [pscustomobject]@{ Id = $p.Id; Name = $p.ProcessName; Pct = ($p.TotalProcessorTime.TotalMilliseconds - $cpu1[$p.Id]) / 15 / $cores; Path = "$($p.Path)" } } } catch { }
+    }
+    # Which running programs are games: inside a game library, or busy on the graphics card
+    $libs = @()
+    if ($cfg.Steam) { $libs += Join-Path $cfg.Steam 'steamapps\common'
+        $vdf = Join-Path $cfg.Steam 'steamapps\libraryfolders.vdf'
+        if (Test-Path $vdf) { foreach ($m in [regex]::Matches((Get-Content $vdf -Raw), '"path"\s+"([^"]+)"')) { $libs += Join-Path ($m.Groups[1].Value -replace '\\\\', '\') 'steamapps\common' } } }
+    foreach ($f in Get-ChildItem "$env:ProgramData\Epic\EpicGamesLauncher\Data\Manifests" -Filter *.item -ErrorAction SilentlyContinue) { try { $libs += (Get-Content $f.FullName -Raw | ConvertFrom-Json).InstallLocation } catch { } }
+    $libs += "${env:ProgramFiles(x86)}\Ubisoft\Ubisoft Game Launcher\games", "$env:ProgramFiles\EA Games", 'C:\XboxGames', "${env:ProgramFiles(x86)}\GOG Galaxy\Games", 'C:\Games'
+    $libs = @($libs | Where-Object { $_ } | ForEach-Object { $_.TrimEnd('\').ToLower() + '\' } | Select-Object -Unique)
+    $notGames = '^(dwm|explorer|msedge|chrome|firefox|brave|opera|vivaldi|Teams|ms-teams|Discord|steamwebhelper|EpicWebHelper|Spotify|vlc|Video\.UI|Photos|PhotosApp|SearchHost|ShellExperienceHost|StartMenuExperienceHost|TextInputHost|Widgets|ApplicationFrameHost|csrss|System|Idle|NVIDIA.*|nvcontainer|obs64|PC-TuneUp|powershell|Code|devenv)$'
+    $games = @{}
+    foreach ($p in $cpu) {
+        $path = $p.Path.ToLower()
+        $gpu3d = ($use.Keys | Where-Object { $_ -like "$($p.Id)|*" } | ForEach-Object { $use[$_] } | Measure-Object -Sum).Sum
+        if (($path -and ($libs | Where-Object { $path.StartsWith($_) })) -or ($gpu3d -gt 25 -and $p.Name -notmatch $notGames)) {
+            if ($p.Name -match '^(steam|EpicGamesLauncher|UnrealCEFSubProcess|CrashReport.*|.*Launcher.*)$') { continue }
+            $games[$p.Id] = $p
+        }
+    }
+    if (-not $games.Count) {
+        Add-G 'Game' 'Info' 'No game running right now' 'Start your game, switch back here (Alt+Tab) and click "Check again" to see which graphics card it uses and what else is busy. The Windows settings below are checked either way.'
+    }
+    foreach ($g in $games.Values) {
+        $per = @{}; foreach ($k in $use.Keys) { if ($k -like "$($g.Id)|*") { $per[($k -split '\|')[1]] = $use[$k] } }
+        $top = $per.Keys | Sort-Object { $per[$_] } -Descending | Select-Object -First 1
+        $card = if ($top) { $gpus[$top] }
+        $title = $g.Name
+        if (-not $card) { Add-G "Game: $title" 'Info' 'runs, but not drawing anything at the moment' 'Switch to the game for a moment (so it draws), then come back and click "Check again".'; continue }
+        $busy = [int]$per[$top]
+        if ($hybrid -and -not $card.Discrete) {
+            Add-G "Game: $title" 'Problem' "runs on $($card.Name) - the slower, built-in graphics" `
+                "Set it to use the fast graphics card (fix below), then restart the game. Same as Settings > System > Display > Graphics > (the game) > High performance." "gpu|$($g.Path)" $true
+        } else {
+            Add-G "Game: $title" 'OK' "runs on $($card.Name) ($busy% busy)" $(if ($busy -ge 95) { 'The graphics card is the limit (fully busy) - lower the graphics settings or the resolution in the game for more frames.' } else { 'Nothing to do.' })
+        }
+        $g | Add-Member -NotePropertyName Gpu -NotePropertyValue $busy -Force
+    }
+    # Other programs that take processor or graphics time away from the game
+    $hogs = @($cpu | Where-Object { -not $games.ContainsKey($_.Id) -and $_.Name -notmatch '^(Idle|System|dwm|csrss|audiodg|MsMpEng|PC-TuneUp|powershell)$' -and $_.Pct -ge 8 } | Sort-Object Pct -Descending | Select-Object -First 3)
+    foreach ($h in $hogs) { Add-G "Busy: $($h.Name)" 'Warning' ('uses {0:N0}% of the processor' -f $h.Pct) "Close $($h.Name) while you play, if you don't need it. (It may also be Windows doing updates or a virus scan - those finish by themselves.)" }
+    foreach ($k in $use.Keys) {
+        $pid2 = [int]($k -split '\|')[0]
+        if ($games.ContainsKey($pid2) -or $use[$k] -lt 10) { continue }
+        $pr = $cpu | Where-Object Id -eq $pid2 | Select-Object -First 1
+        if ($pr -and $pr.Name -notmatch '^(dwm|csrss)$') { Add-G "Busy: $($pr.Name)" 'Warning' ('uses {0:N0}% of {1}' -f $use[$k], $(if ($gpus[($k -split '\|')[1]]) { $gpus[($k -split '\|')[1]].Name } else { 'a graphics card' })) "Close $($pr.Name) (videos, animated wallpapers and browser tabs use the graphics card too) while you play." }
+    }
+    # Power
+    if ($cfg.OnBattery) { Add-G 'Power' 'Problem' 'on battery' 'Plug in the charger: on battery, laptops slow the processor and graphics card down a lot.' 'powermode' }
+    elseif ($cfg.Mode -and $cfg.Mode -ne 'best performance') { Add-G 'Power mode' 'Warning' "$($cfg.Mode)" 'Set Power mode to "Best performance" while gaming (Settings > System > Power & battery) - the button opens it.' 'powermode' }
+    else { Add-G 'Power' 'OK' "plugged in$(if ($cfg.Mode) { ", $($cfg.Mode)" })" 'Nothing to do.' }
+    if ($cfg.MemFree -lt 20) { Add-G 'Memory' 'Warning' "only $($cfg.MemFree)% free" 'Close browsers and other big programs before playing - when memory is full, games stutter.' }
+    # Windows settings that cost frames
+    $gm = (Get-ItemProperty 'HKCU:\Software\Microsoft\GameBar' -ErrorAction SilentlyContinue).AutoGameModeEnabled
+    if ($gm -eq 0) { Add-G 'Game Mode' 'Warning' 'off' 'Game Mode gives the game priority and pauses Windows Update installs while you play. Turn it on (fix below).' 'gamemode' $true }
+    else { Add-G 'Game Mode' 'OK' 'on' 'Nothing to do.' }
+    $hist = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' -ErrorAction SilentlyContinue).HistoricalCaptureEnabled
+    if ($hist -eq 1) { Add-G 'Background recording' 'Warning' 'on ("Record what happened")' 'Windows keeps recording the last minutes of every game, which costs frames. Turn it off (fix below); you can still record by hand with Win+Alt+R.' 'record' $true }
+    else { Add-G 'Background recording' 'OK' 'off' 'Nothing to do.' }
+    $glob = "$((Get-ItemProperty $cfg.PrefKey -ErrorAction SilentlyContinue).DirectXUserGlobalSettings)"
+    if ($glob -match 'SwapEffectUpgradeEnable=1') { Add-G 'Optimizations for windowed games' 'OK' 'on' 'Nothing to do.' }
+    else { Add-G 'Optimizations for windowed games' 'Info' 'off' 'Lowers delay and allows Auto HDR / variable refresh rate for games in a window or borderless window. Turn it on (fix below).' 'windowed' $true }
+    $hags = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers' -ErrorAction SilentlyContinue).HwSchMode
+    Add-G 'Hardware-accelerated GPU scheduling' $(if ($hags -eq 2) { 'OK' } else { 'Info' }) $(switch ($hags) { 2 { 'on' } 1 { 'off' } default { 'Windows default' } }) `
+        $(if ($hags -eq 2) { 'Nothing to do.' } else { 'Lets the graphics card schedule its own work - often a little smoother, and needed for DLSS frame generation. Needs administrator and a restart (fix below). If games stutter afterwards, undo it.' }) $(if ($hags -ne 2) { 'hags' })
+    $over = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^(Discord|gameoverlayui|NVIDIA Overlay|GameBar|RTSS|MSIAfterburner|Overwolf|Medal)$' } | ForEach-Object ProcessName | Select-Object -Unique)
+    if ($over) { Add-G 'Overlays' 'Info' ($over -join ', ') 'Overlays draw on top of the game. Usually fine; if a game stutters or crashes, switch its overlay off first.' }
+    [pscustomobject]@{ Rows = $rows; Games = @($games.Values) }
+}
+function Update-Gaming {
+    $btnGameScan.Enabled = $false
+    $txtGame.Text = 'Measuring (about 5 seconds)...'
+    $q = $script:HealthQuick
+    $steam = (Get-ItemProperty 'HKCU:\Software\Valve\Steam' -ErrorAction SilentlyContinue).SteamPath
+    $cfg = @{ Steam = $(if ($steam) { $steam -replace '/', '\' })
+              OnBattery = [Windows.Forms.SystemInformation]::PowerStatus.PowerLineStatus -eq 'Offline'; Mode = $(if ($q) { $q.Mode }); PrefKey = $GpuPrefKey
+              MemFree = $(if ($q -and $q.TotalKB) { [int](100 * $q.FreeKB / $q.TotalKB) } else { 100 }) }
+    Start-Bg -Label 'Checking for gaming' $GamingWork $cfg {
+        param($r)
+        $btnGameScan.Enabled = $true
+        $r = @($r)[0]
+        $lvGame.BeginUpdate(); $lvGame.Items.Clear()
+        foreach ($g in $r.Rows | Sort-Object { $SecLevels[$_.Level] }) {
+            $it = Add-Row $lvGame @($g.Check, $g.Level, $g.Result, $g.Todo) $g ($g.Rec -and $g.Fix)
+            $it.ForeColor = switch ($g.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+        }
+        # The graphics driver's age comes from the Drivers page, if it has loaded
+        foreach ($d in @($lvDrv.Items | Where-Object { $_.Tag.Kind -eq 'Graphics' -and $_.Tag.Device -notmatch 'Intel|Basic' })) {
+            $it = Add-Row $lvGame @('Graphics driver', $d.Tag.Level, "$($d.Tag.Device): $($d.Tag.Driver)", $(if ($d.Tag.Level -eq 'OK') { 'Nothing to do.' } else { $d.Tag.Todo })) ([pscustomobject]@{ Check = 'Graphics driver'; Level = $d.Tag.Level; Result = $d.Tag.Driver; Todo = $d.Tag.Todo; Fix = $null })
+            $it.ForeColor = if ($d.Tag.Level -eq 'OK') { $Theme.Good } else { $Theme.Warn }
+        }
+        $lvGame.EndUpdate()
+        if ($lvGame.Items.Count) { $lvGame.Items[0].Selected = $true }
+    }
+}
+$lvGame.Add_SelectedIndexChanged({
+    if (-not $lvGame.SelectedItems.Count) { return }
+    $g = $lvGame.SelectedItems[0].Tag
+    $txtGame.Text = "$($g.Check): $($g.Result)`r`n`r`nWhat to do: $($g.Todo)"
+})
+$btnGameFix.Add_Click({
+    $picked = @($lvGame.CheckedItems | ForEach-Object { $_.Tag } | Where-Object Fix)
+    if (-not $picked) { Show-Msg 'Check one or more rows that have a fix first.' | Out-Null; return }
+    if ((@($picked | Where-Object Fix -eq 'hags')) -and -not $IsAdmin) { Show-Msg 'Hardware-accelerated GPU scheduling needs administrator rights - click "Restart as admin" first, or uncheck it.' 'OK' 'Warning' | Out-Null; return }
+    $done = @(); $restart = $false
+    foreach ($g in $picked) {
+        try {
+            switch -Regex ($g.Fix) {
+                '^powermode$' { Start-Process 'ms-settings:powersleep'; continue }
+                '^gamemode$' { $old = Get-RegValue 'HKCU:\Software\Microsoft\GameBar' 'AutoGameModeEnabled'; Set-RegValue 'HKCU:\Software\Microsoft\GameBar' 'AutoGameModeEnabled' 1
+                               Add-History 'Gaming' 'Game Mode' 'turned on' @{ Type = 'Reg'; Values = @(@{ P = 'HKCU:\Software\Microsoft\GameBar'; N = 'AutoGameModeEnabled'; Old = $old; T = 'DWord' }) } }
+                '^record$' { $k = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR'; $old = Get-RegValue $k 'HistoricalCaptureEnabled'; Set-RegValue $k 'HistoricalCaptureEnabled' 0
+                             Add-History 'Gaming' 'Background recording' 'turned off' @{ Type = 'Reg'; Values = @(@{ P = $k; N = 'HistoricalCaptureEnabled'; Old = $old; T = 'DWord' }) } }
+                '^windowed$' { $old = Get-RegValue $GpuPrefKey 'DirectXUserGlobalSettings'
+                               $new = (("$old" -split ';' | Where-Object { $_ -and $_ -notmatch '^SwapEffectUpgradeEnable=' }) + 'SwapEffectUpgradeEnable=1') -join ';'
+                               Set-RegValue $GpuPrefKey 'DirectXUserGlobalSettings' ($new + ';') 'String'
+                               Add-History 'Gaming' 'Optimizations for windowed games' 'turned on' @{ Type = 'Reg'; Values = @(@{ P = $GpuPrefKey; N = 'DirectXUserGlobalSettings'; Old = $old; T = 'String' }) } }
+                '^gpu\|(.+)$' { $exe = $Matches[1]; $old = Get-RegValue $GpuPrefKey $exe; Set-RegValue $GpuPrefKey $exe 'GpuPreference=2;' 'String'
+                                Add-History 'Gaming' (Split-Path $exe -Leaf) 'set to use the fast graphics card' @{ Type = 'Reg'; Values = @(@{ P = $GpuPrefKey; N = $exe; Old = $old; T = 'String' }) } }
+                '^hags$' { $k = 'HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers'; $old = Get-RegValue $k 'HwSchMode'; Set-RegValue $k 'HwSchMode' 2; $restart = $true
+                           Add-History 'Gaming' 'Hardware-accelerated GPU scheduling' 'turned on (after a restart)' @{ Type = 'Reg'; Values = @(@{ P = $k; N = 'HwSchMode'; Old = $old; T = 'DWord' }) } }
+            }
+            $done += $g.Check
+        } catch { Show-Msg "Couldn't change $($g.Check): $($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+    }
+    Update-History; Update-Gaming
+    Show-Msg "Done: $($done -join ', ').$(if ($restart) { ' Restart the PC for GPU scheduling to take effect.' }) Restart the game to feel the difference. Undo from the History page." | Out-Null
+})
+$btnGameScan.Add_Click({ Update-Gaming })
+$btnGameGfx.Add_Click({ Start-Process 'ms-settings:display-advancedgraphics' })
+$btnGameMode.Add_Click({ Start-Process 'ms-settings:gaming-gamemode' })
+
+# ===========================================================================
+# Search: finds pages, settings and rows on every page (Ctrl+F)
+# ===========================================================================
+$pgFind = New-Page 'Search' 'Everything that matches, on every page. Double-click a result (or select it and press Enter) to go there.'
+$lvFind = New-ListView $false @('Found', 380, 'Page', 140, 'Details', 600)
+$lblFind = New-Status
+Set-PageLayout $pgFind $lvFind @() $lblFind
+# Lower case without accents; hyphens joined, other punctuation becomes a space:
+# "Wi-Fi" finds "wifi", "geïnstalleerd" finds "geinstalleerd", but "teams.teams" doesn't contain "steam".
+$SearchMarks = [regex]'\p{Mn}'; $SearchJoin = [regex]"[-'\u2019]"; $SearchSpace = [regex]'[^\p{L}\p{N}]+'
+function ConvertTo-SearchText([string]$Text) {
+    $d = $SearchMarks.Replace($Text.ToLowerInvariant().Normalize([Text.NormalizationForm]::FormD), '')
+    ' ' + $SearchSpace.Replace($SearchJoin.Replace($d, ''), ' ').Trim() + ' '
+}
+function Invoke-Search([string]$Query) {
+    $words = @(foreach ($w in (ConvertTo-SearchText $Query).Trim() -split ' ') { if ($w) { $w } })
+    if (-not $words) { return }
+    $hit = { param($t) $n = ConvertTo-SearchText $t; foreach ($w in $words) { if (-not $n.Contains($w)) { return $false } }; $true }
+    $lvFind.BeginUpdate(); $lvFind.Items.Clear()
+    $n = 0
+    $pages = @($script:Pages | Where-Object { $_ -ne $pgFind -and $script:NavButtons[$_.Name] })   # only pages that are in the sidebar
+    # Pages whose name matches come first, then pages whose description matches, then rows
+    foreach ($p in $pages | Sort-Object { -not (& $hit $_.Text) }) {
+        $intro = (@($p.Tag.Controls) | ForEach-Object Text) -join ' '
+        if (& $hit "$($p.Text) $intro") { [void](Add-Row $lvFind @($p.Text, $p.Text, $intro) @{ Page = $p; Item = $null }); $n++ }
+    }
+    foreach ($p in $pages) {
+        foreach ($lv in @($p.Controls | Where-Object { $_ -is [Windows.Forms.ListView] })) {
+            foreach ($it in $lv.Items) {
+                if ($n -ge 300) { break }
+                $all = ($it.SubItems | ForEach-Object Text) -join '  '
+                if (& $hit $all) { [void](Add-Row $lvFind @($it.Text, $p.Text, (($it.SubItems | Select-Object -Skip 1 | ForEach-Object Text | Where-Object { $_ }) -join '  |  ')) @{ Page = $p; Item = $it; List = $lv }); $n++ }
+            }
+        }
+    }
+    foreach ($c in $setFlow.Controls) {   # Settings sections and their hints
+        if ($c -is [Windows.Forms.Label] -and $c.Text -and (& $hit $c.Text)) { [void](Add-Row $lvFind @($c.Text, $pgSet.Text, '') @{ Page = $pgSet; Item = $null }); $n++ }
+    }
+    $lvFind.EndUpdate()
+    $lblFind.Text = if ($n) { "$n result(s) for ""$Query""." } else { "Nothing found for ""$Query"". Pages still loading are searched once they are ready." }
+    if ($pgFind.Visible -eq $false) { Show-Page $pgFind }
+    if ($lvFind.Items.Count) { $lvFind.Items[0].Selected = $true }
+}
+function Open-SearchResult {
+    if (-not $lvFind.SelectedItems.Count) { return }
+    $t = $lvFind.SelectedItems[0].Tag
+    Show-Page $t.Page
+    if ($t.Item -and $t.List) { $t.List.SelectedItems.Clear(); $t.Item.Selected = $true; $t.Item.Focused = $true; $t.Item.EnsureVisible(); [void]$t.List.Focus() }
+}
+$lvFind.Add_DoubleClick({ Open-SearchResult })
+$lvFind.Add_KeyDown({ if ($_.KeyCode -eq 'Return') { Open-SearchResult; $_.Handled = $true } })
+
+# ===========================================================================
 # 7. Upgrades: what could be added or replaced, and the exact spec to buy
 # ===========================================================================
 $pgUpg = New-Page 'Upgrades' 'What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.'
@@ -5719,6 +6002,7 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
 <h2>$(T 'Space savers')</h2>$(ConvertTo-HtmlRows @('Saver', 'Can free', 'Now', 'What it does - and what you give up') $lvSpace.Items @(0, 1, 2, 3))
+<h2>$(T 'Gaming')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvGame.Items @(0, 1, 2, 3))
 <h2>$(T 'Browsers')</h2>$(ConvertTo-HtmlRows @('Item', 'Browser', 'Kind', 'Status', 'Details') $lvBrw.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Network')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvNet.Items @(0, 1, 2, 3))
 $(if ($HasBattery) { "<h2>$(T 'Battery')</h2>$(ConvertTo-HtmlRows @('Reading', 'Value', 'What it means') $lvBatt.Items @(0, 1, 2))" })
@@ -5917,7 +6201,7 @@ $OldExeCleanupWork = {
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
     @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk', 'Space savers') }
-    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', 'Gaming', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
     @{ Title = $null;      Pages = @('History', 'Settings'); Bottom = $true }   # pinned under the list, side by side, so they never scroll away
 )
 $script:NavButtons = @{}
@@ -5995,21 +6279,47 @@ $appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
 $appVer = New-Object Windows.Forms.Label
 $appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.AutoSize = $true
 $appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 2)
-$nav.Controls.AddRange(@($appName, $appVer))
+# Search box (Ctrl+F): results appear on the Search page as you type.
+$txtSearch = New-Object Windows.Forms.TextBox
+$txtSearch.Width = 178; $txtSearch.Margin = New-Object Windows.Forms.Padding(0, 4, 0, 4); $txtSearch.BorderStyle = 'FixedSingle'
+$txtSearch.BackColor = $Theme.Input; $txtSearch.ForeColor = $Theme.Text
+$txtSearch.Add_HandleCreated({   # grey hint text inside the empty box (EM_SETCUEBANNER)
+    $h = [Runtime.InteropServices.Marshal]::StringToHGlobalUni((T 'Search  (Ctrl+F)'))
+    try { [void][PcTuneUp.Native]::SendMessage($this.Handle, 0x1501, [IntPtr]1, $h) } finally { [Runtime.InteropServices.Marshal]::FreeHGlobal($h) }
+})
+$searchTimer = New-Object Windows.Forms.Timer; $searchTimer.Interval = 400
+$searchTimer.Add_Tick({ $searchTimer.Stop(); if ($txtSearch.Text.Trim().Length -ge 2) { Invoke-Search $txtSearch.Text.Trim() } })
+$txtSearch.Add_TextChanged({ $searchTimer.Stop(); $searchTimer.Start() })
+$txtSearch.Add_KeyDown({
+    if ($_.KeyCode -eq 'Return') { $searchTimer.Stop(); if ($txtSearch.Text.Trim()) { Invoke-Search $txtSearch.Text.Trim(); if ($lvFind.Items.Count) { [void]$lvFind.Focus() } }; $_.SuppressKeyPress = $true }
+    elseif ($_.KeyCode -eq 'Down' -and $lvFind.Items.Count) { [void]$lvFind.Focus(); $_.SuppressKeyPress = $true }
+    elseif ($_.KeyCode -eq 'Escape') { $txtSearch.Clear(); Show-Page $pgHealth; $_.SuppressKeyPress = $true }
+})
+$nav.Controls.AddRange(@($appName, $txtSearch))
+# Keyboard: Ctrl+F searches, F5 reloads the page you are on.
+$form.KeyPreview = $true
+$form.Add_KeyDown({
+    if ($_.Control -and $_.KeyCode -eq 'F') { [void]$txtSearch.Focus(); $txtSearch.SelectAll(); $_.SuppressKeyPress = $true }
+    elseif ($_.KeyCode -eq 'F5') {
+        $cur = $script:Pages | Where-Object Visible | Select-Object -First 1
+        if ($cur -eq $pgHealth) { Update-Health } elseif ($cur -eq $pgHist) { Update-History } elseif ($cur -and $script:PageLoaders.ContainsKey($cur.Name)) { & $script:PageLoaders[$cur.Name] }
+        $_.SuppressKeyPress = $true
+    }
+})
 $navBottom = New-Object Windows.Forms.FlowLayoutPanel
-$navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(12, 6, 12, 2)
+$navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(12, 2, 12, 0)
 foreach ($g in $NavGroups) {
     if ($g.Title) {
         $cap = New-Object Windows.Forms.Label
         $cap.Text = $g.Title; $cap.Font = $FontSmall; $cap.ForeColor = $Theme.Dim; $cap.AutoSize = $true
-        $cap.Margin = New-Object Windows.Forms.Padding(10, 5, 0, 1)
+        $cap.Margin = New-Object Windows.Forms.Padding(10, 4, 0, 0)
         $nav.Controls.Add($cap)
     }
     foreach ($name in $g.Pages) {
         $page = $script:Pages | Where-Object Name -eq $name | Select-Object -First 1
         if (-not $page) { continue }
         $b = New-Object Windows.Forms.Button
-        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 24; $b.TextAlign = 'MiddleLeft'
+        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 23; $b.TextAlign = 'MiddleLeft'
         $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
         $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
         $b.Cursor = [Windows.Forms.Cursors]::Hand
@@ -6039,7 +6349,7 @@ if (-not $IsAdmin) {
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply, $btnGameFix)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -6081,7 +6391,7 @@ $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-St
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
                          Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy }
                          Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context }
-                         Startup = { Update-Boot }; 'Space savers' = { Update-Space } }
+                         Startup = { Update-Boot }; 'Space savers' = { Update-Space }; Gaming = { Update-Gaming } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -6093,7 +6403,7 @@ function Start-Everything {
     Update-Health; Update-Startup; Update-History
     $script:EverythingStarted = $true
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Gaming', 'Clean'))
     if ($HasBattery) { [void]$script:LoadQueue.Insert(5, 'Battery') }
 }
 Enable-Translation $form

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0
+
+- **Search** (Ctrl+F): a search box at the top of the sidebar finds pages, settings and rows on every page as you type - "battery", "Chrome", "hibernation", "Steam" - and Enter or a double-click takes you straight to the row. F5 reloads the page you are on.
+- New **Gaming** page: start a game and click Check again - it shows which graphics card the game really uses (with a one-click fix when a laptop runs it on the slower built-in graphics), other programs taking processor or graphics time, power mode and memory, and the Windows settings that cost frames: Game Mode, background recording, optimizations for windowed games and hardware-accelerated GPU scheduling. Recommended fixes are pre-checked and can be undone from History.
+- New **website**: https://michaelkloprogge-gif.github.io/pc-tuneup/ - what the app does, screenshots, and a download button.
+- The version number moved from the sidebar to the window title and Settings, to make room for the search box.
 ## 1.11.0
 
 - **Notifications only when something is new**: the automatic maintenance run remembers what it found last time and only shows a notification for new things - a new crash, a new browser extension, a device problem, a security problem, or a crash that happens a lot more often - for example "New since last time: New browser extension: ... (Chrome)". Choose in Settings: when something is new (default), after every run, or never.

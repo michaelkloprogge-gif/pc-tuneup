@@ -57,7 +57,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.9.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.9.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1214,6 +1214,8 @@ Connection	Verbinding
 Not connected	Niet verbonden
 Plug in the network cable or connect to Wi-Fi (the network icon at the bottom right).	Sluit de netwerkkabel aan of maak verbinding met wifi (het netwerkpictogram rechtsonder).
 Wi-Fi	Wifi
+Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).	Geïnstalleerd met winget - bijwerken of verwijderen gaat met winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).
+It was installed with winget, so winget updates it. Update now? (A window opens; start PC Tune-Up again afterwards.)	Het is geïnstalleerd met winget, dus winget werkt het bij. Nu bijwerken? (Er opent een venster; start PC Tune-Up daarna opnieuw.)
 shared	gedeeld
 Cable (Ethernet)	Kabel (ethernet)
 VPN	VPN
@@ -1376,6 +1378,8 @@ function Enable-Translation($Control) {
 $InstallDir = Join-Path $env:LOCALAPPDATA 'Programs\PC Tune-Up'
 $InstalledExe = Join-Path $InstallDir 'PC-TuneUp.exe'
 $IsInstalled = $RunningAsExe -and ($SelfExe -eq $InstalledExe)
+# Installed with winget ("winget install MichaelKloprogge.PCTuneUp"): winget owns the file, so it also does the updates.
+$FromWinget = $RunningAsExe -and $SelfExe -match '\\Microsoft\\WinGet\\(Packages|Links)\\'
 
 function Write-Log([string]$Msg) {
     Add-Content -Path $LogFile -Value ('{0:yyyy-MM-dd HH:mm:ss}  {1}' -f (Get-Date), $Msg) -Encoding UTF8
@@ -5154,6 +5158,7 @@ $MaintTaskName = 'PC Tune-Up maintenance'
 function Set-MaintenanceTask([string]$Mode) {
     if ($Mode -eq 'off') { Unregister-ScheduledTask -TaskName $MaintTaskName -Confirm:$false -ErrorAction SilentlyContinue; return $true }
     if ($IsInstalled) { $exe = $InstalledExe; $arg = '/auto' }
+    elseif ($FromWinget) { $exe = $SelfExe; $arg = '/auto' }
     elseif (-not $RunningAsExe) { $exe = 'powershell.exe'; $arg = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }   # developer mode
     else { Show-Msg 'Install PC Tune-Up first (Settings > Installation): the automatic run needs it in a fixed place.' 'OK' 'Warning' | Out-Null; return $false }
     try {
@@ -5182,11 +5187,12 @@ $btnAutoNow.Add_Click({
     Show-Msg 'The maintenance run has started in the background. A notification appears when it is done (in a minute or two).' | Out-Null
 })
 
-Add-SetSection 'Installation' $(if ($IsInstalled) { "Installed for you in $InstallDir - it appears in the Start menu and in Settings > Apps." }
+Add-SetSection 'Installation' $(if ($FromWinget) { 'Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).' }
+                                 elseif ($IsInstalled) { "Installed for you in $InstallDir - it appears in the Start menu and in Settings > Apps." }
                                  elseif ($RunningAsExe) { "Running from $SelfExe without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed)." }
                                  else { 'Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.' })
 $btnInstall = New-Button $(if ($IsInstalled) { 'Uninstall PC Tune-Up' } else { 'Install on this PC' })
-$btnInstall.Enabled = $RunningAsExe
+$btnInstall.Enabled = $RunningAsExe -and -not $FromWinget
 Add-SetRow @($btnInstall)
 $btnInstall.Add_Click({ if ($IsInstalled) { Uninstall-App } else { Install-App -Launch } })
 
@@ -5462,6 +5468,13 @@ function Start-UpdateCheck([switch]$Silent) {
         $newer = try { [version]$r.Version -gt [version]$AppVersion } catch { $false }
         if (-not $newer) { if (-not $script:UpdateSilent) { Show-Msg "You have the latest version ($AppVersion)." | Out-Null }; return }
         $notes = (($r.Notes -split "`n" | Where-Object { $_.Trim() } | Select-Object -First 8) -join "`n").Trim()
+        if ($FromWinget) {
+            if ((Show-Msg "PC Tune-Up $($r.Version) is available (you have $AppVersion).`n`n$notes`n`nIt was installed with winget, so winget updates it. Update now? (A window opens; start PC Tune-Up again afterwards.)" 'YesNo' 'Information') -eq 'Yes') {
+                Start-Process cmd.exe '/c winget upgrade --id MichaelKloprogge.PCTuneUp --exact --accept-source-agreements & pause'
+                $form.Close()
+            }
+            return
+        }
         if (-not $RunningAsExe -or -not $r.Url) {
             if ((Show-Msg "PC Tune-Up $($r.Version) is available (you have $AppVersion).`n`n$notes`n`nOpen the download page?" 'YesNo' 'Information') -eq 'Yes') { Start-Process $r.Page }
             return
@@ -5724,7 +5737,7 @@ $form.Add_Shown({
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
     if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
     # First start from a downloaded file: offer to install (once).
-    if ($RunningAsExe -and -not $IsInstalled -and -not $Settings.AskedInstall) {
+    if ($RunningAsExe -and -not $IsInstalled -and -not $FromWinget -and -not $Settings.AskedInstall) {
         $Settings.AskedInstall = $true; Save-Settings
         $q = "Install PC Tune-Up on this PC?`n`nIt adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.`n`nYou can also do this later in Settings."
         if ((Show-Msg $q 'YesNo' 'Question') -eq 'Yes') { Install-App -Launch }

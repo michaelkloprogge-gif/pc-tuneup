@@ -47,7 +47,7 @@ by itself when the PC is idle, then shows a notification. It never changes start
 
 ## Download
 
-Get **PC-TuneUp.exe** from the [latest release](../../releases/latest) and run it. It offers to
+Get **PC-TuneUp.exe** from the [latest release](../../releases/latest) and run it (or, once it is accepted into winget: `winget install MichaelKloprogge.PCTuneUp`). It offers to
 install itself for you (Start menu, Settings > Apps; no administrator rights needed) and keeps
 itself up to date. Without installing, the exe runs as-is from anywhere.
 

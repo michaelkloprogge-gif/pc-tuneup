@@ -60,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.14.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.15.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1671,6 +1671,8 @@ Simple view	Eenvoudige weergave
 All tools	Alle hulpmiddelen
 Send a report to someone who helps you...	Rapport sturen naar iemand die je helpt...
 Copy a short summary	Korte samenvatting kopiëren
+Show the programs using the most memory	Programma's tonen die het meeste geheugen gebruiken
+Back to the readings	Terug naar de metingen
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1994,15 +1996,40 @@ function New-Button([string]$Text) {
     $b.Padding = New-Object Windows.Forms.Padding(10, 0, 10, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 0, 8, 6)
     $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.Cursor = [Windows.Forms.Cursors]::Hand
     $b.BackColor = $Theme.Bg; $b.ForeColor = $Theme.Text; $b.FlatAppearance.BorderColor = $Theme.Border; $b.FlatAppearance.MouseOverBackColor = $Theme.Soft
-    # Windows draws disabled text in a fixed grey that is unreadable on dark backgrounds; draw it ourselves.
-    $b.Add_Paint({
-        param($sender, $e)
-        if ($sender.Enabled) { return }
-        $e.Graphics.Clear($sender.BackColor)
-        $pen = New-Object Drawing.Pen($Theme.Border); $e.Graphics.DrawRectangle($pen, 0, 0, $sender.Width - 1, $sender.Height - 1); $pen.Dispose()
-        [Windows.Forms.TextRenderer]::DrawText($e.Graphics, $sender.Text, $sender.Font, $sender.ClientRectangle, $Theme.Muted, 'HorizontalCenter, VerticalCenter, EndEllipsis')
-    })
+    $b.FlatAppearance.BorderSize = 0
+    # Drawn by us: rounded corners, a soft border, a hover colour, readable disabled text (Windows' fixed grey is unreadable in dark mode).
+    $b.Add_Paint({ param($sender, $e) Draw-Button $sender $e.Graphics })
+    $b.Add_MouseEnter({ $script:HotButton = $this; $this.Invalidate() })
+    $b.Add_MouseLeave({ if ($script:HotButton -eq $this) { $script:HotButton = $null }; $this.Invalidate() })
     $b
+}
+# A rounded rectangle, used for buttons, the sidebar and the progress bar.
+function New-RoundRect([single]$X, [single]$Y, [single]$W, [single]$H, [single]$R) {
+    $p = New-Object Drawing.Drawing2D.GraphicsPath
+    $d = [single][Math]::Max([double]1, [Math]::Min([double]($R * 2), [Math]::Min([double]$W, [double]$H)))
+    $p.AddArc($X, $Y, $d, $d, 180, 90); $p.AddArc($X + $W - $d, $Y, $d, $d, 270, 90)
+    $p.AddArc($X + $W - $d, $Y + $H - $d, $d, $d, 0, 90); $p.AddArc($X, $Y + $H - $d, $d, $d, 90, 90); $p.CloseFigure()
+    $p
+}
+function Draw-Button($B, $G) {
+    $G.SmoothingMode = 'AntiAlias'
+    $G.Clear($(if ($B.Parent) { $B.Parent.BackColor } else { $Theme.Bg }))
+    $primary = $B.BackColor.ToArgb() -eq $Theme.Accent.ToArgb()
+    $fill = if (-not $B.Enabled) { if ($primary) { $Theme.Soft } else { $B.BackColor } } elseif ($script:HotButton -eq $B) { $B.FlatAppearance.MouseOverBackColor } else { $B.BackColor }
+    $path = New-RoundRect 0.5 0.5 ($B.Width - 1.5) ($B.Height - 1.5) (Px 6)
+    $br = New-Object Drawing.SolidBrush($fill); $G.FillPath($br, $path); $br.Dispose()
+    if (-not $primary -or -not $B.Enabled) { $pen = New-Object Drawing.Pen($(if ($script:HotButton -eq $B -and $B.Enabled) { $Theme.Dim } else { $Theme.Border })); $G.DrawPath($pen, $path); $pen.Dispose() }
+    $path.Dispose()
+    $flags = [Windows.Forms.TextFormatFlags]'VerticalCenter, EndEllipsis'
+    if ($B.TextAlign -in 'MiddleLeft', 'TopLeft', 'BottomLeft') { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::Left } else { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::HorizontalCenter }
+    if ($B.Text -match "`n") { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::WordBreak }
+    if (-not $B.UseMnemonic) { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::NoPrefix }
+    $r = New-Object Drawing.Rectangle($B.Padding.Left, 0, ($B.Width - $B.Padding.Horizontal), $B.Height)
+    [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $B.Font, $r, $(if ($B.Enabled) { $B.ForeColor } else { $Theme.Muted }), $flags)
+    if ($B.Focused -and $B.ShowFocusCues) {
+        $fp = New-RoundRect 2.5 2.5 ($B.Width - 5.5) ($B.Height - 5.5) (Px 4)
+        $pen = New-Object Drawing.Pen($(if ($primary) { [Drawing.Color]::White } else { $Theme.Accent }), 1); $pen.DashStyle = 'Dot'; $G.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose()
+    }
 }
 # The main action of a page: filled blue.
 function Set-Primary($Button) {
@@ -2015,11 +2042,31 @@ function Update-PrimaryLook($Button) {
     if ($Button.Enabled) { $Button.BackColor = $Theme.Accent; $Button.ForeColor = [Drawing.Color]::White; $Button.FlatAppearance.BorderSize = 0 }
     else { $Button.BackColor = $Theme.Soft; $Button.ForeColor = $Theme.Dim; $Button.FlatAppearance.BorderSize = 1 }
 }
+# The row under the mouse gets a light background (each list remembers its own).
+$script:HotRows = @{}
+function Set-HotRow($Lv, $Item) {
+    $k = $Lv.GetHashCode(); $old = $script:HotRows[$k]
+    if ($old -eq $Item) { return }
+    foreach ($pair in @(@($old, $Theme.Bg), @($Item, $Theme.Hover))) {
+        $it = $pair[0]; if (-not $it -or -not $it.ListView) { continue }
+        $it.BackColor = $pair[1]; if (-not $it.UseItemStyleForSubItems) { foreach ($si in $it.SubItems) { $si.BackColor = $pair[1] } }
+    }
+    $script:HotRows[$k] = $Item
+}
+# The status column shows a coloured dot and word; the rest of the row stays easy to read. Grey (info) rows stay grey.
+function Set-RowStatus($Item, [int]$Col, $Color) {
+    if ($Color.ToArgb() -eq $Theme.Muted.ToArgb()) { $Item.ForeColor = $Theme.Muted; return }
+    $Item.UseItemStyleForSubItems = $false
+    foreach ($si in $Item.SubItems) { $si.ForeColor = $Theme.Text }
+    $si = $Item.SubItems[$Col]; $si.Text = "$([char]0x25CF)  $($si.Text)"; $si.ForeColor = $Color
+}
 function New-ListView([bool]$Checks, [object[]]$Columns) {
     $lv = New-Object Windows.Forms.ListView
     $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.Dock = 'Fill'; $lv.ShowItemToolTips = $true
     $lv.BorderStyle = 'None'; $lv.HeaderStyle = 'Nonclickable'; $lv.BackColor = $Theme.Bg; $lv.ForeColor = $Theme.Text
-    $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, (Px 26))   # taller rows
+    $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, (Px 28))   # taller rows
+    $lv.Add_MouseMove({ Set-HotRow $this ($this.GetItemAt($_.X, $_.Y)) })
+    $lv.Add_MouseLeave({ Set-HotRow $this $null })
     $lv.SmallImageList = $rows
     for ($i = 0; $i -lt $Columns.Count; $i += 2) { [void]$lv.Columns.Add($Columns[$i], (Px $Columns[$i + 1])) }
     if ($Dark) {   # the native header ignores colours, so draw it; rows still draw themselves
@@ -2173,22 +2220,30 @@ $lblAdvice.Add_SizeChanged({ if (-not $script:SizingAdvice) { $script:SizingAdvi
 $lblSpeed = New-Object Windows.Forms.Label
 $lblSpeed.Dock = 'Top'; $lblSpeed.Height = 34; $lblSpeed.TextAlign = 'MiddleLeft'; $lblSpeed.ForeColor = $Theme.Dim
 $lblSpeed.Text = 'Internet:  not tested yet - click Speed test'
-$lblProcCap = New-Object Windows.Forms.Label
-$lblProcCap.Dock = 'Top'; $lblProcCap.Height = 30; $lblProcCap.TextAlign = 'BottomLeft'; $lblProcCap.Font = $FontBold
-$lblProcCap.Text = 'Programs using the most memory'
+# The memory list doesn't fit next to everything else, so it sits behind a link: it then replaces the readings.
+$lblProcCap = New-Object Windows.Forms.LinkLabel
+$lblProcCap.Dock = 'Top'; $lblProcCap.Height = 30; $lblProcCap.TextAlign = 'BottomLeft'
+$lblProcCap.LinkColor = $Theme.AccentText; $lblProcCap.ActiveLinkColor = $Theme.AccentText
+$lblProcCap.Text = 'Show the programs using the most memory'
+$lblProcCap.Add_LinkClicked({
+    $show = -not $lvProc.Visible
+    $lvProc.Visible = $show; $healthTop.Visible = -not $show; $lblAdvice.Visible = -not $show
+    $this.Text = if ($show) { 'Back to the readings' } else { 'Show the programs using the most memory' }
+})
 $lvProc = New-ListView $false @('Program', 300, 'Memory (MB)', 120, 'Processes', 100)
 # Readings on the left, "Health over time" chart on the right.
 $healthTop = New-Object Windows.Forms.TableLayoutPanel
 $healthTop.Dock = 'Top'; $healthTop.AutoSize = $true; $healthTop.AutoSizeMode = 'GrowAndShrink'; $healthTop.ColumnCount = 2; $healthTop.RowCount = 1
 [void]$healthTop.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
-[void]$healthTop.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', (Px 430))))
+[void]$healthTop.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', (Px 390))))
 $chartScore = New-Chart 200
 $chartScore.Dock = 'Fill'; $chartScore.Margin = New-Object Windows.Forms.Padding(12, 0, 0, 8)
+$gridHealth.Dock = 'Fill'   # use the whole column, so readings don't wrap early
 $healthTop.Controls.Add($gridHealth, 0, 0); $healthTop.Controls.Add($chartScore, 1, 0)
 # "Start here": the three most useful next steps from all pages, each with a button that opens the right page.
 $startHere = New-Object Windows.Forms.TableLayoutPanel
 $startHere.Dock = 'Top'; $startHere.AutoSize = $true; $startHere.AutoSizeMode = 'GrowAndShrink'; $startHere.ColumnCount = 2; $startHere.BackColor = $Theme.AccentSoft
-$startHere.Padding = New-Object Windows.Forms.Padding(12, 4, 8, 4); $startHere.Margin = New-Object Windows.Forms.Padding(0)
+$startHere.Padding = New-Object Windows.Forms.Padding(14, 6, 10, 6); $startHere.Margin = New-Object Windows.Forms.Padding(0)
 [void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
 [void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('AutoSize')))
 $shTitle = New-Object Windows.Forms.Label
@@ -2203,8 +2258,9 @@ $script:StartRows = @(foreach ($n in 1..3) {
     $l.Visible = $false; $b.Visible = $false
     @{ Label = $l; Button = $b }
 })
-$shGap = New-Object Windows.Forms.Panel; $shGap.Dock = 'Top'; $shGap.Height = 6
+$shGap = New-Object Windows.Forms.Panel; $shGap.Dock = 'Top'; $shGap.Height = 10
 Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $startHere, $shGap, $healthTop, $lblAdvice, $lblSpeed, $lblProcCap)
+$lvProc.Visible = $false
 
 # Health score: 100, minus points for each thing worth a look and for a low Windows stability rating. Saved once a day.
 $ScoreFile = Join-Path $DataDir 'scores.jsonl'
@@ -3555,7 +3611,7 @@ function Update-Security {
         $lvSec.BeginUpdate(); $lvSec.Items.Clear()
         foreach ($r in $rows | Sort-Object { $SecLevels[$_.Level] }) {
             $it = Add-Row $lvSec @($r.Check, $r.Level, $r.Result, $r.Todo) $r
-            $it.ForeColor = switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+            Set-RowStatus $it 1 $(switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } })
         }
         $lvSec.EndUpdate()
         $p = @($rows | Where-Object Level -eq 'Problem').Count; $w = @($rows | Where-Object Level -eq 'Warning').Count
@@ -4077,7 +4133,7 @@ function Update-Backup {
         $lvBackup.BeginUpdate(); $lvBackup.Items.Clear()
         foreach ($b in $r.Rows | Sort-Object { $SecLevels[$_.Level] }) {
             $it = Add-Row $lvBackup @($b.Check, $b.Level, $b.Result, $b.Todo) $b
-            $it.ForeColor = switch ($b.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+            Set-RowStatus $it 1 $(switch ($b.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } })
         }
         $lvBackup.EndUpdate()
         $lblBackup.Text = if ($r.NoBackup) { 'Nothing is backing up your files.' } elseif ($r.Cloud) { "Your files are backed up to $($r.Cloud)." } else { 'Some backup is in place - see the rows above.' }
@@ -4324,7 +4380,7 @@ function Update-Drivers {
         $lvDrv.BeginUpdate(); $lvDrv.Items.Clear()
         foreach ($d in $rows | Sort-Object { $DrvLevels[$_.Level] }, Kind, Device) {
             $it = Add-Row $lvDrv @($d.Device, $d.Kind, $d.Level, $d.Driver, $d.Todo) $d
-            $it.ForeColor = switch ($d.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } }
+            Set-RowStatus $it 2 $(switch ($d.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } })
         }
         $lvDrv.EndUpdate()
         $bad = @($rows | Where-Object Level -eq 'Problem').Count
@@ -4622,7 +4678,7 @@ function Update-Browsers {
         $lvBrw.BeginUpdate(); $lvBrw.Items.Clear()
         foreach ($r in $rows | Sort-Object { $BrwLevels[$_.Level] }, Browser, Item) {
             $it = Add-Row $lvBrw @($r.Item, $r.Browser, $r.Kind, $r.Level, $r.Detail) $r ($r.Kind -eq 'Policy' -and $r.Level -eq 'Risky' -and $r.Extra)
-            $it.ForeColor = switch ($r.Level) { 'Risky' { $Theme.Bad } 'Review' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } }
+            Set-RowStatus $it 3 $(switch ($r.Level) { 'Risky' { $Theme.Bad } 'Review' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } })
         }
         $lvBrw.EndUpdate()
         $script:BrowserRisky = @($rows | Where-Object Level -eq 'Risky').Count
@@ -4979,7 +5035,7 @@ function Update-Network {
         $lvNet.BeginUpdate(); $lvNet.Items.Clear()
         foreach ($r in $rows | Sort-Object { $SecLevels[$_.Level] }) {
             $it = Add-Row $lvNet @($r.Check, $r.Level, $r.Result, $r.Todo) $r
-            $it.ForeColor = switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+            Set-RowStatus $it 1 $(switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } })
         }
         $lvNet.EndUpdate()
         $script:NetProblems = @($rows | Where-Object Level -eq 'Problem').Count
@@ -5418,7 +5474,7 @@ function Update-Gaming {
         $lvGame.BeginUpdate(); $lvGame.Items.Clear()
         foreach ($g in $r.Rows | Sort-Object { $SecLevels[$_.Level] }) {
             $it = Add-Row $lvGame @($g.Check, $g.Level, $g.Result, $g.Todo) $g ($g.Rec -and $g.Fix)
-            $it.ForeColor = switch ($g.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+            Set-RowStatus $it 1 $(switch ($g.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } })
         }
         # The graphics driver's age comes from the Drivers page, if it has loaded
         foreach ($d in @($lvDrv.Items | Where-Object { $_.Tag.Kind -eq 'Graphics' -and $_.Tag.Device -notmatch 'Intel|Basic' })) {
@@ -6537,6 +6593,7 @@ function Show-Page($Page) {
         $b.BackColor = if ($on) { $Theme.AccentSoft } else { $Theme.Side }
         $b.ForeColor = if ($on) { $Theme.AccentText } else { $Theme.Text }
         $b.Font = if ($on) { $FontBold } else { $Font }
+        $b.Invalidate()
     }
     Invoke-PageLoader $Page.Name   # load a page's data the first time it is opened
 }
@@ -6622,6 +6679,37 @@ $form.Add_KeyDown({
         $_.SuppressKeyPress = $true
     }
 })
+# Icons from the font built into Windows 11 (Segoe Fluent Icons) or Windows 10 (Segoe MDL2 Assets).
+$IconFontName = if ((New-Object Drawing.Text.InstalledFontCollection).Families.Name -contains 'Segoe Fluent Icons') { 'Segoe Fluent Icons' } else { 'Segoe MDL2 Assets' }
+$IconFont = New-Object Drawing.Font($IconFontName, 11)
+$NavIcons = @{ Health = 0xE95E; Clean = 0xEA99; Startup = 0xE7E8; Bloatware = 0xE74D; Programs = 0xE71D; Services = 0xE9F5; Tasks = 0xE823
+               'Right-click' = 0xE7C9; Privacy = 0xE890; Disk = 0xEDA2; 'Space savers' = 0xF012; Updates = 0xE895; Drivers = 0xE950
+               Security = 0xEA18; Browsers = 0xE774; Stability = 0xE9D9; Network = 0xE701; Gaming = 0xE7FC; Battery = 0xE83F
+               Backup = 0xE753; Upgrades = 0xEEA0; History = 0xE81C; Settings = 0xE713 }
+function Draw-NavButton($B, $G) {
+    $G.SmoothingMode = 'AntiAlias'
+    $G.Clear($Theme.Side)
+    $on = $B.BackColor.ToArgb() -eq $Theme.AccentSoft.ToArgb()   # Show-Page marks the open page this way
+    if ($on -or $script:HotNav -eq $B) {
+        $p = New-RoundRect 0.5 0.5 ($B.Width - 1.5) ($B.Height - 1.5) (Px 5)
+        $br = New-Object Drawing.SolidBrush($(if ($on) { $Theme.AccentSoft } else { $Theme.Hover })); $G.FillPath($br, $p); $br.Dispose(); $p.Dispose()
+    }
+    if ($on) {   # the blue bar on the left, like Windows 11 Settings
+        $h = [single]($B.Height * 0.5); $bar = New-RoundRect 1 (($B.Height - $h) / 2) (Px 3) $h (Px 2)
+        $br = New-Object Drawing.SolidBrush($Theme.Accent); $G.FillPath($br, $bar); $br.Dispose(); $bar.Dispose()
+    }
+    $code = $NavIcons[$B.AccessibleName]
+    $small = $B.Parent -eq $navBottom   # History and Settings sit side by side, so they get a tighter layout
+    $x = if ($small) { Px 2 } else { Px 10 }
+    if ($code) {
+        $ir = New-Object Drawing.Rectangle($x, 0, (Px 20), $B.Height)
+        [Windows.Forms.TextRenderer]::DrawText($G, [string][char]$code, $IconFont, $ir, $(if ($on) { $Theme.AccentText } else { $Theme.Dim }), 'VerticalCenter, HorizontalCenter, NoPrefix')
+        $x += if ($small) { Px 22 } else { Px 30 }
+    }
+    $tr = New-Object Drawing.Rectangle($x, 0, ($B.Width - $x - (Px 4)), $B.Height)
+    [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $B.Font, $tr, $B.ForeColor, 'VerticalCenter, Left, EndEllipsis, NoPrefix')
+    if ($B.Focused -and $B.ShowFocusCues) { $fp = New-RoundRect 1.5 1.5 ($B.Width - 3.5) ($B.Height - 3.5) (Px 4); $pen = New-Object Drawing.Pen($Theme.Accent); $pen.DashStyle = 'Dot'; $G.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose() }
+}
 $navBottom = New-Object Windows.Forms.FlowLayoutPanel
 $navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(8, 2, 0, 0)
 foreach ($g in $NavGroups) {
@@ -6641,21 +6729,30 @@ foreach ($g in $NavGroups) {
         $b.Cursor = [Windows.Forms.Cursors]::Hand
         $b.Add_Click({ Show-Page $this.Tag })
         $b.AccessibleName = $name
-        # Flat buttons show no focus rectangle: outline the one that has keyboard focus.
-        $b.Add_GotFocus({ $this.FlatAppearance.BorderSize = 1; $this.FlatAppearance.BorderColor = $Theme.Accent })
-        $b.Add_LostFocus({ $this.FlatAppearance.BorderSize = 0 })
+        $b.Add_Paint({ param($sender, $e) Draw-NavButton $sender $e.Graphics })
+        $b.Add_MouseEnter({ $script:HotNav = $this; $this.Invalidate() })
+        $b.Add_MouseLeave({ if ($script:HotNav -eq $this) { $script:HotNav = $null }; $this.Invalidate() })
+        $b.Add_GotFocus({ $this.Invalidate() }); $b.Add_LostFocus({ $this.Invalidate() })
         $script:NavButtons[$name] = $b
-        if ($g.Bottom) { $b.AutoSize = $true; $b.MinimumSize = New-Object Drawing.Size(60, 23); $b.Width = 60; $b.Padding = New-Object Windows.Forms.Padding(4, 0, 4, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 2, 1); $navBottom.Controls.Add($b) } else { $nav.Controls.Add($b) }   # bottom buttons are sized to their (translated) text
+        if ($g.Bottom) { $b.AutoSize = $true; $b.MinimumSize = New-Object Drawing.Size(60, 23); $b.Width = 60; $b.AutoSize = $false; $b.Margin = New-Object Windows.Forms.Padding(0, 1, 2, 1); $navBottom.Controls.Add($b) } else { $nav.Controls.Add($b) }   # bottom buttons are sized to their (translated) text
     }
 }
 $sidebar.Controls.Add($nav)
 $sidebar.Controls.Add($navBottom)
+# History and Settings: as wide as icon + (translated) text, measured once the texts are final
+function Resize-NavBottom {
+    foreach ($b in $navBottom.Controls) {
+        # Measured in screen pixels, but the whole window is scaled for the display afterwards - so undo the scaling here.
+        $b.Width = [int]([Windows.Forms.TextRenderer]::MeasureText((T $b.Text), $FontBold).Width / $DpiScale) + 28; $b.Height = 24
+    }
+}
 if (-not $IsAdmin) {
     $adm = New-Object Windows.Forms.Panel
     # Kept small: with 20+ pages the sidebar needs the room.
-    $adm.Dock = 'Bottom'; $adm.Height = 74; $adm.Padding = New-Object Windows.Forms.Padding(16, 4, 14, 10)
+    $adm.Dock = 'Bottom'; $adm.Height = 66; $adm.Padding = New-Object Windows.Forms.Padding(16, 4, 14, 10)
     $admT = New-Object Windows.Forms.Label
-    $admT.Text = 'Limited mode - some fixes need administrator rights.'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 30; $admT.Font = $FontSmall; $admT.AutoEllipsis = $true
+    $admT.Text = 'Limited mode'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 22; $admT.Font = $FontSmall; $admT.AutoEllipsis = $true
+    (New-Object Windows.Forms.ToolTip).SetToolTip($admT, (T 'Some fixes need administrator rights.'))
     $admB = New-Button 'Restart as admin'
     $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
     $admB.Add_Click({
@@ -6679,8 +6776,23 @@ $activity.Dock = 'Bottom'; $activity.Height = 42; $activity.BackColor = $Theme.S
 $activity.Padding = New-Object Windows.Forms.Padding(26, 7, 26, 7)
 $actText = New-Object Windows.Forms.Label
 $actText.Dock = 'Fill'; $actText.TextAlign = 'MiddleLeft'; $actText.AutoEllipsis = $true
-$actBar = New-Object Windows.Forms.ProgressBar
-$actBar.Dock = 'Right'; $actBar.Width = 220; $actBar.Style = 'Marquee'; $actBar.MarqueeAnimationSpeed = 30
+# A slim rounded bar in the theme's colours (instead of Windows' old green one): filled to the progress, or a moving
+# piece when the length of the job is unknown.
+$actBar = New-Object Windows.Forms.PictureBox
+$actBar.Dock = 'Right'; $actBar.Width = 220; $actBar.BackColor = $Theme.Soft
+$script:ActProg = @{ Max = 0; Value = 0; Pos = 0.0 }
+$actBar.Add_Paint({ param($sender, $e)
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'
+    $h = [single](Px 6); $y = ($sender.Height - $h) / 2; $w = [single]($sender.Width - 2)
+    $track = New-RoundRect 1 $y $w $h ($h / 2); $br = New-Object Drawing.SolidBrush($Theme.Border); $g.FillPath($br, $track); $br.Dispose(); $track.Dispose()
+    $p = $script:ActProg
+    if ($p.Max -gt 0) { $x0 = 1; $fw = [single]([Math]::Max([double]$h, $w * [Math]::Min([double]1, [double]$p.Value / [double]$p.Max))) }
+    else { $fw = [single]($w * 0.3); $x0 = 1 + ($w - $fw) * (0.5 - 0.5 * [Math]::Cos($p.Pos)) }
+    $fill = New-RoundRect $x0 $y $fw $h ($h / 2); $br = New-Object Drawing.SolidBrush($Theme.Accent); $g.FillPath($br, $fill); $br.Dispose(); $fill.Dispose()
+})
+$actAnim = New-Object Windows.Forms.Timer; $actAnim.Interval = 40
+$actAnim.Add_Tick({ if ($activity.Visible -and $script:ActProg.Max -le 0) { $script:ActProg.Pos += 0.08; $actBar.Invalidate() } })
+$actAnim.Start()
 $actGap = New-Object Windows.Forms.Panel; $actGap.Dock = 'Right'; $actGap.Width = 10
 $actCancel = New-Button 'Cancel'
 $actCancel.AutoSize = $false; $actCancel.Dock = 'Right'; $actCancel.Width = 96
@@ -6694,10 +6806,7 @@ function Update-ActivityBar {
     $more = $running.Count - 1 + $script:LoadQueue.Count
     $t = $j.Label + $(if ($j.State.Text) { ": $($j.State.Text)" }) + $(if ($more -gt 0) { "      ($more more waiting)" })
     if ($actText.Text -ne $t) { $actText.Text = $t }
-    if ($j.State.Max -gt 0) {
-        if ($actBar.Style -ne 'Continuous') { $actBar.Style = 'Continuous' }
-        $actBar.Maximum = $j.State.Max; $actBar.Value = [Math]::Min($j.State.Max, [Math]::Max(0, $j.State.Value))
-    } elseif ($actBar.Style -ne 'Marquee') { $actBar.Style = 'Marquee' }
+    $script:ActProg.Max = [Math]::Max(0, $j.State.Max); $script:ActProg.Value = [Math]::Max(0, $j.State.Value); $actBar.Invalidate()
     $actCancel.Visible = $j.Cancellable; $actCancel.Tag = $j
     $actCancel.Enabled = -not $j.State.Cancel
     $actCancel.Text = if ($j.State.Cancel) { 'Stopping...' } else { 'Cancel' }
@@ -7082,6 +7191,7 @@ if ($CliMode) {
 # New users start in simple view; people who already used PC Tune-Up keep all tools.
 if ($Settings.View -notin 'simple', 'full') { $Settings.View = if ($Settings.TourShown -or $Settings.AskedInstall -or (Test-Path $HistoryFile)) { 'full' } else { 'simple' }; Save-Settings }
 Set-ViewMode $Settings.View
+Resize-NavBottom
 $form.Add_Shown({
     Start-Everything
     if ($Settings.CheckUpdates) { Start-UpdateCheck -Silent }

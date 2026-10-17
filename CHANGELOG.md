@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.15.0
+
+- **A cleaner, more modern look**: an icon for every page in the sidebar and a blue bar next to the open page (like Windows 11 Settings); rounded, softer buttons; a slim progress bar in the app's colours; a light highlight under the mouse in every list, with a little more room per row.
+- **Status as a coloured dot**: lists show "● OK", "● Warning" or "● Problem" in the status column, so the rest of the row stays easy to read.
+- **Health page**: the readings get more room, so lines like the PC name and the free disk space no longer wrap; the memory list (which didn't fit) is behind "Show the programs using the most memory".
+- The sidebar's "Limited mode" note is one short line, and History and Settings fit side by side in every language.
 ## 1.14.2
 
 - Fixed: in 1.14.0 the left edge of every page was hidden under the sidebar (the page title, the first buttons and the start of each line). The page test now checks that pages always start next to the sidebar.

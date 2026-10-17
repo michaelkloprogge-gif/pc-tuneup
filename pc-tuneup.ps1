@@ -2468,12 +2468,14 @@ $BootWork = {
     $data = { param($e) $h = @{}; foreach ($d in ([xml]$e.ToXml()).Event.EventData.Data) { $h[$d.Name] = $d.'#text' }; $h }
     # Without administrator rights a filtered query just says "no events", so test access to the log first.
     try { [void](Get-WinEvent -LogName $log -MaxEvents 1 -ErrorAction Stop) } catch [UnauthorizedAccessException] { return [pscustomobject]@{ Denied = $true } } catch { if ($_.Exception.Message -match 'unauthori|access') { return [pscustomobject]@{ Denied = $true } } }
-    $ev = @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 100 } -MaxEvents 200 -ErrorAction SilentlyContinue)
+    # A switched-off or empty log makes filtered queries fail with "The parameter is incorrect": treat that as "nothing recorded".
+    $ev = try { @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 100 } -MaxEvents 200 -ErrorAction Stop) } catch { @() }
     $boots = @(foreach ($e in $ev) { $h = & $data $e
         if ([double]$h.BootTime -gt 0) { [pscustomobject]@{ X = $e.TimeCreated; Y = [Math]::Round([double]$h.BootTime / 1000, 1); Main = [double]$h.MainPathBootTime / 1000; Post = [double]$h.BootPostBootTime / 1000 } } })
     # What slowed start-up down (apps, drivers, services, devices) in the last 90 days
     $kind = @{ 101 = 'app'; 102 = 'driver'; 103 = 'service'; 106 = 'background task'; 109 = 'device' }
-    $slow = @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 101, 102, 103, 106, 109; StartTime = (Get-Date).AddDays(-90) } -ErrorAction SilentlyContinue | ForEach-Object {
+    $slowEv = try { @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 101, 102, 103, 106, 109; StartTime = (Get-Date).AddDays(-90) } -ErrorAction Stop) } catch { @() }
+    $slow = @($slowEv | ForEach-Object {
         $h = & $data $_; $name = if ($h.FriendlyName) { $h.FriendlyName } else { $h.Name }
         if ($name) { [pscustomobject]@{ Name = "$name".Trim(); Kind = $kind[$_.Id]; Sec = [double]$h.DegradationTime / 1000 } } } |
         Group-Object Name | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Kind = $_.Group[0].Kind; Sec = [Math]::Round(($_.Group | Measure-Object Sec -Maximum).Maximum, 1); Times = $_.Count } } |
@@ -4718,7 +4720,7 @@ $NetworkWork = {
         }
     }
     # Dropped Wi-Fi connections in the last 30 days
-    $ev = @(Get-WinEvent -FilterHashtable @{ LogName = 'Microsoft-Windows-WLAN-AutoConfig/Operational'; Id = 8003, 8002; StartTime = (Get-Date).AddDays(-30) } -ErrorAction SilentlyContinue)
+    $ev = try { @(Get-WinEvent -FilterHashtable @{ LogName = 'Microsoft-Windows-WLAN-AutoConfig/Operational'; Id = 8003, 8002; StartTime = (Get-Date).AddDays(-30) } -ErrorAction Stop) } catch { @() }
     $drops = @($ev | Where-Object Id -eq 8003).Count; $fails = @($ev | Where-Object Id -eq 8002).Count
     if ($w.Ssid -or $ev) {
         $lvl = if ($drops -ge 30 -or $fails -ge 10) { 'Warning' } else { 'OK' }

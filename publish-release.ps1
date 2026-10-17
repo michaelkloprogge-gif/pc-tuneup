@@ -1,4 +1,4 @@
-# Publishes a new PC Tune-Up release. GitHub Actions does the building, testing and releasing;
+﻿# Publishes a new PC Tune-Up release. GitHub Actions does the building, testing and releasing;
 # every installed copy then offers the update.
 #   1. Bump $AppVersion in pc-tuneup.ps1
 #   2. Add a "## <version>" section at the top of CHANGELOG.md (or pass -Notes and it is added for you)
@@ -24,6 +24,8 @@ if ($log -notmatch "(?m)^## $([regex]::Escape($version))\s*$") {
 if ($LASTEXITCODE) { throw 'Upgrade advice tests failed - run .\tests\Test-Upgrades.ps1 -Check' }
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\Test-Translation.ps1 | Out-Null
 if ($LASTEXITCODE) { throw 'Translation tests failed - run .\tests\Test-Translation.ps1' }
+& powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Test-Pages.ps1 -Language en | Out-Null
+if ($LASTEXITCODE) { throw 'Page tests failed - run .\tests\Test-Pages.ps1' }
 
 git add -A
 git diff --cached --quiet

@@ -58,7 +58,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.10.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.11.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -71,9 +71,27 @@ New-Item -ItemType Directory -Force $DataDir | Out-Null
 $LogFile = Join-Path $DataDir 'changes.log'
 $ServiceStateFile = Join-Path $DataDir 'services-original.json'
 $KeepFile = Join-Path $DataDir 'keep.txt'
-$HistoryFile = Join-Path $DataDir 'history.jsonl'   # one JSON entry per change; drives the History tab
+$HistoryFile = Join-Path $DataDir 'history.jsonl'
+$ErrorLogFile = Join-Path $DataDir 'errors.log'      # problems inside PC Tune-Up itself; "Save report" includes recent ones
+$script:ErrorsThisRun = 0
+function Write-AppError([string]$Where, $Err) {
+    try {
+        $msg = if ($Err -is [Management.Automation.ErrorRecord]) {
+            $at = if ($Err.InvocationInfo -and $Err.InvocationInfo.ScriptLineNumber) { " [line $($Err.InvocationInfo.ScriptLineNumber): $("$($Err.InvocationInfo.Line)".Trim())]" } else { '' }
+            "$($Err.Exception.Message)$at"
+        } else { "$Err" }
+        Add-Content -Path $ErrorLogFile -Value ('{0:s}  v{1}  {2}: {3}' -f (Get-Date), $AppVersion, $Where, ($msg -replace '\s+', ' ')) -Encoding UTF8
+        if ((Get-Item -LiteralPath $ErrorLogFile).Length -gt 256KB) { Set-Content -Path $ErrorLogFile -Value @(Get-Content $ErrorLogFile -Tail 500) -Encoding UTF8 }
+        $script:ErrorsThisRun++
+    } catch { }
+}
+function Get-AppErrors([int]$Days = 14) {
+    if (-not (Test-Path $ErrorLogFile)) { return }
+    $since = (Get-Date).AddDays(-$Days).ToString('s')
+    Get-Content $ErrorLogFile -Encoding UTF8 -Tail 300 | Where-Object { $_.Length -ge 19 -and $_.Substring(0, 19) -ge $since }
+}   # one JSON entry per change; drives the History tab
 $SettingsFile = Join-Path $DataDir 'settings.json'
-$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = '' }
+$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = ''; AutoNotify = 'changes' }
 if (Test-Path $SettingsFile) {
     try { (Get-Content $SettingsFile -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($Settings.Contains($_.Name)) { $Settings[$_.Name] = $_.Value } } } catch { }
 }
@@ -1423,6 +1441,21 @@ done, about {0}	klaar, ongeveer {0}
 done, about {0} ({1})	klaar, ongeveer {0} ({1})
 put back as it was	teruggezet zoals het was
 Needs administrator rights - click 'Restart as admin'.	Beheerdersrechten nodig - klik op 'Opnieuw als beheerder'.
+Error log	Foutenlogboek
+No problems inside PC Tune-Up have been recorded.	Er zijn geen problemen binnen PC Tune-Up vastgelegd.
+Problems inside PC Tune-Up (last 14 days)	Problemen binnen PC Tune-Up (afgelopen 14 dagen)
+None recorded.	Niets vastgelegd.
+Notify me when something is new (recommended)	Meld het als er iets nieuws is (aanbevolen)
+Notify me after every run	Meld het na elke keer
+Never notify me	Nooit melden
+New since last time: {0}	Nieuw sinds de vorige keer: {0}
+and {0} more	en nog {0}
+New browser extension: {0} ({1})	Nieuwe browserextensie: {0} ({1})
+Security: {0} - {1}	Beveiliging: {0} - {1}
+Device problem: {0}	Probleem met apparaat: {0}
+More often: {0} (+{1})	Vaker: {0} (+{1})
+freed {0}, {1} new thing(s)	{0} vrijgemaakt, {1} nieuw(e) punt(en)
+freed {0}, nothing new	{0} vrijgemaakt, niets nieuws
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1620,10 +1653,14 @@ $JobTimer.Add_Tick({
         if ($tick.ElapsedMilliseconds -gt 100) { break }   # several finished at once: show the rest next tick, so the window keeps responding
         if (-not $j.Handle.IsCompleted) { continue }
         [void]$script:Jobs.Remove($j)
+        $what = if ($j.Label) { $j.Label } else { 'a background check' }
         try { $result = @($j.PS.EndInvoke($j.Handle)) }
-        catch { $result = @(); Show-Msg "Something went wrong:`n$($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+        catch { $result = @(); Write-AppError "$what (background)" $_; Show-Msg "Something went wrong:`n$($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+        foreach ($e in @($j.PS.Streams.Error)) { Write-AppError "$what (background)" $e }   # errors the check didn't expect
         $j.PS.Dispose(); $j.RS.Dispose()
-        & $j.Done $result $j.State
+        try {
+            & $j.Done $result $j.State
+        } catch { Write-AppError "$what (showing the result)" $_ }
     }
     while ($script:LoadQueue.Count -and $script:Jobs.Count -lt 4) {   # four checks at a time
         $next = $script:LoadQueue[0]; $script:LoadQueue.RemoveAt(0)
@@ -3681,7 +3718,7 @@ $TaskScanWork = {
         if (-not $known -and "$text $company" -match $cfg.Keep) { continue }
         $kind = if ($known) { 'known' } elseif ($t.TaskName -match $cfg.Likely) { 'likely' } else { 'review' }
         $why = if ($known) { $known.Why } elseif ($kind -eq 'likely') { 'looks like an updater or telemetry - usually safe to turn off' } else { 'review: only turn off if you know what it is' }
-        $runs = (@($t.Triggers | ForEach-Object { $c = $_.CimClass.CimClassName; if ($c -eq 'MSFT_TaskTimeTrigger') { if ($_.Repetition.Interval) { 'repeatedly' } else { 'once' } } elseif ($when[$c]) { $when[$c] } else { 'on a schedule' } } | Select-Object -Unique))
+        $runs = (@($t.Triggers | Where-Object { $_ } | ForEach-Object { $c = "$($_.CimClass.CimClassName)"; if ($c -eq 'MSFT_TaskTimeTrigger') { if ($_.Repetition.Interval) { 'repeatedly' } else { 'once' } } elseif ($c -and $when[$c]) { $when[$c] } else { 'on a schedule' } } | Select-Object -Unique))
         [pscustomobject]@{ Name = $t.TaskName; Path = $t.TaskPath; Maker = $maker; Runs = $(if ($runs) { $runs } else { , @('only when started') })
                            State = "$($t.State)"; Kind = $kind; Why = $why }
     }
@@ -4280,9 +4317,9 @@ $BrowserWork = {
             if ($se) { $h = & $hostOf ($se -replace '\{[^}]+\}', 'x'); $ok = $h -match $knownSearch
                 Add-B "Search engine: $h" $label 'Search' $(if ($ok) { 'OK' } else { 'Review' }) $(if ($ok) { 'a well-known search engine' } else { 'not a well-known search engine - adware often swaps it' }) `
                     $(if ($ok) { $todoOk } else { 'Change it back in the browser: Settings > Search engine. If it changes again, use "Reset browser settings".' }) $null }
-            $home = & $get $prefs @('homepage')
-            if ($home -and (& $get $prefs @('homepage_is_newtabpage')) -ne $true -and (& $get $prefs @('browser', 'show_home_button')) -eq $true) {
-                Add-B "Home page: $(& $hostOf $home)" $label 'Home page' 'Info' "$home" 'Fine if you chose it.' $null
+            $homeUrl = & $get $prefs @('homepage')   # not $home: that is PowerShell's own (read-only) variable
+            if ($homeUrl -and (& $get $prefs @('homepage_is_newtabpage')) -ne $true -and (& $get $prefs @('browser', 'show_home_button')) -eq $true) {
+                Add-B "Home page: $(& $hostOf $homeUrl)" $label 'Home page' 'Info' "$homeUrl" 'Fine if you chose it.' $null
             }
             if ((& $get $prefs @('session', 'restore_on_startup')) -eq 4) {
                 $urls = @(& $get $prefs @('session', 'startup_urls'))
@@ -5494,6 +5531,10 @@ Add-SetSection 'Automatic maintenance' 'PC Tune-Up cleans junk files and checks 
 $cmbAuto = New-Choice @('Off', 'Every week', 'Every 4 weeks') @('off', 'weekly', 'monthly') $Settings.AutoMaintenance
 $btnAutoNow = New-Button 'Run now'
 Add-SetRow @($cmbAuto, $btnAutoNow)
+$cmbAutoNote = New-Choice @('Notify me when something is new (recommended)', 'Notify me after every run', 'Never notify me') @('changes', 'always', 'never') $Settings.AutoNotify
+$cmbAutoNote.Width = 380
+$cmbAutoNote.Add_SelectedIndexChanged({ $Settings.AutoNotify = $this.Tag[$this.SelectedIndex]; Save-Settings })
+Add-SetRow @($cmbAutoNote)
 $lblAutoLast = New-Object Windows.Forms.Label
 $lblAutoLast.AutoSize = $true; $lblAutoLast.ForeColor = $Theme.Dim; $lblAutoLast.Margin = New-Object Windows.Forms.Padding(0, 2, 0, 0)
 $lblAutoLast.Text = if ($Settings.LastAuto) { "Last run: $($Settings.LastAuto)" } else { 'Not run yet.' }
@@ -5543,7 +5584,12 @@ $btnInstall.Add_Click({ if ($IsInstalled) { Uninstall-App } else { Install-App -
 
 Add-SetSection 'Files' "Settings, history, the keep list and the change log are kept in $DataDir."
 $btnSetKeep = New-Button 'Keep list'; $btnSetLog = New-Button 'Change log'; $btnSetData = New-Button 'Open data folder'; $btnSetReport = New-Button 'Save report'
-Add-SetRow @($btnSetKeep, $btnSetLog, $btnSetData, $btnSetReport)
+$btnSetErr = New-Button 'Error log'
+Add-SetRow @($btnSetKeep, $btnSetLog, $btnSetErr, $btnSetData, $btnSetReport)
+$btnSetErr.Add_Click({
+    if (Test-Path $ErrorLogFile) { Start-Process notepad.exe "`"$ErrorLogFile`"" }
+    else { Show-Msg 'No problems inside PC Tune-Up have been recorded.' | Out-Null }
+})
 $btnSetKeep.Add_Click({ $btnKeep.PerformClick() })
 $btnSetLog.Add_Click({ $btnLog.PerformClick() })
 $btnSetData.Add_Click({ Start-Process explorer.exe "`"$DataDir`"" })
@@ -5685,6 +5731,8 @@ $(if ($HasBattery) { "<h2>$(T 'Battery')</h2>$(ConvertTo-HtmlRows @('Reading', '
 <h2>$(T 'Program updates available')</h2>$(ConvertTo-HtmlRows @('Program', 'Installed', 'Available', 'Note') $lvUpd.Items @(0, 1, 2, 3))
 <h2>$(T 'Upgrade options')</h2>$(ConvertTo-HtmlRows @('Part', 'You have now', 'Upgrade option', 'Worth it?', 'What to buy') $lvUpg.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Changes made by PC Tune-Up')</h2>$(ConvertTo-HtmlRows @('When', 'What', 'Item', 'Change', 'Undo') $histRows @(0, 1, 2, 3, 4))
+<h2>$(T 'Problems inside PC Tune-Up (last 14 days)')</h2>$($errs = @(Get-AppErrors); if ($errs) { '<pre class="errors">' + (($errs | ForEach-Object { & $enc $_ }) -join "
+") + '</pre>' } else { "<p class='none'>$(T 'None recorded.')</p>" })
 </body></html>
 "@
     $safeName = ($PcName -replace '[\\/:*?"<>|]', '').Trim()
@@ -6055,6 +6103,36 @@ Show-Page $pgHealth
 function Write-Cli([string]$Text) { try { [Console]::Out.WriteLine((T $Text)) } catch { } }
 if ($Cli.Install) { Install-App; Write-Cli "PC Tune-Up installed in $InstallDir"; return }
 if ($Cli.Uninstall) { Uninstall-App; return }
+# Things worth telling about, each with a stable key, so the automatic run can say what is NEW since last time.
+# Numbers are left out of the keys ("17 updates" and "18 updates" are the same thing); crashes keep their count, so "more crashes" shows up too.
+$WatchFile = Join-Path $DataDir 'watch.json'
+function Get-WatchFacts {
+    $f = @{}
+    $norm = { param($t) ("$t" -replace '\(.*?\)', '' -replace '\d+([.,]\d+)?', '#' -replace '\s+', ' ').Trim() }
+    foreach ($a in @($script:HealthAdvice)) { $f["advice|$(& $norm $a)"] = @{ Text = "$a"; Count = 0 } }
+    foreach ($it in $lvStab.Items) { if ($it.Tag.Level -in 'Problem', 'Warning') { $f["stab|$($it.Tag.Problem)|$(& $norm $it.Tag.What)"] = @{ Text = "$($it.Tag.What)"; Count = [int]$it.Tag.Count } } }
+    foreach ($it in $lvBrw.Items) {
+        if ($it.Tag.Kind -eq 'Extension') { $f["ext|$($it.Tag.Browser)|$($it.Tag.Item)"] = @{ Text = "New browser extension: $($it.Tag.Item) ($($it.Tag.Browser))"; Count = 0 } }
+        elseif ($it.Tag.Level -eq 'Risky') { $f["brw|$($it.Tag.Item)"] = @{ Text = "$($it.Tag.Item) ($($it.Tag.Browser))"; Count = 0 } }
+    }
+    foreach ($it in $lvSec.Items) { if ($it.Tag.Level -eq 'Problem') { $f["sec|$($it.Tag.Check)"] = @{ Text = "Security: $($it.Tag.Check) - $($it.Tag.Result)"; Count = 0 } } }
+    foreach ($it in $lvDrv.Items) { if ($it.Tag.Level -eq 'Problem') { $f["drv|$($it.Tag.Device)"] = @{ Text = "Device problem: $($it.Tag.Device)"; Count = 0 } } }
+    $f
+}
+# Compares with the last run and remembers this one. Returns the lines worth a notification ($null on the very first run).
+function Compare-WatchFacts {
+    $now = Get-WatchFacts
+    $old = $null
+    if (Test-Path $WatchFile) { try { $old = @{}; (Get-Content $WatchFile -Raw -Encoding UTF8 | ConvertFrom-Json).PSObject.Properties | ForEach-Object { $old[$_.Name] = [int]$_.Value } } catch { $old = $null } }
+    $save = [ordered]@{}; foreach ($k in $now.Keys) { $save[$k] = $now[$k].Count }
+    try { $save | ConvertTo-Json -Compress | Set-Content -Path $WatchFile -Encoding UTF8 } catch { }
+    if ($null -eq $old) { return $null }
+    $new = foreach ($k in $now.Keys) {
+        if (-not $old.ContainsKey($k)) { $now[$k].Text }
+        elseif ($k -like 'stab|*' -and $now[$k].Count -ge $old[$k] + 3) { "More often: $($now[$k].Text) (+$($now[$k].Count - $old[$k]))" }
+    }
+    , @($new)
+}
 if ($Cli.Auto) {
     # Scheduled maintenance: clean like Fix my PC (no startup or service changes), save a report, then a notification.
     $script:AutoRun = $true
@@ -6068,15 +6146,24 @@ if ($Cli.Auto) {
     $reportFile = Join-Path $DataDir 'last-report.html'
     try { [void](Save-ReportNow -Path $reportFile -NoOpen) } catch { }
     $look = @($script:HealthAdvice)
-    $summary = "freed $(Format-Size $script:FixFreed)$(if ($look) { ", $($look.Count) thing(s) worth a look" })"
+    $news = Compare-WatchFacts                         # $null = first run, nothing to compare with
+    $summary = "freed $(Format-Size $script:FixFreed)$(if ($news) { ", $(@($news).Count) new thing(s)" } elseif ($null -ne $news) { ', nothing new' } elseif ($look) { ", $($look.Count) thing(s) worth a look" })"
     Add-History 'Maintenance' 'Automatic' $summary
     $Settings.LastAuto = "$((Get-Date).ToString('g')) - $(T $summary)"; Save-Settings
+    $notify = switch ($Settings.AutoNotify) { 'never' { $false } 'always' { $true } default { $null -eq $news -or @($news).Count -gt 0 } }
+    if (-not $notify) { $JobTimer.Stop(); return }
     # A tray notification (shows as a Windows notification); clicking it opens PC Tune-Up.
     $tray = New-Object Windows.Forms.NotifyIcon
     $tray.Icon = if ($RunningAsExe) { [Drawing.Icon]::ExtractAssociatedIcon($SelfExe) } else { [Drawing.SystemIcons]::Information }
     $tray.Text = 'PC Tune-Up'; $tray.Visible = $true
     $tray.BalloonTipTitle = T 'PC Tune-Up maintenance'
-    $tray.BalloonTipText = T $(if ($look) { "Cleaned $(Format-Size $script:FixFreed). $($look.Count) thing(s) worth a look - click to see." } else { "Cleaned $(Format-Size $script:FixFreed). Everything looks fine." })
+    $text = if ($news) {
+        $list = (@($news) | Select-Object -First 3 | ForEach-Object { T $_ }) -join '; '
+        if (@($news).Count -gt 3) { $list += '; ' + (T "and $(@($news).Count - 3) more") }
+        (T 'New since last time: {0}').Replace('{0}', $list)
+    } elseif ($look) { T "Cleaned $(Format-Size $script:FixFreed). $($look.Count) thing(s) worth a look - click to see." }
+    else { T "Cleaned $(Format-Size $script:FixFreed). Everything looks fine." }
+    $tray.BalloonTipText = if ($text.Length -gt 250) { $text.Substring(0, 247) + '...' } else { $text }   # Windows cuts notifications at about 255 characters
     $script:AutoOpen = $false
     $tray.Add_BalloonTipClicked({ $script:AutoOpen = $true }); $tray.Add_Click({ $script:AutoOpen = $true })
     $tray.ShowBalloonTip(15000)

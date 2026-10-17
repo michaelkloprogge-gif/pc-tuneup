@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.0
+
+- **Notifications only when something is new**: the automatic maintenance run remembers what it found last time and only shows a notification for new things - a new crash, a new browser extension, a device problem, a security problem, or a crash that happens a lot more often - for example "New since last time: New browser extension: ... (Chrome)". Choose in Settings: when something is new (default), after every run, or never.
+- **Error log**: when something goes wrong inside PC Tune-Up itself, it is written to `errors.log` (Settings > Files > Error log), and "Save report" includes the last 14 days - handy to send along with a question. The exe also records errors that would otherwise vanish silently.
+- Fixed with the help of the new log: the browser home-page check never ran, and one kind of scheduled task made the Tasks page skip its "Runs" text.
+- Every release is now tested on a clean Windows machine: GitHub Actions opens every page in English and Dutch and fails on errors, pages that never finish loading, long freezes and missing report sections (`tests\Test-Pages.ps1`).
 ## 1.10.0
 
 - **Start here** on the Health page: the three most useful next steps from all pages (for example "Clean up 1.6 GB of junk files", "Free up to 4 GB with space savers", "17 program updates available"), most urgent first, each with a button that opens the right page.

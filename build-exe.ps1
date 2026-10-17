@@ -87,6 +87,18 @@ namespace PcTuneUp
 
 static class Program
 {
+    static void LogError(string text)
+    {
+        try
+        {
+            var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PCTuneUp");
+            Directory.CreateDirectory(dir);
+            var v = Assembly.GetExecutingAssembly().GetName().Version;
+            File.AppendAllText(Path.Combine(dir, "errors.log"), DateTime.Now.ToString("s") + "  v" + v.Major + "." + v.Minor + "." + v.Build + "  " +
+                System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ") + Environment.NewLine);
+        }
+        catch { }
+    }
     [STAThread]
     static int Main(string[] args)
     {
@@ -107,9 +119,16 @@ static class Program
             {
                 ps.Runspace = rs;
                 ps.AddScript(script);
+                // Errors nobody handled (for example in a button's click handler) would vanish in a window app: keep them in errors.log.
+                ps.Streams.Error.DataAdded += (s, e) => {
+                    var rec = ps.Streams.Error[e.Index];
+                    var at = rec.InvocationInfo != null && rec.InvocationInfo.ScriptLineNumber > 0 ? " [line " + rec.InvocationInfo.ScriptLineNumber + ": " + (rec.InvocationInfo.Line ?? "").Trim() + "]" : "";
+                    LogError("unhandled: " + rec.Exception.Message + at);
+                };
                 try { ps.Invoke(); }
                 catch (Exception e)
                 {
+                    LogError("PC Tune-Up stopped: " + e.Message);
                     MessageBox.Show("PC Tune-Up stopped:\n\n" + e.Message, "PC Tune-Up", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return 1;
                 }

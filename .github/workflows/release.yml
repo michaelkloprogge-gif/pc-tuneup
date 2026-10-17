@@ -38,6 +38,17 @@ jobs:
         shell: powershell
         run: .\tests\Test-Translation.ps1; exit $LASTEXITCODE
 
+      # Opens every page in a hidden window, in English and Dutch: fails on errors inside the app, pages that never
+      # finish loading, long freezes and missing report sections. (Runners are slower and have no Wi-Fi, battery or browsers.)
+      - name: Test every page (English)
+        shell: powershell
+        run: .\tests\Test-Pages.ps1 -Language en -MaxFreezeMs 5000; exit $LASTEXITCODE
+
+      - name: Test every page (Dutch)
+        shell: powershell
+        run: .\tests\Test-Pages.ps1 -Language nl -MaxFreezeMs 5000; exit $LASTEXITCODE
+
+
       - name: Build PC-TuneUp.exe
         shell: powershell
         run: .\build-exe.ps1

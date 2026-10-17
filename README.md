@@ -40,7 +40,7 @@ Security software, VPNs, drivers and databases are never touched, and you can ad
 to a keep list. English and Dutch, light and dark theme.
 
 **Automatic maintenance** (Settings): every week or every 4 weeks PC Tune-Up cleans junk files and checks the PC
-by itself when the PC is idle, then shows a notification. It never changes startup apps, services or programs on its own.
+by itself when the PC is idle, and shows a notification when it finds something new. It never changes startup apps, services or programs on its own.
 
 | | |
 |---|---|

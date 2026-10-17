@@ -1,0 +1,12 @@
+﻿# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: MichaelKloprogge.PCTuneUp
+PackageVersion: 1.6.0
+InstallerType: portable
+Commands:
+- pc-tuneup
+Installers:
+- Architecture: x64
+  InstallerUrl: https://github.com/michaelkloprogge-gif/pc-tuneup/releases/download/v1.6.0/PC-TuneUp.exe
+  InstallerSha256: B3AB2552D9C2531CB5A370864415082377AF324A19A32442C125292521F3241C
+ManifestType: installer
+ManifestVersion: 1.6.0

@@ -19,6 +19,7 @@ git diff --cached --quiet
 if ($LASTEXITCODE) { git commit -m "Release $tag" -m $Notes }
 git tag $tag
 git push origin HEAD --tags
+if ($LASTEXITCODE) { throw 'git push failed (signed in? run: gh auth setup-git)' }
 gh release create $tag .\dist\PC-TuneUp.exe --title "PC Tune-Up $tag" --notes $Notes
 if ($LASTEXITCODE) { throw 'gh release create failed' }
 "Published $tag"

@@ -1,4 +1,4 @@
-# Builds and tests PC Tune-Up on every push, and publishes a GitHub release when a v* tag is pushed
+﻿# Builds and tests PC Tune-Up on every push, and publishes a GitHub release when a v* tag is pushed
 # (publish-release.ps1 does the tagging). Copies of the app update themselves from these releases.
 name: Build and release
 
@@ -17,7 +17,7 @@ jobs:
     env:
       HAS_CERT: ${{ secrets.SIGNING_CERT_BASE64 != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check script syntax
         shell: powershell

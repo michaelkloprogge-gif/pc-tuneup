@@ -28,14 +28,19 @@ if ($LASTEXITCODE) { throw 'Translation tests failed - run .\tests\Test-Translat
 git add -A
 git diff --cached --quiet
 if ($LASTEXITCODE) { git commit -m "Release $tag" }
-git tag $tag
-git push origin HEAD --tags
+git push origin HEAD
 if ($LASTEXITCODE) { throw 'git push failed (signed in? run: gh auth setup-git)' }
+# The tag goes in its own push: GitHub doesn't always start a tag build when it arrives together with the branch.
+git tag $tag
+git push origin "refs/tags/$tag"
+if ($LASTEXITCODE) { throw 'pushing the tag failed' }
 
-# Follow the GitHub build until the release is out.
-Start-Sleep 8
-$run = gh run list --workflow release.yml --branch $tag --limit 1 --json databaseId --jq '.[0].databaseId'
-if (-not $run) { $run = gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId' }
+# Follow the tag's GitHub build (not the branch build, which never publishes) until the release is out.
+$run = $null
+foreach ($i in 1..40) { Start-Sleep 3; $run = gh run list --workflow release.yml --branch $tag --limit 1 --json databaseId --jq '.[0].databaseId'; if ($run) { break } }
+if (-not $run) { throw "No GitHub build started for $tag - check the Actions tab." }
 gh run watch $run --exit-status
 if ($LASTEXITCODE) { throw "The GitHub build failed - see: gh run view $run --log-failed" }
+gh release view $tag --json tagName --jq .tagName | Out-Null
+if ($LASTEXITCODE) { throw "The build passed but release $tag is missing." }
 "Published $tag"

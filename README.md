@@ -19,10 +19,12 @@ you can undo.
 | **Startup** | stop apps from launching with Windows |
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |
 | **Services** | trim background services from PC makers, updaters and telemetry, with one-click restore |
+| **Tasks** | scheduled tasks from other companies (updaters, telemetry, promo helpers from Adobe, Google, Zoom, PC makers...) - switch them off with undo |
 | **Disk** | see which folders fill the drive |
 | **Updates** | update outdated programs through winget; safe updates are pre-selected |
 | **Security** | is Windows still supported, can it run Windows 11, are antivirus, firewall, encryption, Secure Boot and TPM on |
-| **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with the fix |
+| **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with one-click fixes (turn off NVIDIA nView, repair Visual C++, reset Windows Update, repair system files, check the drive...) |
+| **Backup** | are Desktop, Documents and Pictures in OneDrive/Dropbox/iCloud, File History, backup programs and restore points - warns when nothing backs up your files |
 | **Upgrades** | which memory, drive and battery upgrades fit, the exact specification to buy, and whether it is worth it |
 | **History** | every change, with Undo |
 

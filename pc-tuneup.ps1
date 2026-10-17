@@ -5,10 +5,12 @@
 #   Startup   - turn startup apps on/off (same flags Task Manager uses)
 #   Bloatware - find pre-installed junk (OEM tools, trial antivirus, promo apps) and uninstall it
 #   Services  - background services from PC makers, updaters and telemetry, with one-click restore
+#   Tasks     - scheduled tasks from other companies (updaters, telemetry), switch off/on with undo
 #   Disk      - find the folders eating your drive
 #   Updates   - outdated programs, updated through winget
 #   Security  - Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM...
-#   Stability - crashes, freezes, blue screens and errors from the last 30 days, with the likely fix
+#   Stability - crashes, freezes, blue screens and errors from the last 30 days, with one-click fixes
+#   Backup    - are Desktop/Documents/Pictures in the cloud, File History, backup programs, restore points
 #   Upgrades  - memory / drive / battery upgrade options with the exact spec to buy
 #   History   - every change, with undo
 # Every change is logged to %LOCALAPPDATA%\PCTuneUp\changes.log. Anything listed
@@ -47,7 +49,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.6.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.7.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -775,6 +777,138 @@ Check the CPU support list of the motherboard ({0}) on its maker's website.	Beki
 Upgrade shopping list for {0}	Boodschappenlijst voor uitbreidingen van {0}
 Upgrade shopping list for {0} (serial {1})	Boodschappenlijst voor uitbreidingen van {0} (serienummer {1})
 {0} ({1}):	{0} ({1}):
+Tasks	Taken
+Backup	Back-up
+Scheduled tasks	Geplande taken
+Scheduled tasks from other companies: updaters, telemetry and helpers that Windows runs on a timer or at sign-in - the last place bloatware hides. Known junk is listed first and pre-checked. Switching a task off can be undone from History.	Geplande taken van andere bedrijven: updaters, telemetrie en hulpprogramma's die Windows op vaste tijden of bij het aanmelden start - de laatste plek waar bloatware zich verstopt. Bekende rommel staat bovenaan en is al aangevinkt. Een taak uitzetten kun je terugdraaien via Geschiedenis.
+Turn off checked	Aangevinkte uitzetten
+Turn on checked	Aangevinkte aanzetten
+Open Task Scheduler	Taakplanner openen
+Task	Taak
+Made by	Gemaakt door
+Runs	Start
+State	Staat
+Reading scheduled tasks	Geplande taken lezen
+Reading scheduled tasks...	Geplande taken lezen...
+at sign-in	bij aanmelden
+at start-up	bij opstarten
+daily	dagelijks
+weekly	wekelijks
+when idle	bij inactiviteit
+on unlock	bij ontgrendelen
+on a Windows event	bij een Windows-gebeurtenis
+when installed	na installatie
+repeatedly	herhaaldelijk
+once	eenmalig
+on a schedule	volgens schema
+only when started	alleen als iets hem start
+NVIDIA nView launcher - crashes other programs	NVIDIA nView-starter - laat andere programma's crashen
+NVIDIA telemetry / updater	NVIDIA-telemetrie / updater
+Adobe updater (Acrobat still updates when opened)	Adobe-updater (Acrobat werkt zichzelf nog bij als je het opent)
+Adobe Creative Cloud helper - only needed if you use Creative Cloud	Adobe Creative Cloud-hulp - alleen nodig als je Creative Cloud gebruikt
+Google promotions helper	Google-promotiehulp
+browser updater (updates when the browser is open)	browser-updater (werkt bij als de browser open is)
+Firefox usage reporting	Firefox-gebruiksrapportage
+Zoom updater (Zoom updates itself when opened)	Zoom-updater (Zoom werkt zichzelf bij als je het opent)
+Dell support / telemetry tool	Dell-ondersteunings- / telemetrieprogramma
+HP support / telemetry tool	HP-ondersteunings- / telemetrieprogramma
+Lenovo helper / telemetry	Lenovo-hulp / telemetrie
+Acer promo / registration	Acer-promotie / registratie
+cleaner / trial / adware helper	opschoner / proefversie / adware-hulp
+Windows tips and promotional notifications	Windows-tips en reclamemeldingen
+looks like an updater or telemetry - usually safe to turn off	lijkt een updater of telemetrie - meestal veilig om uit te zetten
+review: only turn off if you know what it is	nakijken: alleen uitzetten als je weet wat het is
+{0} known junk task(s) are switched on and pre-checked. Grey rows are already off.	{0} bekende rommeltaak/-taken staan aan en zijn aangevinkt. Grijze rijen staan al uit.
+No known junk tasks are running. Grey rows are already off.	Er staan geen bekende rommeltaken aan. Grijze rijen staan al uit.
+Check one or more tasks that are off first.	Vink eerst een of meer taken aan die uit staan.
+Check one or more tasks that are on first.	Vink eerst een of meer taken aan die aan staan.
+{0} task(s) switched off. Undo from the History page.	{0} taak/taken uitgezet. Terugdraaien via Geschiedenis.
+{0} task(s) switched on. Undo from the History page.	{0} taak/taken aangezet. Terugdraaien via Geschiedenis.
+These need administrator rights (click "Restart as admin"): {0}	Hiervoor zijn beheerdersrechten nodig (klik op "Opnieuw als beheerder"): {0}
+switched off	uitgezet
+switched on	aangezet
+scheduled task switched back on	geplande taak weer aangezet
+scheduled task switched off again	geplande taak weer uitgezet
+disabled (stops NVIDIA nView crashing other programs)	uitgezet (zodat NVIDIA nView geen andere programma's meer laat crashen)
+Would your files survive a broken, lost or stolen PC? Checks your cloud folders, File History, backup programs and restore points. Double-click a row (or select it and click Open setting) to change it.	Overleven je bestanden een kapotte, verloren of gestolen pc? Controleert je cloudmappen, Bestandsgeschiedenis, back-upprogramma's en herstelpunten. Dubbelklik op een rij (of selecteer hem en klik op Instelling openen) om iets te wijzigen.
+Create restore point now	Nu een herstelpunt maken
+Checking backups	Back-ups controleren
+Checking backups...	Back-ups controleren...
+Desktop, Documents and Pictures	Bureaublad, Documenten en Afbeeldingen
+Backed up to {0}	Back-up in {0}
+Nothing to do - every change is copied to the cloud.	Niets te doen - elke wijziging wordt naar de cloud gekopieerd.
+{0} backed up to {1}; not: {2}	{0} met back-up in {1}; niet: {2}
+Add the missing folders: OneDrive settings > Sync and back up > Manage back up (or Settings > Accounts > Windows backup).	Voeg de ontbrekende mappen toe: OneDrive-instellingen > Synchroniseren en back-up maken > Back-up beheren (of Instellingen > Accounts > Windows-back-up).
+Not in any cloud folder	Niet in een cloudmap
+If the PC breaks or is stolen, these files are gone. Turn on folder backup: Settings > Accounts > Windows backup (OneDrive), or use File History with an external drive.	Gaat de pc kapot of wordt hij gestolen, dan zijn deze bestanden weg. Zet mapback-up aan: Instellingen > Accounts > Windows-back-up (OneDrive), of gebruik Bestandsgeschiedenis met een externe schijf.
+OneDrive running	OneDrive actief
+Yes - changes are uploaded	Ja - wijzigingen worden geüpload
+No - changes are not being uploaded	Nee - wijzigingen worden niet geüpload
+Start OneDrive (it is in the Start menu) and let it sign in; check that it starts with Windows on the Startup page.	Start OneDrive (staat in het Startmenu) en laat het aanmelden; controleer op de pagina Opstarten dat het met Windows meestart.
+File History	Bestandsgeschiedenis
+Keep the backup drive connected now and then.	Sluit de back-upschijf af en toe aan.
+Optional extra copy (also of older versions) on an external drive: Control Panel > File History.	Optionele extra kopie (ook van oudere versies) op een externe schijf: Configuratiescherm > Bestandsgeschiedenis.
+Backup program	Back-upprogramma
+Found: {0}	Gevonden: {0}
+Check now and then that it still runs and that you can restore a file.	Controleer af en toe of het nog werkt en of je een bestand kunt terugzetten.
+Optional: a backup program (Macrium Reflect and Veeam Agent have free versions) makes a full copy of the PC, including programs and settings.	Optioneel: een back-upprogramma (Macrium Reflect en Veeam Agent hebben gratis versies) maakt een volledige kopie van de pc, inclusief programma's en instellingen.
+Restore points	Herstelpunten
+{0} restore point(s), the latest {1} day(s) ago	{0} herstelpunt(en), het laatste {1} dag(en) geleden
+Create one now (button above) - they let you undo a bad driver or update.	Maak er nu een (knop hierboven) - daarmee draai je een slecht stuurprogramma of een slechte update terug.
+None found - System Protection may be off	Geen gevonden - Systeembeveiliging staat misschien uit
+Switch on System Protection for C: (System Properties > System Protection > Configure), then create one.	Zet Systeembeveiliging aan voor C: (Systeemeigenschappen > Systeembeveiliging > Configureren) en maak er dan een.
+Only visible as administrator	Alleen zichtbaar als beheerder
+Click "Restart as admin" to check them.	Klik op "Opnieuw als beheerder" om ze te controleren.
+Nothing is backing up your files.	Niets maakt een back-up van je bestanden.
+Your files are backed up to {0}.	Er staat een back-up van je bestanden in {0}.
+Some backup is in place - see the rows above.	Er is een vorm van back-up - zie de rijen hierboven.
+Backup: nothing backs up your files - see the Backup page.	Back-up: niets maakt een back-up van je bestanden - zie de pagina Back-up.
+OneDrive was not found.	OneDrive is niet gevonden.
+Restore point created.	Herstelpunt gemaakt.
+No restore point made: {0}	Geen herstelpunt gemaakt: {0}
+Fix selected problem	Geselecteerd probleem oplossen
+One-click fix: {0} (needs administrator)	Oplossen met één klik: {0} (beheerder nodig)
+One-click fix: {0}	Oplossen met één klik: {0}
+Turn off NVIDIA nView	NVIDIA nView uitzetten
+Uninstall NVIDIA nView completely (the graphics driver stays)	NVIDIA nView helemaal verwijderen (het grafische stuurprogramma blijft)
+Repair the Visual C++ runtimes	De Visual C++-runtimes repareren
+Reset Windows Update	Windows Update opnieuw instellen
+Repair Windows system files	Windows-systeembestanden repareren
+Check drive C: for errors	Station C: op fouten controleren
+Test the memory at the next restart	Het geheugen testen bij de volgende herstart
+Open driver updates in Windows Update	Stuurprogramma-updates openen in Windows Update
+Open Store app updates	Updates voor Store-apps openen
+Look for an update on the Updates page	Zoek een update op de pagina Updates
+{0} needs administrator rights - click "Restart as admin" first.	{0} heeft beheerdersrechten nodig - klik eerst op "Opnieuw als beheerder".
+Switched off: {0}	Uitgezet: {0}
+Fixed: nView's start-up task is switched off and there have been no crashes since {0}. To remove it completely, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	Opgelost: de opstarttaak van nView staat uit en sinds {0} is er niets meer gecrasht. Wil je het helemaal weg, verwijder dan "NVIDIA RTX Desktop Manager" via Instellingen > Apps.
+Windows Memory Diagnostic checks the memory while the PC restarts (about 10-20 minutes). It asks whether to restart now or next time.	Windows Geheugendiagnose controleert het geheugen terwijl de pc opnieuw opstart (ongeveer 10-20 minuten). Het vraagt of je nu of de volgende keer wilt herstarten.
+Memory test	Geheugentest
+scheduled with Windows Memory Diagnostic	ingepland met Windows Geheugendiagnose
+Turn off NVIDIA nView?	NVIDIA nView uitzetten?
+It stops its start-up task and closes it. The graphics driver and NVIDIA Control Panel keep working. You can undo this from the History page.	De opstarttaak wordt uitgezet en nView wordt gesloten. Het grafische stuurprogramma en het NVIDIA-configuratiescherm blijven werken. Terugdraaien kan via Geschiedenis.
+NVIDIA nView is switched off. If programs still crash in it, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	NVIDIA nView staat uit. Crashen programma's er nog steeds in, verwijder dan "NVIDIA RTX Desktop Manager" via Instellingen > Apps.
+NVIDIA nView is switched off (its start-up task was already off; running parts were closed). If programs still crash in it, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	NVIDIA nView staat uit (de opstarttaak stond al uit; draaiende onderdelen zijn gesloten). Crashen programma's er nog steeds in, verwijder dan "NVIDIA RTX Desktop Manager" via Instellingen > Apps.
+Uninstall NVIDIA RTX Desktop Manager (nView)?	NVIDIA RTX Desktop Manager (nView) verwijderen?
+The graphics driver stays. NVIDIA's uninstaller may show its own window.	Het grafische stuurprogramma blijft. Het verwijderprogramma van NVIDIA kan een eigen venster tonen.
+Repair the Microsoft Visual C++ runtimes (64- and 32-bit)?	De Microsoft Visual C++-runtimes (64- en 32-bits) repareren?
+They are reinstalled through winget; programs that use them keep working. Takes a minute or two.	Ze worden opnieuw geïnstalleerd via winget; programma's die ze gebruiken blijven werken. Duurt een minuut of twee.
+Reset Windows Update?	Windows Update opnieuw instellen?
+Its services are stopped, its download caches are set aside (renamed, not deleted) and it starts fresh. Afterwards, open Windows Update and check for updates again.	De services worden gestopt, de downloadcaches apart gezet (hernoemd, niet verwijderd) en het begint opnieuw. Open daarna Windows Update en zoek opnieuw naar updates.
+Repair Windows system files?	Windows-systeembestanden repareren?
+Runs sfc /scannow and then DISM, which can take 15-30 minutes. You can keep using the PC (and press Cancel).	Voert sfc /scannow en daarna DISM uit; dat kan 15-30 minuten duren. Je kunt de pc gewoon blijven gebruiken (en op Annuleren drukken).
+Check drive C: for errors?	Station C: op fouten controleren?
+An online check (chkdsk /scan) - you can keep working. If it finds a problem that needs fixing, Windows repairs it at the next restart.	Een controle terwijl Windows draait (chkdsk /scan) - je kunt doorwerken. Vindt het een probleem dat hersteld moet worden, dan doet Windows dat bij de volgende herstart.
+{0}: done - {1}	{0}: klaar - {1}
+{0}: problem - {1}	{0}: probleem - {1}
+{0}: stopped	{0}: gestopt
+done - {0}	klaar - {0}
+problem - {0}	probleem - {0}
+stopped	gestopt
+checking system files (sfc)	systeembestanden controleren (sfc)
+repairing the Windows image (DISM)	Windows-image repareren (DISM)
+winget is missing	winget ontbreekt
+nView is not installed any more	nView is niet meer geïnstalleerd
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1319,7 +1453,7 @@ function Render-Health {
     } else { $lines += "This PC:   $PcName"; $lines += 'Checking this PC...' }
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
-    foreach ($k in 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
+    foreach ($k in 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $key = ($lines + $advice) -join '|'
     if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
         $script:HealthDrawn = $key
@@ -2389,9 +2523,10 @@ $pgStab = New-Page 'Stability' 'What went wrong in the last 30 days according to
 $btnStabScan = New-Button 'Refresh'
 $btnStabRel = New-Button 'Open Reliability Monitor'
 $btnStabWeb = New-Button 'Search selected online'
+$btnStabFix = New-Button 'Fix selected problem'; $btnStabFix.Enabled = $false
 $lvStab = New-ListView $false @('Problem', 160, 'What', 300, 'Times', 60, 'Last', 130, 'What to do', 600)
 $txtStab = New-DetailBox 114
-Set-PageLayout $pgStab $lvStab @((New-ButtonBar @($btnStabScan, $btnStabRel, $btnStabWeb))) $txtStab
+Set-PageLayout $pgStab $lvStab @((New-ButtonBar @($btnStabFix, $btnStabScan, $btnStabRel, $btnStabWeb))) $txtStab
 $lblStab = New-Status; $pgStab.Controls.Add($lblStab)
 
 $StabScanWork = {
@@ -2402,20 +2537,22 @@ $StabScanWork = {
         try { @(Get-WinEvent -FilterHashtable $f -ErrorAction Stop) } catch { @() }
     }
     $rows = New-Object System.Collections.ArrayList
-    function Add-Stab($Problem, $Level, $What, $Events, $Todo, $Search) {
+    # $Fix names the one-click fix for the row (see $StabilityFixes); set $nextFix just before calling.
+    function Add-Stab($Problem, $Level, $What, $Events, $Todo, $Search, $Fix = $nextFix) {
         $last = ($Events | Measure-Object TimeCreated -Maximum).Maximum
-        [void]$rows.Add([pscustomobject]@{ Problem = $Problem; Level = $Level; What = $What; Count = @($Events).Count; Last = $last; Todo = $Todo; Search = $Search })
+        [void]$rows.Add([pscustomobject]@{ Problem = $Problem; Level = $Level; What = $What; Count = @($Events).Count; Last = $last; Todo = $Todo; Search = $Search; Fix = $Fix })
     }
+    $nextFix = $null
     $sev = { param($n, $warnAt, $probAt) if ($n -ge $probAt) { 'Problem' } elseif ($n -ge $warnAt) { 'Warning' } else { 'Info' } }
 
     # --- App crashes, grouped by what actually caused them ---
     # Add-ons that load themselves into other programs and are a common hidden crash cause.
     $injectors = @(
-        @{ Match = 'nview'; Name = 'NVIDIA nView'; Todo = 'NVIDIA nView (an old desktop-manager add-on) loads itself into other programs and crashes them. Turn it off: NVIDIA Control Panel > Desktop Management > Disable, or uninstall "NVIDIA nView" in Settings > Apps.' }
-        @{ Match = '^(nvlddmkm|nvwgf2um|nvd3dum|nvoglv|nvapi|nvcuda)'; Name = 'NVIDIA graphics driver'; Todo = 'Update the NVIDIA driver from nvidia.com or the PC maker''s support page (choose a clean install).' }
-        @{ Match = '^(atidxx|amdxx|atiumd|amdkmdag|aticfx|amdvlk)'; Name = 'AMD graphics driver'; Todo = 'Update the AMD graphics driver from amd.com or the PC maker''s support page.' }
-        @{ Match = '^(igd|ig\d|igc|igxelp)'; Name = 'Intel graphics driver'; Todo = 'Update the Intel graphics driver (Windows Update > Advanced > Optional updates, or the PC maker''s support page).' }
-        @{ Match = '^(ucrtbase|vcruntime|msvcp|msvcr)'; Name = 'Visual C++ runtime'; Todo = 'Repair "Microsoft Visual C++ Redistributable" in Settings > Apps (Modify > Repair), then update the crashing programs.' }
+        @{ Match = 'nview'; Fix = 'nview'; Name = 'NVIDIA nView'; Todo = 'NVIDIA nView (an old desktop-manager add-on) loads itself into other programs and crashes them. Turn it off: NVIDIA Control Panel > Desktop Management > Disable, or uninstall "NVIDIA nView" in Settings > Apps.' }
+        @{ Match = '^(nvlddmkm|nvwgf2um|nvd3dum|nvoglv|nvapi|nvcuda)'; Fix = 'drivers'; Name = 'NVIDIA graphics driver'; Todo = 'Update the NVIDIA driver from nvidia.com or the PC maker''s support page (choose a clean install).' }
+        @{ Match = '^(atidxx|amdxx|atiumd|amdkmdag|aticfx|amdvlk)'; Fix = 'drivers'; Name = 'AMD graphics driver'; Todo = 'Update the AMD graphics driver from amd.com or the PC maker''s support page.' }
+        @{ Match = '^(igd|ig\d|igc|igxelp)'; Fix = 'drivers'; Name = 'Intel graphics driver'; Todo = 'Update the Intel graphics driver (Windows Update > Advanced > Optional updates, or the PC maker''s support page).' }
+        @{ Match = '^(ucrtbase|vcruntime|msvcp|msvcr)'; Fix = 'vcredist'; Name = 'Visual C++ runtime'; Todo = 'Repair "Microsoft Visual C++ Redistributable" in Settings > Apps (Modify > Repair), then update the crashing programs.' }
         @{ Match = '^(rtsshooks|gameoverlayrenderer|discordhook|overlay|nahimic|sonic|a-volute|ss3|sbiedll)'; Name = 'an overlay or audio add-on'; Todo = 'An overlay (Steam, Discord, RivaTuner) or audio enhancer (Nahimic, Sonic Studio) loads into other programs. Update it or switch its overlay off.' }
     )
     $crashes = Get-Events 'Application' 1000 'Application Error'
@@ -2430,12 +2567,27 @@ $StabScanWork = {
     foreach ($g in $groups.Values) {
         $n = $g.Events.Count; $apps = ($g.Apps.Keys | Sort-Object) -join ', '
         if ($g.Inj) {
-            Add-Stab 'App crashes' (& $sev $n 2 3) "$($g.Inj.Name) crashed $apps" $g.Events $g.Inj.Todo "$($g.Inj.Name) $(@($g.Mods.Keys)[0]) crash"
+            $nextFix = $g.Inj.Fix
+            $level = & $sev $n 2 3; $todo = $g.Inj.Todo; $what = "$($g.Inj.Name) crashed $apps"
+            if ($g.Inj.Fix -eq 'nview') {
+                # Already switched off? Its start-up task is disabled and nothing crashed after the task last ran.
+                $tasks = @(Get-ScheduledTask -TaskName 'nWizard*' -ErrorAction SilentlyContinue)
+                $lastRun = ($tasks | Get-ScheduledTaskInfo -ErrorAction SilentlyContinue | Measure-Object LastRunTime -Maximum).Maximum
+                $lastCrash = ($g.Events | Measure-Object TimeCreated -Maximum).Maximum
+                $running = Get-Process -Name 'nview*', 'nwiz*' -ErrorAction SilentlyContinue
+                if ($tasks -and -not ($tasks | Where-Object State -ne 'Disabled') -and -not $running -and $lastRun -and $lastCrash -le $lastRun.AddMinutes(30)) {
+                    $level = 'Info'; $what = "Switched off: $($g.Inj.Name) crashed $apps"
+                    $todo = "Fixed: nView's start-up task is switched off and there have been no crashes since $($lastCrash.ToString('g')). To remove it completely, uninstall ""NVIDIA RTX Desktop Manager"" in Settings > Apps."
+                }
+            }
+            Add-Stab 'App crashes' $level $what $g.Events $todo "$($g.Inj.Name) $(@($g.Mods.Keys)[0]) crash"
         } else {
+            $nextFix = 'appupdate'
             Add-Stab 'App crashes' (& $sev $n 2 5) "$apps crashed" $g.Events "Update or reinstall $apps. If it keeps crashing, check the maker's support site (crash point: $(@($g.Mods.Keys)[0]))." "$apps crash $(@($g.Mods.Keys)[0])"
         }
     }
 
+    $nextFix = $null
     # --- Programs freezing ---
     $hangs = Get-Events 'Application' 1002 'Application Hang'
     $hangGroups = @($hangs | Group-Object { "$($_.Properties[0].Value)" })
@@ -2462,10 +2614,17 @@ $StabScanWork = {
     foreach ($g in $bsods | Group-Object { if ($_.Message -match '0x([0-9a-fA-F]{8})') { $Matches[1].ToLower() } else { '?' } }) {
         $name, $cause = "$($bugchecks[$g.Name])" -split '\|'
         if (-not $name) { $name = "stop code 0x$($g.Name)"; $cause = 'a driver or hardware' }
+        $nextFix = switch -Regex ($name) {
+            'MEMORY_MANAGEMENT|PAGE_FAULT|FAULTY_HARDWARE|WHEA' { 'memtest' }
+            'CRITICAL_PROCESS_DIED' { 'sfc' }
+            'KERNEL_DATA_INPAGE|CRITICAL_OBJECT_TERMINATION' { 'chkdsk' }
+            default { 'drivers' }
+        }
         Add-Stab 'Blue screens' 'Problem' "Windows crashed: $name" $g.Group `
             "Usually caused by $cause. Install driver updates (Windows Update > Advanced options > Optional updates, or the PC maker's support page). If it keeps happening, test the memory: run mdsched.exe." "$name blue screen fix"
     }
 
+    $nextFix = $null
     # --- Shutdowns without warning (not counting blue screens, already listed) ---
     $down = @(Get-Events 'System' 41 'Microsoft-Windows-Kernel-Power' | Where-Object { "$($_.Properties[0].Value)" -eq '0' }) + @(Get-Events 'System' 6008 'EventLog')
     if ($down.Count) {
@@ -2476,14 +2635,17 @@ $StabScanWork = {
 
     # --- Graphics driver resets ---
     $tdr = Get-Events 'System' 4101 'Display'
+    $nextFix = 'drivers'
     if ($tdr.Count) { Add-Stab 'Graphics resets' (& $sev $tdr.Count 2 5) 'The graphics driver stopped responding and recovered' $tdr 'Update the graphics driver. If it happens in games, check the GPU temperature and stop any overclocking.' 'display driver stopped responding and has recovered' }
 
     # --- Drive and hardware errors ---
     $disk = Get-Events 'System' $null @('disk', 'Ntfs', 'stornvme', 'storahci', 'iaStorVD', 'iaStorAVC', 'iaStorA') @(1, 2, 3)
+    $nextFix = 'chkdsk'
     foreach ($g in $disk | Group-Object ProviderName) {
         Add-Stab 'Drive errors' (& $sev $g.Count 1 3) "Storage errors ($($g.Name))" $g.Group 'Back up important files now. Then check drive health on the Health tab and run the drive maker''s tool; frequent errors mean the drive or its cable is failing.' "$($g.Name) event error windows"
     }
     $whea = Get-Events 'System' $null 'Microsoft-Windows-WHEA-Logger' @(1, 2, 3)
+    $nextFix = 'memtest'
     if ($whea.Count) { Add-Stab 'Hardware errors' $(if ($whea | Where-Object Level -le 2) { 'Problem' } else { 'Warning' }) 'The processor, memory or a PCIe device reported errors' $whea `
         'Make sure the PC isn''t overheating (clean the fans). If blue screens happen too, test the memory: run mdsched.exe.' 'WHEA-Logger error' }
 
@@ -2492,13 +2654,15 @@ $StabScanWork = {
     $store = @($wu | Where-Object { "$($_.Properties[1].Value)" -match '^9[A-Z0-9]{11}-' })   # Store app packages
     # Defender's definition updates (KB2267602) and platform updates (KB4052623) retry on their own within hours - not worth showing.
     $win = @($wu | Where-Object { "$($_.Properties[1].Value)" -notmatch '^9[A-Z0-9]{11}-|KB2267602|KB4052623' })
+    $nextFix = 'store'
     if ($store.Count) {
         $apps = @($store | ForEach-Object { ("$($_.Properties[1].Value)" -replace '^9[A-Z0-9]{11}-', '' -split '\.')[-1] } | Select-Object -Unique)
         Add-Stab 'Store app updates' 'Info' "$($apps.Count) Store app update(s) kept waiting ($(($apps | Select-Object -First 4) -join ', ')...)" $store `
             'Usually because the app was open at the time - they install by themselves later. To force it: Microsoft Store > Library > Get updates.' $null
     }
+    $nextFix = 'wureset'
     foreach ($g in $win | Group-Object { "$($_.Properties[1].Value)" }) {
-        $code = '0x{0:X8}' -f ([int64]$g.Group[0].Properties[0].Value -band 0xFFFFFFFF)   # stored signed; show as the usual 0x8... code
+        $code = '0x{0:X8}' -f ([int64]$g.Group[0].Properties[0].Value -band 4294967295L)   # stored signed; show as the usual 0x8... code
         Add-Stab 'Windows Update' (& $sev $g.Count 2 4) "Couldn't install: $($g.Name)" $g.Group `
             "Restart and try Windows Update again. If it keeps failing: Settings > System > Troubleshoot > Other troubleshooters > Windows Update. (Error $code)" "$code windows update"
     }
@@ -2530,16 +2694,356 @@ function Update-Stability {
     }
 }
 $lvStab.Add_SelectedIndexChanged({
-    if (-not $lvStab.SelectedItems.Count) { return }
+    if (-not $lvStab.SelectedItems.Count) { $btnStabFix.Enabled = $false; return }
     $s = $lvStab.SelectedItems[0].Tag
-    $txtStab.Text = "$($s.Problem): $($s.What) - $($s.Count) time(s) in 30 days, last on $(if ($s.Last) { $s.Last.ToString('g') })`r`n`r`nWhat to do: $($s.Todo)"
+    $fix = Get-StabilityFix $s
+    $txtStab.Text = "$($s.Problem): $($s.What) - $($s.Count) time(s) in 30 days, last on $(if ($s.Last) { $s.Last.ToString('g') })`r`n`r`nWhat to do: $($s.Todo)" +
+                    $(if ($fix) { "`r`n`r`nOne-click fix: $($fix.Label)$(if ($fix.Admin -and -not $IsAdmin) { ' (needs administrator)' })" })
+    $btnStabFix.Enabled = [bool]$fix
 })
 $btnStabScan.Add_Click({ Update-Stability })
+$btnStabFix.Add_Click({ Invoke-StabilityFix })
+
+# ---------------------------------------------------------------------------
+# One-click fixes for what the Stability page finds. Each asks first, and is recorded in History.
+# ---------------------------------------------------------------------------
+$StabilityFixes = @{
+    nview     = @{ Label = 'Turn off NVIDIA nView'; Admin = $true }
+    nviewgone = @{ Label = 'Uninstall NVIDIA nView completely (the graphics driver stays)'; Admin = $true }
+    vcredist  = @{ Label = 'Repair the Visual C++ runtimes'; Admin = $false }
+    wureset   = @{ Label = 'Reset Windows Update'; Admin = $true }
+    sfc       = @{ Label = 'Repair Windows system files'; Admin = $true }
+    chkdsk    = @{ Label = 'Check drive C: for errors'; Admin = $true }
+    memtest   = @{ Label = 'Test the memory at the next restart'; Admin = $false }
+    drivers   = @{ Label = 'Open driver updates in Windows Update'; Admin = $false }
+    store     = @{ Label = 'Open Store app updates'; Admin = $false }
+    appupdate = @{ Label = 'Look for an update on the Updates page'; Admin = $false }
+}
+function Get-StabilityFix($Row) {
+    if (-not $Row.Fix) { return $null }
+    $id = if ($Row.Fix -eq 'nview' -and $Row.Level -eq 'Info') { 'nviewgone' } else { $Row.Fix }   # already off: offer the uninstall
+    $f = $StabilityFixes[$id]; if (-not $f) { return $null }
+    [pscustomobject]@{ Id = $id; Label = $f.Label; Admin = $f.Admin }
+}
+# Long repairs run in the background; output from sfc/chkdsk/DISM is UTF-16, so stray NULs are removed.
+$RepairWork = {
+    param($what)
+    $lastLines = { param($text) (($text -replace "`0", '') -split "`r?`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -and $_ -notmatch '^\d+(\.\d+)?\s*%|^\[=*\s*\d' } | Select-Object -Last 3) -join ' / ' }
+    switch ($what) {
+        'sfc' {
+            Set-JobProgress 'checking system files (sfc)'
+            $a = Invoke-Native "$env:windir\System32\sfc.exe" '/scannow' 3600
+            if ($a.Cancelled) { return [pscustomobject]@{ Ok = $false; Msg = 'stopped' } }
+            Set-JobProgress 'repairing the Windows image (DISM)'
+            $b = Invoke-Native "$env:windir\System32\Dism.exe" '/Online /Cleanup-Image /RestoreHealth' 3600
+            [pscustomobject]@{ Ok = ($a.Code -eq 0 -and $b.Code -eq 0); Msg = "sfc: $(& $lastLines $a.Out)`r`nDISM: $(& $lastLines $b.Out)" }
+        }
+        'chkdsk' {
+            $r = Invoke-Native "$env:windir\System32\chkdsk.exe" 'C: /scan' 3600
+            [pscustomobject]@{ Ok = ($r.Code -eq 0); Msg = (& $lastLines $r.Out) }
+        }
+        'wureset' {
+            # The standard Windows Update reset: stop its services, set its caches aside (renamed, not deleted), start again.
+            $svcs = 'wuauserv', 'bits', 'cryptsvc', 'msiserver', 'usosvc'
+            $log = @()
+            foreach ($s in $svcs) { Stop-Service -Name $s -Force -ErrorAction SilentlyContinue }
+            $stamp = Get-Date -Format 'yyyyMMdd-HHmm'
+            foreach ($d in "$env:windir\SoftwareDistribution", "$env:windir\System32\catroot2") {
+                if (-not (Test-Path $d)) { continue }
+                try { Rename-Item -LiteralPath $d -NewName "$(Split-Path $d -Leaf).bak-$stamp" -ErrorAction Stop; $log += "$(Split-Path $d -Leaf) set aside" }
+                catch { $log += "$(Split-Path $d -Leaf) in use - left as it was" }
+            }
+            foreach ($s in $svcs) { Start-Service -Name $s -ErrorAction SilentlyContinue }
+            [pscustomobject]@{ Ok = $true; Msg = ($log -join '; ') }
+        }
+        'vcredist' {
+            $wg = Get-Command winget.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+            if (-not $wg) { return [pscustomobject]@{ Ok = $false; Msg = 'winget is missing' } }
+            $out = foreach ($id in 'Microsoft.VCRedist.2015+.x64', 'Microsoft.VCRedist.2015+.x86') {
+                Set-JobProgress $id
+                $r = Invoke-Native $wg "install --id $id --exact --force --silent --accept-package-agreements --accept-source-agreements --disable-interactivity" 900
+                "$id`: $(if ($r.Code -eq 0) { 'repaired' } else { "exit code $($r.Code)" })"
+            }
+            [pscustomobject]@{ Ok = -not ($out -match 'exit code'); Msg = ($out -join '; ') }
+        }
+        'nviewgone' {
+            $entry = foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall') {
+                Get-ChildItem $k -ErrorAction SilentlyContinue | ForEach-Object { Get-ItemProperty $_.PSPath } | Where-Object { $_.DisplayName -match 'RTX Desktop Manager|nView' } }
+            $entry = @($entry)[0]
+            if (-not $entry) { return [pscustomobject]@{ Ok = $false; Msg = 'nView is not installed any more' } }
+            $p = Start-Process cmd.exe -ArgumentList "/c `"$($entry.UninstallString)`"" -Wait -PassThru -WindowStyle Hidden
+            [pscustomobject]@{ Ok = ($p.ExitCode -eq 0); Msg = "$($entry.DisplayName): exit code $($p.ExitCode)" }
+        }
+    }
+}
+function Invoke-StabilityFix {
+    if (-not $lvStab.SelectedItems.Count) { return }
+    $row = $lvStab.SelectedItems[0].Tag
+    $fix = Get-StabilityFix $row
+    if (-not $fix) { return }
+    if ($fix.Admin -and -not $IsAdmin) { Show-Msg "$($fix.Label) needs administrator rights - click ""Restart as admin"" first." 'OK' 'Warning' | Out-Null; return }
+    switch ($fix.Id) {
+        'drivers'   { Start-Process 'ms-settings:windowsupdate-optionalupdates'; return }
+        'store'     { Start-Process 'ms-windows-store://downloadsandupdates'; return }
+        'appupdate' { Show-Page $pgUpd; return }
+        'memtest'   {
+            if ((Show-Msg 'Windows Memory Diagnostic checks the memory while the PC restarts (about 10-20 minutes). It asks whether to restart now or next time.' 'OKCancel' 'Information') -eq 'OK') {
+                Start-Process mdsched.exe; Add-History 'Repair' 'Memory test' 'scheduled with Windows Memory Diagnostic'; Update-History
+            }
+            return
+        }
+        'nview' {
+            if ((Show-Msg "Turn off NVIDIA nView?`n`nIt stops its start-up task and closes it. The graphics driver and NVIDIA Control Panel keep working. You can undo this from the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+            $done = 0
+            foreach ($t in @(Get-ScheduledTask -TaskName 'nWizard*' -ErrorAction SilentlyContinue | Where-Object State -ne 'Disabled')) {
+                try { [void](Disable-ScheduledTask -TaskPath $t.TaskPath -TaskName $t.TaskName -ErrorAction Stop); $done++
+                      Add-History 'Task' $t.TaskName 'disabled (stops NVIDIA nView crashing other programs)' @{ Type = 'Task'; Path = $t.TaskPath; Name = $t.TaskName; Enable = $true } } catch { }
+            }
+            Get-Process -Name 'nview*', 'nwiz*' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+            Show-Msg "NVIDIA nView is switched off$(if (-not $done) { ' (its start-up task was already off; running parts were closed)' }). If programs still crash in it, uninstall ""NVIDIA RTX Desktop Manager"" in Settings > Apps." | Out-Null
+            Update-History; Update-Stability; return
+        }
+    }
+    # The rest are longer repairs that run in the background.
+    $ask = @{
+        nviewgone = "Uninstall NVIDIA RTX Desktop Manager (nView)?`n`nThe graphics driver stays. NVIDIA's uninstaller may show its own window."
+        vcredist  = "Repair the Microsoft Visual C++ runtimes (64- and 32-bit)?`n`nThey are reinstalled through winget; programs that use them keep working. Takes a minute or two."
+        wureset   = "Reset Windows Update?`n`nIts services are stopped, its download caches are set aside (renamed, not deleted) and it starts fresh. Afterwards, open Windows Update and check for updates again."
+        sfc       = "Repair Windows system files?`n`nRuns sfc /scannow and then DISM, which can take 15-30 minutes. You can keep using the PC (and press Cancel)."
+        chkdsk    = "Check drive C: for errors?`n`nAn online check (chkdsk /scan) - you can keep working. If it finds a problem that needs fixing, Windows repairs it at the next restart."
+    }
+    if ((Show-Msg $ask[$fix.Id] 'YesNo' 'Question') -ne 'Yes') { return }
+    $script:RepairFix = $fix
+    $run = { Start-Bg -Label $script:RepairFix.Label -Cancellable $RepairWork $script:RepairFix.Id {
+        param($r, $state)
+        $r = $r[0]
+        $msg = if ($state.Cancel) { 'stopped' } elseif ($r.Ok) { "done - $($r.Msg)" } else { "problem - $($r.Msg)" }
+        Add-History 'Repair' $script:RepairFix.Label $msg
+        Update-History
+        Show-Msg "$($script:RepairFix.Label): $msg" | Out-Null
+        if ($script:RepairFix.Id -eq 'wureset') { Start-Process 'ms-settings:windowsupdate' }
+        Update-Stability
+    } }
+    if ($fix.Id -in 'wureset', 'sfc') { Start-WithRestorePoint $fix.Label $run } else { & $run }
+}
 $btnStabRel.Add_Click({ Start-Process perfmon.exe '/rel' })
 $btnStabWeb.Add_Click({
     if (-not $lvStab.SelectedItems.Count) { return }
     $q = $lvStab.SelectedItems[0].Tag.Search
     if ($q) { Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString($q)) }
+})
+
+# ===========================================================================
+# Tasks: scheduled tasks from other companies - updaters, telemetry and helpers on a timer
+# ===========================================================================
+$pgTasks = New-Page 'Tasks' 'Scheduled tasks from other companies: updaters, telemetry and helpers that Windows runs on a timer or at sign-in - the last place bloatware hides. Known junk is listed first and pre-checked. Switching a task off can be undone from History.'
+$btnTaskOff = New-Button 'Turn off checked'
+$btnTaskOn = New-Button 'Turn on checked'
+$btnTaskScan = New-Button 'Reload'
+$btnTaskOpen = New-Button 'Open Task Scheduler'
+$lvTasks = New-ListView $true @('Task', 270, 'Made by', 170, 'Runs', 150, 'State', 80, 'Advice', 420)
+$lblTasks = New-Status
+Set-PageLayout $pgTasks $lvTasks @((New-ButtonBar @($btnTaskOff, $btnTaskOn, $btnTaskScan, $btnTaskOpen))) $lblTasks
+# Matched against task name, folder and author. Checked before the keep rules (like services).
+$TaskCatalog = @(
+    @{ Match = 'nWizard|nView';                                                           Why = 'NVIDIA nView launcher - crashes other programs' }
+    @{ Match = 'NvTmRep|NvProfileUpdater|NvNodeLauncher|NvDriverUpdateCheck|GeForce Experience SelfUpdate'; Why = 'NVIDIA telemetry / updater' }
+    @{ Match = 'AdobeGCInvoker|Adobe-Genuine-Software-Integrity|AdobeGenuine';              Why = 'Adobe licence checker' }
+    @{ Match = 'Adobe Acrobat Update Task|AdobeAAMUpdater';                                Why = 'Adobe updater (Acrobat still updates when opened)' }
+    @{ Match = 'Launch Adobe CCXProcess';                                                  Why = 'Adobe Creative Cloud helper - only needed if you use Creative Cloud' }
+    @{ Match = 'GoogleUpdateTask|GoogleUpdater';                                           Why = 'Google updater (Chrome still updates when open)' }
+    @{ Match = 'PlatformExperienceHelper|GoogleUserPEH';                                   Why = 'Google promotions helper' }
+    @{ Match = 'MicrosoftEdgeUpdateTask';                                                  Why = 'Edge updater (Edge still updates when open)' }
+    @{ Match = 'BraveSoftwareUpdate|Opera scheduled Autoupdate|Opera GX scheduled';        Why = 'browser updater (updates when the browser is open)' }
+    @{ Match = 'Firefox Default Browser Agent';                                            Why = 'Firefox usage reporting' }
+    @{ Match = 'ZoomUpdateTask';                                                           Why = 'Zoom updater (Zoom updates itself when opened)' }
+    @{ Match = 'SupportAssist|DellTechHub|Dell(?!.*Peripheral).*(Update|Optimizer|Digital|Customer)'; Why = 'Dell support / telemetry tool' }
+    @{ Match = 'HP (Customer Participation|Support Assistant|JumpStart|Touchpoint|Notifications)|HPCEE|HPAudioSwitch'; Why = 'HP support / telemetry tool' }
+    @{ Match = 'Lenovo.*(UDC|Vantage|Now|Welcome)';                                        Why = 'Lenovo helper / telemetry' }
+    @{ Match = 'ASUS.*(Update|LiveUpdate|GiftBox)|AsusUpdateCheck';                        Why = 'ASUS updater' }
+    @{ Match = 'Acer.*(Jumpstart|Collection|Portal|Registration)';                         Why = 'Acer promo / registration' }
+    @{ Match = 'Intel.*(Telemetry|SUR|ESRV)|USER_ESRV_SVC';                                Why = 'Intel telemetry' }
+    @{ Match = 'CCleaner|Avast|AVG|McAfee|Norton|WildTangent|Driver Booster|OneLaunch|Wave Browser'; Why = 'cleaner / trial / adware helper' }
+    @{ Match = 'SoftLanding';                                                              Why = 'Windows tips and promotional notifications' }
+)
+$TaskLikely = 'Update|Updater|Telemetry|Metrics|Report|Analytics|Promo|Notif|Survey'
+$TaskScanWork = {
+    param($cfg)
+    $when = @{ MSFT_TaskLogonTrigger = 'at sign-in'; MSFT_TaskBootTrigger = 'at start-up'; MSFT_TaskDailyTrigger = 'daily'; MSFT_TaskWeeklyTrigger = 'weekly'
+               MSFT_TaskIdleTrigger = 'when idle'; MSFT_TaskSessionStateChangeTrigger = 'on unlock'; MSFT_TaskEventTrigger = 'on a Windows event'; MSFT_TaskRegistrationTrigger = 'when installed' }
+    foreach ($t in Get-ScheduledTask -ErrorAction SilentlyContinue) {
+        $soft = $t.TaskName -like 'SoftLanding*' -or $t.TaskPath -like '\SoftLanding\*'
+        if ($t.TaskPath -like '\Microsoft\*' -and -not $soft) { continue }   # Windows' own
+        $text = "$($t.TaskPath)$($t.TaskName) | $($t.Author)"
+        $exe = [Environment]::ExpandEnvironmentVariables("$(@($t.Actions)[0].Execute)".Trim('"'))
+        $company = if ($exe -and (Test-Path -LiteralPath $exe -ErrorAction SilentlyContinue)) { try { [Diagnostics.FileVersionInfo]::GetVersionInfo($exe).CompanyName } catch { '' } } else { '' }
+        $maker = if ($t.Author -and $t.Author -notmatch '\\') { "$($t.Author)" } elseif ($company) { $company } elseif ($soft) { 'Microsoft (Windows)' } else { '' }
+        $known = $cfg.Catalog | Where-Object { $text -match $_.Match } | Select-Object -First 1
+        if (-not $known -and $cfg.UserKeep -and "$text $company" -match $cfg.UserKeep) { continue }
+        if (-not $known -and "$text $company" -match $cfg.Keep) { continue }
+        $kind = if ($known) { 'known' } elseif ($t.TaskName -match $cfg.Likely) { 'likely' } else { 'review' }
+        $why = if ($known) { $known.Why } elseif ($kind -eq 'likely') { 'looks like an updater or telemetry - usually safe to turn off' } else { 'review: only turn off if you know what it is' }
+        $runs = (@($t.Triggers | ForEach-Object { $c = $_.CimClass.CimClassName; if ($c -eq 'MSFT_TaskTimeTrigger') { if ($_.Repetition.Interval) { 'repeatedly' } else { 'once' } } elseif ($when[$c]) { $when[$c] } else { 'on a schedule' } } | Select-Object -Unique))
+        [pscustomobject]@{ Name = $t.TaskName; Path = $t.TaskPath; Maker = $maker; Runs = $(if ($runs) { $runs } else { , @('only when started') })
+                           State = "$($t.State)"; Kind = $kind; Why = $why }
+    }
+}
+$TaskOrder = @{ known = 0; likely = 1; review = 2 }
+function Update-Tasks {
+    $btnTaskScan.Enabled = $false
+    $lblTasks.Text = 'Reading scheduled tasks...'
+    Start-Bg -Label 'Reading scheduled tasks' $TaskScanWork @{ Catalog = $TaskCatalog; Likely = $TaskLikely; Keep = $KeepBuiltIn; UserKeep = (Get-UserKeep) } {
+        param($rows)
+        $btnTaskScan.Enabled = $true
+        $lvTasks.BeginUpdate(); $lvTasks.Items.Clear()
+        foreach ($r in $rows | Sort-Object { $TaskOrder[$_.Kind] }, { $_.State -eq 'Disabled' }, Name) {
+            $it = Add-Row $lvTasks @($r.Name, $r.Maker, ((@($r.Runs) | ForEach-Object { T $_ }) -join ', '), $(if ($r.State -eq 'Disabled') { 'Off' } else { 'On' }), $r.Why) $r ($r.Kind -eq 'known' -and $r.State -ne 'Disabled')
+            $it.ForeColor = if ($r.State -eq 'Disabled') { $Theme.Muted } elseif ($r.Kind -eq 'known') { $Theme.Bad } elseif ($r.Kind -eq 'review') { $Theme.Muted } else { $Theme.Text }
+        }
+        $lvTasks.EndUpdate()
+        $active = @($rows | Where-Object { $_.Kind -eq 'known' -and $_.State -ne 'Disabled' }).Count
+        $lblTasks.Text = if ($active) { "$active known junk task(s) are switched on and pre-checked. Grey rows are already off." } else { 'No known junk tasks are running. Grey rows are already off.' }
+        $script:TasksActive = $active
+        if ($script:NavButtons) { Update-NavBadges }
+    }
+}
+function Set-Tasks([bool]$Enable) {
+    $picked = @($lvTasks.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { ($_.State -eq 'Disabled') -eq $Enable })
+    if (-not $picked) { Show-Msg $(if ($Enable) { 'Check one or more tasks that are off first.' } else { 'Check one or more tasks that are on first.' }) | Out-Null; return }
+    $done = 0; $denied = @()
+    foreach ($t in $picked) {
+        try {
+            if ($Enable) { [void](Enable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction Stop) }
+            else { [void](Disable-ScheduledTask -TaskPath $t.Path -TaskName $t.Name -ErrorAction Stop) }
+            Add-History 'Task' $t.Name $(if ($Enable) { 'switched on' } else { 'switched off' }) @{ Type = 'Task'; Path = $t.Path; Name = $t.Name; Enable = (-not $Enable) }
+            $done++
+        } catch { $denied += $t.Name }
+    }
+    Update-History; Update-Tasks
+    $msg = "$done task(s) switched $(if ($Enable) { 'on' } else { 'off' }). Undo from the History page."
+    if ($denied) { $msg += "`n`nThese need administrator rights (click ""Restart as admin""): $($denied -join ', ')" }
+    Show-Msg $msg | Out-Null
+}
+$btnTaskOff.Add_Click({ Set-Tasks $false })
+$btnTaskOn.Add_Click({ Set-Tasks $true })
+$btnTaskScan.Add_Click({ Update-Tasks })
+$btnTaskOpen.Add_Click({ Start-Process taskschd.msc })
+
+# ===========================================================================
+# Backup: would the files survive a broken, lost or stolen PC?
+# ===========================================================================
+$pgBackup = New-Page 'Backup' 'Would your files survive a broken, lost or stolen PC? Checks your cloud folders, File History, backup programs and restore points. Double-click a row (or select it and click Open setting) to change it.'
+$btnBkOpen = New-Button 'Open setting'
+$btnBkScan = New-Button 'Check again'
+$btnBkRp = New-Button 'Create restore point now'
+if (-not $IsAdmin) { $btnBkRp.Enabled = $false }
+$lvBackup = New-ListView $false @('Check', 220, 'Status', 80, 'Result', 380, 'What to do', 560)
+$txtBackup = New-DetailBox 104
+Set-PageLayout $pgBackup $lvBackup @((New-ButtonBar @($btnBkOpen, $btnBkScan, $btnBkRp))) $txtBackup
+$lblBackup = New-Status; $pgBackup.Controls.Add($lblBackup)
+$BackupWork = {
+    param($admin)
+    $rows = New-Object System.Collections.ArrayList
+    function Add-Bk($Check, $Level, $Result, $Todo, $Link) { [void]$rows.Add([pscustomobject]@{ Check = $Check; Level = $Level; Result = $Result; Todo = $Todo; Link = $Link }) }
+    # Cloud folders that keep a copy of what's inside them
+    $roots = @()
+    foreach ($a in Get-ChildItem 'HKCU:\Software\Microsoft\OneDrive\Accounts' -ErrorAction SilentlyContinue) {
+        $p = Get-ItemProperty $a.PSPath -ErrorAction SilentlyContinue
+        if ($p.UserFolder) { $roots += [pscustomobject]@{ Name = $(if ($a.PSChildName -eq 'Personal') { 'OneDrive' } else { Split-Path $p.UserFolder -Leaf }); Path = $p.UserFolder } }
+    }
+    $dbx = Join-Path $env:LOCALAPPDATA 'Dropbox\info.json'
+    if (Test-Path $dbx) { try { (Get-Content $dbx -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($_.Value.path) { $roots += [pscustomobject]@{ Name = 'Dropbox'; Path = $_.Value.path } } } } catch { } }
+    $icloud = Join-Path $env:USERPROFILE 'iCloudDrive'
+    if (Test-Path $icloud) { $roots += [pscustomobject]@{ Name = 'iCloud Drive'; Path = $icloud } }
+    $usf = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -ErrorAction SilentlyContinue
+    $folders = [ordered]@{ Desktop = $usf.Desktop; Documents = $usf.Personal; Pictures = $usf.'My Pictures' }
+    $covered = @(); $missing = @(); $where = @()
+    foreach ($k in $folders.Keys) {
+        $path = [Environment]::ExpandEnvironmentVariables("$($folders[$k])")
+        $root = $roots | Where-Object { $path -and $path.StartsWith($_.Path.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1
+        if ($root) { $covered += $k; $where += $root.Name } else { $missing += $k }
+    }
+    $cloud = ($where | Select-Object -Unique) -join ', '
+    if (-not $missing) { Add-Bk 'Desktop, Documents and Pictures' 'OK' "Backed up to $cloud" 'Nothing to do - every change is copied to the cloud.' 'ms-settings:backup' }
+    elseif ($covered) { Add-Bk 'Desktop, Documents and Pictures' 'Warning' "$($covered -join ', ') backed up to $cloud; not: $($missing -join ', ')" 'Add the missing folders: OneDrive settings > Sync and back up > Manage back up (or Settings > Accounts > Windows backup).' 'ms-settings:backup' }
+    else { Add-Bk 'Desktop, Documents and Pictures' 'Problem' 'Not in any cloud folder' 'If the PC breaks or is stolen, these files are gone. Turn on folder backup: Settings > Accounts > Windows backup (OneDrive), or use File History with an external drive.' 'ms-settings:backup' }
+    if ($roots | Where-Object Name -like 'OneDrive*') {
+        if (Get-Process -Name OneDrive -ErrorAction SilentlyContinue) { Add-Bk 'OneDrive running' 'OK' 'Yes - changes are uploaded' 'Nothing to do.' $null }
+        else { Add-Bk 'OneDrive running' 'Warning' 'No - changes are not being uploaded' 'Start OneDrive (it is in the Start menu) and let it sign in; check that it starts with Windows on the Startup page.' 'start-onedrive' }
+    }
+    # File History: a second copy on an external drive or network share
+    if (Test-Path (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\FileHistory\Configuration\Config1.xml')) { Add-Bk 'File History' 'OK' 'On' 'Keep the backup drive connected now and then.' 'control.exe /name Microsoft.FileHistory' }
+    else { Add-Bk 'File History' 'Info' 'Off' 'Optional extra copy (also of older versions) on an external drive: Control Panel > File History.' 'control.exe /name Microsoft.FileHistory' }
+    # Backup programs
+    $progs = foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall', 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall') {
+        Get-ChildItem $k -ErrorAction SilentlyContinue | ForEach-Object { "$((Get-ItemProperty $_.PSPath -ErrorAction SilentlyContinue).DisplayName)" } |
+            Where-Object { $_ -match 'Acronis|Macrium|Veeam|Backblaze|IDrive|Carbonite|CrashPlan|EaseUS Todo Backup|AOMEI Backupper|Duplicati|Cobian|Synology (Active Backup|Drive)|Google Drive|Paragon Backup|Arq' } }
+    $progs = @($progs | Select-Object -Unique)
+    if ($progs) { Add-Bk 'Backup program' 'OK' "Found: $(($progs | Select-Object -First 3) -join ', ')" 'Check now and then that it still runs and that you can restore a file.' $null }
+    else { Add-Bk 'Backup program' 'Info' 'None found' 'Optional: a backup program (Macrium Reflect and Veeam Agent have free versions) makes a full copy of the PC, including programs and settings.' $null }
+    # Restore points (Windows only shows them to administrators)
+    if ($admin) {
+        $rp = @(Get-ComputerRestorePoint -ErrorAction SilentlyContinue)
+        if ($rp) {
+            $last = ($rp | ForEach-Object { $_.ConvertToDateTime($_.CreationTime) } | Measure-Object -Maximum).Maximum
+            $days = [int]((Get-Date) - $last).TotalDays
+            Add-Bk 'Restore points' $(if ($days -le 30) { 'OK' } else { 'Warning' }) "$($rp.Count) restore point(s), the latest $days day(s) ago" `
+                $(if ($days -le 30) { 'Nothing to do.' } else { 'Create one now (button above) - they let you undo a bad driver or update.' }) 'SystemPropertiesProtection.exe'
+        } else { Add-Bk 'Restore points' 'Warning' 'None found - System Protection may be off' 'Switch on System Protection for C: (System Properties > System Protection > Configure), then create one.' 'SystemPropertiesProtection.exe' }
+    } else { Add-Bk 'Restore points' 'Info' 'Only visible as administrator' 'Click "Restart as admin" to check them.' 'SystemPropertiesProtection.exe' }
+    $none = -not $covered -and -not (Test-Path (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\FileHistory\Configuration\Config1.xml')) -and -not $progs
+    [pscustomobject]@{ Rows = $rows; NoBackup = $none; Cloud = $cloud }
+}
+function Update-Backup {
+    $btnBkScan.Enabled = $false
+    $lblBackup.Text = 'Checking backups...'
+    Start-Bg -Label 'Checking backups' $BackupWork $IsAdmin {
+        param($r)
+        $btnBkScan.Enabled = $true
+        $r = $r[0]
+        $lvBackup.BeginUpdate(); $lvBackup.Items.Clear()
+        foreach ($b in $r.Rows | Sort-Object { $SecLevels[$_.Level] }) {
+            $it = Add-Row $lvBackup @($b.Check, $b.Level, $b.Result, $b.Todo) $b
+            $it.ForeColor = switch ($b.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+        }
+        $lvBackup.EndUpdate()
+        $lblBackup.Text = if ($r.NoBackup) { 'Nothing is backing up your files.' } elseif ($r.Cloud) { "Your files are backed up to $($r.Cloud)." } else { 'Some backup is in place - see the rows above.' }
+        if ($r.NoBackup) { $script:ExtraAdvice['Backup'] = 'Backup: nothing backs up your files - see the Backup page.' } else { $script:ExtraAdvice.Remove('Backup') }
+        $script:BackupProblems = @($r.Rows | Where-Object { $_.Level -in 'Problem', 'Warning' }).Count
+        if ($lvBackup.Items.Count) { $lvBackup.Items[0].Selected = $true }
+        Update-Health -Quick
+    }
+}
+function Open-BackupSetting {
+    if (-not $lvBackup.SelectedItems.Count) { return }
+    $link = $lvBackup.SelectedItems[0].Tag.Link
+    if (-not $link) { return }
+    try {
+        if ($link -eq 'start-onedrive') {
+            $od = @("$env:LOCALAPPDATA\Microsoft\OneDrive\OneDrive.exe", "$env:ProgramFiles\Microsoft OneDrive\OneDrive.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+            if ($od) { Start-Process $od } else { Show-Msg 'OneDrive was not found.' | Out-Null }
+        } elseif ($link -match '^control\.exe (.*)$') { Start-Process control.exe $Matches[1] }
+        else { Start-Process $link }
+    } catch { Show-Msg "Couldn't open $link" | Out-Null }
+}
+$lvBackup.Add_SelectedIndexChanged({
+    if (-not $lvBackup.SelectedItems.Count) { return }
+    $b = $lvBackup.SelectedItems[0].Tag
+    $txtBackup.Text = "$($b.Check): $($b.Result)`r`n`r`nWhat to do: $($b.Todo)"
+    $btnBkOpen.Enabled = [bool]$b.Link
+})
+$lvBackup.Add_DoubleClick({ Open-BackupSetting })
+$btnBkOpen.Add_Click({ Open-BackupSetting })
+$btnBkScan.Add_Click({ Update-Backup })
+$btnBkRp.Add_Click({
+    $btnBkRp.Enabled = $false
+    Start-Bg -Label 'Creating a restore point' { try { Checkpoint-Computer -Description 'PC Tune-Up' -RestorePointType MODIFY_SETTINGS -ErrorAction Stop -WarningVariable w -WarningAction SilentlyContinue; if ($w) { "skipped: $($w[0])" } else { 'ok' } } catch { $_.Exception.Message } } $null {
+        param($r)
+        $btnBkRp.Enabled = $true
+        if ("$($r[0])" -eq 'ok') { Add-History 'Restore point' 'C:' 'created'; Update-History; Show-Msg 'Restore point created.' | Out-Null }
+        else { Show-Msg "No restore point made: $($r[0])" 'OK' 'Warning' | Out-Null }
+        Update-Backup
+    }
 })
 
 # ===========================================================================
@@ -2906,6 +3410,11 @@ $btnHistUndo.Add_Click({
                     if ($orig.ContainsKey($u.Name) -and $orig[$u.Name] -eq $u.StartType) { $orig.Remove($u.Name); Save-ServiceOriginals $orig }
                     $logs += , @('Undo', $e.Item, "service back to $($u.StartType)")
                 }
+                'Task' {
+                    if ($u.Enable) { [void](Enable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
+                    else { [void](Disable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
+                    $logs += , @('Undo', $e.Item, $(if ($u.Enable) { 'scheduled task switched back on' } else { 'scheduled task switched off again' }))
+                }
                 'Store' {
                     Start-Process "ms-windows-store://pdp/?PFN=$($u.Family)"   # opens its Store page; user clicks Get
                     $markUndone = $false
@@ -3129,6 +3638,8 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T "Apps that start with Windows ($($startOn.Count) on)")</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>$(T 'Backup')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvBackup.Items @(0, 1, 2, 3))
+<h2>$(T 'Scheduled tasks')</h2>$(ConvertTo-HtmlRows @('Task', 'Made by', 'Runs', 'State', 'Advice') $lvTasks.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Security')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvSec.Items @(0, 1, 2, 3))
 <h2>$(T 'Stability (last 30 days)')</h2>$(ConvertTo-HtmlRows @('Problem', 'What', 'Times', 'Last', 'What to do') $lvStab.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Program updates available')</h2>$(ConvertTo-HtmlRows @('Program', 'Installed', 'Available', 'Note') $lvUpd.Items @(0, 1, 2, 3))
@@ -3307,8 +3818,8 @@ $OldExeCleanupWork = {
 # ===========================================================================
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
-    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Disk') }
-    @{ Title = 'CHECK';    Pages = @('Updates', 'Security', 'Stability', 'Upgrades') }
+    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Tasks', 'Disk') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Security', 'Stability', 'Backup', 'Upgrades') }
     @{ Title = 'MORE';     Pages = @('History', 'Settings') }
 )
 $script:NavButtons = @{}
@@ -3332,6 +3843,8 @@ function Update-NavBadges {
     Set-NavBadge 'Security' @($lvSec.Items | Where-Object { $_.Tag.Level -in 'Problem', 'Warning' }).Count
     Set-NavBadge 'Stability' @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
     Set-NavBadge 'Bloatware' @($lvBloat.Items).Count
+    Set-NavBadge 'Tasks' $script:TasksActive
+    Set-NavBadge 'Backup' $script:BackupProblems
 }
 
 $nav = New-Object Windows.Forms.FlowLayoutPanel
@@ -3385,7 +3898,7 @@ if (-not $IsAdmin) {
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -3424,7 +3937,8 @@ function Update-ActivityBar {
 # Page data loads in the background after the window opens, or straight away when a page is opened
 # ---------------------------------------------------------------------------
 $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-Stability }; Bloatware = { Start-BloatScan }; Services = { Update-Services }
-                         Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades } }
+                         Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
+                         Tasks = { Update-Tasks }; Backup = { Update-Backup } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -3435,7 +3949,7 @@ function Invoke-PageLoader([string]$Name) {
 function Start-Everything {
     Update-Health; Update-Startup; Update-History
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Updates', 'Services', 'Bloatware', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Updates', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Clean'))
 }
 Enable-Translation $form
 Show-Page $pgHealth

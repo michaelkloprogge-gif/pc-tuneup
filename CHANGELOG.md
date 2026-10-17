@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0
+
+- **One-click fixes on the Stability page**: select a problem and click *Fix selected problem* - turn off NVIDIA nView (or uninstall it), repair the Visual C++ runtimes, reset Windows Update, repair Windows system files (sfc + DISM), check the drive, schedule a memory test, or jump to driver and Store updates. Everything asks first and is recorded in History; turning off nView can be undone.
+- Stability recognises when nView is already switched off and no longer counts its old crashes as a problem.
+- New **Backup** page: checks whether Desktop, Documents and Pictures are backed up to OneDrive, Dropbox or iCloud, whether OneDrive is running, File History, backup programs and restore points (with a *Create restore point now* button). Health warns when nothing backs up your files.
+- New **Tasks** page: scheduled tasks from other companies - updaters, telemetry and promo helpers (Adobe, Google, Zoom, Edge, Dell, HP, Lenovo, Windows tips...). Known junk is pre-checked; switching a task off can be undone from History, and the keep list is respected.
+- Windows Update error codes are shown in the usual form (0x800F0820 instead of 0xFFFFFFFF800F0820).
 ## 1.6.1
 
 - **Faster and smoother**: the window no longer freezes while checks finish (longest freeze down from about 4 seconds to under 0.3 s). Health readings are gathered in the background and the page only redraws what changed.

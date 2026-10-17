@@ -19,14 +19,15 @@
 
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 # Tell Windows this app scales itself, so it is drawn sharp at 125%/150% instead of being stretched (blurry).
-# Must happen before the first window is created.
-Add-Type -Namespace PcTuneUp -Name Native -ErrorAction SilentlyContinue -MemberDefinition @'
+# Must happen before the first window is created. PC-TuneUp.exe already contains these functions (no compiling
+# at start-up, which costs about half a second); the plain script compiles them itself.
+if (-not ('PcTuneUp.Native' -as [type])) { Add-Type -Namespace PcTuneUp -Name Native -ErrorAction SilentlyContinue -MemberDefinition @'
 [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
 [DllImport("kernel32.dll")] public static extern bool AttachConsole(int pid);
 [DllImport("dwmapi.dll")] public static extern int DwmSetWindowAttribute(System.IntPtr h, int attr, ref int value, int size);
 [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)] public static extern int SetWindowTheme(System.IntPtr h, string app, string idList);
 [DllImport("user32.dll")] public static extern System.IntPtr SendMessage(System.IntPtr h, int msg, System.IntPtr w, System.IntPtr l);
-'@
+'@ }
 try { [void][PcTuneUp.Native]::SetProcessDPIAware() } catch { }
 [Windows.Forms.Application]::EnableVisualStyles()
 $DpiScale = try { [Drawing.Graphics]::FromHwnd([IntPtr]::Zero).DpiX / 96 } catch { 1 }
@@ -46,7 +47,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.6.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.6.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -959,7 +960,7 @@ function Start-Bg([scriptblock]$Work, $Arg, [scriptblock]$Done, [string]$Label, 
     [void]$script:Jobs.Add(@{ PS = $ps; RS = $rs; Handle = $ps.BeginInvoke(); Done = $Done; Label = $Label; State = $state; Cancellable = [bool]$Cancellable })
     if ($activity) { Update-ActivityBar }
 }
-# Page data is loaded in the background a couple of jobs at a time, so the window opens instantly.
+# Page data is loaded in the background a few jobs at a time, so the window opens instantly.
 $script:LoadQueue = New-Object System.Collections.ArrayList
 $JobTimer = New-Object Windows.Forms.Timer
 $JobTimer.Interval = 250
@@ -972,7 +973,7 @@ $JobTimer.Add_Tick({
         $j.PS.Dispose(); $j.RS.Dispose()
         & $j.Done $result $j.State
     }
-    while ($script:LoadQueue.Count -and $script:Jobs.Count -lt 2) {
+    while ($script:LoadQueue.Count -and $script:Jobs.Count -lt 4) {   # four checks at a time
         $next = $script:LoadQueue[0]; $script:LoadQueue.RemoveAt(0)
         Invoke-PageLoader $next
     }
@@ -1205,8 +1206,10 @@ function Set-KeyValues($Grid, [string[]]$Lines) {
     $Grid.ResumeLayout()
 }
 
-$cs = Get-CimInstance Win32_ComputerSystem
-$PcName = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim()
+# The PC's name from the registry (instant) rather than WMI (~200 ms at every start); WMI only if it's missing.
+$bios = Get-ItemProperty 'HKLM:\HARDWARE\DESCRIPTION\System\BIOS' -ErrorAction SilentlyContinue
+$PcName = ('{0} {1}' -f $bios.SystemManufacturer, $bios.SystemProductName).Trim()
+if (-not $PcName) { $cs = Get-CimInstance Win32_ComputerSystem; $PcName = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim() }
 $script:HealthDeep = $null   # drive / battery / update results from the background check
 $script:ExtraAdvice = @{}    # one-line findings from the Updates / Security / Stability tabs, keyed by tab
 
@@ -1258,36 +1261,22 @@ $HealthDeepWork = {
     [pscustomobject]@{ Lines = $lines; Advice = $advice }
 }
 
-function Update-Health([switch]$Quick) {
+# The everyday readings (CPU, memory, disks, power, top programs). Gathered in the background: reading
+# the processor load alone takes about a second, which would freeze the window.
+$HealthQuickWork = {
+    $PSDefaultParameterValues = @{ 'Get-CimInstance:OperationTimeoutSec' = 15; 'Get-CimInstance:ErrorAction' = 'SilentlyContinue' }
     $os = Get-CimInstance Win32_OperatingSystem
     $cpu = [int](Get-CimInstance Win32_Processor | Measure-Object LoadPercentage -Average).Average
-    $up = (Get-Date) - $os.LastBootUpTime
     $procs = @(Get-Process | Group-Object Name | ForEach-Object {
         [pscustomobject]@{ Name = $_.Name; MB = [int](($_.Group | Measure-Object WorkingSet64 -Sum).Sum / 1MB); Count = $_.Count }
-    } | Sort-Object MB -Descending)
-    $usedPct = [int](100 * (1 - $os.FreePhysicalMemory / $os.TotalVisibleMemorySize))
-    $advice = @()
-    $lines = @(
-        "This PC:   $PcName ($($os.Caption -replace '^Microsoft ', ''))"
-        "CPU load:  $cpu%"
-        ('Memory:    {0:N1} GB free of {1:N1} GB ({2}% used)' -f ($os.FreePhysicalMemory / 1MB), ($os.TotalVisibleMemorySize / 1MB), $usedPct)
-        ('Uptime:    {0}d {1}h {2}m' -f $up.Days, $up.Hours, $up.Minutes)
-    )
-    if ($usedPct -ge 85) {
-        $top = $procs | Where-Object { $_.Name -notin 'svchost', 'Memory Compression', 'System', 'dwm' } | Select-Object -First 1
-        $advice += "Memory is $usedPct% full, which slows everything down - closing $($top.Name) ($($top.MB) MB) would help most."
-    }
-    foreach ($d in Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3') {
-        if (-not $d.Size) { continue }
-        $pct = [int](100 * $d.FreeSpace / $d.Size)
-        $lines += ('Disk {0}:    {1} free of {2} ({3}% free)' -f $d.DeviceID.TrimEnd(':'), (Format-Size $d.FreeSpace), (Format-Size $d.Size), $pct)
-        if ($pct -lt 15) { $advice += "Drive $($d.DeviceID) is getting full ($pct% free) - use Fix my PC, then the Clean and Disk tabs." }
-    }
+    } | Sort-Object MB -Descending | Select-Object -First 25)
+    $disks = @(Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | Where-Object Size |
+               ForEach-Object { [pscustomobject]@{ Id = $_.DeviceID; Free = [double]$_.FreeSpace; Size = [double]$_.Size } })
     # Power plan, plus the Windows 11 power-mode slider (an "overlay" on the plan).
     $plan = if ("$(powercfg /getactivescheme)" -match '\(([^)]+)\)') { $Matches[1] } else { 'unknown' }
     $ps = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes' -ErrorAction SilentlyContinue
-    $bat = Get-CimInstance Win32_Battery -ErrorAction SilentlyContinue | Select-Object -First 1
-    $onBattery = $bat -and $bat.BatteryStatus -eq 1
+    $bat = Get-CimInstance Win32_Battery | Select-Object -First 1
+    $onBattery = [bool]($bat -and $bat.BatteryStatus -eq 1)
     $overlay = if ($onBattery) { $ps.ActiveOverlayDcPowerScheme } else { $ps.ActiveOverlayAcPowerScheme }
     $mode = switch ($overlay) {
         '961cc777-2547-4f9d-8174-7d86181b8a7a' { 'best power efficiency' }
@@ -1295,30 +1284,65 @@ function Update-Health([switch]$Quick) {
         'ded574b5-45a0-4f42-8737-46345c09c238' { 'best performance' }
         default { '' }
     }
-    $powerLine = "Power:     $plan plan" + $(if ($mode) { ", $mode mode" }) + $(if ($bat) { if ($onBattery) { ', on battery' } else { ', plugged in' } })
-    $lines += $powerLine
-    if (-not $onBattery -and ($plan -match 'saver' -or $mode -eq 'best power efficiency')) {
-        $advice += 'The PC is plugged in but set to save energy - set Power mode to Balanced in Settings > System > Power for more speed.'
-    }
-    if ($up.TotalDays -gt 7) { $advice += "The PC hasn't restarted in $($up.Days) days - a restart clears out a lot of slowness." }
+    [pscustomobject]@{ Stamp = [guid]::NewGuid(); Caption = "$($os.Caption)" -replace '^Microsoft ', ''; Cpu = $cpu
+                       FreeKB = [double]$os.FreePhysicalMemory; TotalKB = [double]$os.TotalVisibleMemorySize; Boot = $os.LastBootUpTime
+                       Procs = $procs; Disks = $disks; Plan = $plan; Mode = $mode; HasBattery = [bool]$bat; OnBattery = $onBattery }
+}
+$script:HealthQuick = $null
 
+# Draws the Health page from the latest readings. Cheap (no Windows queries), so every page can call it.
+function Render-Health {
+    $q = $script:HealthQuick
+    $advice = @()
+    $lines = @()
+    if ($q) {
+        $up = (Get-Date) - $q.Boot
+        $usedPct = [int](100 * (1 - $q.FreeKB / $q.TotalKB))
+        $lines += "This PC:   $PcName ($($q.Caption))"
+        $lines += "CPU load:  $($q.Cpu)%"
+        $lines += ('Memory:    {0:N1} GB free of {1:N1} GB ({2}% used)' -f ($q.FreeKB / 1MB), ($q.TotalKB / 1MB), $usedPct)
+        $lines += ('Uptime:    {0}d {1}h {2}m' -f $up.Days, $up.Hours, $up.Minutes)
+        if ($usedPct -ge 85) {
+            $top = $q.Procs | Where-Object { $_.Name -notin 'svchost', 'Memory Compression', 'System', 'dwm' } | Select-Object -First 1
+            $advice += "Memory is $usedPct% full, which slows everything down - closing $($top.Name) ($($top.MB) MB) would help most."
+        }
+        foreach ($d in $q.Disks) {
+            $pct = [int](100 * $d.Free / $d.Size)
+            $lines += ('Disk {0}:    {1} free of {2} ({3}% free)' -f $d.Id.TrimEnd(':'), (Format-Size $d.Free), (Format-Size $d.Size), $pct)
+            if ($pct -lt 15) { $advice += "Drive $($d.Id) is getting full ($pct% free) - use Fix my PC, then the Clean and Disk tabs." }
+        }
+        $lines += "Power:     $($q.Plan) plan" + $(if ($q.Mode) { ", $($q.Mode) mode" }) + $(if ($q.HasBattery) { if ($q.OnBattery) { ', on battery' } else { ', plugged in' } })
+        if (-not $q.OnBattery -and ($q.Plan -match 'saver' -or $q.Mode -eq 'best power efficiency')) {
+            $advice += 'The PC is plugged in but set to save energy - set Power mode to Balanced in Settings > System > Power for more speed.'
+        }
+        if ($up.TotalDays -gt 7) { $advice += "The PC hasn't restarted in $($up.Days) days - a restart clears out a lot of slowness." }
+    } else { $lines += "This PC:   $PcName"; $lines += 'Checking this PC...' }
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
     foreach ($k in 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
-    $script:HealthLines = $lines
-    Set-KeyValues $gridHealth $lines
-    $lblAdvice.Text = ($advice | ForEach-Object { [char]0x2022 + "  $_" }) -join "`r`n"
-    Resize-Advice
+    $key = ($lines + $advice) -join '|'
+    if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
+        $script:HealthDrawn = $key
+        $script:HealthLines = $lines
+        Set-KeyValues $gridHealth $lines
+        $lblAdvice.Text = ($advice | ForEach-Object { [char]0x2022 + "  $_" }) -join "`r`n"
+        Resize-Advice
+    }
     $script:HealthAdvice = $advice
     if ($script:NavButtons) { Update-NavBadges }
-
-    $lvProc.BeginUpdate(); $lvProc.Items.Clear()
-    $procs | Select-Object -First 20 | ForEach-Object { [void](Add-Row $lvProc @($_.Name, $_.MB, $_.Count)) }
-    $lvProc.EndUpdate()
-
-    if (-not $Quick) {   # refresh the slow checks too, then redraw with them
-        Start-Bg -Label 'Checking drive, battery and updates' $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0] }; Update-Health -Quick }
+    if ($q -and $script:ProcsDrawn -ne $q.Stamp) {
+        $script:ProcsDrawn = $q.Stamp
+        $lvProc.BeginUpdate(); $lvProc.Items.Clear()
+        $q.Procs | Select-Object -First 20 | ForEach-Object { [void](Add-Row $lvProc @($_.Name, $_.MB, $_.Count)) }
+        $lvProc.EndUpdate()
     }
+}
+# -Quick: just redraw. Otherwise also refresh both sets of readings in the background.
+function Update-Health([switch]$Quick) {
+    Render-Health
+    if ($Quick) { return }
+    Start-Bg -Label 'Checking this PC' $HealthQuickWork $null { param($r) if ($r) { $script:HealthQuick = $r[0] }; Render-Health }
+    Start-Bg -Label 'Checking drive, battery and updates' $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0] }; Render-Health }
 }
 
 $SpeedWork = {
@@ -3410,7 +3434,8 @@ function Invoke-PageLoader([string]$Name) {
 }
 function Start-Everything {
     Update-Health; Update-Startup; Update-History
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Bloatware', 'Services', 'Clean', 'Updates', 'Upgrades'))
+    # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Updates', 'Services', 'Bloatware', 'Clean'))
 }
 Enable-Translation $form
 Show-Page $pgHealth

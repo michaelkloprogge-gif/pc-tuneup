@@ -1,4 +1,4 @@
-# Builds PC-TuneUp.exe: a small C# host with pc-tuneup.ps1 embedded as a resource.
+﻿# Builds PC-TuneUp.exe: a small C# host with pc-tuneup.ps1 embedded as a resource.
 # Uses the C# compiler that ships with Windows (.NET Framework 4.x) - nothing to install.
 # Run again after editing pc-tuneup.ps1.
 
@@ -70,6 +70,20 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Health check, cleanup, startup apps, bloatware and services")]
 [assembly: AssemblyVersion("APPVERSION.0")]
 [assembly: AssemblyFileVersion("APPVERSION.0")]
+
+// The Windows functions the script needs. Defined here so the script doesn't have to compile them
+// at every start (it checks for PcTuneUp.Native before calling Add-Type).
+namespace PcTuneUp
+{
+    public static class Native
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")] public static extern bool AttachConsole(int pid);
+        [System.Runtime.InteropServices.DllImport("dwmapi.dll")] public static extern int DwmSetWindowAttribute(IntPtr h, int attr, ref int value, int size);
+        [System.Runtime.InteropServices.DllImport("uxtheme.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int SetWindowTheme(IntPtr h, string app, string idList);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
+    }
+}
 
 static class Program
 {

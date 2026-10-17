@@ -13,6 +13,7 @@
 #   Browsers  - extensions, search engine, home page and forced policies (adware) in Chrome/Edge/Brave/Vivaldi/Firefox
 #   Network   - Wi-Fi signal, delays, DNS speed, dropped connections, network reset
 #   Battery   - wear, wear speed, runtime, charge-limit advice (laptops only)
+#   Space savers - hibernation file, reserved storage, OneDrive copies, Compact OS, Storage Sense (with undo)
 #   Disk      - find the folders eating your drive
 #   Updates   - outdated programs, updated through winget
 #   Security  - Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM...
@@ -57,7 +58,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.9.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.10.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1322,7 +1323,106 @@ No history yet.	Nog geen geschiedenis.
 PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)	PC-TuneUp.exe /auto                 het automatische onderhoud (opruimen, controleren, melden)
 {0} programs, {1} in total. {2} with no sign of use for 6 months or more.  Use is recorded since {3}.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  Gebruik wordt bijgehouden sinds {3}.
 {0} programs, {1} in total. {2} with no sign of use for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
-{0}; {1}	{0}; {1}
+{0}; {1}	{0}; {1}
+Start here	Begin hier
+1.  {0}	1.  {0}
+2.  {0}	2.  {0}
+3.  {0}	3.  {0}
+Open	Openen
+Nothing urgent - this PC looks good.	Niets dringends - deze pc ziet er goed uit.
+Security: {0} problem(s) to fix	Beveiliging: {0} probleem/problemen om op te lossen
+Fix	Oplossen
+Nothing backs up your files yet	Er maakt nog niets een back-up van je bestanden
+Set up backup	Back-up instellen
+{0} browser item(s) look like adware	{0} browseronderdeel/-onderdelen lijken op adware
+{0} device(s) have a driver problem	{0} apparaat/apparaten hebben een probleem met het stuurprogramma
+{0} kind(s) of crashes or errors keep happening	{0} soort(en) crashes of fouten blijven terugkomen
+See fixes	Oplossingen bekijken
+Drive C: is almost full ({0} free)	Station C: is bijna vol ({0} vrij)
+Free up space	Ruimte vrijmaken
+The network has a problem	Het netwerk heeft een probleem
+Clean up {0} of junk files	{0} aan rommelbestanden opruimen
+Free up to {0} with space savers	Tot {0} vrijmaken met ruimtebesparingen
+Stop {0} app(s) starting with Windows	{0} app(s) niet meer met Windows laten starten
+{0} program update(s) available	{0} programma-update(s) beschikbaar
+Turn off {0} Windows ads, tips and tracking settings	{0} instellingen voor Windows-advertenties, -tips en -tracking uitzetten
+Turn off	Uitzetten
+Switch off {0} junk scheduled task(s)	{0} geplande rommeltaak/-taken uitzetten
+The battery is worn out - see how to replace it	De accu is versleten - bekijk hoe je hem vervangt
+See	Bekijken
+Hide {0} leftover right-click menu entr(y/ies)	{0} achtergebleven item(s) in het rechtsklikmenu verbergen
+Start-up time	Opstarttijd
+Start-up time: {0} s	Opstarttijd: {0} s
+Reading start-up times	Opstarttijden lezen
+Seconds until the desktop is ready	Seconden tot het bureaublad klaar is
+Windows only shows start-up times to administrators - click "Restart as admin" to see them.	Windows toont opstarttijden alleen aan beheerders - klik op "Opnieuw als beheerder" om ze te zien.
+No start-up times recorded yet.	Nog geen opstarttijden vastgelegd.
+Fast startup is on, so Shut down and then starting again is quicker than Restart (only Restart does a full start).	Snel opstarten staat aan, dus Afsluiten en dan weer aanzetten is sneller dan Opnieuw opstarten (alleen Opnieuw opstarten doet een volledige start).
+Fast startup is off.	Snel opstarten staat uit.
+Last full start: {0} s ({1} s for Windows, then {2} s for start-up apps); {3} s on average over 30 days.	Laatste volledige start: {0} s ({1} s voor Windows, daarna {2} s voor opstart-apps); gemiddeld {3} s over 30 dagen.
+Last full start: {0} s ({1} s for Windows, then {2} s for start-up apps).	Laatste volledige start: {0} s ({1} s voor Windows, daarna {2} s voor opstart-apps).
+That is slow - turning off start-up apps below helps most.	Dat is traag - opstart-apps hieronder uitzetten helpt het meest.
+Fine; fewer start-up apps would make it quicker.	Prima; met minder opstart-apps gaat het sneller.
+Quick.	Snel.
+app	app
+driver	stuurprogramma
+service	service
+background task	achtergrondtaak
+device	apparaat
+Slowing it down: {0}.	Vertragen het: {0}.
+Space savers	Ruimtebesparingen
+Big chunks of disk space that Windows keeps by default - each with what you give up. Nothing is checked except Storage Sense; most need administrator rights, and every change except freeing OneDrive copies can be undone from History.	Grote stukken schijfruimte die Windows standaard vasthoudt - elk met wat je ervoor inlevert. Alleen Opslaginzicht is aangevinkt; de meeste hebben beheerdersrechten nodig, en elke wijziging behalve het vrijmaken van OneDrive-kopieën kun je terugdraaien via Geschiedenis.
+Apply checked	Aangevinkte toepassen
+Storage settings	Opslaginstellingen
+Saver	Besparing
+Can free	Kan vrijmaken
+Now	Nu
+What it does - and what you give up	Wat het doet - en wat je inlevert
+Looking for space savers	Ruimtebesparingen zoeken
+Checking...	Controleren...
+ongoing	doorlopend
+Hibernation file	Slaapstandbestand
+{0} GB (full size)	{0} GB (volledige grootte)
+{0} GB (already reduced)	{0} GB (al verkleind)
+Shrinks C:\hiberfil.sys to half. Fast startup keeps working; the PC can no longer hibernate (sleep still works, but if the battery runs flat while asleep, unsaved work is lost).	Verkleint C:\hiberfil.sys tot de helft. Snel opstarten blijft werken; de pc kan niet meer in sluimerstand (slaapstand werkt nog, maar raakt de accu leeg tijdens de slaapstand, dan gaat niet-opgeslagen werk verloren).
+Removes C:\hiberfil.sys. A desktop rarely hibernates; Fast startup is switched off too, so starting takes a few seconds longer.	Verwijdert C:\hiberfil.sys. Een desktop gaat zelden in sluimerstand; ook Snel opstarten gaat uit, dus opstarten duurt een paar seconden langer.
+Already as small as it can be while keeping Fast startup.	Al zo klein als kan met Snel opstarten aan.
+Reserved storage	Gereserveerde opslag
+on (about 7 GB)	aan (ongeveer 7 GB)
+only visible as administrator	alleen zichtbaar als beheerder
+Windows keeps about 7 GB free for updates. Switching it off gives you that space; on a nearly full drive an update may then fail until you free space.	Windows houdt ongeveer 7 GB vrij voor updates. Uitzetten geeft je die ruimte; op een bijna volle schijf kan een update dan mislukken tot je ruimte vrijmaakt.
+Windows keeps about 7 GB free for updates. Click "Restart as admin" to check and change it.	Windows houdt ongeveer 7 GB vrij voor updates. Klik op "Opnieuw als beheerder" om het te bekijken en te wijzigen.
+Nothing to free.	Niets vrij te maken.
+Compress Windows files	Windows-bestanden comprimeren
+Windows says this isn't worth it on this PC (see "Now"), so it is not counted in the total. Compresses Windows' own files (Compact OS), about 2-4 GB; on a fast PC the slowdown is barely noticeable. Takes 10-20 minutes.	Windows vindt dit op deze pc niet de moeite waard (zie "Nu"), dus het telt niet mee in het totaal. Comprimeert de eigen bestanden van Windows (Compact OS), ongeveer 2-4 GB; op een snelle pc merk je de vertraging nauwelijks. Duurt 10-20 minuten.
+Compresses Windows' own files (Compact OS), about 2-4 GB; on a fast PC the slowdown is barely noticeable. Takes 10-20 minutes.	Comprimeert de eigen bestanden van Windows (Compact OS), ongeveer 2-4 GB; op een snelle pc merk je de vertraging nauwelijks. Duurt 10-20 minuten.
+OneDrive copies ({0})	OneDrive-kopieën ({0})
+{0} file(s) kept on this PC	{0} bestand(en) op deze pc bewaard
+Removes the copies on this PC; the files stay in OneDrive with a cloud icon and download again when you open them (you need internet for that). Files set to "Always keep on this device" stay.	Verwijdert de kopieën op deze pc; de bestanden blijven in OneDrive met een wolkpictogram en worden opnieuw gedownload als je ze opent (daarvoor heb je internet nodig). Bestanden met "Altijd op dit apparaat behouden" blijven staan.
+Storage Sense	Opslaginzicht
+Windows already cleans temporary files and old Recycle Bin items by itself.	Windows ruimt tijdelijke bestanden en oude items in de Prullenbak al zelf op.
+Turns on Windows' own automatic clean-up: every week it removes temporary files and Recycle Bin items older than 30 days. Your own files are not touched.	Zet het eigen automatische opruimen van Windows aan: elke week verwijdert het tijdelijke bestanden en items in de Prullenbak die ouder zijn dan 30 dagen. Je eigen bestanden blijven onaangeroerd.
+Paging file	Wisselbestand
+Windows' overflow for memory. Leave it to Windows - shrinking it can make programs crash when memory fills up. If it is large, more memory is the real fix (see the Upgrades page).	De overloop van Windows voor het geheugen. Laat dit aan Windows over - verkleinen kan programma's laten crashen als het geheugen vol raakt. Is het groot, dan is meer geheugen de echte oplossing (zie de pagina Upgrades).
+Extra Windows languages	Extra Windows-talen
+Each extra language with its speech and handwriting add-ons takes a few hundred MB. Remove ones you don't use in Settings > Time & language > Language & region.	Elke extra taal met spraak- en handschriftonderdelen neemt een paar honderd MB in beslag. Verwijder talen die je niet gebruikt via Instellingen > Tijd en taal > Taal en regio.
+Check one or more savers first (grey rows are only information).	Vink eerst een of meer besparingen aan (grijze rijen zijn alleen informatie).
+These need administrator rights - click "Restart as admin" first: {0}	Deze hebben beheerdersrechten nodig - klik eerst op "Opnieuw als beheerder": {0}
+Apply these space savers?	Deze ruimtebesparingen toepassen?
+See the right-hand column for what each one gives up.	Zie de rechterkolom voor wat elke besparing inlevert.
+Compressing Windows files takes 10-20 minutes.	Windows-bestanden comprimeren duurt 10-20 minuten.
+turned on (weekly)	aangezet (wekelijks)
+Storage Sense is on.	Opslaginzicht staat aan.
+Applying space savers	Ruimtebesparingen toepassen
+Space savers:	Ruimtebesparingen:
+ - {0}: done	 - {0}: klaar
+ - {0}: failed {1}	 - {0}: mislukt {1}
+OneDrive frees its copies over the next minutes. Undo the others from the History page.	OneDrive maakt zijn kopieën in de komende minuten vrij. De rest draai je terug via Geschiedenis.
+Space	Ruimte
+done, about {0}	klaar, ongeveer {0}
+done, about {0} ({1})	klaar, ongeveer {0} ({1})
+put back as it was	teruggezet zoals het was
+Needs administrator rights - click 'Restart as admin'.	Beheerdersrechten nodig - klik op 'Opnieuw als beheerder'.
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1515,7 +1615,9 @@ $script:LoadQueue = New-Object System.Collections.ArrayList
 $JobTimer = New-Object Windows.Forms.Timer
 $JobTimer.Interval = 250
 $JobTimer.Add_Tick({
+    $tick = [Diagnostics.Stopwatch]::StartNew()
     foreach ($j in @($script:Jobs)) {
+        if ($tick.ElapsedMilliseconds -gt 100) { break }   # several finished at once: show the rest next tick, so the window keeps responding
         if (-not $j.Handle.IsCompleted) { continue }
         [void]$script:Jobs.Remove($j)
         try { $result = @($j.PS.EndInvoke($j.Handle)) }
@@ -1810,7 +1912,26 @@ $healthTop.Dock = 'Top'; $healthTop.AutoSize = $true; $healthTop.AutoSizeMode = 
 $chartScore = New-Chart 200
 $chartScore.Dock = 'Fill'; $chartScore.Margin = New-Object Windows.Forms.Padding(12, 0, 0, 8)
 $healthTop.Controls.Add($gridHealth, 0, 0); $healthTop.Controls.Add($chartScore, 1, 0)
-Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $healthTop, $lblAdvice, $lblSpeed, $lblProcCap)
+# "Start here": the three most useful next steps from all pages, each with a button that opens the right page.
+$startHere = New-Object Windows.Forms.TableLayoutPanel
+$startHere.Dock = 'Top'; $startHere.AutoSize = $true; $startHere.AutoSizeMode = 'GrowAndShrink'; $startHere.ColumnCount = 2; $startHere.BackColor = $Theme.AccentSoft
+$startHere.Padding = New-Object Windows.Forms.Padding(12, 4, 8, 4); $startHere.Margin = New-Object Windows.Forms.Padding(0)
+[void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
+[void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('AutoSize')))
+$shTitle = New-Object Windows.Forms.Label
+$shTitle.Text = 'Start here'; $shTitle.Font = $FontBold; $shTitle.AutoSize = $true; $shTitle.Margin = New-Object Windows.Forms.Padding(0, 2, 0, 2)
+$startHere.Controls.Add($shTitle, 0, 0); $startHere.SetColumnSpan($shTitle, 2)
+$script:StartRows = @(foreach ($n in 1..3) {
+    $l = New-Object Windows.Forms.Label
+    $l.AutoSize = $true; $l.Anchor = 'Left'; $l.Margin = New-Object Windows.Forms.Padding(0, 1, 8, 1); $l.Text = ''
+    $b = New-Button 'Open'; $b.MinimumSize = New-Object Drawing.Size(110, 28); $b.Height = 28; $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
+    $b.Add_Click({ if ($this.Tag) { Show-Page $this.Tag } })
+    $startHere.Controls.Add($l, 0, $n); $startHere.Controls.Add($b, 1, $n)
+    $l.Visible = $false; $b.Visible = $false
+    @{ Label = $l; Button = $b }
+})
+$shGap = New-Object Windows.Forms.Panel; $shGap.Dock = 'Top'; $shGap.Height = 6
+Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $startHere, $shGap, $healthTop, $lblAdvice, $lblSpeed, $lblProcCap)
 
 # Health score: 100, minus points for each thing worth a look and for a low Windows stability rating. Saved once a day.
 $ScoreFile = Join-Path $DataDir 'scores.jsonl'
@@ -2192,6 +2313,7 @@ function Start-CleanScan {
             }
         }
         $lblClean.Text = 'Checked items add up to about {0}.' -f (Format-Size $total)
+        $script:JunkBytes = $total; if ($script:NavButtons) { Update-NavBadges }
         $btnScan.Enabled = $true; $btnClean.Enabled = $true
     }
 }
@@ -2247,7 +2369,10 @@ $btnStartApply = New-Button 'Apply changes'
 $btnStartTM = New-Button 'Open Task Manager'
 $lvStart = New-ListView $true @('App', 260, 'For', 80, 'Advice', 170, 'Command', 420)
 $lblStart = New-Status
-Set-PageLayout $pgStartup $lvStart @((New-ButtonBar @($btnStartReload, $btnStartApply, $btnStartTM))) $lblStart
+$chartBoot = New-Chart 150
+$lblBoot = New-Object Windows.Forms.Label
+$lblBoot.Dock = 'Top'; $lblBoot.Height = 74; $lblBoot.ForeColor = $Theme.Dim; $lblBoot.Padding = New-Object Windows.Forms.Padding(0, 2, 0, 6)
+Set-PageLayout $pgStartup $lvStart @((New-ButtonBar @($btnStartReload, $btnStartApply, $btnStartTM)), $chartBoot, $lblBoot) $lblStart
 
 function Get-StartupFlag($ApprovedPath, $Name) {
     $k = Get-Item -LiteralPath $ApprovedPath -ErrorAction SilentlyContinue
@@ -2299,6 +2424,51 @@ function Update-Startup {
 }
 $btnStartReload.Add_Click({ Update-Startup })
 $btnStartTM.Add_Click({ Start-Process taskmgr.exe '/7 /startup' })
+
+# --- Start-up time: how long Windows takes to start, from its own log (readable by administrators only) ---
+$BootWork = {
+    $log = 'Microsoft-Windows-Diagnostics-Performance/Operational'
+    $data = { param($e) $h = @{}; foreach ($d in ([xml]$e.ToXml()).Event.EventData.Data) { $h[$d.Name] = $d.'#text' }; $h }
+    # Without administrator rights a filtered query just says "no events", so test access to the log first.
+    try { [void](Get-WinEvent -LogName $log -MaxEvents 1 -ErrorAction Stop) } catch [UnauthorizedAccessException] { return [pscustomobject]@{ Denied = $true } } catch { if ($_.Exception.Message -match 'unauthori|access') { return [pscustomobject]@{ Denied = $true } } }
+    $ev = @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 100 } -MaxEvents 200 -ErrorAction SilentlyContinue)
+    $boots = @(foreach ($e in $ev) { $h = & $data $e
+        if ([double]$h.BootTime -gt 0) { [pscustomobject]@{ X = $e.TimeCreated; Y = [Math]::Round([double]$h.BootTime / 1000, 1); Main = [double]$h.MainPathBootTime / 1000; Post = [double]$h.BootPostBootTime / 1000 } } })
+    # What slowed start-up down (apps, drivers, services, devices) in the last 90 days
+    $kind = @{ 101 = 'app'; 102 = 'driver'; 103 = 'service'; 106 = 'background task'; 109 = 'device' }
+    $slow = @(Get-WinEvent -FilterHashtable @{ LogName = $log; Id = 101, 102, 103, 106, 109; StartTime = (Get-Date).AddDays(-90) } -ErrorAction SilentlyContinue | ForEach-Object {
+        $h = & $data $_; $name = if ($h.FriendlyName) { $h.FriendlyName } else { $h.Name }
+        if ($name) { [pscustomobject]@{ Name = "$name".Trim(); Kind = $kind[$_.Id]; Sec = [double]$h.DegradationTime / 1000 } } } |
+        Group-Object Name | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Kind = $_.Group[0].Kind; Sec = [Math]::Round(($_.Group | Measure-Object Sec -Maximum).Maximum, 1); Times = $_.Count } } |
+        Sort-Object Sec -Descending | Select-Object -First 5)
+    [pscustomobject]@{ Denied = $false; Boots = $boots; Slow = $slow }
+}
+function Update-Boot {
+    $fast = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power' -ErrorAction SilentlyContinue).HiberbootEnabled -eq 1
+    $script:BootFast = $fast
+    Start-Bg -Label 'Reading start-up times' $BootWork $null {
+        param($r)
+        $r = @($r)[0]
+        $fastTxt = if ($script:BootFast) { 'Fast startup is on, so Shut down and then starting again is quicker than Restart (only Restart does a full start).' } else { 'Fast startup is off.' }
+        if (-not $r -or $r.Denied) {
+            Set-Chart $chartBoot @() 60 ' s' 'Start-up time' 'Windows only shows start-up times to administrators - click "Restart as admin" to see them.'
+            $lblBoot.Text = $fastTxt; return
+        }
+        $b = @($r.Boots | Sort-Object X)
+        if (-not $b) { Set-Chart $chartBoot @() 60 ' s' 'Start-up time' 'No start-up times recorded yet.'; $lblBoot.Text = $fastTxt; return }
+        $max = [Math]::Max(30, [Math]::Ceiling((($b | Measure-Object Y -Maximum).Maximum) / 30) * 30)
+        $recent = @($b | Where-Object { $_.X -gt (Get-Date).AddDays(-30) })
+        $avg = if ($recent) { [Math]::Round(($recent | Measure-Object Y -Average).Average) } else { $null }
+        $last = $b[-1]
+        Set-Chart $chartBoot @(@{ Name = 'Seconds until the desktop is ready'; Color = $Theme.Accent; Points = $b }) $max ' s' "Start-up time: $([Math]::Round($last.Y)) s"
+        $txt = "Last full start: $([Math]::Round($last.Y)) s ($([Math]::Round($last.Main)) s for Windows, then $([Math]::Round($last.Post)) s for start-up apps)$(if ($avg) { "; $avg s on average over 30 days" })."
+        # One sentence per line, so each line translates on its own.
+        $txt += "`r`n" + $(if ($last.Y -gt 60) { 'That is slow - turning off start-up apps below helps most.' } elseif ($last.Y -gt 30) { 'Fine; fewer start-up apps would make it quicker.' } else { 'Quick.' })
+        if ($r.Slow) { $txt += "`r`nSlowing it down: $(($r.Slow | Select-Object -First 3 | ForEach-Object { "$($_.Name) ($(T $_.Kind), +$($_.Sec) s)" }) -join ', ')." }
+        $lblBoot.Text = "$txt`r`n$fastTxt"
+    }
+}
+
 $btnStartApply.Add_Click({
     $changed = 0; $failed = @()
     foreach ($it in $lvStart.Items) {
@@ -4696,6 +4866,162 @@ $btnCtxShow.Add_Click({ Set-ContextEntries $false })
 $btnCtxReload.Add_Click({ Update-Context })
 
 # ===========================================================================
+# Space savers: big chunks of disk space Windows sets aside by default
+# ===========================================================================
+$pgSpace = New-Page 'Space savers' 'Big chunks of disk space that Windows keeps by default - each with what you give up. Nothing is checked except Storage Sense; most need administrator rights, and every change except freeing OneDrive copies can be undone from History.'
+$btnSpaceApply = New-Button 'Apply checked'
+$btnSpaceSense = New-Button 'Storage settings'
+$btnSpaceReload = New-Button 'Reload'
+$lvSpace = New-ListView $true @('Saver', 260, 'Can free', 100, 'Now', 230, 'What it does - and what you give up', 560)
+$txtSpace = New-DetailBox 104
+Set-PageLayout $pgSpace $lvSpace @((New-ButtonBar @($btnSpaceApply, $btnSpaceSense, $btnSpaceReload))) $txtSpace
+$SenseKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy'
+$SpaceWork = {
+    param($cfg)
+    $rows = New-Object System.Collections.ArrayList
+    function Add-S($Name, $Free, $Now, $What, $Action, $Admin, $Level = 'Info') {
+        [void]$rows.Add([pscustomobject]@{ Name = $Name; Free = $Free; Now = $Now; What = $What; Action = $Action; Admin = $Admin; Level = $Level })
+    }
+    $ram = 0; try { $ram = [double](Get-CimInstance Win32_ComputerSystem -OperationTimeoutSec 10).TotalPhysicalMemory } catch { }
+    # Hibernation file: about 40% of the memory when "full", 20% when "reduced" (enough for Fast startup).
+    $hib = try { [IO.FileInfo]::new('C:\hiberfil.sys') } catch { $null }
+    if ($hib -and $hib.Exists -and $hib.Length -gt 0) {
+        $full = -not $ram -or $hib.Length -gt 0.3 * $ram
+        if ($cfg.Battery -and $full) {
+            Add-S 'Hibernation file' ([int64]($hib.Length / 2)) "$([Math]::Round($hib.Length / 1GB, 1)) GB (full size)" `
+                'Shrinks C:\hiberfil.sys to half. Fast startup keeps working; the PC can no longer hibernate (sleep still works, but if the battery runs flat while asleep, unsaved work is lost).' 'hibshrink' $true
+        } elseif (-not $cfg.Battery) {
+            Add-S 'Hibernation file' ([int64]$hib.Length) "$([Math]::Round($hib.Length / 1GB, 1)) GB" `
+                'Removes C:\hiberfil.sys. A desktop rarely hibernates; Fast startup is switched off too, so starting takes a few seconds longer.' 'hiboff' $true
+        } else { Add-S 'Hibernation file' 0 "$([Math]::Round($hib.Length / 1GB, 1)) GB (already reduced)" 'Already as small as it can be while keeping Fast startup.' $null $false 'OK' }
+    }
+    # Reserved storage: space Windows keeps free for updates (about 7 GB)
+    if ($cfg.Admin) {
+        $st = try { "$((Get-WindowsReservedStorageState -ErrorAction Stop).ReservedStorageState)" } catch { '' }
+        if ($st -eq 'Enabled') { Add-S 'Reserved storage' ([int64]7GB) 'on (about 7 GB)' 'Windows keeps about 7 GB free for updates. Switching it off gives you that space; on a nearly full drive an update may then fail until you free space.' 'reserved' $true }
+        elseif ($st) { Add-S 'Reserved storage' 0 "$($st.ToLower())" 'Nothing to free.' $null $true 'OK' }
+    } else { Add-S 'Reserved storage' ([int64]7GB) 'only visible as administrator' 'Windows keeps about 7 GB free for updates. Click "Restart as admin" to check and change it.' 'reserved' $true }
+    # Compressing Windows' own files (Compact OS)
+    $q = (& "$env:windir\System32\compact.exe" /compactos:query 2>&1 | Out-String).Trim() -replace '\s+', ' '
+    if ($q -and $q -notmatch '(?i)\bis in the compact state|bevindt zich in de compacte') {
+        $cw = $(if ($q -match '(?i)not beneficial|niet .*(nuttig|voordelig|zinvol)') { 'Windows says this isn''t worth it on this PC (see "Now"), so it is not counted in the total. ' }) + 'Compresses Windows'' own files (Compact OS), about 2-4 GB; on a fast PC the slowdown is barely noticeable. Takes 10-20 minutes.'
+        Add-S 'Compress Windows files' ([int64]2.5GB) $(if ($q.Length -gt 90) { $q.Substring(0, 90) + '...' } else { $q }) $cw 'compact' $true $(if ($q -match '(?i)not beneficial|niet .*(nuttig|voordelig|zinvol)') { 'NotAdvised' } else { 'Info' })
+    }
+    # OneDrive: copies of cloud files kept on this PC
+    foreach ($a in Get-ChildItem 'HKCU:\Software\Microsoft\OneDrive\Accounts' -ErrorAction SilentlyContinue) {
+        $root = (Get-ItemProperty $a.PSPath -ErrorAction SilentlyContinue).UserFolder
+        if (-not $root -or -not (Test-Path $root)) { continue }
+        $bytes = 0; $n = 0; $sw = [Diagnostics.Stopwatch]::StartNew()
+        foreach ($path in [IO.Directory]::EnumerateFiles($root, '*', 'AllDirectories')) {   # OneDrive's own folders are cloud placeholders, not junctions, so walking them is safe
+            $f = [IO.FileInfo]$path
+            if ($sw.Elapsed.TotalSeconds -gt 20) { break }
+            $at = [int]$f.Attributes
+            if (($at -band 0x400000) -or ($at -band 0x1000) -or ($at -band 0x80000)) { continue }   # already online-only, or "always keep on this device"
+            $bytes += $f.Length; $n++
+        }
+        if ($bytes -gt 100MB) {
+            Add-S "OneDrive copies ($(Split-Path $root -Leaf))" ([int64]$bytes) "$n file(s) kept on this PC" `
+                'Removes the copies on this PC; the files stay in OneDrive with a cloud icon and download again when you open them (you need internet for that). Files set to "Always keep on this device" stay.' "onedrive|$root" $false
+        }
+    }
+    # Storage Sense: Windows' own automatic clean-up
+    $sense = (Get-ItemProperty $cfg.SenseKey -ErrorAction SilentlyContinue).'01'
+    if ($sense -eq 1) { Add-S 'Storage Sense' 0 'on' 'Windows already cleans temporary files and old Recycle Bin items by itself.' $null $false 'OK' }
+    else { Add-S 'Storage Sense' 0 'off' 'Turns on Windows'' own automatic clean-up: every week it removes temporary files and Recycle Bin items older than 30 days. Your own files are not touched.' 'sense' $false 'Recommended' }
+    # Explained, but best left alone
+    $pf = try { [IO.FileInfo]::new('C:\pagefile.sys') } catch { $null }
+    if ($pf -and $pf.Exists) {
+        Add-S 'Paging file' 0 "$([Math]::Round($pf.Length / 1GB, 1)) GB" "Windows' overflow for memory. Leave it to Windows - shrinking it can make programs crash when memory fills up. If it is large, more memory is the real fix (see the Upgrades page)." $null $false 'OK'
+    }
+    $langs = @(try { (Get-WinUserLanguageList).LanguageTag } catch { })
+    if ($langs.Count -gt 1) { Add-S 'Extra Windows languages' 0 ($langs -join ', ') 'Each extra language with its speech and handwriting add-ons takes a few hundred MB. Remove ones you don''t use in Settings > Time & language > Language & region.' $null $false 'OK' }
+    $rows
+}
+function Update-Space {
+    $btnSpaceReload.Enabled = $false
+    $txtSpace.Text = 'Checking...'
+    Start-Bg -Label 'Looking for space savers' $SpaceWork @{ Admin = $IsAdmin; Battery = $HasBattery; SenseKey = $SenseKey } {
+        param($rows)
+        $btnSpaceReload.Enabled = $true
+        $lvSpace.BeginUpdate(); $lvSpace.Items.Clear()
+        foreach ($r in $rows | Sort-Object { -not $_.Action }, { - $_.Free }) {
+            $free = if ($r.Free -gt 0) { Format-Size $r.Free } elseif ($r.Action -eq 'sense') { 'ongoing' } else { '' }
+            $it = Add-Row $lvSpace @($r.Name, $free, $r.Now, $r.What) $r ($r.Action -eq 'sense')
+            $it.ForeColor = if (-not $r.Action) { $Theme.Muted } elseif ($r.Admin -and -not $IsAdmin) { $Theme.Muted } else { $Theme.Text }
+        }
+        $lvSpace.EndUpdate()
+        $script:SpaceFree = (@($rows | Where-Object { $_.Action -and $_.Free -gt 0 -and $_.Level -ne 'NotAdvised' -and -not ($_.Admin -and -not $IsAdmin -and $_.Action -eq 'reserved') }) | Measure-Object Free -Sum).Sum
+        if ($lvSpace.Items.Count) { $lvSpace.Items[0].Selected = $true }
+        if ($script:NavButtons) { Update-NavBadges }
+    }
+}
+$lvSpace.Add_SelectedIndexChanged({
+    if (-not $lvSpace.SelectedItems.Count) { return }
+    $r = $lvSpace.SelectedItems[0].Tag
+    $txtSpace.Text = "$($r.Name): $($r.Now)`r`n`r`n$($r.What)$(if ($r.Action -and $r.Admin -and -not $IsAdmin) { ""`r`n`r`nNeeds administrator rights - click 'Restart as admin'."" })"
+})
+# Longer jobs run in the background; Storage Sense is just a setting.
+$SpaceApplyWork = {
+    param($list)
+    foreach ($a in $list) {
+        Set-JobProgress $a.Name
+        $ok = $true; $msg = ''
+        try {
+            switch -Regex ($a.Action) {
+                '^hibshrink$' { $r = Invoke-Native "$env:windir\System32\powercfg.exe" '/hibernate /type reduced' 60; $ok = $r.Code -eq 0; $msg = $r.Out.Trim() }
+                '^hiboff$' { $r = Invoke-Native "$env:windir\System32\powercfg.exe" '/hibernate off' 60; $ok = $r.Code -eq 0; $msg = $r.Out.Trim() }
+                '^reserved$' { Set-WindowsReservedStorageState -State Disabled -ErrorAction Stop | Out-Null }
+                '^compact$' { $r = Invoke-Native "$env:windir\System32\compact.exe" '/compactos:always' 3600; $ok = $r.Code -eq 0 }
+                '^onedrive\|(.+)$' {
+                    $root = $Matches[1]; $n = 0
+                    foreach ($path in [IO.Directory]::EnumerateFiles($root, '*', 'AllDirectories')) {
+                        $f = [IO.FileInfo]$path; $at = [int]$f.Attributes
+                        if (($at -band 0x400000) -or ($at -band 0x1000) -or ($at -band 0x80000)) { continue }
+                        try { $f.Attributes = [Enum]::ToObject([IO.FileAttributes], ($at -bor 0x100000)); $n++ } catch { }   # "unpinned": OneDrive frees the local copy
+                    }
+                    $msg = "$n file(s)"
+                }
+            }
+        } catch { $ok = $false; $msg = $_.Exception.Message }
+        [pscustomobject]@{ Action = $a.Action; Name = $a.Name; Ok = $ok; Msg = $msg; Free = $a.Free }
+    }
+}
+$btnSpaceApply.Add_Click({
+    $picked = @($lvSpace.CheckedItems | ForEach-Object { $_.Tag } | Where-Object Action)
+    if (-not $picked) { Show-Msg 'Check one or more savers first (grey rows are only information).' | Out-Null; return }
+    $locked = @($picked | Where-Object { $_.Admin -and -not $IsAdmin })
+    if ($locked) { Show-Msg "These need administrator rights - click ""Restart as admin"" first: $(($locked | ForEach-Object Name) -join ', ')" 'OK' 'Warning' | Out-Null; return }
+    if ((Show-Msg "Apply these space savers?`n`n$(($picked | ForEach-Object { " - $($_.Name)" }) -join "`n")`n`nSee the right-hand column for what each one gives up.$(if ($picked | Where-Object Action -eq 'compact') { "`n`nCompressing Windows files takes 10-20 minutes." })" 'YesNo' 'Question') -ne 'Yes') { return }
+    foreach ($p in @($picked | Where-Object Action -eq 'sense')) {
+        $undo = @(foreach ($n in '01', '04', '08', '256', '2048') { @{ P = $SenseKey; N = $n; Old = (Get-RegValue $SenseKey $n); T = 'DWord' } })
+        Set-RegValue $SenseKey '01' 1; Set-RegValue $SenseKey '04' 1; Set-RegValue $SenseKey '08' 1; Set-RegValue $SenseKey '256' 30; Set-RegValue $SenseKey '2048' 7
+        Add-History 'Space' 'Storage Sense' 'turned on (weekly)' @{ Type = 'Reg'; Values = $undo }
+    }
+    $jobs = @($picked | Where-Object Action -ne 'sense')
+    if (-not $jobs) { Update-History; Update-Space; Show-Msg 'Storage Sense is on.' | Out-Null; return }
+    $btnSpaceApply.Enabled = $false
+    $script:SpaceJobs = $jobs
+    Start-WithRestorePoint 'space savers' { Start-Bg -Label 'Applying space savers' $SpaceApplyWork $script:SpaceJobs {
+        param($res)
+        $btnSpaceApply.Enabled = $true
+        $undoCmd = @{ hibshrink = @('powercfg.exe', '/hibernate /type full'); hiboff = @('powercfg.exe', '/hibernate on'); compact = @('compact.exe', '/compactos:never')
+                      reserved = @('DISM.exe', '/Online /Set-ReservedStorageState /State:Enabled') }
+        $lines = foreach ($r in $res) {
+            $key = ($r.Action -split '\|')[0]
+            if ($r.Ok) {
+                $u = $undoCmd[$key]
+                Add-History 'Space' $r.Name "done$(if ($r.Free) { ', about ' + (Format-Size $r.Free) })$(if ($r.Msg) { " ($($r.Msg))" })" $(if ($u) { @{ Type = 'Cmd'; Exe = $u[0]; Args = $u[1]; Admin = $true } })
+                " - $($r.Name): done"
+            } else { " - $($r.Name): failed $($r.Msg)" }
+        }
+        Update-History; Update-Space; Update-Health
+        Show-Msg "Space savers:`n$($lines -join "`n")`n`nOneDrive frees its copies over the next minutes. Undo the others from the History page." | Out-Null
+    } }
+})
+$btnSpaceSense.Add_Click({ Start-Process 'ms-settings:storagesense' })
+$btnSpaceReload.Add_Click({ Update-Space })
+
+# ===========================================================================
 # 7. Upgrades: what could be added or replaced, and the exact spec to buy
 # ===========================================================================
 $pgUpg = New-Page 'Upgrades' 'What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.'
@@ -5037,7 +5363,7 @@ $btnHistLog.Add_Click({ $btnLog.PerformClick() })
 $btnHistUndo.Add_Click({
     $picked = @($lvHist.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { (Get-UndoStatus $_) -in 'can undo', 'reinstall from Store' })
     if (-not $picked) { Show-Msg 'Check one or more rows that say "can undo" first.' | Out-Null; return }
-    if ($IsAdmin -eq $false -and ($picked | Where-Object { $_.Undo.Type -eq 'Service' })) {
+    if ($IsAdmin -eq $false -and ($picked | Where-Object { $_.Undo.Type -eq 'Service' -or ($_.Undo.Type -eq 'Cmd' -and $_.Undo.Admin) })) {
         Show-Msg 'Undoing service changes needs administrator rights - use "Restart as administrator" first.' 'OK' 'Warning' | Out-Null; return
     }
     $names = ($picked | ForEach-Object { " - $($_.Item): $($_.Change)" }) -join "`n"
@@ -5063,6 +5389,11 @@ $btnHistUndo.Add_Click({
                     if ($u.Enable) { [void](Enable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
                     else { [void](Disable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
                     $logs += , @('Undo', $e.Item, $(if ($u.Enable) { 'scheduled task switched back on' } else { 'scheduled task switched off again' }))
+                }
+                'Cmd' {
+                    $p = Start-Process $u.Exe -ArgumentList $u.Args -Wait -PassThru -WindowStyle Hidden
+                    if ($p.ExitCode) { throw "$($u.Exe) $($u.Args): exit code $($p.ExitCode)" }
+                    $logs += , @('Undo', $e.Item, 'put back as it was')
                 }
                 'Reg' {
                     foreach ($v in @($u.Values)) {
@@ -5339,6 +5670,7 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T "Apps that start with Windows ($($startOn.Count) on)")</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>$(T 'Space savers')</h2>$(ConvertTo-HtmlRows @('Saver', 'Can free', 'Now', 'What it does - and what you give up') $lvSpace.Items @(0, 1, 2, 3))
 <h2>$(T 'Browsers')</h2>$(ConvertTo-HtmlRows @('Item', 'Browser', 'Kind', 'Status', 'Details') $lvBrw.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Network')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvNet.Items @(0, 1, 2, 3))
 $(if ($HasBattery) { "<h2>$(T 'Battery')</h2>$(ConvertTo-HtmlRows @('Reading', 'Value', 'What it means') $lvBatt.Items @(0, 1, 2))" })
@@ -5534,7 +5866,7 @@ $OldExeCleanupWork = {
 # ===========================================================================
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
-    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk') }
+    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk', 'Space savers') }
     @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
     @{ Title = $null;      Pages = @('History', 'Settings'); Bottom = $true }   # pinned under the list, side by side, so they never scroll away
 )
@@ -5553,6 +5885,40 @@ function Set-NavBadge([string]$Name, $Count) {
     $b = $script:NavButtons[$Name]
     if ($b) { $b.Text = if ($Count) { "$Name  ($Count)" } else { $Name } }
 }
+# The three most useful next steps, most urgent first. Buttons only open the page - every change is still made there.
+function Update-StartHere {
+    if (-not $script:StartRows) { return }
+    $c = New-Object System.Collections.ArrayList
+    $add = { param($p, $text, $btn, $page) [void]$c.Add([pscustomobject]@{ P = $p; Text = $text; Btn = $btn; Page = $page }) }
+    $n = @($lvSec.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;      if ($n) { & $add 10 "Security: $n problem(s) to fix" 'Fix' $pgSec }
+    if ($script:ExtraAdvice['Backup']) { & $add 15 'Nothing backs up your files yet' 'Set up backup' $pgBackup }
+    if ($script:BrowserRisky) { & $add 20 "$($script:BrowserRisky) browser item(s) look like adware" 'Review' $pgBrw }
+    $n = @($lvDrv.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;      if ($n) { & $add 25 "$n device(s) have a driver problem" 'Check' $pgDrv }
+    $n = @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;     if ($n) { & $add 30 "$n kind(s) of crashes or errors keep happening" 'See fixes' $pgStab }
+    $c0 = @($script:HealthQuick.Disks | Where-Object { $_.Id -eq 'C:' })[0]
+    if ($c0 -and $c0.Size -and $c0.Free / $c0.Size -lt 0.1) { & $add 35 "Drive C: is almost full ($(Format-Size $c0.Free) free)" 'Free up space' $pgSpace }
+    if ($script:NetProblems) { & $add 40 'The network has a problem' 'Check' $pgNet }
+    if ($script:JunkBytes -gt 1GB) { & $add 45 "Clean up $(Format-Size $script:JunkBytes) of junk files" 'Clean' $pgClean }
+    if ($script:SpaceFree -gt 3GB) { & $add 48 "Free up to $(Format-Size $script:SpaceFree) with space savers" 'Review' $pgSpace }
+    $n = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' }).Count; if ($n) { & $add 50 "Stop $n app(s) starting with Windows" 'Review' $pgStartup }
+    $n = @($lvUpd.Items).Count;                                                    if ($n) { & $add 55 "$n program update(s) available" 'Update' $pgUpd }
+    if ($script:PrivacyOn) { & $add 60 "Turn off $($script:PrivacyOn) Windows ads, tips and tracking settings" 'Turn off' $pgPriv }
+    if ($script:TasksActive) { & $add 65 "Switch off $($script:TasksActive) junk scheduled task(s)" 'Review' $pgTasks }
+    if ($script:BatteryWorn) { & $add 70 'The battery is worn out - see how to replace it' 'See' $pgBatt }
+    if ($script:CtxLeftovers) { & $add 75 "Hide $($script:CtxLeftovers) leftover right-click menu entr(y/ies)" 'Review' $pgCtx }
+    $top = @($c | Sort-Object P | Select-Object -First 3)
+    $key = ($top | ForEach-Object { $_.Text }) -join '|'
+    if ($key -eq $script:StartDrawn) { return }
+    $script:StartDrawn = $key
+    $startHere.SuspendLayout()
+    for ($i = 0; $i -lt 3; $i++) {
+        $row = $script:StartRows[$i]
+        if ($i -lt $top.Count) { $row.Label.Text = "$($i + 1).  $($top[$i].Text)"; $row.Button.Text = $top[$i].Btn; $row.Button.Tag = $top[$i].Page; $row.Label.Visible = $true; $row.Button.Visible = $true }
+        elseif ($i -eq 0) { $row.Label.Text = 'Nothing urgent - this PC looks good.'; $row.Label.Visible = $true; $row.Button.Visible = $false }
+        else { $row.Label.Visible = $false; $row.Button.Visible = $false }
+    }
+    $startHere.ResumeLayout()
+}
 # Counts next to page names: things waiting for attention.
 function Update-NavBadges {
     Set-NavBadge 'Updates' @($lvUpd.Items).Count
@@ -5567,11 +5933,12 @@ function Update-NavBadges {
     Set-NavBadge 'Network' $script:NetProblems
     Set-NavBadge 'Right-click' $script:CtxLeftovers
     Set-NavBadge 'Battery' $script:BatteryWorn
+    Update-StartHere
 }
 
 $nav = New-Object Windows.Forms.FlowLayoutPanel
 $nav.Dock = 'Fill'; $nav.FlowDirection = 'TopDown'; $nav.WrapContents = $false; $nav.AutoScroll = $true
-$nav.Padding = New-Object Windows.Forms.Padding(12, 12, 12, 4)
+$nav.Padding = New-Object Windows.Forms.Padding(12, 8, 12, 2)
 $appName = New-Object Windows.Forms.Label
 $appName.Text = 'PC Tune-Up'; $appName.Font = New-Object Drawing.Font('Segoe UI Semibold', 13); $appName.AutoSize = $true
 $appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
@@ -5585,14 +5952,14 @@ foreach ($g in $NavGroups) {
     if ($g.Title) {
         $cap = New-Object Windows.Forms.Label
         $cap.Text = $g.Title; $cap.Font = $FontSmall; $cap.ForeColor = $Theme.Dim; $cap.AutoSize = $true
-        $cap.Margin = New-Object Windows.Forms.Padding(10, 6, 0, 1)
+        $cap.Margin = New-Object Windows.Forms.Padding(10, 5, 0, 1)
         $nav.Controls.Add($cap)
     }
     foreach ($name in $g.Pages) {
         $page = $script:Pages | Where-Object Name -eq $name | Select-Object -First 1
         if (-not $page) { continue }
         $b = New-Object Windows.Forms.Button
-        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 25; $b.TextAlign = 'MiddleLeft'
+        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 24; $b.TextAlign = 'MiddleLeft'
         $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
         $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
         $b.Cursor = [Windows.Forms.Cursors]::Hand
@@ -5622,7 +5989,7 @@ if (-not $IsAdmin) {
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -5663,7 +6030,8 @@ function Update-ActivityBar {
 $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-Stability }; Bloatware = { Start-BloatScan }; Services = { Update-Services }
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
                          Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy }
-                         Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context } }
+                         Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context }
+                         Startup = { Update-Boot }; 'Space savers' = { Update-Space } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -5675,7 +6043,7 @@ function Start-Everything {
     Update-Health; Update-Startup; Update-History
     $script:EverythingStarted = $true
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Clean'))
     if ($HasBattery) { [void]$script:LoadQueue.Insert(5, 'Battery') }
 }
 Enable-Translation $form

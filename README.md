@@ -14,9 +14,9 @@ you can undo.
 
 | Page | |
 |---|---|
-| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once - plus a health score over time |
+| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once - plus **Start here** (the three most useful next steps) and a health score over time |
 | **Clean** | temp files, crash dumps, browser caches (Chrome, Edge, Brave, Firefox), Windows Update leftovers, old drivers, Windows.old |
-| **Startup** | stop apps from launching with Windows |
+| **Startup** | stop apps from launching with Windows, and see how long Windows takes to start (graph) and what slows it down |
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |
 | **Programs** | every installed program with its size and when you last opened it; uninstall several in one go, leftover folders to the Recycle Bin |
 | **Services** | trim background services from PC makers, updaters and telemetry, with one-click restore |
@@ -24,6 +24,7 @@ you can undo.
 | **Right-click** | entries other programs add to Explorer's right-click menu - leftovers of removed programs pre-checked; hide with undo |
 | **Privacy** | switch off Windows ads, tips and tracking (advertising ID, Start-menu ads, web results in search, lock-screen promos, optional diagnostic data...) with undo |
 | **Disk** | see which folders fill the drive, and find large and duplicate files (they only go to the Recycle Bin when you say so; cloud-only OneDrive files are never touched) |
+| **Space savers** | hibernation file, reserved storage, Windows file compression, OneDrive copies and Storage Sense - each with what you give up, with undo |
 | **Updates** | update outdated programs through winget; safe updates are pre-selected |
 | **Drivers** | devices with a problem (Device Manager error codes, explained) and the age of the drivers that matter most: graphics, network, audio, storage, BIOS |
 | **Security** | is Windows still supported, can it run Windows 11, are antivirus, firewall, encryption, Secure Boot and TPM on |

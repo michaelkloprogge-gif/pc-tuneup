@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.0
+
+- **Start here** on the Health page: the three most useful next steps from all pages (for example "Clean up 1.6 GB of junk files", "Free up to 4 GB with space savers", "17 program updates available"), most urgent first, each with a button that opens the right page.
+- **Start-up time** on the Startup page: a graph of how long Windows took to start, from its own log (shown to administrators), the split between Windows itself and start-up apps, the 30-day average, and which apps, drivers or services slowed it down. Also explains Fast startup.
+- New **Space savers** page: the hibernation file (shrink on laptops, switch off on desktops), Windows' reserved storage (about 7 GB), compressing Windows' own files, freeing OneDrive copies kept on the PC, and turning on Storage Sense - each with what you give up, and all except the OneDrive one can be undone from History. The paging file and extra Windows languages are explained.
+- Smoother loading: when several checks finish at once, the window updates them one after another instead of freezing.
 ## 1.9.2
 
 - Programs page: games and other programs started through a launcher (Steam, Wargaming, Epic...) no longer look unused - a recent change in the program's own files now counts as use too. The label now says "no sign of use" instead of "not opened", because some programs (such as 7-Zip from the right-click menu) are used without being opened.

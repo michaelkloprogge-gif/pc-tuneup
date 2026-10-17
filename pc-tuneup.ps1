@@ -17,7 +17,7 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Windows.Forms.Application]::EnableVisualStyles()
 
-$AppVersion = '1.2.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.3.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1109,151 +1109,273 @@ $txtUpg.Multiline = $true; $txtUpg.ReadOnly = $true; $txtUpg.Dock = 'Bottom'; $t
 $txtUpg.BackColor = [Drawing.SystemColors]::Window
 Set-PageLayout $pgUpg $lvUpg @((New-ButtonBar @($btnUpgReload, $btnUpgSupport, $btnUpgManual, $btnUpgCopy))) $txtUpg
 
-$UpgradeWork = {
+# Two parts: $UpgradeCollectWork gathers raw hardware facts in the background (works on any make,
+# desktop, laptop or VM); Get-UpgradeRows turns those facts into advice. Keeping the advice a pure
+# function means it can be checked against made-up PCs, not just the one it runs on.
+$UpgradeCollectWork = {
+    # Hardware queries can crawl while a game has the GPU busy; give each one a time limit.
+    $PSDefaultParameterValues = @{ 'Get-CimInstance:OperationTimeoutSec' = 15; 'Get-CimInstance:ErrorAction' = 'SilentlyContinue' }
+    $cs = Get-CimInstance Win32_ComputerSystem
+    $board = Get-CimInstance Win32_BaseBoard
+    $os = Get-CimInstance Win32_OperatingSystem
+    $arr = Get-CimInstance Win32_PhysicalMemoryArray | Where-Object Use -eq 3 | Select-Object -First 1   # 3 = system memory
+    $mods = foreach ($m in Get-CimInstance Win32_PhysicalMemory) {
+        [pscustomobject]@{ SizeGB = [int]($m.Capacity / 1GB); SmbiosType = [int]$m.SMBIOSMemoryType; MemoryType = [int]$m.MemoryType
+                           Speed = [int]$(if ($m.ConfiguredClockSpeed) { $m.ConfiguredClockSpeed } else { $m.Speed }); FormFactor = [int]$m.FormFactor
+                           VoltageMV = [int]$m.ConfiguredVoltage; ECC = ($m.TotalWidth -gt $m.DataWidth); Registered = [bool]([int]$m.TypeDetail -band 8192)
+                           Maker = "$($m.Manufacturer)".Trim(); Part = "$($m.PartNumber)".Trim(); Locator = "$($m.DeviceLocator)".Trim() }
+    }
+    $sysDisk = try { "$((Get-Partition -DriveLetter C -ErrorAction Stop | Get-Disk).Number)" } catch { '' }
+    $disks = foreach ($d in Get-PhysicalDisk -ErrorAction SilentlyContinue) {
+        [pscustomobject]@{ Name = "$($d.FriendlyName)".Trim(); SizeGB = [int]($d.Size / 1GB); Bus = "$($d.BusType)"; Media = "$($d.MediaType)"
+                           Spindle = [long]$d.SpindleSpeed; IsSystem = ("$($d.DeviceId)" -eq $sysDisk) }
+    }
+    $c = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+    $batteries = @()
+    $xml = Join-Path $env:TEMP "pctuneup-upg-battery-$PID.xml"
+    powercfg /batteryreport /xml /output $xml 2>$null | Out-Null
+    if (Test-Path $xml) {
+        try {
+            [xml]$x = Get-Content $xml
+            $batteries = foreach ($b in @($x.BatteryReport.Batteries.Battery)) {
+                if (-not $b -or [double]$b.DesignCapacity -le 0) { continue }
+                [pscustomobject]@{ Wh = [Math]::Round([double]$b.DesignCapacity / 1000); Pct = [Math]::Min(100, [int](100 * [double]$b.FullChargeCapacity / [double]$b.DesignCapacity))
+                                   Chem = "$($b.Chemistry)"; Maker = "$($b.Manufacturer)"; Id = "$($b.Id)".Trim() }
+            }
+        } catch { }
+        Remove-Item $xml -ErrorAction SilentlyContinue
+    }
+    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
+    $wifi = @(Get-CimInstance Win32_NetworkAdapter -Filter 'PhysicalAdapter=TRUE' -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -match 'Wi-?Fi|Wireless|WLAN|802\.11' -and $_.Name -notmatch 'Virtual|Direct|Bluetooth' } | ForEach-Object { $_.Name.Trim() })
+    [pscustomobject]@{
+        Maker = "$($cs.Manufacturer)".Trim(); Model = "$($cs.Model)".Trim(); Serial = "$((Get-CimInstance Win32_BIOS).SerialNumber)".Trim()
+        BoardMaker = "$($board.Manufacturer)".Trim(); BoardProduct = "$($board.Product)".Trim()
+        Chassis = @((Get-CimInstance Win32_SystemEnclosure).ChassisTypes | ForEach-Object { [int]$_ })
+        UsedPct = [int](100 * (1 - $os.FreePhysicalMemory / $os.TotalVisibleMemorySize))
+        Slots = [int]$arr.MemoryDevices; MaxKB = [long]$(if ($arr.MaxCapacityEx) { $arr.MaxCapacityEx } else { $arr.MaxCapacity })
+        Modules = @($mods); Disks = @($disks); CFreePct = $(if ($c.Size) { [int](100 * $c.FreeSpace / $c.Size) } else { 100 })
+        Usb4 = [bool](Get-CimInstance Win32_USBController -ErrorAction SilentlyContinue | Where-Object Name -match 'USB4|Thunderbolt')
+        Batteries = @($batteries)
+        Cpu = "$($cpu.Name)".Trim(); Cores = [int]$cpu.NumberOfCores; Threads = [int]$cpu.NumberOfLogicalProcessors
+        Gpus = @(Get-CimInstance Win32_VideoController | Where-Object { $_.Name -notmatch 'Basic|Remote|Virtual|Parsec|Meta|Mirage|DisplayLink' } | ForEach-Object { $_.Name.Trim() })
+        WiFi = $wifi
+    }
+}
+
+function Get-PcIdentity($Hw) {
+    # Custom-built desktops leave the system name as a placeholder; the motherboard then identifies the PC.
+    $placeholder = '^(To Be Filled|System (Product )?Name|System manufacturer|Default string|O\.?E\.?M|Not Applicable|None|x\.x|$)'
+    $isVM = ("$($Hw.Maker) $($Hw.Model)" -match 'VMware|VirtualBox|innotek|QEMU|KVM|Xen|Parallels|HVM domU|Bochs') -or
+            ($Hw.Maker -match '^Microsoft' -and $Hw.Model -match 'Virtual Machine')
+    $custom = ($Hw.Model -match $placeholder) -or ($Hw.Maker -match $placeholder)
+    $name = if ($custom -and $Hw.BoardProduct) { "$($Hw.BoardMaker) $($Hw.BoardProduct) (custom-built PC)" } else { "$($Hw.Maker) $($Hw.Model)".Trim() }
+    $laptop = [bool]($Hw.Chassis | Where-Object { $_ -in 8, 9, 10, 11, 12, 14, 18, 21, 30, 31, 32 })
+    if (-not $laptop -and -not ($Hw.Chassis | Where-Object { $_ -in 3, 4, 5, 6, 7, 13, 15, 16, 17, 23, 24, 35, 36 }) -and $Hw.Batteries.Count) { $laptop = $true }   # unknown chassis + battery
+    [pscustomobject]@{ Name = $name; IsVM = $isVM; Custom = $custom; Laptop = $laptop }
+}
+
+function Get-UpgradeRows($Hw) {
+    $id = Get-PcIdentity $Hw
     $rows = New-Object System.Collections.ArrayList
     function Add-Upg($Part, $Now, $Option, $Worth, $Spec, $Why) {
         [void]$rows.Add([pscustomobject]@{ Part = $Part; Now = $Now; Option = $Option; Worth = $Worth; Spec = $Spec; Why = $Why })
     }
-    $cs = Get-CimInstance Win32_ComputerSystem
-    $model = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim()
-    $serial = "$((Get-CimInstance Win32_BIOS).SerialNumber)".Trim()
-    $chassis = @((Get-CimInstance Win32_SystemEnclosure).ChassisTypes)
-    $isLaptop = [bool]($chassis | Where-Object { $_ -in 8, 9, 10, 11, 12, 14, 18, 21, 30, 31, 32 })
-    $os = Get-CimInstance Win32_OperatingSystem
-    $usedPct = [int](100 * (1 - $os.FreePhysicalMemory / $os.TotalVisibleMemorySize))
+    $totalGB = ($Hw.Modules | Measure-Object SizeGB -Sum).Sum
+    if ($id.IsVM) {
+        Add-Upg 'Memory / disk' "$totalGB GB memory - this is a virtual machine" 'Change the VM settings' 'n/a' `
+            'Nothing to buy - give the virtual machine more memory or disk space in VMware / VirtualBox / Hyper-V settings.' 'Physical upgrades belong to the computer that runs the VM.'
+        return , $rows
+    }
 
     # --- Memory ---
     $memTypes = @{ 20 = 'DDR'; 21 = 'DDR2'; 24 = 'DDR3'; 26 = 'DDR4'; 27 = 'LPDDR'; 28 = 'LPDDR2'; 29 = 'LPDDR3'; 30 = 'LPDDR4'; 34 = 'DDR5'; 35 = 'LPDDR5' }
-    $jedec = @{ '2C' = 'Micron'; 'CE' = 'Samsung'; 'AD' = 'SK hynix'; '9B' = 'Crucial'; '98' = 'Kingston'; 'CB' = 'ADATA'; '9E' = 'Corsair'; 'CD' = 'G.Skill' }
-    $arr = Get-CimInstance Win32_PhysicalMemoryArray | Where-Object Use -eq 3 | Select-Object -First 1   # 3 = system memory
-    $mods = @(Get-CimInstance Win32_PhysicalMemory)
+    $jedec = @{ '2C' = 'Micron'; 'CE' = 'Samsung'; 'AD' = 'SK hynix'; '9B' = 'Crucial'; '98' = 'Kingston'; 'CB' = 'ADATA'; '9E' = 'Corsair'; 'CD' = 'G.Skill'; '4F' = 'Transcend'; 'C1' = 'Infineon'; 'FE' = 'Elpida' }
+    $mods = @($Hw.Modules)
     if ($mods) {
         $m = $mods[0]
-        $type = $memTypes[[int]$m.SMBIOSMemoryType]; if (-not $type) { $type = 'DDR' }
-        $speed = if ($m.ConfiguredClockSpeed) { $m.ConfiguredClockSpeed } else { $m.Speed }
-        $ff = [int]$m.FormFactor   # 8 = DIMM (desktop), 12 = SO-DIMM (laptop)
-        $ffName = if ($ff -eq 12) { 'SO-DIMM' } else { 'DIMM' }
-        $pins = @{ 'DDR5|12' = 262; 'DDR5|8' = 288; 'DDR4|12' = 260; 'DDR4|8' = 288; 'DDR3|12' = 204; 'DDR3|8' = 240 }["$type|$ff"]
-        $volt = if ($m.ConfiguredVoltage) { '{0:0.0#} V' -f ($m.ConfiguredVoltage / 1000) } else { '' }
-        $ecc = $m.TotalWidth -gt $m.DataWidth
-        $maker = "$($m.Manufacturer)".Trim()
+        $type = $memTypes[$m.SmbiosType]; if (-not $type) { $type = $memTypes[$m.MemoryType] }
+        $guessed = $false
+        if (-not $type) {   # older firmware doesn't say; the speed gives it away
+            $guessed = $true
+            $type = if ($m.Speed -ge 4800) { 'DDR5' } elseif ($m.Speed -ge 2133) { 'DDR4' } elseif ($m.Speed -ge 800) { 'DDR3' } else { 'DDR2' }
+        }
+        $speed = ($mods | Where-Object Speed | Measure-Object Speed -Minimum).Minimum   # mixed modules all run at the slowest one's speed
+        $isRemovable = { param($x) $x.FormFactor -in 8, 12 -and -not ($memTypes[$x.SmbiosType] -like 'LP*') }
+        $removable = @($mods | Where-Object { & $isRemovable $_ })
+        $soldered = @($mods | Where-Object { -not (& $isRemovable $_) })
+        $solderedGB = ($soldered | Measure-Object SizeGB -Sum).Sum
+        $ff = if ($removable) { $removable[0].FormFactor } elseif ($id.Laptop) { 12 } else { 8 }
+        $ffName = if ($ff -eq 12) { 'SO-DIMM (laptop size)' } else { 'DIMM (desktop size)' }
+        $pins = @{ 'DDR5|12' = 262; 'DDR5|8' = 288; 'DDR4|12' = 260; 'DDR4|8' = 288; 'DDR3|12' = 204; 'DDR3|8' = 240; 'DDR2|12' = 200; 'DDR2|8' = 240 }["$type|$ff"]
+        $volt = if ($m.VoltageMV) { '{0:0.0#} V' -f ($m.VoltageMV / 1000) } elseif ($type -eq 'DDR3') { '1.35 or 1.5 V (match the fitted module)' } else { '' }
+        $kind = if ($m.Registered) { 'registered ECC (RDIMM)' } elseif ($m.ECC) { 'unbuffered ECC' } else { 'non-ECC' }
+        $maker = $m.Maker
         if ($maker -match '^[0-9A-F]{4,}$') { $code = $maker.Substring(2, 2); if ($jedec[$code]) { $maker = $jedec[$code] } }
-        $slots = [Math]::Max([int]$arr.MemoryDevices, $mods.Count)
-        $maxGB = if ($arr.MaxCapacityEx) { [int][Math]::Round($arr.MaxCapacityEx / 1MB) } elseif ($arr.MaxCapacity) { [int][Math]::Round($arr.MaxCapacity / 1MB) } else { 0 }
-        $sizes = @($mods | ForEach-Object { [int]($_.Capacity / 1GB) })
-        $totalGB = ($sizes | Measure-Object -Sum).Sum
+        $slots = [Math]::Max($Hw.Slots, $mods.Count)
+        $maxGB = [int][Math]::Round($Hw.MaxKB / 1MB)
+        if ($maxGB -lt $totalGB -or $maxGB -gt 2048) { $maxGB = 0 }   # firmware sometimes reports nonsense
         $free = $slots - $mods.Count
-        $layout = (($sizes | Group-Object | ForEach-Object { "$($_.Count) x $($_.Name) GB" }) -join ' + ')
-        $now = "$totalGB GB: $layout $type-$speed $ffName ($maker $("$($m.PartNumber)".Trim())), $(if ($free) { "$free of $slots slot(s) free" } else { "all $slots slots used" })"
-        $soldered = $type -like 'LP*' -or $ff -notin 8, 12
-        if ($soldered) {
+        $layout = (($mods | Group-Object SizeGB | ForEach-Object { "$($_.Count) x $($_.Name) GB" }) -join ' + ')
+        $where = if (-not $removable -and -not $free) { 'soldered to the motherboard' }
+                 elseif ($free) { "$(if ($solderedGB) { "$solderedGB GB soldered, " })$free of $slots slot(s) free" }
+                 else { "$(if ($solderedGB) { "$solderedGB GB soldered, " })all $slots slot(s) used" }
+        $now = "$totalGB GB: $layout $type-$speed ($maker $($m.Part)), $where"
+        $check = 'Crucial''s free System Scanner (crucial.com) or the service manual lists the exact modules this PC accepts.'
+        if (-not $removable -and -not $free) {
             Add-Upg 'Memory' $now 'Not upgradeable' 'n/a' 'Nothing to buy - this memory is soldered to the motherboard.' `
-                "$type memory, or a form factor other than a removable module, means it can't be swapped or added to."
+                "$type memory that isn't a removable module can't be swapped or added to. If memory is the bottleneck, the next PC needs more of it."
         } else {
-            $target = if ($totalGB -lt 16) { 16 } elseif ($totalGB -lt 32) { 32 } else { 64 }
+            $tiers = if ($id.Laptop) { 8, 16, 32, 64 } else { 8, 16, 32, 64, 128 }
+            $target = ($tiers | Where-Object { $_ -gt $totalGB } | Select-Object -First 1)
+            if (-not $target) { $target = $totalGB }
             if ($maxGB -and $target -gt $maxGB) { $target = $maxGB }
-            $base = "$type-$speed $ffName$(if ($pins) { " ($pins-pin)" })$(if ($volt) { ", $volt" }), $(if ($ecc) { 'ECC' } else { 'non-ECC' })"
+            # Soldered LPDDR next to a slot: the slot itself takes normal DDR of the same generation.
+            $buyType = if ($removable) { $type } else { $type -replace '^LP', '' }
+            if ($buyType -ne $type) { $pins = @{ 'DDR5|12' = 262; 'DDR4|12' = 260; 'DDR3|12' = 204 }["$buyType|12"]; $volt = '' }
+            $base = "$buyType-$speed $ffName$(if ($pins) { ", $pins-pin" })$(if ($volt) { ", $volt" }), $kind"
             if ($target -le $totalGB) {
                 Add-Upg 'Memory' $now 'Already at the maximum' 'Not needed' "Nothing to buy - $totalGB GB is the most this PC supports." "The firmware reports a maximum of $maxGB GB."
             } else {
-                $each = $sizes[0]
+                $each = if ($removable) { $removable[0].SizeGB } else { [int](($target - $totalGB) / [Math]::Max(1, $free)) }
                 if ($free -gt 0 -and ($totalGB + $free * $each) -ge $target) {
                     $n = [Math]::Ceiling(($target - $totalGB) / $each)
                     $option = "Add $n x $each GB (total $($totalGB + $n * $each) GB)"
-                    $spec = "$n x $each GB $base - match the module already fitted. Total afterwards: $($totalGB + $n * $each) GB."
+                    $spec = "$n x $each GB $base - $(if ($removable) { 'match the module already fitted' } else { 'same speed as the built-in memory' }). Total afterwards: $($totalGB + $n * $each) GB."
                 } else {
-                    $per = [int]($target / $slots)
-                    $option = "Replace with $slots x $per GB (total $target GB)"
-                    $spec = "A matched kit of $slots x $per GB $base = $target GB. The current modules come out (keep or sell them)."
+                    $remSlots = [Math]::Max(1, $slots - $soldered.Count)
+                    $per = [Math]::Max(4, [int][Math]::Pow(2, [Math]::Ceiling([Math]::Log(($target - $solderedGB) / $remSlots, 2))))
+                    $newTotal = $solderedGB + $remSlots * $per
+                    if ($maxGB -and $newTotal -gt $maxGB) { $per = [int](($maxGB - $solderedGB) / $remSlots); $newTotal = $solderedGB + $remSlots * $per }
+                    $option = "Replace with $remSlots x $per GB (total $newTotal GB)"
+                    $spec = if ($remSlots -gt 1) { "A matched kit of $remSlots x $per GB $base. The current modules come out (keep or sell them)." }
+                            else { "1 x $per GB $base in place of the current module$(if ($solderedGB) { " (the $solderedGB GB soldered memory stays)" })." }
                 }
+                if ($guessed) { $spec += " ($type worked out from the speed - double-check before buying.)" }
                 $spec += " Faster-rated $type modules also work and simply run at $speed MT/s." + $(if ($maxGB) { " Most supported: $maxGB GB." })
-                $worth = if ($mods.Count -eq 1 -and $slots -ge 2) { 'Recommended - one module means single-channel; a matching second module roughly doubles memory speed' }
+                $single = $mods.Count -eq 1 -and $slots -ge 2
+                $worth = if ($single) { 'Recommended - one module means single-channel; a matching second module roughly doubles memory speed' }
                          elseif ($totalGB -lt 8) { 'Strongly recommended' }
                          elseif ($totalGB -lt 16) { 'Recommended' }
-                         elseif ($usedPct -ge 80) { "Recommended - memory is $usedPct% full right now" }
+                         elseif ($Hw.UsedPct -ge 80) { "Recommended - memory is $($Hw.UsedPct)% full right now" }
                          elseif ($totalGB -lt 32) { 'Optional - worth it for virtual machines, big spreadsheets, photo/video/CAD work or many browser tabs' }
                          else { 'Not needed' }
-                Add-Upg 'Memory' $now $option $worth $spec "Memory is $usedPct% used right now. Modules must match the type ($type) and form factor ($ffName) and should match the speed; mixing sizes works but can lose dual-channel speed."
+                Add-Upg 'Memory' $now $option $worth $spec "Memory is $($Hw.UsedPct)% used right now. Modules must match the type ($type) and size ($ffName). $check"
             }
         }
     }
 
     # --- Storage ---
-    $sysDisk = try { (Get-Partition -DriveLetter C -ErrorAction Stop | Get-Disk).Number } catch { $null }
-    $cDrive = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
-    $cPct = if ($cDrive.Size) { [int](100 * $cDrive.FreeSpace / $cDrive.Size) } else { 100 }
-    foreach ($d in Get-PhysicalDisk) {
-        if ("$($d.BusType)" -eq 'USB') { continue }
-        $gb = [int]($d.Size / 1GB)
-        $isSys = "$($d.DeviceId)" -eq "$sysDisk"
-        $now = "$("$($d.FriendlyName)".Trim()): $gb GB $($d.BusType) $($d.MediaType)$(if ($isSys) { ", holds Windows (C: $cPct% free)" })"
-        if ("$($d.MediaType)" -eq 'HDD') {
-            Add-Upg 'Drive' $now 'Replace with an SSD' $(if ($isSys) { 'Strongly recommended - the biggest speed-up an older PC can get' } else { 'Optional' }) `
-                '1 TB (or larger) SSD: 2.5-inch SATA SSD to replace this drive, or an M.2 NVMe SSD if the PC has an M.2 slot. Copy ("clone") the old drive with the SSD maker''s free tool.' `
+    $internal = @($Hw.Disks | Where-Object { $_.Bus -notin 'USB', 'SD', 'MMC', 'File Backed Virtual' })
+    foreach ($d in $internal) {
+        $media = if ($d.Media -eq 'HDD' -or ($d.Media -notin 'SSD', 'SCM' -and $d.Spindle -gt 0 -and $d.Spindle -lt 100000)) { 'HDD' }
+                 elseif ($d.Media -in 'SSD', 'SCM' -or $d.Name -match 'SSD|NVMe|Solid') { 'SSD' } else { 'drive' }
+        $now = "$($d.Name): $($d.SizeGB) GB $($d.Bus) $media$(if ($d.IsSystem) { ", holds Windows (C: $($Hw.CFreePct)% free)" })"
+        if ($media -eq 'HDD') {
+            $spec = if ($id.Laptop) { '1 TB 2.5-inch SATA SSD (7 mm) in place of this hard disk, or an M.2 SSD if the laptop has an M.2 slot. Copy ("clone") the old drive with the SSD maker''s free tool.' }
+                    else { '1 TB SSD: M.2 NVMe if the motherboard has an M.2 slot (fastest), otherwise a 2.5-inch SATA SSD. Put Windows on it and keep the hard disk for files.' }
+            Add-Upg 'Drive' $now 'Replace with an SSD' $(if ($d.IsSystem) { 'Strongly recommended - the biggest speed-up an older PC can get' } else { 'Optional - only matters for files on this disk' }) $spec `
                 'Hard disks are 20-50x slower than SSDs at the small reads Windows does all the time.'
-        } elseif ($isSys) {
-            $worth = if ($cPct -lt 15) { "Recommended - C: is only $cPct% free" } elseif ($gb -lt 300) { 'Recommended - small drive' } else { 'Optional' }
-            $form = if ("$($d.BusType)" -eq 'NVMe') { 'M.2 2280 NVMe SSD, PCIe Gen4 x4 (also works in Gen3 slots)' } else { '2.5-inch SATA SSD (or M.2 NVMe if the PC has an M.2 slot)' }
+        } elseif ($d.IsSystem) {
+            $worth = if ($Hw.CFreePct -lt 15) { "Recommended - C: is only $($Hw.CFreePct)% free" } elseif ($d.SizeGB -lt 300) { 'Recommended - small drive' } else { 'Optional' }
+            $form = if ($d.Bus -eq 'NVMe' -or $d.Name -match 'NVMe') { 'M.2 2280 NVMe SSD, PCIe Gen4 x4 (also works in Gen3 slots)' }
+                    elseif ($d.Bus -eq 'SATA' -and -not $id.Laptop) { '2.5-inch SATA SSD, or M.2 NVMe if the motherboard has an M.2 slot' }
+                    elseif ($d.Bus -eq 'SATA') { '2.5-inch SATA SSD, or M.2 if the laptop has an M.2 slot (check whether it takes SATA or NVMe M.2)' }
+                    else { 'SSD of the same type as the current one' }
             $spec = "$form, 1 TB or 2 TB."
-            $spec += if ($isLaptop) { ' If the laptop has a free M.2 slot, add it as a second drive; if not, replace this drive with the bigger one and clone it.' }
+            $spec += if ($id.Laptop) { ' If the laptop has a free M.2 slot, add it as a second drive; if not, replace this drive with the bigger one and clone it.' }
                      else { ' Desktops usually have spare M.2 slots or 2.5/3.5-inch bays - add it as a second drive.' }
-            Add-Upg 'Drive' $now 'Bigger or second SSD' $worth $spec 'Check the service manual for a free M.2 slot - Windows cannot see empty slots. Gen4 drives fall back to the slot''s speed, so they are always a safe pick.'
+            Add-Upg 'Drive' $now 'Bigger or second SSD' $worth $spec 'Windows cannot see empty slots, so check the manual for a free one. Gen4 drives fall back to the slot''s speed, so they are always a safe pick.'
         }
     }
-    $usb4 = [bool](Get-CimInstance Win32_USBController -ErrorAction SilentlyContinue | Where-Object Name -match 'USB4|Thunderbolt')
-    Add-Upg 'External drive' $(if ($usb4) { 'This PC has a USB4/Thunderbolt port' } else { 'USB ports' }) 'External SSD' 'Optional - no screwdriver needed, good for games, photos and backups' `
-        $(if ($usb4) { 'External NVMe SSD (or an NVMe enclosure) for USB4/Thunderbolt, 1-2 TB: up to ~3,000 MB/s on this PC.' } else { 'USB 3.2 Gen 2 external SSD, 1-2 TB (about 1,000 MB/s).' }) `
-        'Use the fastest port - on most laptops it has a lightning or USB4 symbol.'
+    Add-Upg 'External drive' $(if ($Hw.Usb4) { 'This PC has a USB4/Thunderbolt port' } else { 'USB ports' }) 'External SSD' 'Optional - no screwdriver needed, good for games, photos and backups' `
+        $(if ($Hw.Usb4) { 'External NVMe SSD (or an NVMe enclosure) for USB4/Thunderbolt, 1-2 TB: up to ~3,000 MB/s on this PC.' } else { 'USB 3.2 Gen 2 external SSD, 1-2 TB (about 1,000 MB/s) - use a blue or "SS 10" USB port.' }) `
+        'Use the fastest port: USB4/Thunderbolt (lightning symbol) > USB-C 10 Gbps > blue USB-A.'
 
     # --- Battery ---
-    if ($isLaptop) {
-        $xml = Join-Path $env:TEMP "pctuneup-upg-battery-$PID.xml"
-        powercfg /batteryreport /xml /output $xml 2>$null | Out-Null
-        if (Test-Path $xml) {
-            try {
-                [xml]$x = Get-Content $xml
-                foreach ($b in @($x.BatteryReport.Batteries.Battery)) {
-                    if (-not $b -or [double]$b.DesignCapacity -le 0) { continue }
-                    $pct = [Math]::Min(100, [int](100 * [double]$b.FullChargeCapacity / [double]$b.DesignCapacity))
-                    $wh = [Math]::Round([double]$b.DesignCapacity / 1000)
-                    $worth = if ($pct -lt 60) { 'Recommended - battery life is roughly halved' } elseif ($pct -lt 80) { 'Optional' } else { 'Not needed' }
-                    Add-Upg 'Battery' "$wh Wh $($b.Chemistry) battery ($($b.Manufacturer)), now holds $pct% of its original charge" 'Replacement battery' $worth `
-                        "Replacement battery for the $model`: $wh Wh $($b.Chemistry). This battery reports itself as '$("$($b.Id)".Trim())' - search that, or your service tag, to find the exact part. Prefer the maker's original part." `
-                        'Batteries wear with age and charge cycles. A worn battery doesn''t slow the PC down, it just runs out sooner.'
-                }
-            } catch { }
-            Remove-Item $xml -ErrorAction SilentlyContinue
-        }
+    foreach ($b in $Hw.Batteries) {
+        $worth = if ($b.Pct -lt 60) { 'Recommended - battery life is roughly halved' } elseif ($b.Pct -lt 80) { 'Optional' } else { 'Not needed' }
+        Add-Upg 'Battery' "$($b.Wh) Wh $($b.Chem) battery ($($b.Maker)), now holds $($b.Pct)% of its original charge" 'Replacement battery' $worth `
+            "Replacement battery for the $($id.Name): $($b.Wh) Wh $($b.Chem). It reports itself as '$($b.Id)' - search that, or the serial number, to find the exact part. Prefer the maker's original." `
+            'Batteries wear with age and charge cycles. A worn battery doesn''t slow the PC down, it just runs out sooner.'
     }
 
-    # --- Processor and graphics (information) ---
-    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
-    $cpuNow = "$("$($cpu.Name)".Trim()) - $($cpu.NumberOfCores) cores / $($cpu.NumberOfLogicalProcessors) threads"
-    if ($isLaptop) { Add-Upg 'Processor' $cpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop processors are soldered to the motherboard.' 'If the processor is too slow, the upgrade path is a new laptop.' }
-    else {
-        $board = Get-CimInstance Win32_BaseBoard
-        Add-Upg 'Processor' $cpuNow 'Depends on the motherboard' 'Rarely worth it' "Check the CPU support list of your motherboard ($($board.Manufacturer) $($board.Product)) on the maker's website." 'A new processor often needs a BIOS update first, and only fits the same socket.'
+    # --- Wi-Fi ---
+    $w = @($Hw.WiFi)[0]
+    if ($w) {
+        $gen = if ($w -match 'BE\d{3}|Wi-?Fi 7') { 7 } elseif ($w -match 'AX2\d\d|AX4\d\d|6E') { 6 } elseif ($w -match 'AX\d|Wi-?Fi 6') { 6 }
+               elseif ($w -match 'AC\d|\bAC\b|Wi-?Fi 5|802\.11 ?a?c') { 5 }
+               elseif ($w -match '\bN\b|-N |802\.11 ?b?g?n|\bbgn\b|Wireless-N|Wireless N|\bN\d{3,4}') { 4 } else { 0 }
+        $genName = @{ 7 = 'Wi-Fi 7'; 6 = 'Wi-Fi 6/6E'; 5 = 'Wi-Fi 5'; 4 = 'Wi-Fi 4' }[$gen]
+        $spec = if ($id.Laptop) { 'M.2 2230 Wi-Fi 6E card with Bluetooth (e.g. Intel AX210). Most laptops let you swap it; a few have it soldered or only accept approved cards - check the manual.' }
+                else { 'PCIe Wi-Fi 6E card with Bluetooth (e.g. Intel AX210 based), or a USB Wi-Fi 6 adapter if you''d rather not open the case.' }
+        $worth = switch ($gen) { 4 { 'Recommended - Wi-Fi 4 is slow and crowded' } 5 { 'Optional - faster and steadier on a Wi-Fi 6 router' }
+                                 0 { 'Optional - check which Wi-Fi standard this card supports' } default { 'Not needed' } }
+        if ($gen -ge 6) { $spec = 'Nothing to buy - this Wi-Fi is already current.' }
+        Add-Upg 'Wi-Fi' "$w$(if ($genName) { " ($genName)" })" $(if ($gen -ge 6) { 'Already modern' } else { 'Wi-Fi 6E card' }) $worth $spec 'Faster Wi-Fi only helps if your router supports it too.'
+    } elseif (-not $id.Laptop) {
+        Add-Upg 'Wi-Fi' 'No Wi-Fi adapter' 'Add Wi-Fi' 'Optional - only if you can''t use a cable' 'PCIe Wi-Fi 6E card with Bluetooth, or a USB Wi-Fi 6 adapter.' 'A network cable is still the fastest and steadiest connection.'
     }
-    $gpus = @(Get-CimInstance Win32_VideoController | Where-Object { $_.Name -notmatch 'Basic|Remote|Virtual|Parsec|Meta' })
-    $gpuNow = ($gpus | ForEach-Object { $_.Name.Trim() }) -join ' + '
-    if ($isLaptop) { Add-Upg 'Graphics' $gpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop graphics are soldered. An external GPU box over Thunderbolt/USB4 is possible but costly.' '' }
-    else { Add-Upg 'Graphics' $gpuNow 'Graphics card' 'Depends on use' 'Needs a free PCIe x16 slot, enough power-supply wattage and connectors, and room in the case - check all three first.' '' }
 
-    $support = if ($cs.Manufacturer -match 'Dell' -and $serial) { "https://www.dell.com/support/home/en-us/product-support/servicetag/$serial/overview" } else { $null }
-    [pscustomobject]@{ Rows = $rows; Model = $model; Support = $support
-                       Manual = 'https://www.bing.com/search?q=' + [uri]::EscapeDataString("$model service manual memory SSD upgrade") }
+    # --- Processor and graphics ---
+    $cpuNow = "$($Hw.Cpu) - $($Hw.Cores) cores / $($Hw.Threads) threads"
+    $gpuNow = if ($Hw.Gpus) { $Hw.Gpus -join ' + ' } else { 'Not read - Windows didn''t answer in time (busy with a game?). Click Refresh later.' }
+    if ($id.Laptop) {
+        Add-Upg 'Processor' $cpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop processors are soldered to the motherboard.' 'If the processor is too slow, the upgrade path is a new laptop.'
+        Add-Upg 'Graphics' $gpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop graphics are soldered.' $(if ($Hw.Usb4) { 'An external graphics box over USB4/Thunderbolt is possible but costly.' } else { '' })
+    } else {
+        Add-Upg 'Processor' $cpuNow 'Depends on the motherboard' 'Rarely worth it' "Check the CPU support list of the motherboard ($($Hw.BoardMaker) $($Hw.BoardProduct)) on its maker's website." `
+            'A new processor only fits the same socket and often needs a BIOS update first.'
+        $integrated = $gpuNow -and -not ($Hw.Gpus | Where-Object { $_ -match 'NVIDIA|Radeon RX|Radeon Pro|Arc A|Arc B|GeForce|Quadro|FirePro' })
+        Add-Upg 'Graphics' $gpuNow $(if ($integrated) { 'Add a graphics card' } else { 'Faster graphics card' }) $(if ($integrated) { 'Optional - for gaming, video editing or 3D' } else { 'Depends on use' }) `
+            'Needs a free PCIe x16 slot, enough power-supply wattage and connectors, and room in the case - check all three first.' `
+            'Office PCs from HP, Dell and Lenovo often have small power supplies; a low-profile card that needs no power cable is the safe choice there.'
+    }
+    , $rows
 }
+
+# Where to look up this exact PC: maker support pages take the serial number (copied to the clipboard).
+function Get-SupportInfo($Hw) {
+    $id = Get-PcIdentity $Hw
+    $maker = if ($id.Custom) { $Hw.BoardMaker } else { $Hw.Maker }
+    $pages = [ordered]@{
+        'Dell'                 = "https://www.dell.com/support/home/en-us/product-support/servicetag/$($Hw.Serial)/overview"
+        'Lenovo'               = 'https://pcsupport.lenovo.com/'
+        'HP|Hewlett'           = 'https://support.hp.com/'
+        'ASUS'                 = 'https://www.asus.com/support/'
+        'Acer'                 = 'https://www.acer.com/support'
+        'Micro-Star|MSI'       = 'https://www.msi.com/support'
+        'Microsoft'            = 'https://support.microsoft.com/surface'
+        'Samsung'              = 'https://www.samsung.com/support/'
+        'Gigabyte'             = 'https://www.gigabyte.com/Support'
+        'ASRock'               = 'https://www.asrock.com/support/'
+        'Fujitsu'              = 'https://support.ts.fujitsu.com/'
+        'Toshiba|Dynabook'     = 'https://support.dynabook.com/'
+        'Razer'                = 'https://mysupport.razer.com/'
+        'Medion'               = 'https://www.medion.com/support'
+        'Framework'            = 'https://frame.work/support'
+    }
+    $url = $null
+    foreach ($k in $pages.Keys) { if ($maker -match $k) { $url = $pages[$k]; break } }
+    $serialOk = $Hw.Serial -and $Hw.Serial -notmatch '^(To Be Filled.*|Default string|System Serial.*|Serial.?Number|Not Specified|Chassis Serial.*|0+|None|N/A|123456789)$'
+    $query = if ($id.Custom) { "$($Hw.BoardMaker) $($Hw.BoardProduct) motherboard manual" } else { "$($id.Name) service manual memory SSD upgrade" }
+    [pscustomobject]@{ Name = $id.Name; Url = $url; Serial = $(if ($serialOk) { $Hw.Serial } else { '' })
+                       Manual = 'https://www.bing.com/search?q=' + [uri]::EscapeDataString($query); Custom = $id.Custom }
+}
+
 function Update-Upgrades {
     $btnUpgReload.Enabled = $false
     $txtUpg.Text = 'Looking at this PC''s hardware...'
-    Start-Bg $UpgradeWork $null {
+    Start-Bg $UpgradeCollectWork $null {
         param($r)
         $btnUpgReload.Enabled = $true
         if (-not $r) { $txtUpg.Text = 'Could not read the hardware details.'; return }
-        $script:UpgInfo = $r[0]
-        $btnUpgSupport.Enabled = [bool]$script:UpgInfo.Support
+        $script:UpgHw = $r[0]
+        $script:UpgInfo = Get-SupportInfo $script:UpgHw
+        $btnUpgSupport.Enabled = [bool]$script:UpgInfo.Url
+        $btnUpgManual.Text = if ($script:UpgInfo.Custom) { 'Find motherboard manual' } else { 'Find service manual' }
         $lvUpg.BeginUpdate(); $lvUpg.Items.Clear()
-        foreach ($u in $script:UpgInfo.Rows) {
+        foreach ($u in (Get-UpgradeRows $script:UpgHw)) {
             $it = Add-Row $lvUpg @($u.Part, $u.Now, $u.Option, $u.Worth, $u.Spec) $u
             if ($u.Worth -like 'Strongly*' -or $u.Worth -like 'Recommended*') { $it.ForeColor = [Drawing.Color]::DarkRed }
             elseif ($u.Worth -in 'n/a', 'Not needed') { $it.ForeColor = [Drawing.Color]::Gray }
@@ -1268,12 +1390,20 @@ $lvUpg.Add_SelectedIndexChanged({
     $txtUpg.Text = "$($u.Part): $($u.Option)`r`nWorth it? $($u.Worth)`r`n`r`nYou have now: $($u.Now)`r`n`r`nWhat to buy: $($u.Spec)" + $(if ($u.Why) { "`r`n`r`nGood to know: $($u.Why)" })
 })
 $btnUpgReload.Add_Click({ Update-Upgrades })
-$btnUpgSupport.Add_Click({ if ($script:UpgInfo.Support) { Start-Process $script:UpgInfo.Support } })
+$btnUpgSupport.Add_Click({
+    $i = $script:UpgInfo
+    if (-not $i.Url) { return }
+    if ($i.Serial -and $i.Url -notmatch [regex]::Escape($i.Serial)) {
+        [Windows.Forms.Clipboard]::SetText($i.Serial)
+        Show-Msg "The serial number ($($i.Serial)) is copied - paste it into the support page's search box to see this exact PC's parts." | Out-Null
+    }
+    Start-Process $i.Url
+})
 $btnUpgManual.Add_Click({ if ($script:UpgInfo) { Start-Process $script:UpgInfo.Manual } })
 $btnUpgCopy.Add_Click({
     $items = @($lvUpg.Items | ForEach-Object Tag | Where-Object { $_.Worth -notin 'n/a', 'Not needed' })
     if (-not $items) { Show-Msg 'Nothing worth upgrading was found.' | Out-Null; return }
-    $text = "Upgrade shopping list for $($script:UpgInfo.Model)`r`n`r`n" + (($items | ForEach-Object { "- $($_.Part) ($($_.Worth)):`r`n  $($_.Spec)" }) -join "`r`n`r`n")
+    $text = "Upgrade shopping list for $($script:UpgInfo.Name)$(if ($script:UpgInfo.Serial) { " (serial $($script:UpgInfo.Serial))" })`r`n`r`n" + (($items | ForEach-Object { "- $($_.Part) ($($_.Worth)):`r`n  $($_.Spec)" }) -join "`r`n`r`n")
     [Windows.Forms.Clipboard]::SetText($text)
     Show-Msg 'Shopping list copied - paste it into an email, a note or a shop''s chat.' | Out-Null
 })

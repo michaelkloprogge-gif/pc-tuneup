@@ -6,6 +6,7 @@
 - All checks are ready about 40% sooner (four run at the same time, slowest first).
 - Starts a little quicker: the PC name comes from the registry, and the exe no longer compiles helper code at every start.
 - New `tests\Profile.ps1` shows where the time goes.
+
 ## 1.6.0
 
 - **Installer**: install for the current user (no administrator needed) with a Start-menu entry, a desktop shortcut and an entry in Settings > Apps to uninstall it. The first start from a downloaded file offers to install.

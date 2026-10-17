@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.8.0
+
+- **Automatic maintenance** (Settings): every week or every 4 weeks, PC Tune-Up cleans junk files and checks the PC by itself - only when the PC is idle, and catching up if it was off - then shows a notification ("Cleaned 1.2 GB. 2 things worth a look"); click it to open the app. It never changes startup apps, services or programs by itself. Uses a normal scheduled task for your account (no administrator needed); uninstalling removes it. Also available as `PC-TuneUp.exe /auto`.
+- New **Privacy** page: switch off Windows' ads, tips and tracking - advertising ID, tailored experiences, tips pop-ups, suggestions in Settings and Start, "finish setting up" screens, apps installed without asking, lock-screen promos, search highlights, web results in Start search, feedback requests, typing personalisation; as administrator also optional diagnostic data, activity history and Recall. Recommended ones are pre-checked; every change can be undone from History or with *Turn back on*.
+- New **Drivers** page: devices Windows reports a problem with (error codes explained, with what to do - e.g. a USB device that keeps failing), and the drivers that matter most (graphics, network, audio, Bluetooth, storage, BIOS) with their age. *Get driver updates* opens the PC maker's driver page for this exact model. Health mentions devices with problems.
+- Stability's driver fix now opens the Drivers page.
+- More compact sidebar, so all pages fit without scrolling.
 ## 1.7.0
 
 - **One-click fixes on the Stability page**: select a problem and click *Fix selected problem* - turn off NVIDIA nView (or uninstall it), repair the Visual C++ runtimes, reset Windows Update, repair Windows system files (sfc + DISM), check the drive, schedule a memory test, or jump to driver and Store updates. Everything asks first and is recorded in History; turning off nView can be undone.

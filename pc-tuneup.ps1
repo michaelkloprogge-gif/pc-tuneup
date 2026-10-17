@@ -6,6 +6,8 @@
 #   Bloatware - find pre-installed junk (OEM tools, trial antivirus, promo apps) and uninstall it
 #   Services  - background services from PC makers, updaters and telemetry, with one-click restore
 #   Tasks     - scheduled tasks from other companies (updaters, telemetry), switch off/on with undo
+#   Privacy   - Windows ads, tips and tracking settings, switch off with undo
+#   Drivers   - devices with problems, and the age of the drivers that matter most
 #   Disk      - find the folders eating your drive
 #   Updates   - outdated programs, updated through winget
 #   Security  - Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM...
@@ -35,21 +37,22 @@ try { [void][PcTuneUp.Native]::SetProcessDPIAware() } catch { }
 $DpiScale = try { [Drawing.Graphics]::FromHwnd([IntPtr]::Zero).DpiX / 96 } catch { 1 }
 function Px([double]$Pixels) { [int][Math]::Round($Pixels * $DpiScale) }   # for sizes WinForms doesn't scale itself
 
-# Command line (PC-TuneUp.exe /fix /report[:file] /install /uninstall /?). The exe host passes $AppArgs.
+# Command line (PC-TuneUp.exe /fix /report[:file] /auto /install /uninstall /?). The exe host passes $AppArgs.
 $CliArgs = if ($AppArgs) { @($AppArgs) } else { @($args) }
-$Cli = @{ Fix = $false; Report = $null; Help = $false; Install = $false; Uninstall = $false }
+$Cli = @{ Fix = $false; Report = $null; Help = $false; Install = $false; Uninstall = $false; Auto = $false }
 foreach ($a in $CliArgs) {
     switch -Regex ("$a") {
         '^[/-](\?|h|help)$' { $Cli.Help = $true }
         '^[/-]fix$' { $Cli.Fix = $true }
+        '^[/-]auto$' { $Cli.Auto = $true }   # the scheduled maintenance run: no window, a notification at the end
         '^[/-]report(:(.+))?$' { $Cli.Report = "$($Matches[2])" }
         '^[/-]install$' { $Cli.Install = $true }
         '^[/-]uninstall$' { $Cli.Uninstall = $true }
     }
 }
-$CliMode = $Cli.Help -or $Cli.Fix -or ($null -ne $Cli.Report)
+$CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.7.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.8.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -64,7 +67,7 @@ $ServiceStateFile = Join-Path $DataDir 'services-original.json'
 $KeepFile = Join-Path $DataDir 'keep.txt'
 $HistoryFile = Join-Path $DataDir 'history.jsonl'   # one JSON entry per change; drives the History tab
 $SettingsFile = Join-Path $DataDir 'settings.json'
-$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false }
+$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = '' }
 if (Test-Path $SettingsFile) {
     try { (Get-Content $SettingsFile -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($Settings.Contains($_.Name)) { $Settings[$_.Name] = $_.Value } } } catch { }
 }
@@ -93,6 +96,7 @@ MORE	MEER
 {0}  ({1})	{0}  ({1})
 Version {0}	Versie {0}
 Limited mode	Beperkte modus
+Limited mode - some fixes need administrator rights.	Beperkte modus - sommige oplossingen hebben beheerdersrechten nodig.
 Some fixes need administrator rights.	Sommige oplossingen hebben beheerdersrechten nodig.
 Restart as admin	Opnieuw als beheerder
 Restart as administrator	Opnieuw starten als beheerder
@@ -876,7 +880,7 @@ Reset Windows Update	Windows Update opnieuw instellen
 Repair Windows system files	Windows-systeembestanden repareren
 Check drive C: for errors	Station C: op fouten controleren
 Test the memory at the next restart	Het geheugen testen bij de volgende herstart
-Open driver updates in Windows Update	Stuurprogramma-updates openen in Windows Update
+Check the drivers on the Drivers page	Controleer de stuurprogramma's op de pagina Stuurprogramma's
 Open Store app updates	Updates voor Store-apps openen
 Look for an update on the Updates page	Zoek een update op de pagina Updates
 {0} needs administrator rights - click "Restart as admin" first.	{0} heeft beheerdersrechten nodig - klik eerst op "Opnieuw als beheerder".
@@ -909,6 +913,132 @@ checking system files (sfc)	systeembestanden controleren (sfc)
 repairing the Windows image (DISM)	Windows-image repareren (DISM)
 winget is missing	winget ontbreekt
 nView is not installed any more	nView is niet meer geïnstalleerd
+Privacy	Privacy
+Drivers	Stuurprogramma's
+Ads, tips and tracking that Windows switches on by default. Recommended ones are pre-checked. Turning a setting off only changes your own Windows settings (nothing is uninstalled) and can be undone from History or with "Turn back on".	Advertenties, tips en tracking die Windows standaard aanzet. De aanbevolen instellingen zijn al aangevinkt. Uitzetten verandert alleen je eigen Windows-instellingen (er wordt niets verwijderd) en kan worden teruggedraaid via Geschiedenis of met "Weer aanzetten".
+Turn back on checked	Aangevinkte weer aanzetten
+Open privacy settings	Privacyinstellingen openen
+Setting	Instelling
+What it does	Wat het doet
+restarts Explorer	herstart Verkenner
+Advertising ID	Advertentie-id
+Lets apps show ads based on what you do.	Laat apps advertenties tonen op basis van wat je doet.
+Tailored experiences	Afgestemde ervaringen
+Microsoft uses your diagnostic data for personal tips, ads and recommendations.	Microsoft gebruikt je diagnostische gegevens voor persoonlijke tips, advertenties en aanbevelingen.
+Tips and suggestions notifications	Meldingen met tips en suggesties
+Pop-ups with tips and offers while you use Windows.	Pop-ups met tips en aanbiedingen terwijl je Windows gebruikt.
+Suggested content in Settings	Voorgestelde inhoud in Instellingen
+Suggestions and offers inside the Settings app.	Suggesties en aanbiedingen in de app Instellingen.
+"Finish setting up" and welcome screens	"Apparaat instellen voltooien" en welkomstschermen
+Full-screen pages after updates that push Microsoft 365, OneDrive and Game Pass.	Schermvullende pagina's na updates die Microsoft 365, OneDrive en Game Pass aanprijzen.
+Promoted apps installed without asking	Gepromote apps die zonder te vragen worden geïnstalleerd
+Windows quietly installs suggested apps and games on the Start menu.	Windows installeert stilletjes voorgestelde apps en games in het Startmenu.
+Recommendations and ads in Start	Aanbevelingen en advertenties in Start
+Suggested apps, tips and promotions in the Start menu.	Voorgestelde apps, tips en promoties in het Startmenu.
+Account notifications in Start	Accountmeldingen in Start
+Microsoft account and backup reminders on your picture in the Start menu.	Herinneringen over je Microsoft-account en back-up bij je foto in het Startmenu.
+Fun facts and tips on the lock screen	Weetjes en tips op het vergrendelingsscherm
+Text and promotions on top of the lock-screen picture.	Tekst en promoties over de afbeelding op het vergrendelingsscherm.
+Search highlights	Zoekhoogtepunten
+Trending news and pictures in the search box and search window.	Populair nieuws en afbeeldingen in het zoekvak en zoekvenster.
+Web results in Start search	Webresultaten in zoeken via Start
+What you type in Start search is also sent to Bing. As administrator the Windows policy is set too, which newer Windows versions need.	Wat je in Start zoekt, gaat ook naar Bing. Als beheerder wordt ook het Windows-beleid ingesteld, dat nieuwere Windows-versies nodig hebben.
+Feedback requests	Feedbackverzoeken
+Windows asks now and then what you think of it.	Windows vraagt af en toe wat je ervan vindt.
+Inking and typing personalisation	Persoonlijke inkt- en typegegevens
+What you type and write by hand is collected into a personal dictionary.	Wat je typt en met de hand schrijft, wordt verzameld in een persoonlijk woordenboek.
+Optional diagnostic data	Optionele diagnostische gegevens
+Extra data about the websites you visit and how you use apps, sent to Microsoft. The required basic data stays on.	Extra gegevens over de websites die je bezoekt en hoe je apps gebruikt, verstuurd naar Microsoft. De vereiste basisgegevens blijven aan.
+Activity history	Activiteitengeschiedenis
+Windows keeps a history of the apps, files and websites you used.	Windows houdt een geschiedenis bij van de apps, bestanden en websites die je hebt gebruikt.
+Recall snapshots	Recall-momentopnamen
+Recall saves pictures of everything on your screen every few seconds, to search later.	Recall maakt om de paar seconden een afbeelding van alles op je scherm, om later te doorzoeken.
+Location for apps	Locatie voor apps
+Apps such as Maps and Weather can see where you are. Only turn off if you don't need that.	Apps zoals Kaarten en Weer kunnen zien waar je bent. Zet dit alleen uit als je dat niet nodig hebt.
+Partly on	Deels aan
+{0} recommended setting(s) are still on. Grey rows are already off.	{0} aanbevolen instelling(en) staan nog aan. Grijze rijen staan al uit.
+All recommended settings are off.	Alle aanbevolen instellingen staan uit.
+Check one or more settings first.	Vink eerst een of meer instellingen aan.
+{0} setting(s) turned off. Undo from the History page.	{0} instelling(en) uitgezet. Terugdraaien via Geschiedenis.
+{0} setting(s) turned back on. Undo from the History page.	{0} instelling(en) weer aangezet. Terugdraaien via Geschiedenis.
+Couldn't change: {0}	Kon niet wijzigen: {0}
+Restart Explorer now so the Start menu, search and taskbar pick up the change?	Verkenner nu herstarten zodat het Startmenu, zoeken en de taakbalk de wijziging overnemen?
+Open File Explorer windows close; nothing else is affected.	Open Verkenner-vensters worden gesloten; verder verandert er niets.
+turned off	uitgezet
+turned back on	weer aangezet
+setting put back as it was	instelling teruggezet zoals hij was
+Devices Windows reports a problem with, and the drivers that matter most (graphics, network, audio, storage, BIOS) with their age. Old drivers are a common cause of crashes, blue screens and battery drain.	Apparaten waarmee Windows een probleem meldt, en de belangrijkste stuurprogramma's (grafisch, netwerk, audio, opslag, BIOS) met hun leeftijd. Oude stuurprogramma's zijn een veelvoorkomende oorzaak van crashes, blauwe schermen en een snel lege accu.
+Get driver updates	Stuurprogramma-updates ophalen
+Optional updates in Windows Update	Optionele updates in Windows Update
+Open Device Manager	Apparaatbeheer openen
+Device	Apparaat
+Kind	Soort
+Driver	Stuurprogramma
+Reading drivers	Stuurprogramma's lezen
+Reading devices and drivers...	Apparaten en stuurprogramma's lezen...
+No devices found.	Geen apparaten gevonden.
+Network	Netwerk
+Storage	Opslag
+Camera	Camera
+Sign-in	Aanmelden
+BIOS	BIOS
+USB	USB
+Chipset	Chipset
+Input	Invoer
+Touchpad/mouse	Touchpad/muis
+Keyboard	Toetsenbord
+Printer	Printer
+Other	Overig
+Driver is recent enough	Stuurprogramma is recent genoeg
+Driver is {0} years old	Stuurprogramma is {0} jaar oud
+No proper graphics driver installed	Geen echt grafisch stuurprogramma geïnstalleerd
+Device {0} (code {1})	Apparaat {0} (code {1})
+Problem code {0}	Probleemcode {0}
+Switched off in Device Manager (code 22)	Uitgeschakeld in Apparaatbeheer (code 22)
+is not set up correctly	is niet goed ingesteld
+has a damaged driver	heeft een beschadigd stuurprogramma
+cannot start	kan niet starten
+lacks free resources	heeft te weinig vrije bronnen
+needs a restart	heeft een herstart nodig
+needs its driver reinstalled	moet zijn stuurprogramma opnieuw laten installeren
+has damaged settings	heeft beschadigde instellingen
+has no driver installed	heeft geen stuurprogramma
+is not working properly	werkt niet goed
+has its driver switched off	heeft een uitgeschakeld stuurprogramma
+driver failed to load	stuurprogramma kon niet laden
+driver is missing or damaged	stuurprogramma ontbreekt of is beschadigd
+was stopped by Windows because it reported problems	is door Windows gestopt omdat het problemen meldde
+driver is blocked	stuurprogramma is geblokkeerd
+driver is not signed	stuurprogramma is niet ondertekend
+Driver: {0}	Stuurprogramma: {0}
+Update or reinstall the driver: Device Manager > right-click the device > Update driver. If that doesn't help: Uninstall device, then Action > Scan for hardware changes.	Werk het stuurprogramma bij of installeer het opnieuw: Apparaatbeheer > rechtsklik op het apparaat > Stuurprogramma bijwerken. Helpt dat niet: Apparaat verwijderen, dan Actie > Zoeken naar gewijzigde hardware.
+Switched off on purpose? Then nothing to do. Otherwise: Device Manager > right-click > Enable device.	Bewust uitgezet? Dan hoeft er niets te gebeuren. Anders: Apparaatbeheer > rechtsklik > Apparaat inschakelen.
+Install its driver: Windows Update > Advanced options > Optional updates, or the PC maker's support page (button above).	Installeer het stuurprogramma: Windows Update > Geavanceerde opties > Optionele updates, of de ondersteuningspagina van de pc-maker (knop hierboven).
+Restart the PC.	Start de pc opnieuw op.
+Unplug the USB device and plug it into a different port (not a hub), or try another cable. If nothing is plugged in, update the chipset and USB drivers from the PC maker.	Trek het USB-apparaat los en steek het in een andere poort (geen hub), of probeer een andere kabel. Is er niets aangesloten, werk dan de chipset- en USB-stuurprogramma's van de pc-maker bij.
+Install the graphics driver from the PC maker's support page or nvidia.com / amd.com / intel.com. Until then the screen is slow and games won't run.	Installeer het grafische stuurprogramma via de ondersteuningspagina van de pc-maker of nvidia.com / amd.com / intel.com. Tot die tijd is het beeld traag en werken games niet.
+Update the graphics driver - from the PC maker's support page for a laptop, otherwise from nvidia.com, amd.com or intel.com.	Werk het grafische stuurprogramma bij - via de ondersteuningspagina van de pc-maker bij een laptop, anders via nvidia.com, amd.com of intel.com.
+A BIOS update may be available. Get it only from the PC maker's support page (button above), and keep the PC plugged in while it installs.	Er is misschien een BIOS-update. Haal die alleen van de ondersteuningspagina van de pc-maker (knop hierboven) en laat de pc aan de lader terwijl hij installeert.
+A newer driver may be available from the PC maker's support page or in Windows Update > Optional updates. Only needed if this device gives trouble.	Er is misschien een nieuwer stuurprogramma via de ondersteuningspagina van de pc-maker of Windows Update > Optionele updates. Alleen nodig als dit apparaat problemen geeft.
+Drivers: {0} device(s) have a problem - see the Drivers page.	Stuurprogramma's: {0} apparaat/apparaten hebben een probleem - zie de pagina Stuurprogramma's.
+Automatic maintenance	Automatisch onderhoud
+PC Tune-Up cleans junk files and checks the PC by itself on Sunday around noon (or as soon as the PC is on and not in use), then shows a notification. Startup apps, services and programs are never changed without you.	PC Tune-Up ruimt zelf rommelbestanden op en controleert de pc op zondag rond het middaguur (of zodra de pc aan staat en niet wordt gebruikt), en toont daarna een melding. Opstart-apps, services en programma's worden nooit zonder jou gewijzigd.
+Every week	Elke week
+Every 4 weeks	Elke 4 weken
+Run now	Nu uitvoeren
+Not run yet.	Nog niet uitgevoerd.
+Last run: {0}	Laatst uitgevoerd: {0}
+Install PC Tune-Up first (Settings > Installation): the automatic run needs it in a fixed place.	Installeer PC Tune-Up eerst (Instellingen > Installatie): het automatische onderhoud heeft het op een vaste plek nodig.
+Couldn't set up automatic maintenance: {0}	Kon automatisch onderhoud niet instellen: {0}
+every week	elke week
+every 4 weeks	elke 4 weken
+The maintenance run has started in the background. A notification appears when it is done (in a minute or two).	Het onderhoud is op de achtergrond gestart. Als het klaar is verschijnt er een melding (na een minuut of twee).
+PC Tune-Up maintenance	PC Tune-Up-onderhoud
+Cleaned {0}. {1} thing(s) worth a look - click to see.	{0} opgeruimd. {1} punt(en) om naar te kijken - klik om te bekijken.
+Cleaned {0}. Everything looks fine.	{0} opgeruimd. Alles ziet er goed uit.
+freed {0}, {1} thing(s) worth a look	{0} vrijgemaakt, {1} punt(en) om naar te kijken
+freed {0} (automatic)	{0} vrijgemaakt (automatisch)
+Maintenance	Onderhoud
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -981,7 +1111,7 @@ function Show-Msg([string]$Text, [string]$Buttons = 'OK', [string]$Icon = 'Infor
 function Add-History([string]$Kind, [string]$Item, [string]$Change, $Undo = $null) {
     $e = [ordered]@{ Id = [guid]::NewGuid().ToString('N'); Time = (Get-Date).ToString('s'); Kind = $Kind
                      Item = $Item; Change = $Change; Undo = $Undo; Undone = $false }
-    Add-Content -Path $HistoryFile -Value ($e | ConvertTo-Json -Compress -Depth 4) -Encoding UTF8
+    Add-Content -Path $HistoryFile -Value ($e | ConvertTo-Json -Compress -Depth 6) -Encoding UTF8
     Write-Log "${Kind}: $Item - $Change"
 }
 function Get-History {
@@ -989,7 +1119,7 @@ function Get-History {
     Get-Content $HistoryFile -Encoding UTF8 | Where-Object { $_.Trim() } | ForEach-Object { $_ | ConvertFrom-Json }
 }
 function Save-History($Entries) {
-    Set-Content -Path $HistoryFile -Value @($Entries | ForEach-Object { $_ | ConvertTo-Json -Compress -Depth 4 }) -Encoding UTF8
+    Set-Content -Path $HistoryFile -Value @($Entries | ForEach-Object { $_ | ConvertTo-Json -Compress -Depth 6 }) -Encoding UTF8
 }
 
 # ---------------------------------------------------------------------------
@@ -1453,7 +1583,7 @@ function Render-Health {
     } else { $lines += "This PC:   $PcName"; $lines += 'Checking this PC...' }
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
-    foreach ($k in 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
+    foreach ($k in 'Drivers', 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $key = ($lines + $advice) -join '|'
     if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
         $script:HealthDrawn = $key
@@ -2715,7 +2845,7 @@ $StabilityFixes = @{
     sfc       = @{ Label = 'Repair Windows system files'; Admin = $true }
     chkdsk    = @{ Label = 'Check drive C: for errors'; Admin = $true }
     memtest   = @{ Label = 'Test the memory at the next restart'; Admin = $false }
-    drivers   = @{ Label = 'Open driver updates in Windows Update'; Admin = $false }
+    drivers   = @{ Label = 'Check the drivers on the Drivers page'; Admin = $false }
     store     = @{ Label = 'Open Store app updates'; Admin = $false }
     appupdate = @{ Label = 'Look for an update on the Updates page'; Admin = $false }
 }
@@ -2783,7 +2913,7 @@ function Invoke-StabilityFix {
     if (-not $fix) { return }
     if ($fix.Admin -and -not $IsAdmin) { Show-Msg "$($fix.Label) needs administrator rights - click ""Restart as admin"" first." 'OK' 'Warning' | Out-Null; return }
     switch ($fix.Id) {
-        'drivers'   { Start-Process 'ms-settings:windowsupdate-optionalupdates'; return }
+        'drivers'   { Show-Page $pgDrv; return }
         'store'     { Start-Process 'ms-windows-store://downloadsandupdates'; return }
         'appupdate' { Show-Page $pgUpd; return }
         'memtest'   {
@@ -2874,6 +3004,7 @@ $TaskScanWork = {
     foreach ($t in Get-ScheduledTask -ErrorAction SilentlyContinue) {
         $soft = $t.TaskName -like 'SoftLanding*' -or $t.TaskPath -like '\SoftLanding\*'
         if ($t.TaskPath -like '\Microsoft\*' -and -not $soft) { continue }   # Windows' own
+        if ($t.TaskName -like 'PC Tune-Up*') { continue }                   # our own automatic maintenance
         $text = "$($t.TaskPath)$($t.TaskName) | $($t.Author)"
         $exe = [Environment]::ExpandEnvironmentVariables("$(@($t.Actions)[0].Execute)".Trim('"'))
         $company = if ($exe -and (Test-Path -LiteralPath $exe -ErrorAction SilentlyContinue)) { try { [Diagnostics.FileVersionInfo]::GetVersionInfo($exe).CompanyName } catch { '' } } else { '' }
@@ -3045,6 +3176,240 @@ $btnBkRp.Add_Click({
         Update-Backup
     }
 })
+
+# ===========================================================================
+# Privacy: Windows' ads, tips and tracking settings, switched off with undo
+# ===========================================================================
+$pgPriv = New-Page 'Privacy' 'Ads, tips and tracking that Windows switches on by default. Recommended ones are pre-checked. Turning a setting off only changes your own Windows settings (nothing is uninstalled) and can be undone from History or with "Turn back on".'
+$btnPrivOff = New-Button 'Turn off checked'
+$btnPrivOn = New-Button 'Turn back on checked'
+$btnPrivReload = New-Button 'Reload'
+$btnPrivOpen = New-Button 'Open privacy settings'
+$lvPriv = New-ListView $true @('Setting', 300, 'State', 90, 'What it does', 560, 'Note', 170)
+$lblPriv = New-Status
+Set-PageLayout $pgPriv $lvPriv @((New-ButtonBar @($btnPrivOff, $btnPrivOn, $btnPrivReload, $btnPrivOpen))) $lblPriv
+# Each setting is one or more registry values. Off = the private value; On = Windows' own value (absent: remove ours).
+$cdm = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'
+$adv = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+$PrivacyCatalog = @(
+    @{ Name = 'Advertising ID'; Rec = $true; Why = 'Lets apps show ads based on what you do.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo'; N = 'Enabled'; Off = 0 }) }
+    @{ Name = 'Tailored experiences'; Rec = $true; Why = 'Microsoft uses your diagnostic data for personal tips, ads and recommendations.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Privacy'; N = 'TailoredExperiencesWithDiagnosticDataEnabled'; Off = 0 }) }
+    @{ Name = 'Tips and suggestions notifications'; Rec = $true; Why = 'Pop-ups with tips and offers while you use Windows.'
+       V = @(@{ P = $cdm; N = 'SubscribedContent-338389Enabled'; Off = 0 }) }
+    @{ Name = 'Suggested content in Settings'; Rec = $true; Why = 'Suggestions and offers inside the Settings app.'
+       V = @(@{ P = $cdm; N = 'SubscribedContent-338393Enabled'; Off = 0 }, @{ P = $cdm; N = 'SubscribedContent-353694Enabled'; Off = 0 }, @{ P = $cdm; N = 'SubscribedContent-353696Enabled'; Off = 0 }) }
+    @{ Name = '"Finish setting up" and welcome screens'; Rec = $true; Why = 'Full-screen pages after updates that push Microsoft 365, OneDrive and Game Pass.'
+       V = @(@{ P = $cdm; N = 'SubscribedContent-310093Enabled'; Off = 0 }, @{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement'; N = 'ScoobeSystemSettingEnabled'; Off = 0 }) }
+    @{ Name = 'Promoted apps installed without asking'; Rec = $true; Why = 'Windows quietly installs suggested apps and games on the Start menu.'
+       V = @(@{ P = $cdm; N = 'SilentInstalledAppsEnabled'; Off = 0 }, @{ P = $cdm; N = 'PreInstalledAppsEnabled'; Off = 0 }, @{ P = $cdm; N = 'OemPreInstalledAppsEnabled'; Off = 0 }) }
+    @{ Name = 'Recommendations and ads in Start'; Rec = $true; Explorer = $true; Why = 'Suggested apps, tips and promotions in the Start menu.'
+       V = @(@{ P = $cdm; N = 'SystemPaneSuggestionsEnabled'; Off = 0 }, @{ P = $cdm; N = 'SubscribedContent-338388Enabled'; Off = 0 }, @{ P = $adv; N = 'Start_IrisRecommendations'; Off = 0 }) }
+    @{ Name = 'Account notifications in Start'; Rec = $true; Explorer = $true; Why = 'Microsoft account and backup reminders on your picture in the Start menu.'
+       V = @(@{ P = $adv; N = 'Start_AccountNotifications'; Off = 0 }) }
+    @{ Name = 'Fun facts and tips on the lock screen'; Rec = $true; Why = 'Text and promotions on top of the lock-screen picture.'
+       V = @(@{ P = $cdm; N = 'RotatingLockScreenOverlayEnabled'; Off = 0 }, @{ P = $cdm; N = 'SubscribedContent-338387Enabled'; Off = 0 }) }
+    @{ Name = 'Search highlights'; Rec = $true; Explorer = $true; Why = 'Trending news and pictures in the search box and search window.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings'; N = 'IsDynamicSearchBoxEnabled'; Off = 0 }) }
+    @{ Name = 'Web results in Start search'; Rec = $true; Explorer = $true; Why = 'What you type in Start search is also sent to Bing. As administrator the Windows policy is set too, which newer Windows versions need.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search'; N = 'BingSearchEnabled'; Off = 0 })
+       AdminV = @(@{ P = 'HKCU:\Software\Policies\Microsoft\Windows\Explorer'; N = 'DisableSearchBoxSuggestions'; Off = 1 }) }
+    @{ Name = 'Feedback requests'; Rec = $true; Why = 'Windows asks now and then what you think of it.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Siuf\Rules'; N = 'NumberOfSIUFInPeriod'; Off = 0 }) }
+    @{ Name = 'Inking and typing personalisation'; Rec = $true; Why = 'What you type and write by hand is collected into a personal dictionary.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\InputPersonalization'; N = 'RestrictImplicitInkCollection'; Off = 1 }, @{ P = 'HKCU:\Software\Microsoft\InputPersonalization'; N = 'RestrictImplicitTextCollection'; Off = 1 },
+             @{ P = 'HKCU:\Software\Microsoft\InputPersonalization\TrainedDataStore'; N = 'HarvestContacts'; Off = 0 }) }
+    @{ Name = 'Optional diagnostic data'; Rec = $true; Admin = $true; Why = 'Extra data about the websites you visit and how you use apps, sent to Microsoft. The required basic data stays on.'
+       V = @(@{ P = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection'; N = 'AllowTelemetry'; Off = 1 }) }
+    @{ Name = 'Activity history'; Rec = $true; Admin = $true; Why = 'Windows keeps a history of the apps, files and websites you used.'
+       V = @(@{ P = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System'; N = 'PublishUserActivities'; Off = 0 }, @{ P = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System'; N = 'UploadUserActivities'; Off = 0 }) }
+    @{ Name = 'Recall snapshots'; Rec = $true; Admin = $true; Only = 'Recall'; Why = 'Recall saves pictures of everything on your screen every few seconds, to search later.'
+       V = @(@{ P = 'HKCU:\Software\Policies\Microsoft\Windows\WindowsAI'; N = 'DisableAIDataAnalysis'; Off = 1 }) }
+    @{ Name = 'Location for apps'; Rec = $false; Why = 'Apps such as Maps and Weather can see where you are. Only turn off if you don''t need that.'
+       V = @(@{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location'; N = 'Value'; Off = 'Deny'; On = 'Allow'; T = 'String' }) }
+)
+$HasRecall = Test-Path "$env:windir\SystemApps\MicrosoftWindows.Client.AIX_cw5n1h2txyewy"
+function Get-RegValue([string]$Path, [string]$Name) {
+    $k = Get-Item -LiteralPath $Path -ErrorAction SilentlyContinue
+    if ($k -and $Name -in $k.GetValueNames()) { $k.GetValue($Name) } else { $null }
+}
+function Set-RegValue([string]$Path, [string]$Name, $Value, [string]$Type = 'DWord') {
+    if ($null -eq $Value) { Remove-ItemProperty -LiteralPath $Path -Name $Name -ErrorAction SilentlyContinue; return }
+    if (-not (Test-Path -LiteralPath $Path)) { New-Item -Path $Path -Force -ErrorAction Stop | Out-Null }
+    New-ItemProperty -LiteralPath $Path -Name $Name -Value $Value -PropertyType $Type -Force -ErrorAction Stop | Out-Null
+}
+function Get-PrivacyState($Item) {
+    $off = @($Item.V | Where-Object { "$(Get-RegValue $_.P $_.N)" -eq "$($_.Off)" }).Count
+    if ($off -eq @($Item.V).Count) { 'Off' } elseif ($off) { 'Partly on' } else { 'On' }
+}
+function Update-Privacy {
+    $lvPriv.BeginUpdate(); $lvPriv.Items.Clear()
+    $on = 0
+    foreach ($p in $PrivacyCatalog) {
+        if ($p.Only -eq 'Recall' -and -not $HasRecall) { continue }
+        $state = Get-PrivacyState $p
+        $locked = $p.Admin -and -not $IsAdmin
+        $note = @($(if ($locked) { 'needs administrator' }), $(if ($p.Explorer) { 'restarts Explorer' }) | Where-Object { $_ }) -join ', '
+        $it = Add-Row $lvPriv @($p.Name, $state, $p.Why, $note) $p ($p.Rec -and $state -ne 'Off' -and -not $locked)
+        $it.ForeColor = if ($state -eq 'Off' -or $locked) { $Theme.Muted } else { $Theme.Text }
+        if ($p.Rec -and $state -ne 'Off') { $on++ }
+    }
+    $lvPriv.EndUpdate()
+    $script:PrivacyOn = $on
+    $lblPriv.Text = if ($on) { "$on recommended setting(s) are still on. Grey rows are already off." } else { 'All recommended settings are off.' }
+    if ($script:NavButtons) { Update-NavBadges }
+}
+function Set-Privacy([bool]$Off) {
+    $picked = @($lvPriv.CheckedItems | ForEach-Object { $_.Tag })
+    if (-not $picked) { Show-Msg 'Check one or more settings first.' | Out-Null; return }
+    $locked = @($picked | Where-Object { $_.Admin -and -not $IsAdmin })
+    $picked = @($picked | Where-Object { -not ($_.Admin -and -not $IsAdmin) })
+    $done = 0; $failed = @(); $explorer = $false
+    foreach ($p in $picked) {
+        $vals = @($p.V) + $(if ($IsAdmin -and $p.AdminV) { @($p.AdminV) } else { @() })
+        $undo = @()
+        try {
+            foreach ($v in $vals) {
+                $type = if ($v.T) { $v.T } else { 'DWord' }
+                $undo += @{ P = $v.P; N = $v.N; Old = (Get-RegValue $v.P $v.N); T = $type }
+                Set-RegValue $v.P $v.N $(if ($Off) { $v.Off } else { $v.On }) $type
+            }
+            Add-History 'Privacy' $p.Name $(if ($Off) { 'turned off' } else { 'turned back on' }) @{ Type = 'Reg'; Values = $undo }
+            $done++; if ($p.Explorer) { $explorer = $true }
+        } catch {
+            foreach ($u in $undo) { try { Set-RegValue $u.P $u.N $u.Old $u.T } catch { } }   # leave nothing half-done
+            $failed += "$($p.Name): $($_.Exception.Message)"
+        }
+    }
+    Update-History; Update-Privacy
+    $msg = "$done setting(s) turned $(if ($Off) { 'off' } else { 'back on' }). Undo from the History page."
+    if ($locked) { $msg += "`n`nThese need administrator rights (click ""Restart as admin""): $(($locked | ForEach-Object Name) -join ', ')" }
+    if ($failed) { $msg += "`n`nCouldn't change: $($failed -join '; ')" }
+    Show-Msg $msg | Out-Null
+    if ($explorer -and (Show-Msg "Restart Explorer now so the Start menu, search and taskbar pick up the change?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
+        Get-Process -Name explorer -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue   # Windows starts it again by itself
+    }
+}
+$btnPrivOff.Add_Click({ Set-Privacy $true })
+$btnPrivOn.Add_Click({ Set-Privacy $false })
+$btnPrivReload.Add_Click({ Update-Privacy })
+$btnPrivOpen.Add_Click({ Start-Process 'ms-settings:privacy' })
+
+# ===========================================================================
+# Drivers: devices with problems, and the drivers that matter most and how old they are
+# ===========================================================================
+$pgDrv = New-Page 'Drivers' 'Devices Windows reports a problem with, and the drivers that matter most (graphics, network, audio, storage, BIOS) with their age. Old drivers are a common cause of crashes, blue screens and battery drain.'
+$btnDrvGet = New-Button 'Get driver updates'
+$btnDrvWU = New-Button 'Optional updates in Windows Update'
+$btnDrvDm = New-Button 'Open Device Manager'
+$btnDrvWeb = New-Button 'Search selected online'
+$btnDrvReload = New-Button 'Reload'
+$lvDrv = New-ListView $false @('Device', 300, 'Kind', 110, 'Status', 80, 'Driver', 230, 'What to do', 520)
+$txtDrv = New-DetailBox 104
+Set-PageLayout $pgDrv $lvDrv @((New-ButtonBar @($btnDrvGet, $btnDrvWU, $btnDrvDm, $btnDrvWeb, $btnDrvReload))) $txtDrv
+$DriverWork = {
+    $rows = New-Object System.Collections.ArrayList
+    $kinds = @{ DISPLAY = 'Graphics'; NET = 'Network'; MEDIA = 'Audio'; BLUETOOTH = 'Bluetooth'; HDC = 'Storage'; SCSIADAPTER = 'Storage'; CAMERA = 'Camera'
+                IMAGE = 'Camera'; BIOMETRIC = 'Sign-in'; FIRMWARE = 'BIOS'; USB = 'USB'; SYSTEM = 'Chipset'; HIDCLASS = 'Input'; MOUSE = 'Touchpad/mouse'
+                KEYBOARD = 'Keyboard'; PRINTER = 'Printer'; AUDIOENDPOINT = 'Audio'; SOFTWAREDEVICE = 'Software'; EXTENSION = 'Extension' }
+    $kindOf = { param($c) $k = $kinds["$c".ToUpper()]; if ($k) { $k } elseif ($c) { "$c" } else { 'Other' } }
+    $why = @{ 1 = 'is not set up correctly'; 3 = 'has a damaged driver'; 10 = 'cannot start'; 12 = 'lacks free resources'; 14 = 'needs a restart'
+              18 = 'needs its driver reinstalled'; 19 = 'has damaged settings'; 28 = 'has no driver installed'; 31 = 'is not working properly'
+              32 = 'has its driver switched off'; 37 = 'driver failed to load'; 39 = 'driver is missing or damaged'; 43 = 'was stopped by Windows because it reported problems'
+              48 = 'driver is blocked'; 52 = 'driver is not signed' }
+    $fixDefault = 'Update or reinstall the driver: Device Manager > right-click the device > Update driver. If that doesn''t help: Uninstall device, then Action > Scan for hardware changes.'
+    $seen = @{}
+    # 1. Devices with a problem (code 45 = not plugged in, normal; 22 = switched off on purpose)
+    foreach ($d in Get-CimInstance Win32_PnPEntity -Filter 'ConfigManagerErrorCode <> 0 AND ConfigManagerErrorCode <> 45' -OperationTimeoutSec 30 -ErrorAction SilentlyContinue) {
+        $code = [int]$d.ConfigManagerErrorCode
+        $name = if ($d.Name) { "$($d.Name)" } else { "$($d.DeviceID)" }
+        $kind = & $kindOf $d.PNPClass
+        $level = if ($code -in 22, 24, 47) { 'Info' } else { 'Problem' }
+        $status = if ($why[$code]) { "Device $($why[$code]) (code $code)" } elseif ($code -eq 22) { 'Switched off in Device Manager (code 22)' } else { "Problem code $code" }
+        $todo = switch ($code) {
+            22 { 'Switched off on purpose? Then nothing to do. Otherwise: Device Manager > right-click > Enable device.' }
+            28 { 'Install its driver: Windows Update > Advanced options > Optional updates, or the PC maker''s support page (button above).' }
+            14 { 'Restart the PC.' }
+            43 { if ($kind -eq 'USB' -or $name -match 'USB') { 'Unplug the USB device and plug it into a different port (not a hub), or try another cable. If nothing is plugged in, update the chipset and USB drivers from the PC maker.' } else { $fixDefault } }
+            default { $fixDefault }
+        }
+        $seen[$name] = 1
+        [void]$rows.Add([pscustomobject]@{ Device = $name; Kind = $kind; Level = $level; Driver = ''; Todo = $todo; Search = "$name code $code"; Detail = $status })
+    }
+    # 2. The drivers that matter most, with their age
+    $virtual = 'TAP-|WireGuard|VPN|Virtual|Hyper-V|VMware|VirtualBox|Loopback|Tunnel|WAN Miniport|Npcap|Kernel Debug|Teredo|ISATAP|Bluetooth Device \(Personal'
+    $wanted = 'DISPLAY|NET|MEDIA|BLUETOOTH|HDC|SCSIADAPTER|CAMERA|BIOMETRIC|FIRMWARE'
+    foreach ($d in Get-CimInstance Win32_PnPSignedDriver -OperationTimeoutSec 60 -ErrorAction SilentlyContinue | Where-Object { $_.DeviceName -and "$($_.DeviceClass)" -match "^($wanted)$" }) {
+        $name = "$($d.DeviceName)"; $class = "$($d.DeviceClass)".ToUpper()
+        if ($seen[$name] -or $name -match $virtual) { continue }
+        if ($class -eq 'BLUETOOTH' -and $name -notmatch 'Wireless|Adapter|Radio|Intel|Realtek|Qualcomm|MediaTek|Broadcom') { continue }   # paired gadgets, not the adapter
+        $maker = "$($d.DriverProviderName)"
+        if ($class -ne 'DISPLAY' -and $maker -match '^Microsoft') { continue }   # Windows' own generic drivers
+        $seen[$name] = 1
+        $date = $d.DriverDate
+        $years = if ($date -and $date.Year -ge 2000) { [Math]::Round(((Get-Date) - $date).TotalDays / 365.25, 1) } else { $null }   # Intel's chipset INFs are dated 1968 on purpose
+        $kind = & $kindOf $class
+        $driver = "$($d.DriverVersion)$(if ($years -ne $null) { ' (' + $date.ToString('d') + ')' })$(if ($maker) { ', ' + $maker })"
+        $level = 'OK'; $todo = 'Nothing to do.'; $detail = 'Driver is recent enough'
+        if ($class -eq 'DISPLAY' -and $name -match 'Microsoft Basic Display') {
+            $level = 'Problem'; $detail = 'No proper graphics driver installed'
+            $todo = 'Install the graphics driver from the PC maker''s support page or nvidia.com / amd.com / intel.com. Until then the screen is slow and games won''t run.'
+        } elseif ($years -ne $null) {
+            $limit = @{ DISPLAY = 1.5; FIRMWARE = 2.5; NET = 3 }[$class]; if (-not $limit) { $limit = 4 }
+            if ($years -ge $limit) {
+                $level = if ($class -eq 'DISPLAY') { 'Warning' } else { 'Info' }
+                $detail = "Driver is $years years old"
+                $todo = switch ($class) {
+                    'DISPLAY'  { 'Update the graphics driver - from the PC maker''s support page for a laptop, otherwise from nvidia.com, amd.com or intel.com.' }
+                    'FIRMWARE' { 'A BIOS update may be available. Get it only from the PC maker''s support page (button above), and keep the PC plugged in while it installs.' }
+                    default    { 'A newer driver may be available from the PC maker''s support page or in Windows Update > Optional updates. Only needed if this device gives trouble.' }
+                }
+            }
+        }
+        [void]$rows.Add([pscustomobject]@{ Device = $name; Kind = $kind; Level = $level; Driver = $driver; Todo = $todo; Search = "$name driver"; Detail = $detail })
+    }
+    , $rows
+}
+$DrvLevels = @{ Problem = 0; Warning = 1; Info = 2; OK = 3 }
+function Update-Drivers {
+    $btnDrvReload.Enabled = $false
+    $txtDrv.Text = 'Reading devices and drivers...'
+    Start-Bg -Label 'Reading drivers' $DriverWork $null {
+        param($r)
+        $btnDrvReload.Enabled = $true
+        $rows = @(foreach ($x in $r) { $x })
+        $lvDrv.BeginUpdate(); $lvDrv.Items.Clear()
+        foreach ($d in $rows | Sort-Object { $DrvLevels[$_.Level] }, Kind, Device) {
+            $it = Add-Row $lvDrv @($d.Device, $d.Kind, $d.Level, $d.Driver, $d.Todo) $d
+            $it.ForeColor = switch ($d.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } }
+        }
+        $lvDrv.EndUpdate()
+        $bad = @($rows | Where-Object Level -eq 'Problem').Count
+        $script:DriverIssues = @($rows | Where-Object { $_.Level -in 'Problem', 'Warning' }).Count
+        if ($bad) { $script:ExtraAdvice['Drivers'] = "Drivers: $bad device(s) have a problem - see the Drivers page." } else { $script:ExtraAdvice.Remove('Drivers') }
+        if ($lvDrv.Items.Count) { $lvDrv.Items[0].Selected = $true } else { $txtDrv.Text = 'No devices found.' }
+        Update-Health -Quick
+    }
+}
+$lvDrv.Add_SelectedIndexChanged({
+    if (-not $lvDrv.SelectedItems.Count) { return }
+    $d = $lvDrv.SelectedItems[0].Tag
+    $txtDrv.Text = "$($d.Device) ($($d.Kind)): $($d.Detail)$(if ($d.Driver) { ""`r`nDriver: $($d.Driver)"" })`r`n`r`nWhat to do: $($d.Todo)"
+})
+$btnDrvGet.Add_Click({
+    # The PC maker's driver page knows this exact model; Windows Update is the fallback.
+    if (-not $script:UpgInfo) { Invoke-PageLoader 'Upgrades' }
+    $url = if ($script:UpgInfo) { $script:UpgInfo.Url }
+    if ($url) { Start-Process ($url -replace '/overview$', '/drivers') } else { Start-Process 'ms-settings:windowsupdate-optionalupdates' }
+})
+$btnDrvWU.Add_Click({ Start-Process 'ms-settings:windowsupdate-optionalupdates' })
+$btnDrvDm.Add_Click({ Start-Process devmgmt.msc })
+$btnDrvWeb.Add_Click({
+    if (-not $lvDrv.SelectedItems.Count) { return }
+    Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString("$($lvDrv.SelectedItems[0].Tag.Search) $(if ($script:UpgInfo) { $script:UpgInfo.Name })"))
+})
+$btnDrvReload.Add_Click({ Update-Drivers })
 
 # ===========================================================================
 # 7. Upgrades: what could be added or replaced, and the exact spec to buy
@@ -3415,6 +3780,10 @@ $btnHistUndo.Add_Click({
                     else { [void](Disable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
                     $logs += , @('Undo', $e.Item, $(if ($u.Enable) { 'scheduled task switched back on' } else { 'scheduled task switched off again' }))
                 }
+                'Reg' {
+                    foreach ($v in @($u.Values)) { Set-RegValue $v.P $v.N $v.Old $v.T }
+                    $logs += , @('Undo', $e.Item, 'setting put back as it was')
+                }
                 'Store' {
                     Start-Process "ms-windows-store://pdp/?PFN=$($u.Family)"   # opens its Store page; user clicks Get
                     $markUndone = $false
@@ -3502,6 +3871,47 @@ $chkRp = New-Check 'Create a restore point before Fix my PC, uninstalling and se
 $chkRp.Add_CheckedChanged({ $Settings.RestorePoints = $this.Checked; Save-Settings })
 Add-SetRow @($chkRp)
 
+Add-SetSection 'Automatic maintenance' 'PC Tune-Up cleans junk files and checks the PC by itself on Sunday around noon (or as soon as the PC is on and not in use), then shows a notification. Startup apps, services and programs are never changed without you.'
+$cmbAuto = New-Choice @('Off', 'Every week', 'Every 4 weeks') @('off', 'weekly', 'monthly') $Settings.AutoMaintenance
+$btnAutoNow = New-Button 'Run now'
+Add-SetRow @($cmbAuto, $btnAutoNow)
+$lblAutoLast = New-Object Windows.Forms.Label
+$lblAutoLast.AutoSize = $true; $lblAutoLast.ForeColor = $Theme.Dim; $lblAutoLast.Margin = New-Object Windows.Forms.Padding(0, 2, 0, 0)
+$lblAutoLast.Text = if ($Settings.LastAuto) { "Last run: $($Settings.LastAuto)" } else { 'Not run yet.' }
+$setFlow.Controls.Add($lblAutoLast)
+$MaintTaskName = 'PC Tune-Up maintenance'
+# The task runs the installed exe as this user (no administrator), only when the PC is idle, also on battery.
+function Set-MaintenanceTask([string]$Mode) {
+    if ($Mode -eq 'off') { Unregister-ScheduledTask -TaskName $MaintTaskName -Confirm:$false -ErrorAction SilentlyContinue; return $true }
+    if ($IsInstalled) { $exe = $InstalledExe; $arg = '/auto' }
+    elseif (-not $RunningAsExe) { $exe = 'powershell.exe'; $arg = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }   # developer mode
+    else { Show-Msg 'Install PC Tune-Up first (Settings > Installation): the automatic run needs it in a fixed place.' 'OK' 'Warning' | Out-Null; return $false }
+    try {
+        $action = New-ScheduledTaskAction -Execute $exe -Argument $arg
+        $trigger = New-ScheduledTaskTrigger -Weekly -WeeksInterval $(if ($Mode -eq 'monthly') { 4 } else { 1 }) -DaysOfWeek Sunday -At '12:00'
+        $set = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -RunOnlyIfIdle -IdleDuration '00:05:00' -IdleWaitTimeout '04:00:00' `
+                   -ExecutionTimeLimit (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew
+        $set.IdleSettings.StopOnIdleEnd = $false
+        $who = New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited
+        Register-ScheduledTask -TaskName $MaintTaskName -Action $action -Trigger $trigger -Settings $set -Principal $who `
+            -Description 'PC Tune-Up: clean junk files and check the PC, then show a notification. Change it in PC Tune-Up > Settings.' -Force -ErrorAction Stop | Out-Null
+        $true
+    } catch { Show-Msg "Couldn't set up automatic maintenance: $($_.Exception.Message)" 'OK' 'Warning' | Out-Null; $false }
+}
+$cmbAuto.Add_SelectedIndexChanged({
+    $mode = $this.Tag[$this.SelectedIndex]
+    if ($mode -eq $Settings.AutoMaintenance) { return }
+    if (Set-MaintenanceTask $mode) {
+        $Settings.AutoMaintenance = $mode; Save-Settings
+        Add-History 'Settings' 'Automatic maintenance' $(switch ($mode) { 'off' { 'switched off' } 'weekly' { 'every week' } default { 'every 4 weeks' } })
+        Update-History
+    } else { $this.SelectedIndex = [array]::IndexOf($this.Tag, $Settings.AutoMaintenance) }
+})
+$btnAutoNow.Add_Click({
+    if ($RunningAsExe) { Start-Process $SelfExe '/auto' } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }
+    Show-Msg 'The maintenance run has started in the background. A notification appears when it is done (in a minute or two).' | Out-Null
+})
+
 Add-SetSection 'Installation' $(if ($IsInstalled) { "Installed for you in $InstallDir - it appears in the Start menu and in Settings > Apps." }
                                  elseif ($RunningAsExe) { "Running from $SelfExe without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed)." }
                                  else { 'Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.' })
@@ -3521,7 +3931,7 @@ $btnSetReport.Add_Click({ Save-Report })
 Add-SetSection 'Command line' 'For scripts and IT use (use "start /wait" so the window waits for it):'
 $cliHelp = New-Object Windows.Forms.Label
 $cliHelp.Font = New-Object Drawing.Font('Consolas', 9.5); $cliHelp.AutoSize = $true; $cliHelp.ForeColor = $Theme.Dim
-$cliHelp.Text = "PC-TuneUp.exe /report[:file.html]   check everything and save a report`r`nPC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`r`nPC-TuneUp.exe /install | /uninstall  install or remove for this user"
+$cliHelp.Text = "PC-TuneUp.exe /report[:file.html]   check everything and save a report`r`nPC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`r`nPC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)`r`nPC-TuneUp.exe /install | /uninstall  install or remove for this user"
 $setFlow.Controls.Add($cliHelp)
 
 Add-SetSection 'About' "PC Tune-Up $AppVersion - free and open source (MIT licence). Privacy: everything runs on this PC. The only internet use is the update check (GitHub), the speed test (Cloudflare) and winget's program list; nothing about this PC is sent anywhere."
@@ -3586,6 +3996,7 @@ function Uninstall-App {
         try { if ((Get-ShortcutTarget $l) -eq $InstalledExe) { Remove-Item $l -Force } } catch { }
     }
     Remove-Item -Path $UninstallKey -Recurse -Force -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName $MaintTaskName -Confirm:$false -ErrorAction SilentlyContinue
     if ($wipe) { Remove-Item -LiteralPath $DataDir -Recurse -Force -ErrorAction SilentlyContinue }
     $self = $SelfExe -eq $InstalledExe
     if (-not $self) { Remove-Item -LiteralPath $InstallDir -Recurse -Force -ErrorAction SilentlyContinue }
@@ -3638,6 +4049,8 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T "Apps that start with Windows ($($startOn.Count) on)")</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>$(T 'Drivers')</h2>$(ConvertTo-HtmlRows @('Device', 'Kind', 'Status', 'Driver', 'What to do') ($lvDrv.Items | Where-Object { $_.Tag.Level -ne 'OK' }) @(0, 1, 2, 3, 4))
+<h2>$(T 'Privacy')</h2>$(ConvertTo-HtmlRows @('Setting', 'State', 'What it does') $lvPriv.Items @(0, 1, 2))
 <h2>$(T 'Backup')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvBackup.Items @(0, 1, 2, 3))
 <h2>$(T 'Scheduled tasks')</h2>$(ConvertTo-HtmlRows @('Task', 'Made by', 'Runs', 'State', 'Advice') $lvTasks.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Security')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvSec.Items @(0, 1, 2, 3))
@@ -3692,7 +4105,7 @@ function Invoke-FixMyPc {
     if ($IsAdmin -and -not $script:SvcLoaded) { Invoke-PageLoader 'Services'; Show-Msg 'Still checking services - try again in a few seconds.' | Out-Null; return }
     $clean = @($CleanTargets | Where-Object { $_.Fix -and -not ($_.Admin -and -not $IsAdmin) -and -not (Test-Open $_) })
     $openBrowsers = @($CleanTargets | Where-Object { $_.Fix -and (Test-Open $_) } | ForEach-Object Name)
-    $startup = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' })
+    $startup = if ($script:AutoRun) { @() } else { @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' }) }
     $svc = if ($IsAdmin) {
         @($lvSvc.Items | Where-Object { $_.Tag.Kind -eq 'known' -and $_.Tag.Suggest -and $StartRank[$_.Tag.Start] -gt $StartRank[$_.Tag.Suggest] })
     } else { @() }
@@ -3721,7 +4134,8 @@ function Invoke-FixApply {
     Start-Bg -Label 'Fix my PC: cleaning' -Cancellable $DoCleanWork $p.Clean {
         param($results, $state)
         $freed = 0
-        foreach ($r in $results) { $freed += $r.Freed; Add-History 'Clean' $r.Name ('freed {0} (Fix my PC)' -f (Format-Size $r.Freed)) }
+        foreach ($r in $results) { $freed += $r.Freed; Add-History 'Clean' $r.Name (($(if ($script:AutoRun) { 'freed {0} (automatic)' } else { 'freed {0} (Fix my PC)' })) -f (Format-Size $r.Freed)) }
+        $script:FixFreed = $freed
         $junk = @($lvBloat.Items | Where-Object { $_.Tag.Cat -eq 'Junk' }).Count
         $lines = @($(if ($state.Cancel) { 'Stopped early.' } else { 'Done!' }), '',
             " - Freed $(Format-Size $freed) of junk files",
@@ -3818,8 +4232,8 @@ $OldExeCleanupWork = {
 # ===========================================================================
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
-    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Tasks', 'Disk') }
-    @{ Title = 'CHECK';    Pages = @('Updates', 'Security', 'Stability', 'Backup', 'Upgrades') }
+    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Tasks', 'Privacy', 'Disk') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Stability', 'Backup', 'Upgrades') }
     @{ Title = 'MORE';     Pages = @('History', 'Settings') }
 )
 $script:NavButtons = @{}
@@ -3845,30 +4259,32 @@ function Update-NavBadges {
     Set-NavBadge 'Bloatware' @($lvBloat.Items).Count
     Set-NavBadge 'Tasks' $script:TasksActive
     Set-NavBadge 'Backup' $script:BackupProblems
+    Set-NavBadge 'Drivers' $script:DriverIssues
+    Set-NavBadge 'Privacy' $script:PrivacyOn
 }
 
 $nav = New-Object Windows.Forms.FlowLayoutPanel
 $nav.Dock = 'Fill'; $nav.FlowDirection = 'TopDown'; $nav.WrapContents = $false; $nav.AutoScroll = $true
-$nav.Padding = New-Object Windows.Forms.Padding(12, 18, 12, 8)
+$nav.Padding = New-Object Windows.Forms.Padding(12, 12, 12, 4)
 $appName = New-Object Windows.Forms.Label
 $appName.Text = 'PC Tune-Up'; $appName.Font = New-Object Drawing.Font('Segoe UI Semibold', 13); $appName.AutoSize = $true
 $appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
 $appVer = New-Object Windows.Forms.Label
 $appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.AutoSize = $true
-$appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 8)
+$appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 2)
 $nav.Controls.AddRange(@($appName, $appVer))
 foreach ($g in $NavGroups) {
     if ($g.Title) {
         $cap = New-Object Windows.Forms.Label
         $cap.Text = $g.Title; $cap.Font = $FontSmall; $cap.ForeColor = $Theme.Dim; $cap.AutoSize = $true
-        $cap.Margin = New-Object Windows.Forms.Padding(10, 14, 0, 4)
+        $cap.Margin = New-Object Windows.Forms.Padding(10, 9, 0, 2)
         $nav.Controls.Add($cap)
     }
     foreach ($name in $g.Pages) {
         $page = $script:Pages | Where-Object Name -eq $name | Select-Object -First 1
         if (-not $page) { continue }
         $b = New-Object Windows.Forms.Button
-        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 34; $b.TextAlign = 'MiddleLeft'
+        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 30; $b.TextAlign = 'MiddleLeft'
         $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
         $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
         $b.Cursor = [Windows.Forms.Cursors]::Hand
@@ -3880,11 +4296,10 @@ foreach ($g in $NavGroups) {
 $sidebar.Controls.Add($nav)
 if (-not $IsAdmin) {
     $adm = New-Object Windows.Forms.Panel
-    $adm.Dock = 'Bottom'; $adm.Height = 140; $adm.Padding = New-Object Windows.Forms.Padding(16, 10, 14, 16)
+    # Kept small: with 16 pages the sidebar needs the room.
+    $adm.Dock = 'Bottom'; $adm.Height = 82; $adm.Padding = New-Object Windows.Forms.Padding(16, 6, 14, 12)
     $admT = New-Object Windows.Forms.Label
-    $admT.Text = 'Limited mode'; $admT.Font = $FontBold; $admT.Dock = 'Top'; $admT.Height = 22
-    $admD = New-Object Windows.Forms.Label
-    $admD.Text = 'Some fixes need administrator rights.'; $admD.ForeColor = $Theme.Dim; $admD.Dock = 'Top'; $admD.Height = 58
+    $admT.Text = 'Limited mode - some fixes need administrator rights.'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 30; $admT.Font = $FontSmall
     $admB = New-Button 'Restart as admin'
     $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
     $admB.Add_Click({
@@ -3894,11 +4309,11 @@ if (-not $IsAdmin) {
             $form.Close()
         } catch { }   # user said no to the UAC prompt
     })
-    $adm.Controls.Add($admB); $adm.Controls.Add($admD); $adm.Controls.Add($admT)
+    $adm.Controls.Add($admB); $adm.Controls.Add($admT)
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -3938,7 +4353,7 @@ function Update-ActivityBar {
 # ---------------------------------------------------------------------------
 $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-Stability }; Bloatware = { Start-BloatScan }; Services = { Update-Services }
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
-                         Tasks = { Update-Tasks }; Backup = { Update-Backup } }
+                         Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -3949,7 +4364,7 @@ function Invoke-PageLoader([string]$Name) {
 function Start-Everything {
     Update-Health; Update-Startup; Update-History
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Updates', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Updates', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Privacy', 'Clean'))
 }
 Enable-Translation $form
 Show-Page $pgHealth
@@ -3960,12 +4375,44 @@ Show-Page $pgHealth
 function Write-Cli([string]$Text) { try { [Console]::Out.WriteLine((T $Text)) } catch { } }
 if ($Cli.Install) { Install-App; Write-Cli "PC Tune-Up installed in $InstallDir"; return }
 if ($Cli.Uninstall) { Uninstall-App; return }
+if ($Cli.Auto) {
+    # Scheduled maintenance: clean like Fix my PC (no startup or service changes), save a report, then a notification.
+    $script:AutoRun = $true
+    function Show-Msg([string]$Text, [string]$Buttons = 'OK', [string]$Icon = 'Information') { if ($Buttons -eq 'YesNo') { 'Yes' } else { 'OK' } }
+    $deadline = (Get-Date).AddMinutes(20)
+    function Wait-Idle { do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while (($script:Jobs.Count -or $script:LoadQueue.Count) -and (Get-Date) -lt $deadline) }
+    Start-Everything; Wait-Idle
+    $script:FixFreed = 0
+    Invoke-FixMyPc; Wait-Idle
+    Update-Health -Quick; Wait-Idle
+    $reportFile = Join-Path $DataDir 'last-report.html'
+    try { [void](Save-ReportNow -Path $reportFile -NoOpen) } catch { }
+    $look = @($script:HealthAdvice)
+    $summary = "freed $(Format-Size $script:FixFreed)$(if ($look) { ", $($look.Count) thing(s) worth a look" })"
+    Add-History 'Maintenance' 'Automatic' $summary
+    $Settings.LastAuto = "$((Get-Date).ToString('g')) - $(T $summary)"; Save-Settings
+    # A tray notification (shows as a Windows notification); clicking it opens PC Tune-Up.
+    $tray = New-Object Windows.Forms.NotifyIcon
+    $tray.Icon = if ($RunningAsExe) { [Drawing.Icon]::ExtractAssociatedIcon($SelfExe) } else { [Drawing.SystemIcons]::Information }
+    $tray.Text = 'PC Tune-Up'; $tray.Visible = $true
+    $tray.BalloonTipTitle = T 'PC Tune-Up maintenance'
+    $tray.BalloonTipText = T $(if ($look) { "Cleaned $(Format-Size $script:FixFreed). $($look.Count) thing(s) worth a look - click to see." } else { "Cleaned $(Format-Size $script:FixFreed). Everything looks fine." })
+    $script:AutoOpen = $false
+    $tray.Add_BalloonTipClicked({ $script:AutoOpen = $true }); $tray.Add_Click({ $script:AutoOpen = $true })
+    $tray.ShowBalloonTip(15000)
+    $until = (Get-Date).AddSeconds(20)
+    while ((Get-Date) -lt $until -and -not $script:AutoOpen) { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 }
+    $tray.Visible = $false; $tray.Dispose()
+    if ($script:AutoOpen) { if ($RunningAsExe) { Start-Process $SelfExe } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" } }
+    $JobTimer.Stop()
+    return
+}
 if ($CliMode) {
     if ($RunningAsExe -and [PcTuneUp.Native]::AttachConsole(-1)) {   # print into the console the exe was started from
         $w = New-Object IO.StreamWriter([Console]::OpenStandardOutput()); $w.AutoFlush = $true; [Console]::SetOut($w)
     }
     if ($Cli.Help) {
-        Write-Cli "PC Tune-Up $AppVersion`n`n  PC-TuneUp.exe /report[:file.html]   check everything and save a report (default: Documents)`n  PC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`n  PC-TuneUp.exe /fix /report          both`n  PC-TuneUp.exe /install | /uninstall  install or remove for this user`n`nRun as administrator to include Windows files and services. Use 'start /wait' in a command prompt."
+        Write-Cli "PC Tune-Up $AppVersion`n`n  PC-TuneUp.exe /report[:file.html]   check everything and save a report (default: Documents)`n  PC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`n  PC-TuneUp.exe /fix /report          both`n  PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)`n  PC-TuneUp.exe /install | /uninstall  install or remove for this user`n`nRun as administrator to include Windows files and services. Use 'start /wait' in a command prompt."
         return
     }
     # No window: messages go to the console, and questions are answered Yes.

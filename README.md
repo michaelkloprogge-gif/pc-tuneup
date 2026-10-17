@@ -20,8 +20,10 @@ you can undo.
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |
 | **Services** | trim background services from PC makers, updaters and telemetry, with one-click restore |
 | **Tasks** | scheduled tasks from other companies (updaters, telemetry, promo helpers from Adobe, Google, Zoom, PC makers...) - switch them off with undo |
+| **Privacy** | switch off Windows ads, tips and tracking (advertising ID, Start-menu ads, web results in search, lock-screen promos, optional diagnostic data...) with undo |
 | **Disk** | see which folders fill the drive |
 | **Updates** | update outdated programs through winget; safe updates are pre-selected |
+| **Drivers** | devices with a problem (Device Manager error codes, explained) and the age of the drivers that matter most: graphics, network, audio, storage, BIOS |
 | **Security** | is Windows still supported, can it run Windows 11, are antivirus, firewall, encryption, Secure Boot and TPM on |
 | **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with one-click fixes (turn off NVIDIA nView, repair Visual C++, reset Windows Update, repair system files, check the drive...) |
 | **Backup** | are Desktop, Documents and Pictures in OneDrive/Dropbox/iCloud, File History, backup programs and restore points - warns when nothing backs up your files |
@@ -30,6 +32,9 @@ you can undo.
 
 Security software, VPNs, drivers and databases are never touched, and you can add your own programs
 to a keep list. English and Dutch, light and dark theme.
+
+**Automatic maintenance** (Settings): every week or every 4 weeks PC Tune-Up cleans junk files and checks the PC
+by itself when the PC is idle, then shows a notification. It never changes startup apps, services or programs on its own.
 
 | | |
 |---|---|
@@ -52,6 +57,7 @@ Some fixes (Windows' own files, services, restore points) need administrator rig
 ```
 PC-TuneUp.exe /report[:file.html]    check everything and save a report (default: Documents)
 PC-TuneUp.exe /fix                   run the safe "Fix my PC" steps without asking
+PC-TuneUp.exe /auto                  the automatic maintenance run: clean, check, notification
 PC-TuneUp.exe /install | /uninstall  install or remove for the current user
 ```
 

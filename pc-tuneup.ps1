@@ -6,6 +6,8 @@
 #   Bloatware - find pre-installed junk (OEM tools, trial antivirus, promo apps) and uninstall it
 #   Services  - background services from PC makers, updaters and telemetry, with one-click restore
 #   Disk      - find the folders eating your drive
+#   Upgrades  - memory / drive / battery upgrade options with the exact spec to buy
+#   History   - every change, with undo
 # Every change is logged to %LOCALAPPDATA%\PCTuneUp\changes.log. Anything listed
 # in %LOCALAPPDATA%\PCTuneUp\keep.txt is never flagged or changed.
 # Run PC-TuneUp.exe (this script embedded; rebuild with build-exe.ps1 after
@@ -15,7 +17,7 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Windows.Forms.Application]::EnableVisualStyles()
 
-$AppVersion = '1.1.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.2.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1094,7 +1096,190 @@ $lvDisk.Add_DoubleClick({
 })
 
 # ===========================================================================
-# 7. History
+# 7. Upgrades: what could be added or replaced, and the exact spec to buy
+# ===========================================================================
+$pgUpg = New-Page 'Upgrades' 'What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.'
+$btnUpgReload = New-Button 'Refresh'
+$btnUpgSupport = New-Button 'Open support page'
+$btnUpgManual = New-Button 'Find service manual'
+$btnUpgCopy = New-Button 'Copy shopping list'
+$lvUpg = New-ListView $false @('Part', 110, 'You have now', 290, 'Upgrade option', 220, 'Worth it?', 260, 'What to buy', 600)
+$txtUpg = New-Object Windows.Forms.TextBox
+$txtUpg.Multiline = $true; $txtUpg.ReadOnly = $true; $txtUpg.Dock = 'Bottom'; $txtUpg.Height = 150; $txtUpg.ScrollBars = 'Vertical'
+$txtUpg.BackColor = [Drawing.SystemColors]::Window
+Set-PageLayout $pgUpg $lvUpg @((New-ButtonBar @($btnUpgReload, $btnUpgSupport, $btnUpgManual, $btnUpgCopy))) $txtUpg
+
+$UpgradeWork = {
+    $rows = New-Object System.Collections.ArrayList
+    function Add-Upg($Part, $Now, $Option, $Worth, $Spec, $Why) {
+        [void]$rows.Add([pscustomobject]@{ Part = $Part; Now = $Now; Option = $Option; Worth = $Worth; Spec = $Spec; Why = $Why })
+    }
+    $cs = Get-CimInstance Win32_ComputerSystem
+    $model = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim()
+    $serial = "$((Get-CimInstance Win32_BIOS).SerialNumber)".Trim()
+    $chassis = @((Get-CimInstance Win32_SystemEnclosure).ChassisTypes)
+    $isLaptop = [bool]($chassis | Where-Object { $_ -in 8, 9, 10, 11, 12, 14, 18, 21, 30, 31, 32 })
+    $os = Get-CimInstance Win32_OperatingSystem
+    $usedPct = [int](100 * (1 - $os.FreePhysicalMemory / $os.TotalVisibleMemorySize))
+
+    # --- Memory ---
+    $memTypes = @{ 20 = 'DDR'; 21 = 'DDR2'; 24 = 'DDR3'; 26 = 'DDR4'; 27 = 'LPDDR'; 28 = 'LPDDR2'; 29 = 'LPDDR3'; 30 = 'LPDDR4'; 34 = 'DDR5'; 35 = 'LPDDR5' }
+    $jedec = @{ '2C' = 'Micron'; 'CE' = 'Samsung'; 'AD' = 'SK hynix'; '9B' = 'Crucial'; '98' = 'Kingston'; 'CB' = 'ADATA'; '9E' = 'Corsair'; 'CD' = 'G.Skill' }
+    $arr = Get-CimInstance Win32_PhysicalMemoryArray | Where-Object Use -eq 3 | Select-Object -First 1   # 3 = system memory
+    $mods = @(Get-CimInstance Win32_PhysicalMemory)
+    if ($mods) {
+        $m = $mods[0]
+        $type = $memTypes[[int]$m.SMBIOSMemoryType]; if (-not $type) { $type = 'DDR' }
+        $speed = if ($m.ConfiguredClockSpeed) { $m.ConfiguredClockSpeed } else { $m.Speed }
+        $ff = [int]$m.FormFactor   # 8 = DIMM (desktop), 12 = SO-DIMM (laptop)
+        $ffName = if ($ff -eq 12) { 'SO-DIMM' } else { 'DIMM' }
+        $pins = @{ 'DDR5|12' = 262; 'DDR5|8' = 288; 'DDR4|12' = 260; 'DDR4|8' = 288; 'DDR3|12' = 204; 'DDR3|8' = 240 }["$type|$ff"]
+        $volt = if ($m.ConfiguredVoltage) { '{0:0.0#} V' -f ($m.ConfiguredVoltage / 1000) } else { '' }
+        $ecc = $m.TotalWidth -gt $m.DataWidth
+        $maker = "$($m.Manufacturer)".Trim()
+        if ($maker -match '^[0-9A-F]{4,}$') { $code = $maker.Substring(2, 2); if ($jedec[$code]) { $maker = $jedec[$code] } }
+        $slots = [Math]::Max([int]$arr.MemoryDevices, $mods.Count)
+        $maxGB = if ($arr.MaxCapacityEx) { [int][Math]::Round($arr.MaxCapacityEx / 1MB) } elseif ($arr.MaxCapacity) { [int][Math]::Round($arr.MaxCapacity / 1MB) } else { 0 }
+        $sizes = @($mods | ForEach-Object { [int]($_.Capacity / 1GB) })
+        $totalGB = ($sizes | Measure-Object -Sum).Sum
+        $free = $slots - $mods.Count
+        $layout = (($sizes | Group-Object | ForEach-Object { "$($_.Count) x $($_.Name) GB" }) -join ' + ')
+        $now = "$totalGB GB: $layout $type-$speed $ffName ($maker $("$($m.PartNumber)".Trim())), $(if ($free) { "$free of $slots slot(s) free" } else { "all $slots slots used" })"
+        $soldered = $type -like 'LP*' -or $ff -notin 8, 12
+        if ($soldered) {
+            Add-Upg 'Memory' $now 'Not upgradeable' 'n/a' 'Nothing to buy - this memory is soldered to the motherboard.' `
+                "$type memory, or a form factor other than a removable module, means it can't be swapped or added to."
+        } else {
+            $target = if ($totalGB -lt 16) { 16 } elseif ($totalGB -lt 32) { 32 } else { 64 }
+            if ($maxGB -and $target -gt $maxGB) { $target = $maxGB }
+            $base = "$type-$speed $ffName$(if ($pins) { " ($pins-pin)" })$(if ($volt) { ", $volt" }), $(if ($ecc) { 'ECC' } else { 'non-ECC' })"
+            if ($target -le $totalGB) {
+                Add-Upg 'Memory' $now 'Already at the maximum' 'Not needed' "Nothing to buy - $totalGB GB is the most this PC supports." "The firmware reports a maximum of $maxGB GB."
+            } else {
+                $each = $sizes[0]
+                if ($free -gt 0 -and ($totalGB + $free * $each) -ge $target) {
+                    $n = [Math]::Ceiling(($target - $totalGB) / $each)
+                    $option = "Add $n x $each GB (total $($totalGB + $n * $each) GB)"
+                    $spec = "$n x $each GB $base - match the module already fitted. Total afterwards: $($totalGB + $n * $each) GB."
+                } else {
+                    $per = [int]($target / $slots)
+                    $option = "Replace with $slots x $per GB (total $target GB)"
+                    $spec = "A matched kit of $slots x $per GB $base = $target GB. The current modules come out (keep or sell them)."
+                }
+                $spec += " Faster-rated $type modules also work and simply run at $speed MT/s." + $(if ($maxGB) { " Most supported: $maxGB GB." })
+                $worth = if ($mods.Count -eq 1 -and $slots -ge 2) { 'Recommended - one module means single-channel; a matching second module roughly doubles memory speed' }
+                         elseif ($totalGB -lt 8) { 'Strongly recommended' }
+                         elseif ($totalGB -lt 16) { 'Recommended' }
+                         elseif ($usedPct -ge 80) { "Recommended - memory is $usedPct% full right now" }
+                         elseif ($totalGB -lt 32) { 'Optional - worth it for virtual machines, big spreadsheets, photo/video/CAD work or many browser tabs' }
+                         else { 'Not needed' }
+                Add-Upg 'Memory' $now $option $worth $spec "Memory is $usedPct% used right now. Modules must match the type ($type) and form factor ($ffName) and should match the speed; mixing sizes works but can lose dual-channel speed."
+            }
+        }
+    }
+
+    # --- Storage ---
+    $sysDisk = try { (Get-Partition -DriveLetter C -ErrorAction Stop | Get-Disk).Number } catch { $null }
+    $cDrive = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+    $cPct = if ($cDrive.Size) { [int](100 * $cDrive.FreeSpace / $cDrive.Size) } else { 100 }
+    foreach ($d in Get-PhysicalDisk) {
+        if ("$($d.BusType)" -eq 'USB') { continue }
+        $gb = [int]($d.Size / 1GB)
+        $isSys = "$($d.DeviceId)" -eq "$sysDisk"
+        $now = "$("$($d.FriendlyName)".Trim()): $gb GB $($d.BusType) $($d.MediaType)$(if ($isSys) { ", holds Windows (C: $cPct% free)" })"
+        if ("$($d.MediaType)" -eq 'HDD') {
+            Add-Upg 'Drive' $now 'Replace with an SSD' $(if ($isSys) { 'Strongly recommended - the biggest speed-up an older PC can get' } else { 'Optional' }) `
+                '1 TB (or larger) SSD: 2.5-inch SATA SSD to replace this drive, or an M.2 NVMe SSD if the PC has an M.2 slot. Copy ("clone") the old drive with the SSD maker''s free tool.' `
+                'Hard disks are 20-50x slower than SSDs at the small reads Windows does all the time.'
+        } elseif ($isSys) {
+            $worth = if ($cPct -lt 15) { "Recommended - C: is only $cPct% free" } elseif ($gb -lt 300) { 'Recommended - small drive' } else { 'Optional' }
+            $form = if ("$($d.BusType)" -eq 'NVMe') { 'M.2 2280 NVMe SSD, PCIe Gen4 x4 (also works in Gen3 slots)' } else { '2.5-inch SATA SSD (or M.2 NVMe if the PC has an M.2 slot)' }
+            $spec = "$form, 1 TB or 2 TB."
+            $spec += if ($isLaptop) { ' If the laptop has a free M.2 slot, add it as a second drive; if not, replace this drive with the bigger one and clone it.' }
+                     else { ' Desktops usually have spare M.2 slots or 2.5/3.5-inch bays - add it as a second drive.' }
+            Add-Upg 'Drive' $now 'Bigger or second SSD' $worth $spec 'Check the service manual for a free M.2 slot - Windows cannot see empty slots. Gen4 drives fall back to the slot''s speed, so they are always a safe pick.'
+        }
+    }
+    $usb4 = [bool](Get-CimInstance Win32_USBController -ErrorAction SilentlyContinue | Where-Object Name -match 'USB4|Thunderbolt')
+    Add-Upg 'External drive' $(if ($usb4) { 'This PC has a USB4/Thunderbolt port' } else { 'USB ports' }) 'External SSD' 'Optional - no screwdriver needed, good for games, photos and backups' `
+        $(if ($usb4) { 'External NVMe SSD (or an NVMe enclosure) for USB4/Thunderbolt, 1-2 TB: up to ~3,000 MB/s on this PC.' } else { 'USB 3.2 Gen 2 external SSD, 1-2 TB (about 1,000 MB/s).' }) `
+        'Use the fastest port - on most laptops it has a lightning or USB4 symbol.'
+
+    # --- Battery ---
+    if ($isLaptop) {
+        $xml = Join-Path $env:TEMP "pctuneup-upg-battery-$PID.xml"
+        powercfg /batteryreport /xml /output $xml 2>$null | Out-Null
+        if (Test-Path $xml) {
+            try {
+                [xml]$x = Get-Content $xml
+                foreach ($b in @($x.BatteryReport.Batteries.Battery)) {
+                    if (-not $b -or [double]$b.DesignCapacity -le 0) { continue }
+                    $pct = [Math]::Min(100, [int](100 * [double]$b.FullChargeCapacity / [double]$b.DesignCapacity))
+                    $wh = [Math]::Round([double]$b.DesignCapacity / 1000)
+                    $worth = if ($pct -lt 60) { 'Recommended - battery life is roughly halved' } elseif ($pct -lt 80) { 'Optional' } else { 'Not needed' }
+                    Add-Upg 'Battery' "$wh Wh $($b.Chemistry) battery ($($b.Manufacturer)), now holds $pct% of its original charge" 'Replacement battery' $worth `
+                        "Replacement battery for the $model`: $wh Wh $($b.Chemistry). This battery reports itself as '$("$($b.Id)".Trim())' - search that, or your service tag, to find the exact part. Prefer the maker's original part." `
+                        'Batteries wear with age and charge cycles. A worn battery doesn''t slow the PC down, it just runs out sooner.'
+                }
+            } catch { }
+            Remove-Item $xml -ErrorAction SilentlyContinue
+        }
+    }
+
+    # --- Processor and graphics (information) ---
+    $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
+    $cpuNow = "$("$($cpu.Name)".Trim()) - $($cpu.NumberOfCores) cores / $($cpu.NumberOfLogicalProcessors) threads"
+    if ($isLaptop) { Add-Upg 'Processor' $cpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop processors are soldered to the motherboard.' 'If the processor is too slow, the upgrade path is a new laptop.' }
+    else {
+        $board = Get-CimInstance Win32_BaseBoard
+        Add-Upg 'Processor' $cpuNow 'Depends on the motherboard' 'Rarely worth it' "Check the CPU support list of your motherboard ($($board.Manufacturer) $($board.Product)) on the maker's website." 'A new processor often needs a BIOS update first, and only fits the same socket.'
+    }
+    $gpus = @(Get-CimInstance Win32_VideoController | Where-Object { $_.Name -notmatch 'Basic|Remote|Virtual|Parsec|Meta' })
+    $gpuNow = ($gpus | ForEach-Object { $_.Name.Trim() }) -join ' + '
+    if ($isLaptop) { Add-Upg 'Graphics' $gpuNow 'Not upgradeable' 'n/a' 'Nothing to buy - laptop graphics are soldered. An external GPU box over Thunderbolt/USB4 is possible but costly.' '' }
+    else { Add-Upg 'Graphics' $gpuNow 'Graphics card' 'Depends on use' 'Needs a free PCIe x16 slot, enough power-supply wattage and connectors, and room in the case - check all three first.' '' }
+
+    $support = if ($cs.Manufacturer -match 'Dell' -and $serial) { "https://www.dell.com/support/home/en-us/product-support/servicetag/$serial/overview" } else { $null }
+    [pscustomobject]@{ Rows = $rows; Model = $model; Support = $support
+                       Manual = 'https://www.bing.com/search?q=' + [uri]::EscapeDataString("$model service manual memory SSD upgrade") }
+}
+function Update-Upgrades {
+    $btnUpgReload.Enabled = $false
+    $txtUpg.Text = 'Looking at this PC''s hardware...'
+    Start-Bg $UpgradeWork $null {
+        param($r)
+        $btnUpgReload.Enabled = $true
+        if (-not $r) { $txtUpg.Text = 'Could not read the hardware details.'; return }
+        $script:UpgInfo = $r[0]
+        $btnUpgSupport.Enabled = [bool]$script:UpgInfo.Support
+        $lvUpg.BeginUpdate(); $lvUpg.Items.Clear()
+        foreach ($u in $script:UpgInfo.Rows) {
+            $it = Add-Row $lvUpg @($u.Part, $u.Now, $u.Option, $u.Worth, $u.Spec) $u
+            if ($u.Worth -like 'Strongly*' -or $u.Worth -like 'Recommended*') { $it.ForeColor = [Drawing.Color]::DarkRed }
+            elseif ($u.Worth -in 'n/a', 'Not needed') { $it.ForeColor = [Drawing.Color]::Gray }
+        }
+        $lvUpg.EndUpdate()
+        if ($lvUpg.Items.Count) { $lvUpg.Items[0].Selected = $true } else { $txtUpg.Text = '' }
+    }
+}
+$lvUpg.Add_SelectedIndexChanged({
+    if (-not $lvUpg.SelectedItems.Count) { return }
+    $u = $lvUpg.SelectedItems[0].Tag
+    $txtUpg.Text = "$($u.Part): $($u.Option)`r`nWorth it? $($u.Worth)`r`n`r`nYou have now: $($u.Now)`r`n`r`nWhat to buy: $($u.Spec)" + $(if ($u.Why) { "`r`n`r`nGood to know: $($u.Why)" })
+})
+$btnUpgReload.Add_Click({ Update-Upgrades })
+$btnUpgSupport.Add_Click({ if ($script:UpgInfo.Support) { Start-Process $script:UpgInfo.Support } })
+$btnUpgManual.Add_Click({ if ($script:UpgInfo) { Start-Process $script:UpgInfo.Manual } })
+$btnUpgCopy.Add_Click({
+    $items = @($lvUpg.Items | ForEach-Object Tag | Where-Object { $_.Worth -notin 'n/a', 'Not needed' })
+    if (-not $items) { Show-Msg 'Nothing worth upgrading was found.' | Out-Null; return }
+    $text = "Upgrade shopping list for $($script:UpgInfo.Model)`r`n`r`n" + (($items | ForEach-Object { "- $($_.Part) ($($_.Worth)):`r`n  $($_.Spec)" }) -join "`r`n`r`n")
+    [Windows.Forms.Clipboard]::SetText($text)
+    Show-Msg 'Shopping list copied - paste it into an email, a note or a shop''s chat.' | Out-Null
+})
+
+# ===========================================================================
+# 8. History
 # ===========================================================================
 $pgHist = New-Page 'History' 'Every change PC Tune-Up made on this PC, newest first. Check rows and click Undo to put them back. Cleaned files and uninstalled programs can''t be undone; removed Store apps can be reinstalled.'
 $btnHistReload = New-Button 'Reload'
@@ -1202,6 +1387,7 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>Apps that start with Windows ($($startOn.Count) on)</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>Bloatware found</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>Background services</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>Upgrade options</h2>$(ConvertTo-HtmlRows @('Part', 'You have now', 'Upgrade option', 'Worth it?', 'What to buy') $lvUpg.Items @(0, 1, 2, 3, 4))
 <h2>Changes made by PC Tune-Up</h2>$(ConvertTo-HtmlRows @('When', 'What', 'Item', 'Change', 'Undo') $histRows @(0, 1, 2, 3, 4))
 </body></html>
 "@
@@ -1342,7 +1528,7 @@ $OldExeCleanupWork = {
 }
 
 # ---------------------------------------------------------------------------
-$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-History; Start-UpdateCheck -Silent
+$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Upgrades; Update-History; Start-UpdateCheck -Silent
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
     if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
 })

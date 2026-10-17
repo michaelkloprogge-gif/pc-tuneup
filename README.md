@@ -9,6 +9,7 @@ A small Windows app that speeds up and cleans any Windows 10/11 PC, whatever the
 - **Bloatware** – find and remove pre-installed junk, trial antivirus and OEM extras
 - **Services** – trim background services from PC makers, updaters and telemetry
 - **Disk** – see which folders fill the drive
+- **Upgrades** – memory, drive and battery upgrade options with the exact spec to buy
 - **History** – every change, with Undo
 
 Security software, VPNs, drivers and databases are never touched, and you can add your own

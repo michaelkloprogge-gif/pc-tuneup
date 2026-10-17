@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.1
+
+- Fixed: in 1.14.0 the left edge of every page was hidden under the sidebar (the page title, the first buttons and the start of each line). The page test now checks that pages always start next to the sidebar.
+
 ## 1.14.0
 
 - **Simple view** - for people who don't want 23 pages: one calm screen with a big status in plain words (green: "Your PC is in good shape", orange: "5 things could be better", red: "Something needs attention") and three big buttons: **Make my PC faster**, **Check for problems** (each finding in one everyday sentence, with "Fix this" only for safe changes that can be undone) and **Get help**. New users start in simple view; "Show all tools" (or Settings > View) switches to the full app.

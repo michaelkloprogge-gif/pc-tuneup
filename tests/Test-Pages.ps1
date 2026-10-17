@@ -47,6 +47,13 @@ foreach ($name in @($NavGroups | ForEach-Object { $_.Pages } | Where-Object { $_
     if (-not $b -or -not ($nav.Controls.Contains($b) -or $navBottom.Controls.Contains($b))) { Fail "sidebar has no button for $name" }
 }
 foreach ($name in $script:PageLoaders.Keys) { if (-not $script:Loaded[$name] -and $name -ne 'Battery') { Fail "page $name never loaded its data" } }
+# Layout: the page must start where the sidebar ends (both after start-up and after switching views)
+function Test-Layout([string]$When) {
+    $form.PerformLayout()
+    if ($sidebar.Right -gt $content.Left) { Fail "layout ($When): the page starts at x=$($content.Left), under the sidebar (ends at x=$($sidebar.Right))" }
+    if ($content.Right -gt $form.ClientSize.Width) { Fail "layout ($When): the page is wider than the window" }
+}
+Test-Layout 'start'
 # Simple view: the status, the list of problems and the help screen
 Set-ViewMode 'simple'; Pump 50
 if (-not $sHead.Text -or $sHead.Text -eq (T 'Checking your PC...')) { Fail "simple view status still says: $($sHead.Text)" }
@@ -57,6 +64,7 @@ if ($sList.Controls.Count -lt 3) { Fail 'simple view: "Get help" shows too littl
 [void](Get-PlainSummary)
 Write-Output "      simple view: $($sHead.Text)"
 Set-ViewMode 'full'; Pump 50
+Test-Layout 'after switching back from simple view'
 # 3. The report has every section
 $rep = Join-Path $DataDir 'test-report.html'
 try { [void](Save-ReportNow -Path $rep -NoOpen) } catch { Fail "report: $($_.Exception.Message)" }

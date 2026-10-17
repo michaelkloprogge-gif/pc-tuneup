@@ -60,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.14.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.14.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -6893,7 +6893,9 @@ function Set-ViewMode([string]$Mode) {
     $Settings.View = $Mode; Save-Settings
     $isSimple = $Mode -eq 'simple'
     $simple.Visible = $isSimple; $content.Visible = -not $isSimple; $sidebar.Visible = -not $isSimple
-    if ($isSimple) { $simple.BringToFront(); Update-SimpleView } else { $content.BringToFront(); $sidebar.BringToFront() }
+    # Docking follows the z-order: the Fill panel must be in front, so it is laid out last and gets only the space
+    # the sidebar leaves. (Bringing the sidebar to the front last made the page slide underneath it.)
+    if ($isSimple) { $simple.BringToFront(); Update-SimpleView } else { $sidebar.BringToFront(); $content.BringToFront() }
     if ($cmbView) { $cmbView.SelectedIndex = [Math]::Max(0, [array]::IndexOf($cmbView.Tag, $Mode)) }
 }
 $sFast.Add_Click({ $script:SimpleRun = $true; try { Invoke-FixMyPc } finally { $script:SimpleRun = $false } })

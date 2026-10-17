@@ -17,7 +17,7 @@ $sha = if ($asset.digest -match '^sha256:([0-9a-f]{64})$') { $Matches[1].ToUpper
 $id = 'MichaelKloprogge.PCTuneUp'
 $dir = Join-Path $root "winget\manifests\m\MichaelKloprogge\PCTuneUp\$Version"
 New-Item -ItemType Directory -Force $dir | Out-Null
-$schema = '1.6.0'
+$schema = '1.12.0'
 function Out-Utf8([string]$Path) { process { [IO.File]::WriteAllText($Path, (($_ -replace "`r?`n", "`r`n").TrimEnd() + "`r`n"), (New-Object Text.UTF8Encoding($false))) } }   # winget-pkgs uses UTF-8 without BOM
 @"
 # yaml-language-server: `$schema=https://aka.ms/winget-manifest.version.$schema.schema.json

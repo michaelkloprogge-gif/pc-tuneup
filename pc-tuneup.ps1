@@ -6,6 +6,9 @@
 #   Bloatware - find pre-installed junk (OEM tools, trial antivirus, promo apps) and uninstall it
 #   Services  - background services from PC makers, updaters and telemetry, with one-click restore
 #   Disk      - find the folders eating your drive
+#   Updates   - outdated programs, updated through winget
+#   Security  - Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM...
+#   Stability - crashes, freezes, blue screens and errors from the last 30 days, with the likely fix
 #   Upgrades  - memory / drive / battery upgrade options with the exact spec to buy
 #   History   - every change, with undo
 # Every change is logged to %LOCALAPPDATA%\PCTuneUp\changes.log. Anything listed
@@ -17,7 +20,7 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Windows.Forms.Application]::EnableVisualStyles()
 
-$AppVersion = '1.3.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.4.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -108,6 +111,20 @@ function Get-FilesSafe([string]$Root, [string]$Filter = '*') {
             }
         } catch { }
     }
+}
+# Run a console program hidden and capture its output as UTF-8 (winget prints Unicode names).
+function Invoke-Native([string]$Exe, [string]$Arguments, [int]$TimeoutSec = 600) {
+    $psi = New-Object Diagnostics.ProcessStartInfo $Exe, $Arguments
+    $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true
+    $psi.RedirectStandardOutput = $true; $psi.RedirectStandardError = $true
+    $psi.StandardOutputEncoding = [Text.Encoding]::UTF8
+    $p = [Diagnostics.Process]::Start($psi)
+    $out = $p.StandardOutput.ReadToEndAsync(); $err = $p.StandardError.ReadToEndAsync()
+    if (-not $p.WaitForExit($TimeoutSec * 1000)) {
+        try { $p.Kill() } catch { }
+        return [pscustomobject]@{ Out = ''; Code = -1; TimedOut = $true }
+    }
+    [pscustomobject]@{ Out = $out.Result + $err.Result; Code = $p.ExitCode; TimedOut = $false }
 }
 # Every subfolder under Root (not Root itself), again never crossing a junction.
 function Get-DirsSafe([string]$Root) {
@@ -257,6 +274,7 @@ Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSp
 $cs = Get-CimInstance Win32_ComputerSystem
 $PcName = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim()
 $script:HealthDeep = $null   # drive / battery / update results from the background check
+$script:ExtraAdvice = @{}    # one-line findings from the Updates / Security / Stability tabs, keyed by tab
 
 # Slower checks (a few seconds), run in the background: drive health, battery wear, Windows Update.
 $HealthDeepWork = {
@@ -352,6 +370,7 @@ function Update-Health([switch]$Quick) {
 
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
+    foreach ($k in 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $lblHealth.Text = $lines -join "`r`n"
     $lblHealth.Height = $MonoFont.Height * $lines.Count + 8
     $lblAdvice.Text = ($advice | ForEach-Object { "!  $_" }) -join "`r`n"
@@ -1096,6 +1115,465 @@ $lvDisk.Add_DoubleClick({
 })
 
 # ===========================================================================
+# Updates: programs with a newer version, via winget (the package manager built into Windows)
+# ===========================================================================
+$pgUpd = New-Page 'Updates' 'Programs with a newer version available, via winget (built into Windows). Small updates are pre-checked; big version jumps, self-updating apps, very large updates and keep-list programs are not. Close a program before updating it.'
+$btnUpdScan = New-Button 'Check for updates'
+$btnUpdRun = New-Button 'Update checked'
+$btnUpdStore = New-Button 'Store app updates'
+$lvUpd = New-ListView $true @('Program', 340, 'Installed', 130, 'Available', 130, 'Note', 330)
+$lblUpd = New-Status
+Set-PageLayout $pgUpd $lvUpd @((New-ButtonBar @($btnUpdScan, $btnUpdRun, $btnUpdStore))) $lblUpd
+# Apps that keep themselves current (winget often can't update them anyway) and updates that take ages.
+$SelfUpdating = '^(Microsoft\.Edge|Google\.Chrome|Mozilla\.Firefox|Brave\.Brave|Opera\.|Valve\.Steam|Discord\.|Spotify\.|Microsoft\.Teams|Microsoft\.Office|Microsoft\.OneDrive|Microsoft\.Outlook|Anthropic\.Claude|SlackTechnologies\.|Zoom\.Zoom)'
+$HeavyUpdates = '^(Microsoft\.VisualStudio\.20|Microsoft\.SQLServer\.20|Adobe\.CreativeCloud|EpicGames\.)'
+function Get-Major($Version) { if ("$Version" -match '(\d+)') { [int]$Matches[1] } else { -1 } }
+
+$UpdScanWork = {
+    $wg = Get-Command winget.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+    if (-not $wg) { return [pscustomobject]@{ Error = 'winget missing'; Rows = @() } }
+    $r = Invoke-Native $wg 'upgrade --accept-source-agreements --disable-interactivity' 300
+    # Progress spinners rewrite a line with CR; keep only what's after the last one.
+    $lines = @($r.Out -split "`n" | ForEach-Object { ($_.TrimEnd("`r") -split "`r")[-1] })
+    $rows = @()
+    for ($i = 1; $i -lt $lines.Count; $i++) {
+        if ($lines[$i] -notmatch '^-{20,}\s*$') { continue }
+        # Header names are translated on non-English Windows, so columns are found by position: where each header word starts.
+        $hdr = $lines[$i - 1]
+        $starts = @(0) + @([regex]::Matches($hdr, '(?<=\s)\S') | ForEach-Object Index)
+        if ($starts.Count -lt 4) { continue }
+        for ($j = $i + 1; $j -lt $lines.Count; $j++) {
+            $l = $lines[$j]
+            if (-not $l.Trim()) { break }
+            if ($l.Length -le $starts[3]) { continue }   # footer such as "27 upgrades available."
+            $cut = { param($a, $b) if ($a -ge $l.Length) { '' } elseif ($b -and $b -lt $l.Length) { $l.Substring($a, $b - $a).Trim() } else { $l.Substring($a).Trim() } }
+            $rows += [pscustomobject]@{ Name = (& $cut 0 $starts[1]); Id = (& $cut $starts[1] $starts[2]); Version = (& $cut $starts[2] $starts[3])
+                                        Available = (& $cut $starts[3] $(if ($starts.Count -gt 4) { $starts[4] } else { $null })) }
+        }
+    }
+    $err = if ($r.TimedOut) { 'winget took too long - try again later' }
+           elseif (-not $rows -and $r.Code -ne 0 -and $r.Out -notmatch 'No (installed package|available upgrade|applicable)') {
+               "winget: $(($r.Out -split "`n" | ForEach-Object { ($_.TrimEnd("`r") -split "`r")[-1].Trim() } | Where-Object { $_ } | Select-Object -Last 1))" }
+           else { $null }
+    [pscustomobject]@{ Error = $err; Rows = $rows }
+}
+$UpdRunWork = {
+    param($items)
+    $wg = Get-Command winget.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+    foreach ($i in $items) {
+        $r = Invoke-Native $wg "upgrade --id `"$($i.Id)`" --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity" 1800
+        $last = $r.Out -split "`n" | ForEach-Object { ($_.TrimEnd("`r") -split "`r")[-1].Trim() } |
+                Where-Object { $_ -and $_ -notmatch '^[\-\\|/\s]+$' -and $_ -notmatch '\d+(\.\d+)? ?[KMG]B ?/ ?\d' } | Select-Object -Last 1
+        [pscustomobject]@{ Name = $i.Name; Id = $i.Id; From = $i.Version; To = $i.Available; Ok = ($r.Code -eq 0)
+                           Msg = $(if ($r.TimedOut) { 'took longer than 30 minutes - stopped' } else { $last }) }
+    }
+}
+function Start-UpdScan {
+    $btnUpdScan.Enabled = $false; $btnUpdRun.Enabled = $false
+    $lblUpd.Text = 'Asking winget which programs have updates (20-60 seconds)...'
+    Start-Bg $UpdScanWork $null {
+        param($r)
+        $r = $r[0]
+        $btnUpdScan.Enabled = $true; $btnUpdRun.Enabled = $true
+        if ($r.Error -eq 'winget missing') {
+            $lblUpd.Text = 'winget is missing on this PC - install "App Installer" from the Microsoft Store, then check again.'
+            $script:ExtraAdvice.Remove('Updates'); return
+        }
+        $userKeep = Get-UserKeep
+        $lvUpd.BeginUpdate(); $lvUpd.Items.Clear()
+        foreach ($u in $r.Rows) {
+            $text = "$($u.Name) $($u.Id)"
+            $on = $false
+            $note = if (($userKeep -and $text -match $userKeep) -or $text -match $KeepBuiltIn) { 'on the keep list - update it yourself if you want' }
+                    elseif ($u.Id -match $SelfUpdating) { 'updates itself - just restart it' }
+                    elseif ($u.Id -match $HeavyUpdates) { 'very large update - run it when you have time' }
+                    elseif ($u.Id -match [char]0x2026) { 'name cut off by winget - update it from the program itself' }
+                    elseif ((Get-Major $u.Version) -ne (Get-Major $u.Available)) { 'major new version - check it still suits you' }
+                    else { $on = $true; 'small update' }
+            $it = Add-Row $lvUpd @($u.Name, $u.Version, $u.Available, $note) $u $on
+            if (-not $on) { $it.ForeColor = [Drawing.Color]::DimGray }
+        }
+        $lvUpd.EndUpdate()
+        $n = $r.Rows.Count
+        $lblUpd.Text = if ($r.Error) { $r.Error } elseif ($n) { "$n program(s) can be updated, $($lvUpd.CheckedItems.Count) pre-checked." } else { 'Everything winget knows about is up to date.' }
+        if ($n) { $script:ExtraAdvice['Updates'] = "$n program update(s) available - see the Updates tab." } else { $script:ExtraAdvice.Remove('Updates') }
+        Update-Health -Quick
+    }
+}
+$btnUpdScan.Add_Click({ Start-UpdScan })
+$btnUpdStore.Add_Click({ Start-Process 'ms-windows-store://downloadsandupdates' })
+$btnUpdRun.Add_Click({
+    $picked = @($lvUpd.CheckedItems | ForEach-Object { $_.Tag })
+    if (-not $picked) { Show-Msg 'Check at least one program first.' | Out-Null; return }
+    $names = ($picked | ForEach-Object { " - $($_.Name) ($($_.Version) -> $($_.Available))" }) -join "`n"
+    $q = "Update these $($picked.Count) program(s)?`n$names`n`nClose them first. Some show a permission prompt - click Yes. This can take a few minutes."
+    if ((Show-Msg $q 'YesNo' 'Question') -ne 'Yes') { return }
+    $btnUpdScan.Enabled = $false; $btnUpdRun.Enabled = $false
+    $lblUpd.Text = "Updating $($picked.Count) program(s)... watch for permission prompts."
+    Start-Bg $UpdRunWork $picked {
+        param($results)
+        $bad = @()
+        foreach ($r in $results) {
+            Add-History 'Update' $r.Name ('{0} -> {1}: {2}' -f $r.From, $r.To, $(if ($r.Ok) { 'updated' } else { "failed - $($r.Msg)" }))
+            if (-not $r.Ok) { $bad += "$($r.Name): $($r.Msg)" }
+        }
+        $msg = "$(@($results | Where-Object Ok).Count) of $($results.Count) program(s) updated."
+        if ($bad) { $msg += "`n`nNot updated (often because the program was open - close it and try again):`n" + ($bad -join "`n") }
+        Show-Msg $msg | Out-Null
+        Update-History; Start-UpdScan
+    }
+})
+
+# ===========================================================================
+# Security: is this PC protected?
+# ===========================================================================
+$pgSec = New-Page 'Security' 'Is this PC protected? Green is fine, orange is worth a look, red needs fixing. Double-click a row (or select it and click Open setting) to go to the right Windows setting.'
+$btnSecScan = New-Button 'Check again'
+$btnSecOpen = New-Button 'Open setting'
+$btnSecWS = New-Button 'Open Windows Security'
+$lvSec = New-ListView $false @('Check', 190, 'Status', 80, 'Result', 360, 'What to do', 600)
+$txtSec = New-Object Windows.Forms.TextBox
+$txtSec.Multiline = $true; $txtSec.ReadOnly = $true; $txtSec.Dock = 'Bottom'; $txtSec.Height = 90; $txtSec.ScrollBars = 'Vertical'
+$txtSec.BackColor = [Drawing.SystemColors]::Window
+Set-PageLayout $pgSec $lvSec @((New-ButtonBar @($btnSecScan, $btnSecOpen, $btnSecWS))) $txtSec
+$lblSec = New-Status; $pgSec.Controls.Add($lblSec)
+
+$SecScanWork = {
+    $PSDefaultParameterValues = @{ 'Get-CimInstance:OperationTimeoutSec' = 15; 'Get-CimInstance:ErrorAction' = 'SilentlyContinue' }
+    $rows = New-Object System.Collections.ArrayList
+    function Add-Sec($Check, $Level, $Result, $Todo, $Link) { [void]$rows.Add([pscustomobject]@{ Check = $Check; Level = $Level; Result = $Result; Todo = $Todo; Link = $Link }) }
+    $now = Get-Date
+    $chassis = @((Get-CimInstance Win32_SystemEnclosure).ChassisTypes | ForEach-Object { [int]$_ })
+    $laptop = [bool]($chassis | Where-Object { $_ -in 8, 9, 10, 11, 12, 14, 18, 21, 30, 31, 32 })
+
+    # --- Windows version and how long it gets security updates ---
+    $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
+    $win11 = [int]$cv.CurrentBuild -ge 22000           # ProductName still says "Windows 10" on Windows 11
+    $ver = if ($cv.DisplayVersion) { "$($cv.DisplayVersion)" } else { "$($cv.ReleaseId)" }
+    $edition = "$($cv.EditionID)"
+    $ltsc = $edition -match 'EnterpriseS|IoTEnterpriseS|LTS'
+    $osName = "Windows $(if ($win11) { '11' } else { '10' }) $($edition -replace '^Professional.*', 'Pro' -replace '^Core.*', 'Home') $ver"
+    # Last day of security updates for Home/Pro; Enterprise/Education get about a year more. Dates from 2028 on are estimates.
+    $ends = if ($win11) { @{ '21H2' = '2023-10-10'; '22H2' = '2024-10-08'; '23H2' = '2025-11-11'; '24H2' = '2026-10-13'; '25H2' = '2027-10-12'; '26H2' = '2028-10-10' } }
+            else { @{ '22H2' = '2025-10-14' } }
+    if ($win11 -and $edition -match 'Enterprise|Education') {
+        $ends = @{ '21H2' = '2024-10-08'; '22H2' = '2025-10-14'; '23H2' = '2026-11-10'; '24H2' = '2027-10-12'; '25H2' = '2028-10-10'; '26H2' = '2029-10-09' }
+    }
+    $end = $ends[$ver]
+    if ($ltsc) { Add-Sec 'Windows version' 'OK' "$osName (long-term edition)" 'Long-term editions get security updates for years. Nothing to do.' 'ms-settings:windowsupdate' }
+    elseif (-not $end) {
+        if ($win11) { Add-Sec 'Windows version' 'Info' $osName 'Not a version this check knows. Open Windows Update to see if a newer one is offered.' 'ms-settings:windowsupdate' }
+        else { Add-Sec 'Windows version' 'Problem' "$osName - no longer supported" 'This Windows 10 version gets no security updates any more. See the Windows 11 check below for your options.' 'ms-settings:windowsupdate' }
+    } else {
+        $endDate = [datetime]$end
+        $days = [int]($endDate - $now).TotalDays
+        if ($days -lt 0) {
+            $todo = if ($win11) { 'This version gets no more security updates. Open Windows Update and install the newest Windows 11 version (free).' }
+                    else { 'Windows 10 stopped getting security updates. Upgrade to Windows 11 for free if the PC qualifies (see below), sign up for Extended Security Updates, or plan a replacement.' }
+            Add-Sec 'Windows version' 'Problem' "$osName - security updates ended $($endDate.ToString('d MMM yyyy'))" $todo 'ms-settings:windowsupdate'
+        } elseif ($days -lt 120) {
+            Add-Sec 'Windows version' 'Warning' "$osName - security updates end $($endDate.ToString('d MMM yyyy'))" 'Install the newest Windows version from Windows Update before then (free).' 'ms-settings:windowsupdate'
+        } else {
+            Add-Sec 'Windows version' 'OK' "$osName - supported until $(if ($endDate.Year -ge 2028) { 'about ' })$($endDate.ToString('MMM yyyy'))" 'Nothing to do - Windows Update keeps it patched.' 'ms-settings:windowsupdate'
+        }
+    }
+
+    # --- Firmware, Secure Boot, TPM (also what Windows 11 needs) ---
+    Add-Type -Namespace PcTuneUp -Name Firmware -MemberDefinition '[DllImport("kernel32.dll")] public static extern bool GetFirmwareType(out uint t);' -ErrorAction SilentlyContinue
+    $fwType = 0; try { [void][PcTuneUp.Firmware]::GetFirmwareType([ref]$fwType) } catch { }
+    $secureBoot = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\SecureBoot\State' -ErrorAction SilentlyContinue).UEFISecureBootEnabled
+    $tpmOut = (& tpmtool.exe getdeviceinformation 2>$null) -join "`n"
+    $tpmPresent = $tpmOut -match 'TPM Present:\s*True'
+    $tpmVer = if ($tpmOut -match 'TPM Version:\s*([\d.]+)') { $Matches[1] } else { '' }
+    if ($fwType -eq 1) { Add-Sec 'Secure Boot' 'Warning' 'PC starts in old "legacy BIOS" mode' 'Modern UEFI mode with Secure Boot blocks malware that loads before Windows. Switching needs care (the disk must be converted with MBR2GPT) - get help if unsure.' $null }
+    elseif ($secureBoot -eq 1) { Add-Sec 'Secure Boot' 'OK' 'On' 'Nothing to do.' $null }
+    else { Add-Sec 'Secure Boot' 'Warning' 'Off' 'Switch Secure Boot on in the firmware (BIOS/UEFI) settings - usually F2, F10 or Del while the PC starts.' $null }
+    if ($tpmPresent -and $tpmVer -like '2*') { Add-Sec 'TPM security chip' 'OK' "TPM $tpmVer present" 'Nothing to do.' $null }
+    elseif ($tpmPresent) { Add-Sec 'TPM security chip' 'Warning' "Old TPM $tpmVer" 'Windows 11 needs TPM 2.0. Some PCs can switch to 2.0 with a firmware update from the maker.' $null }
+    elseif ($tpmOut) { Add-Sec 'TPM security chip' 'Warning' 'None found' 'Many PCs have one that is switched off - look for TPM, PTT (Intel) or fTPM (AMD) in the firmware settings.' $null }
+    else { Add-Sec 'TPM security chip' 'Info' 'Could not check' 'Run "tpm.msc" to see the TPM status.' 'tpm.msc' }
+
+    if (-not $win11) {
+        $cpuName = "$((Get-CimInstance Win32_Processor | Select-Object -First 1).Name)".Trim()
+        $cpuOk = if ($cpuName -match 'Core\(TM\) Ultra|Core Ultra') { $true }
+                 elseif ($cpuName -match 'i[3579]-(\d{4,5})') { $n = $Matches[1]; $gen = if ($n.Length -eq 5) { [int]$n.Substring(0, 2) } else { [int]$n.Substring(0, 1) }; $gen -ge 8 }
+                 elseif ($cpuName -match 'Ryzen \d (PRO )?(\d)\d{3}') { [int]$Matches[2] -ge 2 }
+                 else { $null }
+        $os = Get-CimInstance Win32_OperatingSystem
+        $c = Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'"
+        $missing = @()
+        if (-not ($tpmPresent -and $tpmVer -like '2*')) { $missing += 'TPM 2.0 (often only switched off in the firmware)' }
+        if ($fwType -ne 2) { $missing += 'UEFI start-up with Secure Boot' }
+        if ($cpuOk -eq $false) { $missing += "a newer processor (Intel 8th gen or AMD Ryzen 2000 and later; this is a $cpuName)" }
+        if ($os.TotalVisibleMemorySize -lt 3.5MB) { $missing += '4 GB of memory' }
+        if ($c.Size -and $c.Size -lt 60GB) { $missing += 'a 64 GB or larger drive' }
+        if ($missing) {
+            Add-Sec 'Windows 11 ready?' 'Problem' "No - missing: $($missing -join '; ')" 'If only TPM or Secure Boot is missing, switch them on in the firmware settings and check again. Otherwise: Extended Security Updates for Windows 10, or a new or refurbished PC.' $null
+        } else {
+            Add-Sec 'Windows 11 ready?' 'Warning' $(if ($null -eq $cpuOk) { "Probably - processor not recognised ($cpuName); confirm with Microsoft's PC Health Check" } else { 'Yes - this PC can run Windows 11' }) `
+                'Upgrade for free: Settings > Windows Update > Upgrade to Windows 11. Back up your files first.' 'ms-settings:windowsupdate'
+        }
+    }
+
+    # --- Antivirus and firewall (as Windows Security sees them) ---
+    $avs = @(Get-CimInstance -Namespace root\SecurityCenter2 -ClassName AntiVirusProduct)
+    $avOn = @($avs | Where-Object { (($_.productState -shr 8) -band 0x10) })          # byte 2: 0x10 = enabled
+    $avCurrent = @($avOn | Where-Object { -not ($_.productState -band 0x10) })        # byte 3: 0x10 = out of date
+    $nameOf = { param($list) (($list | ForEach-Object { $_.displayName } | Select-Object -Unique) -join ', ') }
+    if ($avCurrent) { Add-Sec 'Antivirus' 'OK' "$(& $nameOf $avCurrent) - on and up to date" 'Nothing to do.' 'windowsdefender://threat' }
+    elseif ($avOn) { Add-Sec 'Antivirus' 'Warning' "$(& $nameOf $avOn) - on but out of date" 'Open it and update it. If that fails, check the internet connection or whether its subscription ran out.' 'windowsdefender://threat' }
+    elseif ($avs) { Add-Sec 'Antivirus' 'Problem' "$(& $nameOf $avs) - switched off" 'Switch it on. If a paid antivirus expired, uninstall it - Microsoft Defender then takes over for free.' 'windowsdefender://threat' }
+    else { Add-Sec 'Antivirus' 'Problem' 'No antivirus found' 'Open Windows Security and switch on Microsoft Defender.' 'windowsdefender://threat' }
+
+    $profiles = @(Get-NetFirewallProfile -ErrorAction SilentlyContinue)
+    $fwOff = @($profiles | Where-Object { "$($_.Enabled)" -eq 'False' } | ForEach-Object Name)
+    $fwOther = @(Get-CimInstance -Namespace root\SecurityCenter2 -ClassName FirewallProduct | Where-Object { (($_.productState -shr 8) -band 0x10) })
+    if (-not $profiles) { Add-Sec 'Firewall' 'Info' 'Could not check' 'Open Windows Security > Firewall & network protection.' 'windowsdefender://network' }
+    elseif (-not $fwOff) { Add-Sec 'Firewall' 'OK' 'Windows Firewall is on' 'Nothing to do.' 'windowsdefender://network' }
+    elseif ($fwOther) { Add-Sec 'Firewall' 'OK' "$(& $nameOf $fwOther) firewall is on" 'Nothing to do.' 'windowsdefender://network' }
+    else { Add-Sec 'Firewall' 'Problem' "Windows Firewall is off ($($fwOff -join ', '))" 'Switch it on in Windows Security > Firewall & network protection.' 'windowsdefender://network' }
+
+    # --- Drive encryption ---
+    $bl = try { (New-Object -ComObject Shell.Application).NameSpace('C:').Self.ExtendedProperty('System.Volume.BitLockerProtection') } catch { $null }
+    $keyTip = 'Know where the recovery key is: account.microsoft.com/devices/recoverykey - you need it if the PC ever asks for it.'
+    switch ([int]$bl) {
+        { $_ -in 1, 3, 6 } { Add-Sec 'Drive encryption' 'OK' 'C: is encrypted (BitLocker / Device encryption)' $keyTip 'ms-settings:deviceencryption' }
+        5 { Add-Sec 'Drive encryption' 'Warning' 'Encryption is paused' 'It is usually paused during an update and resumes after a restart. If it stays paused, resume it in BitLocker settings.' 'ms-settings:deviceencryption' }
+        2 {
+            if ($laptop) { Add-Sec 'Drive encryption' 'Warning' 'C: is not encrypted' "Anyone who steals the laptop can read its files. Turn on Device encryption (Settings > Privacy & security > Device encryption) or BitLocker on Pro. $keyTip" 'ms-settings:deviceencryption' }
+            else { Add-Sec 'Drive encryption' 'Info' 'C: is not encrypted' 'Less important for a desktop that stays at home; worth it for business PCs.' 'ms-settings:deviceencryption' }
+        }
+        default { Add-Sec 'Drive encryption' 'Info' 'Could not check' 'See Settings > Privacy & security > Device encryption.' 'ms-settings:deviceencryption' }
+    }
+
+    # --- Smaller protections ---
+    $hvci = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity' -ErrorAction SilentlyContinue).Enabled
+    if ($hvci -eq 1) { Add-Sec 'Memory integrity' 'OK' 'On' 'Nothing to do.' 'windowsdefender://coreisolation' }
+    else { Add-Sec 'Memory integrity' 'Info' 'Off' 'Optional extra protection: Windows Security > Device security > Core isolation. Very old drivers can block it.' 'windowsdefender://coreisolation' }
+    $uac = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -ErrorAction SilentlyContinue).EnableLUA
+    if ($uac -eq 0) { Add-Sec 'User Account Control' 'Problem' 'Off - every program runs with full rights' 'Search "UAC" in Start, set the slider back to the default level and restart.' $null }
+    else { Add-Sec 'User Account Control' 'OK' 'On' 'Nothing to do.' $null }
+    $smb1 = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb10' -ErrorAction SilentlyContinue
+    if ($smb1 -and $smb1.Start -ne 4) { Add-Sec 'Old file sharing (SMB 1.0)' 'Warning' 'Installed' 'SMB 1.0 is what the WannaCry worm used. Remove it unless a very old NAS or printer needs it: Windows Features > untick "SMB 1.0/CIFS File Sharing Support".' 'optionalfeatures.exe' }
+    else { Add-Sec 'Old file sharing (SMB 1.0)' 'OK' 'Off' 'Nothing to do.' $null }
+    $rdp = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Terminal Server' -ErrorAction SilentlyContinue).fDenyTSConnections
+    if ($rdp -eq 0) { Add-Sec 'Remote Desktop' 'Info' 'On - this PC accepts remote connections' 'Fine if you use it. Otherwise switch it off: Settings > System > Remote Desktop.' 'ms-settings:remotedesktop' }
+    else { Add-Sec 'Remote Desktop' 'OK' 'Off' 'Nothing to do.' 'ms-settings:remotedesktop' }
+
+    # --- Abandoned software that no longer gets security fixes ---
+    $dead = @()
+    foreach ($k in 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall', 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall', 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall') {
+        foreach ($sub in Get-ChildItem -LiteralPath $k -ErrorAction SilentlyContinue) {
+            $n = "$((Get-ItemProperty -LiteralPath $sub.PSPath -ErrorAction SilentlyContinue).DisplayName)"
+            if ($n -match '^Adobe Flash|^Adobe Shockwave|^Java\(TM\) [67]|^Java [67] Update|^QuickTime|^Microsoft Silverlight|^Python 2\.|^Adobe Reader (X|9|8)\b') { $dead += $n }
+            elseif ($n -match '^Microsoft (Windows Desktop Runtime|\.NET Runtime|ASP\.NET Core|\.NET Core).*?\b([1-7])\.\d+\.\d+') { $dead += $n }
+        }
+    }
+    $dead = @($dead | Select-Object -Unique)
+    if ($dead) { Add-Sec 'Out-of-support software' 'Warning' "$($dead.Count) found: $(($dead | Select-Object -First 4) -join '; ')$(if ($dead.Count -gt 4) { '...' })" `
+        'These no longer get security fixes. Uninstall them in Settings > Apps; old .NET runtimes can go too - a program that still needs one will ask for it.' 'ms-settings:appsfeatures' }
+    else { Add-Sec 'Out-of-support software' 'OK' 'None of the usual suspects (Flash, Java 6/7, QuickTime, Silverlight, old .NET)' 'Nothing to do.' $null }
+    $rows   # emitted item by item, so the Done block receives the rows themselves
+}
+$SecLevels = @{ Problem = 0; Warning = 1; Info = 2; OK = 3 }
+function Update-Security {
+    $btnSecScan.Enabled = $false
+    $lblSec.Text = 'Checking security settings...'
+    Start-Bg $SecScanWork $null {
+        param($rows)
+        $btnSecScan.Enabled = $true
+        $lvSec.BeginUpdate(); $lvSec.Items.Clear()
+        foreach ($r in $rows | Sort-Object { $SecLevels[$_.Level] }) {
+            $it = Add-Row $lvSec @($r.Check, $r.Level, $r.Result, $r.Todo) $r
+            $it.ForeColor = switch ($r.Level) { 'Problem' { [Drawing.Color]::DarkRed } 'Warning' { [Drawing.Color]::DarkOrange } 'OK' { [Drawing.Color]::DarkGreen } default { [Drawing.Color]::DimGray } }
+        }
+        $lvSec.EndUpdate()
+        $p = @($rows | Where-Object Level -eq 'Problem').Count; $w = @($rows | Where-Object Level -eq 'Warning').Count
+        $lblSec.Text = "$(@($rows | Where-Object Level -eq 'OK').Count) of $($rows.Count) checks fine" + $(if ($p) { ", $p problem(s)" }) + $(if ($w) { ", $w worth a look" }) + '.'
+        if ($p) { $script:ExtraAdvice['Security'] = "Security: $p problem(s) - see the Security tab." } else { $script:ExtraAdvice.Remove('Security') }
+        if ($lvSec.Items.Count) { $lvSec.Items[0].Selected = $true }
+        Update-Health -Quick
+    }
+}
+function Open-SecSetting {
+    if (-not $lvSec.SelectedItems.Count) { return }
+    $link = $lvSec.SelectedItems[0].Tag.Link
+    if ($link) { try { Start-Process $link } catch { Show-Msg "Couldn't open $link" | Out-Null } }
+    else { Show-Msg 'This one is changed in the firmware (BIOS/UEFI) settings, not in Windows - see "What to do".' | Out-Null }
+}
+$lvSec.Add_SelectedIndexChanged({
+    if (-not $lvSec.SelectedItems.Count) { return }
+    $r = $lvSec.SelectedItems[0].Tag
+    $txtSec.Text = "$($r.Check): $($r.Result)`r`n`r`nWhat to do: $($r.Todo)"
+})
+$lvSec.Add_DoubleClick({ Open-SecSetting })
+$btnSecOpen.Add_Click({ Open-SecSetting })
+$btnSecScan.Add_Click({ Update-Security })
+$btnSecWS.Add_Click({ Start-Process 'windowsdefender:' })
+
+# ===========================================================================
+# Stability: what went wrong in the last 30 days, from Windows' own logs
+# ===========================================================================
+$pgStab = New-Page 'Stability' 'What went wrong in the last 30 days according to Windows'' own logs - crashes, freezes, blue screens, errors - and what usually fixes it. Click a row for details.'
+$btnStabScan = New-Button 'Refresh'
+$btnStabRel = New-Button 'Open Reliability Monitor'
+$btnStabWeb = New-Button 'Search selected online'
+$lvStab = New-ListView $false @('Problem', 160, 'What', 300, 'Times', 60, 'Last', 130, 'What to do', 600)
+$txtStab = New-Object Windows.Forms.TextBox
+$txtStab.Multiline = $true; $txtStab.ReadOnly = $true; $txtStab.Dock = 'Bottom'; $txtStab.Height = 100; $txtStab.ScrollBars = 'Vertical'
+$txtStab.BackColor = [Drawing.SystemColors]::Window
+Set-PageLayout $pgStab $lvStab @((New-ButtonBar @($btnStabScan, $btnStabRel, $btnStabWeb))) $txtStab
+$lblStab = New-Status; $pgStab.Controls.Add($lblStab)
+
+$StabScanWork = {
+    $since = (Get-Date).AddDays(-30)
+    function Get-Events($Log, $Ids, $Providers, $Levels) {
+        $f = @{ LogName = $Log; StartTime = $since }
+        if ($Ids) { $f.Id = $Ids }; if ($Providers) { $f.ProviderName = $Providers }; if ($Levels) { $f.Level = $Levels }
+        try { @(Get-WinEvent -FilterHashtable $f -ErrorAction Stop) } catch { @() }
+    }
+    $rows = New-Object System.Collections.ArrayList
+    function Add-Stab($Problem, $Level, $What, $Events, $Todo, $Search) {
+        $last = ($Events | Measure-Object TimeCreated -Maximum).Maximum
+        [void]$rows.Add([pscustomobject]@{ Problem = $Problem; Level = $Level; What = $What; Count = @($Events).Count; Last = $last; Todo = $Todo; Search = $Search })
+    }
+    $sev = { param($n, $warnAt, $probAt) if ($n -ge $probAt) { 'Problem' } elseif ($n -ge $warnAt) { 'Warning' } else { 'Info' } }
+
+    # --- App crashes, grouped by what actually caused them ---
+    # Add-ons that load themselves into other programs and are a common hidden crash cause.
+    $injectors = @(
+        @{ Match = 'nview'; Name = 'NVIDIA nView'; Todo = 'NVIDIA nView (an old desktop-manager add-on) loads itself into other programs and crashes them. Turn it off: NVIDIA Control Panel > Desktop Management > Disable, or uninstall "NVIDIA nView" in Settings > Apps.' }
+        @{ Match = '^(nvlddmkm|nvwgf2um|nvd3dum|nvoglv|nvapi|nvcuda)'; Name = 'NVIDIA graphics driver'; Todo = 'Update the NVIDIA driver from nvidia.com or the PC maker''s support page (choose a clean install).' }
+        @{ Match = '^(atidxx|amdxx|atiumd|amdkmdag|aticfx|amdvlk)'; Name = 'AMD graphics driver'; Todo = 'Update the AMD graphics driver from amd.com or the PC maker''s support page.' }
+        @{ Match = '^(igd|ig\d|igc|igxelp)'; Name = 'Intel graphics driver'; Todo = 'Update the Intel graphics driver (Windows Update > Advanced > Optional updates, or the PC maker''s support page).' }
+        @{ Match = '^(ucrtbase|vcruntime|msvcp|msvcr)'; Name = 'Visual C++ runtime'; Todo = 'Repair "Microsoft Visual C++ Redistributable" in Settings > Apps (Modify > Repair), then update the crashing programs.' }
+        @{ Match = '^(rtsshooks|gameoverlayrenderer|discordhook|overlay|nahimic|sonic|a-volute|ss3|sbiedll)'; Name = 'an overlay or audio add-on'; Todo = 'An overlay (Steam, Discord, RivaTuner) or audio enhancer (Nahimic, Sonic Studio) loads into other programs. Update it or switch its overlay off.' }
+    )
+    $crashes = Get-Events 'Application' 1000 'Application Error'
+    $groups = @{}
+    foreach ($e in $crashes) {
+        $app = "$($e.Properties[0].Value)"; $mod = "$($e.Properties[3].Value)"
+        $inj = $injectors | Where-Object { $mod -match $_.Match } | Select-Object -First 1
+        $key = if ($inj) { "inj|$($inj.Name)" } else { "app|$app" }
+        if (-not $groups[$key]) { $groups[$key] = @{ Inj = $inj; Apps = @{}; Events = @(); Mods = @{} } }
+        $groups[$key].Apps[$app] = 1; $groups[$key].Mods[$mod] = 1; $groups[$key].Events += $e
+    }
+    foreach ($g in $groups.Values) {
+        $n = $g.Events.Count; $apps = ($g.Apps.Keys | Sort-Object) -join ', '
+        if ($g.Inj) {
+            Add-Stab 'App crashes' (& $sev $n 2 3) "$($g.Inj.Name) crashed $apps" $g.Events $g.Inj.Todo "$($g.Inj.Name) $(@($g.Mods.Keys)[0]) crash"
+        } else {
+            Add-Stab 'App crashes' (& $sev $n 2 5) "$apps crashed" $g.Events "Update or reinstall $apps. If it keeps crashing, check the maker's support site (crash point: $(@($g.Mods.Keys)[0]))." "$apps crash $(@($g.Mods.Keys)[0])"
+        }
+    }
+
+    # --- Programs freezing ---
+    $hangs = Get-Events 'Application' 1002 'Application Hang'
+    $hangGroups = @($hangs | Group-Object { "$($_.Properties[0].Value)" })
+    foreach ($g in $hangGroups | Where-Object Count -gt 1) {
+        Add-Stab 'Freezes' (& $sev $g.Count 3 10) "$($g.Name) stopped responding" $g.Group "If $($g.Name) freezes often, update it. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab." "$($g.Name) not responding"
+    }
+    $once = @($hangGroups | Where-Object Count -eq 1)   # one-off freezes: one row, not one each
+    if ($once) {
+        $level = if ($once.Count -ge 8) { 'Warning' } else { 'Info' }
+        Add-Stab 'Freezes' $level "$($once.Count) program(s) froze once ($((($once | ForEach-Object Name) | Select-Object -First 4) -join ', ')$(if ($once.Count -gt 4) { '...' }))" ($once | ForEach-Object Group) `
+            'A one-off freeze is normal. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab.' $null
+    }
+
+    # --- Blue screens ---
+    $bugchecks = @{
+        '0000000a' = 'IRQL_NOT_LESS_OR_EQUAL|a driver'; '0000001a' = 'MEMORY_MANAGEMENT|memory (RAM) or a driver'; '0000003b' = 'SYSTEM_SERVICE_EXCEPTION|a driver'
+        '00000050' = 'PAGE_FAULT_IN_NONPAGED_AREA|memory or a driver'; '0000007e' = 'SYSTEM_THREAD_EXCEPTION_NOT_HANDLED|a driver'; '0000007a' = 'KERNEL_DATA_INPAGE_ERROR|the drive or its connection'
+        '0000009f' = 'DRIVER_POWER_STATE_FAILURE|a driver during sleep or wake-up'; '000000d1' = 'DRIVER_IRQL_NOT_LESS_OR_EQUAL|a driver (often network or Wi-Fi)'; '000000c2' = 'BAD_POOL_CALLER|a driver'
+        '000000ef' = 'CRITICAL_PROCESS_DIED|damaged Windows files or the drive'; '000000f4' = 'CRITICAL_OBJECT_TERMINATION|the drive'; '00000116' = 'VIDEO_TDR_FAILURE|the graphics driver'
+        '00000124' = 'WHEA_UNCORRECTABLE_ERROR|hardware (processor, memory or overheating)'; '0000012b' = 'FAULTY_HARDWARE_CORRUPTED_PAGE|memory (RAM)'; '00000133' = 'DPC_WATCHDOG_VIOLATION|a storage or other driver'
+        '00000139' = 'KERNEL_SECURITY_CHECK_FAILURE|a driver or memory'; '0000001e' = 'KMODE_EXCEPTION_NOT_HANDLED|a driver'; '000000be' = 'ATTEMPTED_WRITE_TO_READONLY_MEMORY|a driver'
+    }
+    $bsods = Get-Events 'System' 1001 'Microsoft-Windows-WER-SystemErrorReporting'
+    foreach ($g in $bsods | Group-Object { if ($_.Message -match '0x([0-9a-fA-F]{8})') { $Matches[1].ToLower() } else { '?' } }) {
+        $name, $cause = "$($bugchecks[$g.Name])" -split '\|'
+        if (-not $name) { $name = "stop code 0x$($g.Name)"; $cause = 'a driver or hardware' }
+        Add-Stab 'Blue screens' 'Problem' "Windows crashed: $name" $g.Group `
+            "Usually caused by $cause. Install driver updates (Windows Update > Advanced options > Optional updates, or the PC maker's support page). If it keeps happening, test the memory: run mdsched.exe." "$name blue screen fix"
+    }
+
+    # --- Shutdowns without warning (not counting blue screens, already listed) ---
+    $down = @(Get-Events 'System' 41 'Microsoft-Windows-Kernel-Power' | Where-Object { "$($_.Properties[0].Value)" -eq '0' }) + @(Get-Events 'System' 6008 'EventLog')
+    if ($down.Count) {
+        $real = @($down | Where-Object Id -eq 41); if (-not $real) { $real = $down }
+        Add-Stab 'Sudden shutdowns' (& $sev $real.Count 2 4) 'The PC switched off without shutting down properly' $real `
+            'A power cut, the battery running flat, the power button held down, or overheating. If it happens on its own, check the charger or power supply and clean the fans.' 'PC turns off unexpectedly Kernel-Power 41'
+    }
+
+    # --- Graphics driver resets ---
+    $tdr = Get-Events 'System' 4101 'Display'
+    if ($tdr.Count) { Add-Stab 'Graphics resets' (& $sev $tdr.Count 2 5) 'The graphics driver stopped responding and recovered' $tdr 'Update the graphics driver. If it happens in games, check the GPU temperature and stop any overclocking.' 'display driver stopped responding and has recovered' }
+
+    # --- Drive and hardware errors ---
+    $disk = Get-Events 'System' $null @('disk', 'Ntfs', 'stornvme', 'storahci', 'iaStorVD', 'iaStorAVC', 'iaStorA') @(1, 2, 3)
+    foreach ($g in $disk | Group-Object ProviderName) {
+        Add-Stab 'Drive errors' (& $sev $g.Count 1 3) "Storage errors ($($g.Name))" $g.Group 'Back up important files now. Then check drive health on the Health tab and run the drive maker''s tool; frequent errors mean the drive or its cable is failing.' "$($g.Name) event error windows"
+    }
+    $whea = Get-Events 'System' $null 'Microsoft-Windows-WHEA-Logger' @(1, 2, 3)
+    if ($whea.Count) { Add-Stab 'Hardware errors' $(if ($whea | Where-Object Level -le 2) { 'Problem' } else { 'Warning' }) 'The processor, memory or a PCIe device reported errors' $whea `
+        'Make sure the PC isn''t overheating (clean the fans). If blue screens happen too, test the memory: run mdsched.exe.' 'WHEA-Logger error' }
+
+    # --- Updates that keep failing ---
+    $wu = Get-Events 'System' 20 'Microsoft-Windows-WindowsUpdateClient'
+    $store = @($wu | Where-Object { "$($_.Properties[1].Value)" -match '^9[A-Z0-9]{11}-' })   # Store app packages
+    # Defender's definition updates (KB2267602) and platform updates (KB4052623) retry on their own within hours - not worth showing.
+    $win = @($wu | Where-Object { "$($_.Properties[1].Value)" -notmatch '^9[A-Z0-9]{11}-|KB2267602|KB4052623' })
+    if ($store.Count) {
+        $apps = @($store | ForEach-Object { ("$($_.Properties[1].Value)" -replace '^9[A-Z0-9]{11}-', '' -split '\.')[-1] } | Select-Object -Unique)
+        Add-Stab 'Store app updates' 'Info' "$($apps.Count) Store app update(s) kept waiting ($(($apps | Select-Object -First 4) -join ', ')...)" $store `
+            'Usually because the app was open at the time - they install by themselves later. To force it: Microsoft Store > Library > Get updates.' $null
+    }
+    foreach ($g in $win | Group-Object { "$($_.Properties[1].Value)" }) {
+        $code = '0x{0:X8}' -f ([int64]$g.Group[0].Properties[0].Value -band 0xFFFFFFFF)   # stored signed; show as the usual 0x8... code
+        Add-Stab 'Windows Update' (& $sev $g.Count 2 4) "Couldn't install: $($g.Name)" $g.Group `
+            "Restart and try Windows Update again. If it keeps failing: Settings > System > Troubleshoot > Other troubleshooters > Windows Update. (Error $code)" "$code windows update"
+    }
+
+    $index = $null
+    try { $index = (Get-CimInstance Win32_ReliabilityStabilityMetrics -OperationTimeoutSec 15 -ErrorAction Stop | Sort-Object TimeGenerated -Descending | Select-Object -First 1).SystemStabilityIndex } catch { }
+    [pscustomobject]@{ Rows = $rows; Index = $index }
+}
+$StabLevels = @{ Problem = 0; Warning = 1; Info = 2 }
+function Update-Stability {
+    $btnStabScan.Enabled = $false
+    $lblStab.Text = 'Reading Windows'' logs...'
+    Start-Bg $StabScanWork $null {
+        param($r)
+        $btnStabScan.Enabled = $true
+        $r = $r[0]
+        $lvStab.BeginUpdate(); $lvStab.Items.Clear()
+        foreach ($s in $r.Rows | Sort-Object { $StabLevels[$_.Level] }, { - $_.Count }) {
+            $it = Add-Row $lvStab @($s.Problem, $s.What, $s.Count, $(if ($s.Last) { $s.Last.ToString('g') } else { '' }), $s.Todo) $s
+            $it.ForeColor = switch ($s.Level) { 'Problem' { [Drawing.Color]::DarkRed } 'Warning' { [Drawing.Color]::DarkOrange } default { [Drawing.Color]::DimGray } }
+        }
+        $lvStab.EndUpdate()
+        $score = if ($null -ne $r.Index) { 'Windows rates stability {0:0.0} out of 10. ' -f $r.Index } else { '' }
+        $p = @($r.Rows | Where-Object Level -eq 'Problem')
+        $lblStab.Text = $score + $(if ($r.Rows.Count) { "$($r.Rows.Count) kind(s) of trouble in the last 30 days$(if ($p) { ", $($p.Count) worth fixing" })." } else { 'Nothing went wrong in the last 30 days.' })
+        if ($p) { $script:ExtraAdvice['Stability'] = "Stability: $($p[0].What) ($($p[0].Count)x) - see the Stability tab." } else { $script:ExtraAdvice.Remove('Stability') }
+        if ($lvStab.Items.Count) { $lvStab.Items[0].Selected = $true } else { $txtStab.Text = 'No crashes, freezes or errors found.' }
+        Update-Health -Quick
+    }
+}
+$lvStab.Add_SelectedIndexChanged({
+    if (-not $lvStab.SelectedItems.Count) { return }
+    $s = $lvStab.SelectedItems[0].Tag
+    $txtStab.Text = "$($s.Problem): $($s.What) - $($s.Count) time(s) in 30 days, last on $(if ($s.Last) { $s.Last.ToString('g') })`r`n`r`nWhat to do: $($s.Todo)"
+})
+$btnStabScan.Add_Click({ Update-Stability })
+$btnStabRel.Add_Click({ Start-Process perfmon.exe '/rel' })
+$btnStabWeb.Add_Click({
+    if (-not $lvStab.SelectedItems.Count) { return }
+    $q = $lvStab.SelectedItems[0].Tag.Search
+    if ($q) { Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString($q)) }
+})
+
+# ===========================================================================
 # 7. Upgrades: what could be added or replaced, and the exact spec to buy
 # ===========================================================================
 $pgUpg = New-Page 'Upgrades' 'What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.'
@@ -1517,6 +1995,9 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>Apps that start with Windows ($($startOn.Count) on)</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>Bloatware found</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>Background services</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>Security</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvSec.Items @(0, 1, 2, 3))
+<h2>Stability (last 30 days)</h2>$(ConvertTo-HtmlRows @('Problem', 'What', 'Times', 'Last', 'What to do') $lvStab.Items @(0, 1, 2, 3, 4))
+<h2>Program updates available</h2>$(ConvertTo-HtmlRows @('Program', 'Installed', 'Available', 'Note') $lvUpd.Items @(0, 1, 2, 3))
 <h2>Upgrade options</h2>$(ConvertTo-HtmlRows @('Part', 'You have now', 'Upgrade option', 'Worth it?', 'What to buy') $lvUpg.Items @(0, 1, 2, 3, 4))
 <h2>Changes made by PC Tune-Up</h2>$(ConvertTo-HtmlRows @('When', 'What', 'Item', 'Change', 'Undo') $histRows @(0, 1, 2, 3, 4))
 </body></html>
@@ -1658,7 +2139,7 @@ $OldExeCleanupWork = {
 }
 
 # ---------------------------------------------------------------------------
-$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Upgrades; Update-History; Start-UpdateCheck -Silent
+$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Security; Update-Stability; Start-UpdScan; Update-Upgrades; Update-History; Start-UpdateCheck -Silent
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
     if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
 })

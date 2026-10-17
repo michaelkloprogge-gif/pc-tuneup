@@ -8,6 +8,9 @@ A small Windows app that speeds up and cleans any Windows 10/11 PC, whatever the
 - **Startup** – stop apps launching with Windows
 - **Bloatware** – find and remove pre-installed junk, trial antivirus and OEM extras
 - **Services** – trim background services from PC makers, updaters and telemetry
+- **Updates** – update outdated programs through winget, with safe ones pre-selected
+- **Security** – Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM and more
+- **Stability** – crashes, freezes, blue screens and errors from the last 30 days, with the likely cause and fix
 - **Disk** – see which folders fill the drive
 - **Upgrades** – memory, drive and battery upgrade options with the exact spec to buy
 - **History** – every change, with Undo

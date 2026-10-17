@@ -160,9 +160,11 @@ Set-Content -Path $manifest -Encoding UTF8 -Value @'
 </assembly>
 '@
 
+# Extra languages (lang\de.tsv, lang\fr.tsv) go into the exe as resources too.
+$langRes = @(Get-ChildItem (Join-Path $here 'lang') -Filter *.tsv -ErrorAction SilentlyContinue | ForEach-Object { "/resource:$($_.FullName),$($_.Name)" })
 & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$exe" "/win32icon:$ico" "/win32manifest:$manifest" `
     "/reference:$sma" /reference:System.Windows.Forms.dll /reference:System.Core.dll `
-    "/resource:$script,pc-tuneup.ps1" $cs
+    "/resource:$script,pc-tuneup.ps1" @($langRes) $cs
 if ($LASTEXITCODE) { throw "Compile failed (exit $LASTEXITCODE)" }
 Remove-Item $work -Recurse -Force
 "Built $exe - version $version ({0:N0} KB)" -f ((Get-Item $exe).Length / 1KB)

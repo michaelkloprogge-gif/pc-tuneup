@@ -48,6 +48,18 @@ jobs:
         shell: powershell
         run: .\tests\Test-Pages.ps1 -Language nl -MaxFreezeMs 5000; exit $LASTEXITCODE
 
+      - name: Check the German and French translation files
+        shell: powershell
+        run: .\tests\Test-Languages.ps1; exit $LASTEXITCODE
+
+      - name: Test every page (German)
+        shell: powershell
+        run: .\tests\Test-Pages.ps1 -Language de -MaxFreezeMs 5000; exit $LASTEXITCODE
+
+      - name: Test every page (French)
+        shell: powershell
+        run: .\tests\Test-Pages.ps1 -Language fr -MaxFreezeMs 5000; exit $LASTEXITCODE
+
 
       - name: Build PC-TuneUp.exe
         shell: powershell

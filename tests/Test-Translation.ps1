@@ -9,7 +9,9 @@ $Settings = @{ Language = 'nl' }
 $table = $ast.FindAll({ $args[0] -is [Management.Automation.Language.AssignmentStatementAst] -and $args[0].Left.VariablePath.UserPath -eq 'NLTable' }, $false)[0]
 Invoke-Expression $table.Extent.Text
 $init = $ast.FindAll({ $args[0] -is [Management.Automation.Language.AssignmentStatementAst] -and $args[0].Left.VariablePath.UserPath -eq 'script:TExact' }, $false)[0]
-$build = $ast.FindAll({ $args[0] -is [Management.Automation.Language.IfStatementAst] -and $args[0].Extent.Text -match 'TPatterns' -and $args[0].Extent.Text -match '^\s*if \(\$Lang -eq ''nl''\)' }, $false)[0]
+$build = $ast.FindAll({ $args[0] -is [Management.Automation.Language.IfStatementAst] -and $args[0].Extent.Text -match 'TPatterns' -and $args[0].Extent.Text -match '^\s*if \(\$Lang -ne ''en''\)' }, $false)[0]
+$getLang = $ast.FindAll({ $args[0] -is [Management.Automation.Language.FunctionDefinitionAst] -and $args[0].Name -eq 'Get-LangTable' }, $false)[0]
+Invoke-Expression $getLang.Extent.Text
 Invoke-Expression $init.Extent.Text
 $script:TCache = New-Object Collections.Hashtable([StringComparer]::Ordinal); $script:TPatterns = @()
 Invoke-Expression $build.Extent.Text

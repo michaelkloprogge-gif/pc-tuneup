@@ -1,6 +1,6 @@
 # PC Tune-Up
 
-**Website: https://michaelkloprogge-gif.github.io/pc-tuneup/**
+**Website: https://michaelkloprogge-gif.github.io/pc-tuneup/** (Nederlands: [/nl/](https://michaelkloprogge-gif.github.io/pc-tuneup/nl/))
 
 **Check, clean and speed up any Windows 10/11 PC - whatever the brand - with one click, and undo anything.**
 
@@ -40,7 +40,7 @@ you can undo.
 | **History** | every change, with Undo |
 
 Security software, VPNs, drivers and databases are never touched, and you can add your own programs
-to a keep list. Search everything with Ctrl+F. English and Dutch, light and dark theme.
+to a keep list. Search everything with Ctrl+F. English, Nederlands, Deutsch and Français, light and dark theme. Settings and choices can be moved to another PC, and Settings > Help and feedback reports a problem with the details already filled in.
 
 **Automatic maintenance** (Settings): every week or every 4 weeks PC Tune-Up cleans junk files and checks the PC
 by itself when the PC is idle, and shows a notification when it finds something new. It never changes startup apps, services or programs on its own.

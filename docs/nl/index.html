@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC Tune-Up</title>
+<link rel="alternate" hreflang="en" href="../">
+<meta name="description" content="Gratis, open-source programma dat elke Windows-pc controleert, opruimt en versnelt - en elke wijziging kan terugdraaien.">
+<style>
+  :root {
+    --bg: #ffffff; --soft: #f4f6f9; --text: #1f2328; --dim: #5b6270; --border: #d9dde3;
+    --accent: #0067c0; --accent-dark: #00539c; --accent-soft: #e3effb; --good: #13783a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1e1f22; --soft: #2a2c30; --text: #ececec; --dim: #a7acb5; --border: #3d4046;
+            --accent: #3d9bff; --accent-dark: #6cb3ff; --accent-soft: #23364d; --good: #6ecd87; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 18px 0; border-bottom: 1px solid var(--border); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--text); text-decoration: none; }
+  .brand svg { width: 30px; height: 30px; flex: none; }
+  nav a { margin-left: 18px; color: var(--dim); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--accent); }
+  .hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+  h1 { font-size: 42px; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.5px; }
+  .lead { font-size: 19px; color: var(--dim); margin: 0 0 26px; }
+  .buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1px solid var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+  .small { font-size: 14px; color: var(--dim); }
+  .hero img, .shots img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 8px 28px rgba(0,0,0,.12); display: block; }
+  section { padding: 44px 0; }
+  section.alt { background: var(--soft); }
+  h2 { font-size: 28px; margin: 0 0 8px; }
+  .sub { color: var(--dim); margin: 0 0 26px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 14px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--dim); font-size: 15px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--dim); font-size: 14px; margin-top: 8px; }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .steps li { counter-increment: s; padding-left: 44px; position: relative; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; }
+  code { background: var(--soft); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 14px; }
+  pre { background: var(--soft); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 14px; }
+  .note { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0 0; }
+  .check { color: var(--good); font-weight: 700; margin-right: 6px; }
+  ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--border); color: var(--dim); font-size: 14px; }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 36px; }
+    h1 { font-size: 34px; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .shots { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0067c0"/><path d="M8.5 21.5a8.5 8.5 0 1 1 15 0" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M16 17l4.6-4.1" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><circle cx="16" cy="17" r="2.3" fill="#fff"/></svg>
+      PC Tune-Up
+    </a>
+    <nav><a href="#functies">Functies</a><a href="#schermen">Schermafbeeldingen</a><a href="#installeren">Installeren</a><a href="#privacy">Privacy</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a><a href="../" hreflang="en" lang="en">English</a></nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>Controleer, ruim op en versnel elke Windows-pc.</h1>
+      <p class="lead">PC Tune-Up vindt wat je pc vertraagt, legt het uit in gewone taal en lost het op met één klik - en elke wijziging kun je terugdraaien.</p>
+      <div class="buttons">
+        <a class="btn primary" href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Downloaden voor Windows</a>
+        <a class="btn" href="https://github.com/michaelkloprogge-gif/pc-tuneup">Bekijk de broncode</a>
+      </div>
+      <p class="small">Gratis en open source (MIT). Windows 10 en 11. Nederlands, English, Deutsch en Français. Geen account, geen reclame. &middot; <a href="../" lang="en">English</a></p>
+    </div>
+    <img src="../screenshots/nl/health.png" alt="De pagina Gezondheid van PC Tune-Up: metingen, een score door de tijd en de drie nuttigste volgende stappen" width="1440" height="972">
+  </div>
+
+  <section class="alt" id="functies">
+    <div class="wrap">
+      <h2>Alles op één plek</h2>
+      <p class="sub">Waar een pc-monteur naar kijkt, op 23 pagina's die je met Ctrl+F doorzoekt - en een vak "Begin hier" dat vertelt welke drie dingen nu het belangrijkst zijn.</p>
+      <div class="grid">
+        <div class="card"><span class="tag">Opruimen</span><h3>Rommel en ruimte</h3><p>Tijdelijke bestanden, crashdumps, browsercaches en Windows-restanten. Grote en dubbele bestanden. Ruimtebesparingen zoals het slaapstandbestand en OneDrive-kopieën.</p></div>
+        <div class="card"><span class="tag">Opruimen</span><h3>Opstarten en bloatware</h3><p>Apps die met Windows starten, voorgeïnstalleerde rommel van elk merk, ongebruikte programma's, achtergrondservices en geplande taken.</p></div>
+        <div class="card"><span class="tag">Opruimen</span><h3>Privacy en menu's</h3><p>Advertenties, tips en tracking van Windows één voor één uitgezet. Achtergebleven items in het rechtsklikmenu verborgen.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Updates en stuurprogramma's</h3><p>Verouderde programma's bijgewerkt via winget, apparaten met een probleem, en hoe oud de belangrijke stuurprogramma's zijn.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Beveiliging en browsers</h3><p>Ondersteuning van Windows, antivirus, firewall, versleuteling, Secure Boot - en browserextensies of afgedwongen instellingen die op adware lijken.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Crashes en stabiliteit</h3><p>Crashes, vastlopers en blauwe schermen van de afgelopen 30 dagen, gegroepeerd naar de echte oorzaak, met oplossingen met één klik.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Netwerk en gamen</h3><p>Wifi-signaal, vertraging, DNS-snelheid en onderbrekingen. Welke videokaart je game echt gebruikt, en wat hem verder afremt.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Accu en back-up</h3><p>Hoe versleten de accu is en waar je pc-maker de laadlimiet van 80% verstopt. Of je bestanden een kapotte of gestolen pc zouden overleven.</p></div>
+        <div class="card"><span class="tag">Controleren</span><h3>Upgrades</h3><p>Welke geheugen-, schijf- en accu-upgrades in precies deze pc passen, welke specificatie je koopt, en of het de moeite waard is.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Zorgvuldig gebouwd</h2>
+      <p class="sub">Een programma dat je pc opknapt, mag hem nooit slechter maken.</p>
+      <ul class="plain">
+        <li><span class="check">&#10003;</span>Elke wijziging staat op de pagina Geschiedenis, en bijna alles kun je met één klik terugdraaien.</li>
+        <li><span class="check">&#10003;</span>Het vraagt het eerst en laat precies zien wat het gaat doen. Niets groots is vooraf aangevinkt.</li>
+        <li><span class="check">&#10003;</span>Beveiligingssoftware, VPN's, stuurprogramma's en databases worden nooit aangeraakt, en je kunt je eigen programma's op een bewaarlijst zetten.</li>
+        <li><span class="check">&#10003;</span>Als beheerder maakt het eerst een Windows-herstelpunt voor grotere wijzigingen.</li>
+        <li><span class="check">&#10003;</span>Optioneel wekelijks onderhoud ruimt zelf rommel op en meldt alleen iets als er iets nieuws is.</li>
+        <li><span class="check">&#10003;</span>Elke nieuwe versie wordt automatisch getest op een schone Windows-pc, in vier talen.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="alt" id="schermen">
+    <div class="wrap">
+      <h2>Schermafbeeldingen</h2>
+      <p class="sub">Licht en donker, net als je Windows-instelling.</p>
+      <div class="shots">
+        <figure><img src="../screenshots/nl/space-savers.png" alt="Pagina Ruimtebesparingen" loading="lazy" width="1440" height="972"><figcaption>Ruimtebesparingen: grote stukken schijfruimte, elk met wat je ervoor inlevert.</figcaption></figure>
+        <figure><img src="../screenshots/nl/privacy.png" alt="Pagina Privacy" loading="lazy" width="1440" height="972"><figcaption>Privacy: advertenties, tips en tracking van Windows - de aanbevolen instellingen zijn al aangevinkt.</figcaption></figure>
+        <figure><img src="../screenshots/nl/battery.png" alt="Pagina Accu met een grafiek van de slijtage" loading="lazy" width="1440" height="972"><figcaption>Accu: hoeveel lading hij nog vasthoudt, en hoe snel hij slijt.</figcaption></figure>
+        <figure><img src="../screenshots/nl/health-dark.png" alt="Pagina Gezondheid in het donkere thema" loading="lazy" width="1440" height="972"><figcaption>Donker thema.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="installeren">
+    <div class="wrap">
+      <h2>Installeren</h2>
+      <ol class="steps">
+        <li><a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Download PC-TuneUp.exe</a> en start het. Het biedt aan zichzelf voor je te installeren - zonder beheerdersrechten - en houdt zichzelf up-to-date.</li>
+        <li>Windows zegt de eerste keer misschien <em>"Windows heeft uw pc beveiligd"</em>, omdat het programma nog niet digitaal ondertekend is. Klik op <strong>Meer informatie &gt; Toch uitvoeren</strong>.</li>
+        <li>Begin met <strong>Pc repareren</strong> op de pagina Gezondheid, of volg de suggesties bij "Begin hier". Gebruik <strong>Opnieuw als beheerder</strong> om ook de eigen bestanden en instellingen van Windows mee te nemen.</li>
+      </ol>
+      <p class="note">Binnenkort ook via winget: <code>winget install MichaelKloprogge.PCTuneUp</code></p>
+      <h3 style="margin-top:30px">Voor IT en scripts</h3>
+<pre>PC-TuneUp.exe /report[:bestand.html]  alles controleren en een rapport opslaan
+PC-TuneUp.exe /fix                    de veilige stappen van Pc repareren uitvoeren zonder te vragen
+PC-TuneUp.exe /auto                   het automatische onderhoud (opruimen, controleren, melden)
+PC-TuneUp.exe /install | /uninstall   installeren of verwijderen voor de huidige gebruiker</pre>
+    </div>
+  </section>
+
+  <section class="alt" id="privacy">
+    <div class="wrap">
+      <h2>Privacy</h2>
+      <p>Alles draait op je eigen pc. PC Tune-Up heeft geen account, geen tracking en geen analyses, en er wordt niets over je pc verstuurd. Het enige internetgebruik is de updatecontrole (GitHub), de optionele snelheidstest (Cloudflare) en de programmalijst van winget.</p>
+      <p>De volledige broncode staat op <a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a>, dus iedereen kan controleren wat het doet.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">PC Tune-Up is vrije software onder de MIT-licentie. &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases">Alle versies</a> &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/blob/main/CHANGELOG.md">Wat is er nieuw</a> &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/issues">Probleem melden</a></div>
+</footer>
+</body>
+</html>

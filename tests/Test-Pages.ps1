@@ -2,7 +2,7 @@
 # saves a report, and fails when something is wrong: an error inside the app, a page that never finishes loading,
 # a long freeze, or a report section that is missing. Uses its own empty data folder; changes nothing on the PC.
 # Usage: powershell -STA -File .\tests\Test-Pages.ps1 [-Language en|nl] [-TimeoutSec 360] [-MaxFreezeMs 3000]
-param([ValidateSet('en', 'nl')][string]$Language = 'en', [int]$TimeoutSec = 360, [int]$MaxFreezeMs = 3000, [string]$App)
+param([ValidateSet('en', 'nl', 'de', 'fr')][string]$Language = 'en', [int]$TimeoutSec = 360, [int]$MaxFreezeMs = 3000, [string]$App)
 # ($PSScriptRoot is empty in parameter defaults of advanced scripts on Windows PowerShell 5.1.)
 if (-not $App) { $App = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\pc-tuneup.ps1' }
 $src = [IO.File]::ReadAllText($App)
@@ -11,6 +11,7 @@ function Patch([string]$Old, [string]$New) {
     throw "test hook not found: $Old"
 }
 $data = Join-Path $env:TEMP "pctuneup-pagetest-$PID"
+$env:PCTUNEUP_LANGDIR = Join-Path (Split-Path -Parent $App) 'lang'   # the copy runs from TEMP, so point it at the language files
 Patch "`$DataDir = Join-Path `$env:LOCALAPPDATA 'PCTuneUp'" "`$DataDir = '$data'"
 Patch '$Lang = switch ($Settings.Language)' "`$Lang = '$Language'; `$null = switch (`$Settings.Language)"
 $harness = @'
@@ -39,6 +40,11 @@ foreach ($p in $script:Pages) {
     }
     $rows = (@($p.Controls | Where-Object { $_ -is [Windows.Forms.ListView] }) | ForEach-Object { $_.Items.Count } | Measure-Object -Sum).Sum
     Write-Output ("      {0,-14} {1,4} row(s)" -f $p.Name, $rows)
+}
+# Every page in the sidebar list has a button that is really in the sidebar
+foreach ($name in @($NavGroups | ForEach-Object { $_.Pages } | Where-Object { $_ })) {
+    $b = $script:NavButtons[$name]
+    if (-not $b -or -not ($nav.Controls.Contains($b) -or $navBottom.Controls.Contains($b))) { Fail "sidebar has no button for $name" }
 }
 foreach ($name in $script:PageLoaders.Keys) { if (-not $script:Loaded[$name] -and $name -ne 'Battery') { Fail "page $name never loaded its data" } }
 # 3. The report has every section

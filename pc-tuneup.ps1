@@ -60,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.12.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.13.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -93,7 +93,7 @@ function Get-AppErrors([int]$Days = 14) {
     Get-Content $ErrorLogFile -Encoding UTF8 -Tail 300 | Where-Object { $_.Length -ge 19 -and $_.Substring(0, 19) -ge $since }
 }   # one JSON entry per change; drives the History tab
 $SettingsFile = Join-Path $DataDir 'settings.json'
-$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = ''; AutoNotify = 'changes' }
+$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = ''; AutoNotify = 'changes'; TourShown = $false }
 if (Test-Path $SettingsFile) {
     try { (Get-Content $SettingsFile -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($Settings.Contains($_.Name)) { $Settings[$_.Name] = $_.Value } } } catch { }
 }
@@ -102,7 +102,7 @@ function Save-Settings { $Settings | ConvertTo-Json | Set-Content -Path $Setting
 # Language. Code and data stay English; T() translates text on its way to the screen.
 # Table: English <TAB> Dutch, one per line; {0}, {1}... stand for values filled in at run time.
 # ---------------------------------------------------------------------------
-$Lang = switch ($Settings.Language) { 'nl' { 'nl' } 'en' { 'en' } default { if ((Get-UICulture).TwoLetterISOLanguageName -eq 'nl') { 'nl' } else { 'en' } } }
+$Lang = switch ($Settings.Language) { { $_ -in 'nl', 'en', 'de', 'fr' } { $_ } default { $w = (Get-UICulture).TwoLetterISOLanguageName; if ($w -in 'nl', 'de', 'fr') { $w } else { 'en' } } }
 $NLTable = @'
 Health	Gezondheid
 Clean	Opruimen
@@ -1235,6 +1235,8 @@ Connection	Verbinding
 Not connected	Niet verbonden
 Plug in the network cable or connect to Wi-Fi (the network icon at the bottom right).	Sluit de netwerkkabel aan of maak verbinding met wifi (het netwerkpictogram rechtsonder).
 Wi-Fi	Wifi
+on	aan
+off	uit
 Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).	Geïnstalleerd met winget - bijwerken of verwijderen gaat met winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).
 It was installed with winget, so winget updates it. Update now? (A window opens; start PC Tune-Up again afterwards.)	Het is geïnstalleerd met winget, dus winget werkt het bij. Nu bijwerken? (Er opent een venster; start PC Tune-Up daarna opnieuw.)
 shared	gedeeld
@@ -1517,16 +1519,78 @@ Found	Gevonden
 Page	Pagina
 {0} result(s) for "{1}".	{0} resultaat/resultaten voor "{1}".
 Nothing found for "{0}". Pages still loading are searched once they are ready.	Niets gevonden voor "{0}". Pagina's die nog laden worden doorzocht zodra ze klaar zijn.
+Deutsch	Deutsch
+Français	Français
+PC Tune-Up settings	PC Tune-Up-instellingen
+This opens GitHub with a new problem report, filled in with:	Dit opent GitHub met een nieuwe probleemmelding, ingevuld met:
+  Version: {0}	  Versie: {0}
+  Windows: {0}	  Windows: {0}
+  Recent errors: {0}	  Recente fouten: {0}
+{0} line(s) (your name, folders and PC name are blanked out)	{0} regel(s) (je naam, mappen en pc-naam zijn weggelaten)
+none	geen
+You can read and change everything there before you press Submit. You need a free GitHub account.	Je kunt alles daar lezen en aanpassen voordat je op Submit drukt. Je hebt een gratis GitHub-account nodig.
+Saved: {0}	Opgeslagen: {0}
+It holds your settings, keep list ({0}), privacy choices ({1}), switched-off scheduled tasks ({2}), startup apps ({3}) and services ({4}). No files, passwords or personal data. On the other PC: Settings > Move to another PC > Import.	Het bevat je instellingen, bewaarlijst ({0}), privacykeuzes ({1}), uitgezette geplande taken ({2}), opstart-apps ({3}) en services ({4}). Geen bestanden, wachtwoorden of persoonlijke gegevens. Op de andere pc: Instellingen > Naar een andere pc > Importeren.
+That is not a PC Tune-Up settings file.	Dat is geen instellingenbestand van PC Tune-Up.
+ - Settings: language, theme, updates, restore points, notifications	 - Instellingen: taal, thema, updates, herstelpunten, meldingen
+ - Keep list: add {0} program(s)	 - Bewaarlijst: {0} programma('s) toevoegen
+ - Privacy: turn off {0} setting(s)	 - Privacy: {0} instelling(en) uitzetten
+ - Scheduled tasks: switch off {0}	 - Geplande taken: {0} uitzetten
+ - Startup: stop {0} app(s) starting with Windows	 - Opstarten: {0} app(s) niet meer met Windows laten starten
+ - Services: change {0}	 - Services: {0} wijzigen
+ - Services: {0} skipped (needs administrator)	 - Services: {0} overgeslagen (beheerder nodig)
+Import from {0}?	Importeren uit {0}?
+Only what exists on this PC is changed. Everything can be undone from the History page.	Alleen wat op deze pc bestaat wordt gewijzigd. Alles kan worden teruggedraaid via Geschiedenis.
+turned off (imported)	uitgezet (geïmporteerd)
+switched off (imported)	uitgezet (geïmporteerd)
+Imported. Language and theme take effect when PC Tune-Up restarts.	Geïmporteerd. Taal en thema werken zodra PC Tune-Up opnieuw start.
+Welcome to PC Tune-Up	Welkom bij PC Tune-Up
+PC Tune-Up checks this PC and explains in plain language what slows it down. The "Start here" box on the Health page always shows the three most useful things to do right now. "Fix my PC" runs all the safe fixes in one go.	PC Tune-Up controleert deze pc en legt in gewone taal uit wat hem vertraagt. Het vak "Begin hier" op de pagina Gezondheid toont altijd de drie nuttigste dingen om nu te doen. "Pc repareren" voert alle veilige oplossingen in één keer uit.
+Nothing changes without you	Niets verandert zonder jou
+PC Tune-Up asks first and shows exactly what it will do. Every change is listed on the History page, and almost everything can be undone with one click. Security software, VPNs and drivers are never touched, and you can add your own programs to the keep list.	PC Tune-Up vraagt het eerst en laat precies zien wat het gaat doen. Elke wijziging staat op de pagina Geschiedenis, en bijna alles kun je met één klik terugdraaien. Beveiligingssoftware, VPN's en stuurprogramma's worden nooit aangeraakt, en je kunt je eigen programma's op de bewaarlijst zetten.
+A few handy things	Een paar handige dingen
+Some fixes need administrator rights - click "Restart as admin" at the bottom left. Press Ctrl+F to search everything. In Settings you can switch on weekly maintenance, which cleans junk by itself and only tells you when something new turns up.	Sommige oplossingen hebben beheerdersrechten nodig - klik linksonder op "Opnieuw als beheerder". Druk op Ctrl+F om alles te doorzoeken. In Instellingen kun je wekelijks onderhoud aanzetten: dat ruimt zelf rommel op en meldt alleen iets als er iets nieuws is.
+Step {0} of {1}	Stap {0} van {1}
+Next	Volgende
+Back	Terug
+Skip	Overslaan
+Get started	Aan de slag
+Move to another PC	Naar een andere pc
+Saves your choices to one file: settings, keep list, privacy settings you turned off, and the scheduled tasks, startup apps and services you switched off. Import it on another PC - only what exists there is changed, with undo.	Bewaart je keuzes in één bestand: instellingen, bewaarlijst, privacy-instellingen die je hebt uitgezet, en de geplande taken, opstart-apps en services die je hebt uitgezet. Importeer het op een andere pc - alleen wat daar bestaat wordt gewijzigd, met terugdraaien.
+Export settings...	Instellingen exporteren...
+Import settings...	Instellingen importeren...
+Help and feedback	Hulp en feedback
+Something not working, or an idea? It opens a report on GitHub with the version, Windows and recent errors already filled in (your name, folders and PC name are blanked out) - you see everything before you send it.	Werkt er iets niet, of heb je een idee? Er opent een melding op GitHub met de versie, Windows en recente fouten al ingevuld (je naam, mappen en pc-naam zijn weggelaten) - je ziet alles voordat je het verstuurt.
+Report a problem...	Probleem melden...
+Suggest an idea...	Idee voorstellen...
+Show the tour again	Rondleiding opnieuw tonen
+Website	Website
+Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the first nine pages      Ctrl+PageDown / Ctrl+PageUp  next / previous page      Space  check or uncheck a row      Enter  open a search result	Ctrl+F  alles doorzoeken      F5  deze pagina opnieuw laden      Ctrl+1 ... Ctrl+9  de eerste negen pagina's      Ctrl+PageDown / Ctrl+PageUp  volgende / vorige pagina      Spatie  rij aan- of uitvinken      Enter  zoekresultaat openen
+Report this problem? (Opens GitHub with the details filled in - you see everything before you send it.)	Dit probleem melden? (Opent GitHub met de details ingevuld - je ziet alles voordat je het verstuurt.)
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
 $script:TCache = New-Object Collections.Hashtable([StringComparer]::Ordinal)
 $script:TPatterns = @()
 # Dates and numbers in the chosen language too (3,5 / okt 2028).
-$UiCulture = if ($Lang -eq 'nl') { [Globalization.CultureInfo]::GetCultureInfo('nl-NL') } else { [Globalization.CultureInfo]::CurrentCulture }
+$UiCulture = switch ($Lang) { 'nl' { [Globalization.CultureInfo]::GetCultureInfo('nl-NL') } 'de' { [Globalization.CultureInfo]::GetCultureInfo('de-DE') } 'fr' { [Globalization.CultureInfo]::GetCultureInfo('fr-FR') } default { [Globalization.CultureInfo]::CurrentCulture } }
 [Threading.Thread]::CurrentThread.CurrentCulture = $UiCulture
-if ($Lang -eq 'nl') {
-    $pats = foreach ($line in $NLTable -split "`r?`n") {
+# German and French live in lang\de.tsv and lang\fr.tsv (same format), built into the exe as resources.
+function Get-LangTable([string]$Code) {
+    if ($Code -eq 'nl') { return $NLTable }
+    try {
+        if ($RunningAsExe) {
+            $st = [Reflection.Assembly]::GetEntryAssembly().GetManifestResourceStream("$Code.tsv")
+            if ($st) { try { return (New-Object IO.StreamReader($st, [Text.Encoding]::UTF8)).ReadToEnd() } finally { $st.Dispose() } }
+        }
+        $dir = if ($env:PCTUNEUP_LANGDIR) { $env:PCTUNEUP_LANGDIR } else { Join-Path (Split-Path -Parent $PSCommandPath) 'lang' }
+        $file = Join-Path $dir "$Code.tsv"
+        if (Test-Path $file) { return [IO.File]::ReadAllText($file, [Text.Encoding]::UTF8) }
+    } catch { }
+    ''
+}
+if ($Lang -ne 'en') {
+    $pats = foreach ($line in (Get-LangTable $Lang) -split "`r?`n") {
         if (-not $line.Trim()) { continue }
         $en, $nl = $line -split "`t", 2
         if ($en -notmatch '\{\d+\}') { $script:TExact[$en] = $nl; continue }
@@ -1536,7 +1600,7 @@ if ($Lang -eq 'nl') {
     $script:TPatterns = @($pats | Sort-Object { $_.Lit } -Descending)   # most specific first; "{0}: {1}" comes last
 }
 function T([string]$Text, [int]$Depth = 0) {
-    if ($Lang -ne 'nl' -or -not $Text -or $Depth -gt 3) { return $Text }
+    if ($Lang -eq 'en' -or -not $Text -or $Depth -gt 3) { return $Text }
     if ($script:TCache.ContainsKey($Text)) { return $script:TCache[$Text] }
     $out = $Text
     if ($Text -match "`n") { $out = (($Text -split "`r?`n") | ForEach-Object { T $_ $Depth }) -join "`r`n" }
@@ -1558,7 +1622,7 @@ function T([string]$Text, [int]$Depth = 0) {
 }
 # Translate a window's controls now, and again whenever their text changes later.
 function Enable-Translation($Control) {
-    if ($Lang -ne 'nl') { return }
+    if ($Lang -eq 'en') { return }
     $translatable = $Control -is [Windows.Forms.Label] -or $Control -is [Windows.Forms.ButtonBase] -or
                     ($Control -is [Windows.Forms.TextBox] -and $Control.ReadOnly)
     if ($translatable) {
@@ -1716,7 +1780,10 @@ $JobTimer.Add_Tick({
         [void]$script:Jobs.Remove($j)
         $what = if ($j.Label) { $j.Label } else { 'a background check' }
         try { $result = @($j.PS.EndInvoke($j.Handle)) }
-        catch { $result = @(); Write-AppError "$what (background)" $_; Show-Msg "Something went wrong:`n$($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+        catch {
+            $result = @(); Write-AppError "$what (background)" $_
+            if ((Show-Msg "Something went wrong:`n$($_.Exception.Message)`n`nReport this problem? (Opens GitHub with the details filled in - you see everything before you send it.)" 'YesNo' 'Warning') -eq 'Yes') { Open-ProblemReport 'bug' }
+        }
         foreach ($e in @($j.PS.Streams.Error)) { Write-AppError "$what (background)" $e }   # errors the check didn't expect
         $j.PS.Dispose(); $j.RS.Dispose()
         try {
@@ -1801,6 +1868,9 @@ function New-Page([string]$Title, [string]$IntroText) {
 # Docking is laid out last-added-first, so: Fill control, then bottom, then
 # top controls from the lowest one upward.
 function Set-PageLayout($Page, $Fill, [object[]]$Tops, $Bottom) {
+    # Tab moves through the page top to bottom: buttons, then the list, then the details.
+    $n = 0; foreach ($t in $Tops) { $t.TabIndex = $n++ }; $Fill.TabIndex = $n++; if ($Bottom) { $Bottom.TabIndex = $n }
+    if ($Fill -is [Windows.Forms.ListView]) { $Fill.AccessibleName = "$($Page.Name)"; $Fill.AccessibleDescription = $Page.Tag.Controls[0].Text }
     $Page.Controls.Add($Fill)
     if ($Bottom) { $Page.Controls.Add($(if ($Bottom.Wrapper) { $Bottom.Wrapper } else { $Bottom })) }
     [array]::Reverse($Tops)
@@ -4732,8 +4802,8 @@ $NetworkWork = {
         if ($l -match '^\s+(.+?)\s+:\s(.*)$') {
             $k = $Matches[1].Trim(); $v = $Matches[2].Trim()
             switch -Regex ($k) {
-                '^SSID$' { $w.Ssid = $v } '^(Signal|Signaal)$' { $w.Signal = [int]($v -replace '\D', '') } '^Band$' { $w.Band = $v }
-                '^(Channel|Kanaal)$' { $w.Channel = $v } '^(Receive rate|Ontvangstsnelheid)' { $w.Rx = $v } '^(Radio type|Radiotype)$' { $w.Radio = $v }
+                '^SSID$' { $w.Ssid = $v } '^(Signal|Signaal)$' { $w.Signal = [int]($v -replace '\D', '') } '^(Band|Bande)$' { $w.Band = $v }
+                '^(Channel|Kanaal|Kanal|Canal)$' { $w.Channel = $v } '^(Receive rate|Ontvangstsnelheid|Empfangsrate|D.bit de r.ception|R.ception)' { $w.Rx = $v } '^(Radio type|Radiotype|Funktyp|Type de radio)$' { $w.Radio = $v }
                 '^(Description|Beschrijving)$' { $w.Card = $v }
             }
         }
@@ -5756,7 +5826,7 @@ function Add-SetSection([string]$Title, [string]$Hint) {
     $setFlow.Controls.Add($t)
     if ($Hint) {
         $h = New-Object Windows.Forms.Label
-        $h.Text = $Hint; $h.ForeColor = $Theme.Dim; $h.AutoSize = $true; $h.MaximumSize = New-Object Drawing.Size((Px 780), 0)
+        $h.Text = $Hint; $h.ForeColor = $Theme.Dim; $h.AutoSize = $true; $h.MaximumSize = New-Object Drawing.Size((Px 720), 0)
         $h.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 4)
         $setFlow.Controls.Add($h)
     }
@@ -5788,7 +5858,7 @@ function Restart-App {
 }
 
 Add-SetSection 'Language' 'Takes effect when PC Tune-Up restarts.'
-$cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands') @('auto', 'en', 'nl') $Settings.Language
+$cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands', 'Deutsch', 'Français') @('auto', 'en', 'nl', 'de', 'fr') $Settings.Language
 $btnLangRestart = New-Button 'Restart now'
 Add-SetRow @($cmbLang, $btnLangRestart)
 $cmbLang.Add_SelectedIndexChanged({ $Settings.Language = $this.Tag[$this.SelectedIndex]; Save-Settings })
@@ -5885,6 +5955,139 @@ $cliHelp = New-Object Windows.Forms.Label
 $cliHelp.Font = New-Object Drawing.Font('Consolas', 9.5); $cliHelp.AutoSize = $true; $cliHelp.ForeColor = $Theme.Dim
 $cliHelp.Text = "PC-TuneUp.exe /report[:file.html]   check everything and save a report`r`nPC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`r`nPC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)`r`nPC-TuneUp.exe /install | /uninstall  install or remove for this user"
 $setFlow.Controls.Add($cliHelp)
+
+# --- Report a problem / suggest an idea: a GitHub issue filled in with the version, Windows and recent errors ---
+# Names, paths and the PC name are blanked out, and the person sees everything before anything is sent (on GitHub).
+function Get-ProblemInfo {
+    $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -ErrorAction SilentlyContinue
+    $build = "$($cv.CurrentBuild).$($cv.UBR)"
+    $prod = if ([int]$cv.CurrentBuild -ge 22000) { "$($cv.ProductName)" -replace 'Windows 10', 'Windows 11' } else { "$($cv.ProductName)" }
+    $how = if ($FromWinget) { 'winget' } elseif ($IsInstalled) { 'installed' } elseif ($RunningAsExe) { 'exe, not installed' } else { 'script' }
+    # Longest first: the PC name often contains the user name.
+    $clean = { param($t) $t = "$t"; foreach ($p in @($env:USERPROFILE, $env:COMPUTERNAME, $env:USERNAME) | Where-Object { $_ -and $_.Length -ge 3 } | Sort-Object Length -Descending) { $t = $t -ireplace [regex]::Escape($p), '<hidden>' }; $t }
+    [pscustomobject]@{
+        Version = "$AppVersion ($how, $(if ($IsAdmin) { 'administrator' } else { 'normal user' }), language $Lang)"
+        Windows = "$prod $($cv.DisplayVersion) (build $build)"
+        Errors  = (@(Get-AppErrors 14) | Select-Object -Last 15 | ForEach-Object { & $clean $_ }) -join "`n"
+    }
+}
+function Open-ProblemReport([string]$Kind = 'bug') {
+    $i = Get-ProblemInfo
+    if ($Kind -eq 'bug') {
+        $preview = "This opens GitHub with a new problem report, filled in with:`n`n  Version: $($i.Version)`n  Windows: $($i.Windows)`n  Recent errors: $(if ($i.Errors) { "$(@($i.Errors -split "`n").Count) line(s) (your name, folders and PC name are blanked out)" } else { 'none' })`n`nYou can read and change everything there before you press Submit. You need a free GitHub account."
+        if ((Show-Msg $preview 'OKCancel' 'Information') -ne 'OK') { return }
+        $q = "template=bug.yml&version=$([uri]::EscapeDataString($i.Version))&windows=$([uri]::EscapeDataString($i.Windows))"
+        $err = $i.Errors; while ($err -and ([uri]::EscapeDataString($err)).Length -gt 5500) { $err = ($err -split "`n" | Select-Object -Skip 1) -join "`n" }   # URLs have a length limit
+        if ($err) { $q += "&errors=$([uri]::EscapeDataString($err))" }
+    } else { $q = "template=idea.yml&version=$([uri]::EscapeDataString($i.Version))" }
+    Start-Process "https://github.com/$UpdateRepo/issues/new?$q"
+}
+
+# --- Move settings to another PC: one file with your choices; importing applies what exists on that PC ---
+function Export-PcSettings([string]$Path) {   # -Path skips the save dialog (tests)
+    $dlg = New-Object Windows.Forms.SaveFileDialog
+    $dlg.Filter = (T 'PC Tune-Up settings') + ' (*.json)|*.json'; $dlg.FileName = 'PC Tune-Up settings.json'
+    $dlg.InitialDirectory = [Environment]::GetFolderPath('MyDocuments')
+    if ($Path) { $dlg.FileName = $Path } elseif ($dlg.ShowDialog() -ne 'OK') { return }
+    $hist = @(Get-History | Where-Object { -not $_.Undone })
+    $x = [ordered]@{
+        Format = 'PC Tune-Up settings'; Version = $AppVersion; Exported = (Get-Date).ToString('s')
+        Settings = [ordered]@{ Language = $Settings.Language; Theme = $Settings.Theme; CheckUpdates = $Settings.CheckUpdates; RestorePoints = $Settings.RestorePoints; AutoNotify = $Settings.AutoNotify }
+        KeepList = @(Get-Content $KeepFile -ErrorAction SilentlyContinue | Where-Object { $_.Trim() -and $_ -notmatch '^\s*#' })
+        Privacy  = @($PrivacyCatalog | Where-Object { (Get-PrivacyState $_) -eq 'Off' } | ForEach-Object Name)
+        Tasks    = @($hist | Where-Object { $_.Kind -eq 'Task' -and $_.Undo.Type -eq 'Task' -and $_.Undo.Enable } | ForEach-Object { $_.Undo.Name } | Select-Object -Unique)
+        Startup  = @($hist | Where-Object { $_.Kind -eq 'Startup' -and $_.Undo.Type -eq 'Startup' -and $_.Undo.Enable } | ForEach-Object { $_.Undo.Name } | Select-Object -Unique)
+        Services = @($hist | Where-Object { $_.Kind -eq 'Service' -and $_.Undo.Type -eq 'Service' } | ForEach-Object { [ordered]@{ Name = $_.Undo.Name; Start = (($_.Change -split '->')[-1]).Trim() } })
+    }
+    $x | ConvertTo-Json -Depth 5 | Set-Content -Path $dlg.FileName -Encoding UTF8
+    Show-Msg "Saved: $($dlg.FileName)`n`nIt holds your settings, keep list ($($x.KeepList.Count)), privacy choices ($($x.Privacy.Count)), switched-off scheduled tasks ($($x.Tasks.Count)), startup apps ($($x.Startup.Count)) and services ($($x.Services.Count)). No files, passwords or personal data. On the other PC: Settings > Move to another PC > Import." | Out-Null
+}
+function Import-PcSettings([string]$Path) {   # -Path skips the open dialog (tests)
+    $dlg = New-Object Windows.Forms.OpenFileDialog
+    $dlg.Filter = (T 'PC Tune-Up settings') + ' (*.json)|*.json'; $dlg.InitialDirectory = [Environment]::GetFolderPath('MyDocuments')
+    if ($Path) { $dlg.FileName = $Path } elseif ($dlg.ShowDialog() -ne 'OK') { return }
+    try { $x = Get-Content $dlg.FileName -Raw -Encoding UTF8 | ConvertFrom-Json } catch { $x = $null }
+    if (-not $x -or $x.Format -ne 'PC Tune-Up settings') { Show-Msg 'That is not a PC Tune-Up settings file.' 'OK' 'Warning' | Out-Null; return }
+    # Only what exists on this PC, and only what isn't done already
+    $priv = @($PrivacyCatalog | Where-Object { $_.Name -in @($x.Privacy) -and (Get-PrivacyState $_) -ne 'Off' -and -not ($_.Admin -and -not $IsAdmin) })
+    $tasks = @(foreach ($n in @($x.Tasks)) { Get-ScheduledTask -TaskName $n -ErrorAction SilentlyContinue | Where-Object State -ne 'Disabled' })
+    $start = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Name -in @($x.Startup) })
+    $svcs = @(foreach ($s in @($x.Services)) { $sv = Get-Service -Name $s.Name -ErrorAction SilentlyContinue; if ($sv -and "$($sv.StartType)" -ne $s.Start) { [pscustomobject]@{ Name = $s.Name; Start = $s.Start; From = "$($sv.StartType)" } } })
+    $keep = @($x.KeepList | Where-Object { $_ -notin @(Get-Content $KeepFile -ErrorAction SilentlyContinue) })
+    $lines = @(" - Settings: language, theme, updates, restore points, notifications")
+    if ($keep) { $lines += " - Keep list: add $($keep.Count) program(s)" }
+    if ($priv) { $lines += " - Privacy: turn off $($priv.Count) setting(s)" }
+    if ($tasks) { $lines += " - Scheduled tasks: switch off $($tasks.Count)" }
+    if ($start) { $lines += " - Startup: stop $($start.Count) app(s) starting with Windows" }
+    if ($svcs) { $lines += $(if ($IsAdmin) { " - Services: change $($svcs.Count)" } else { " - Services: $($svcs.Count) skipped (needs administrator)" }) }
+    if ((Show-Msg "Import from $(Split-Path $dlg.FileName -Leaf)?`n`n$($lines -join "`n")`n`nOnly what exists on this PC is changed. Everything can be undone from the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+    foreach ($p in 'Language', 'Theme', 'CheckUpdates', 'RestorePoints', 'AutoNotify') { if ($null -ne $x.Settings.$p) { $Settings[$p] = $x.Settings.$p } }
+    Save-Settings
+    if ($keep) { Add-Content -Path $KeepFile -Value $keep -Encoding UTF8 }
+    foreach ($p in $priv) { $undo = @(); foreach ($v in @($p.V)) { $t = if ($v.T) { $v.T } else { 'DWord' }; $undo += @{ P = $v.P; N = $v.N; Old = (Get-RegValue $v.P $v.N); T = $t }; Set-RegValue $v.P $v.N $v.Off $t }
+                            Add-History 'Privacy' $p.Name 'turned off (imported)' @{ Type = 'Reg'; Values = $undo } }
+    foreach ($t in $tasks) { try { [void](Disable-ScheduledTask -TaskPath $t.TaskPath -TaskName $t.TaskName -ErrorAction Stop); Add-History 'Task' $t.TaskName 'switched off (imported)' @{ Type = 'Task'; Path = $t.TaskPath; Name = $t.TaskName; Enable = $true } } catch { } }
+    foreach ($it in $start) { try { Set-StartupEntry $it.Tag $false } catch { } }
+    if ($IsAdmin -and $svcs) { $orig = Get-ServiceOriginals; foreach ($s in $svcs) { try { Set-ServiceStart $s.Name $s.Start $s.From $orig } catch { } }; Save-ServiceOriginals $orig }
+    Update-History; Update-Startup; if ($script:Loaded['Privacy']) { Update-Privacy }; if ($script:Loaded['Tasks']) { Update-Tasks }
+    Show-Msg 'Imported. Language and theme take effect when PC Tune-Up restarts.' | Out-Null
+}
+
+# --- First-run tour: three short screens ---
+$TourSteps = @(
+    @{ Title = 'Welcome to PC Tune-Up'; Text = 'PC Tune-Up checks this PC and explains in plain language what slows it down. The "Start here" box on the Health page always shows the three most useful things to do right now. "Fix my PC" runs all the safe fixes in one go.' }
+    @{ Title = 'Nothing changes without you'; Text = 'PC Tune-Up asks first and shows exactly what it will do. Every change is listed on the History page, and almost everything can be undone with one click. Security software, VPNs and drivers are never touched, and you can add your own programs to the keep list.' }
+    @{ Title = 'A few handy things'; Text = 'Some fixes need administrator rights - click "Restart as admin" at the bottom left. Press Ctrl+F to search everything. In Settings you can switch on weekly maintenance, which cleans junk by itself and only tells you when something new turns up.' }
+)
+function Show-TourStep {
+    $t = $script:Tour; $i = $t.I
+    $t.Step.Text = (T 'Step {0} of {1}').Replace('{0}', "$($i + 1)").Replace('{1}', "$($TourSteps.Count)")
+    $t.Title.Text = T $TourSteps[$i].Title; $t.Text.Text = T $TourSteps[$i].Text
+    $t.Back.Visible = $i -gt 0
+    $t.Next.Text = T $(if ($i -eq $TourSteps.Count - 1) { 'Get started' } else { 'Next' })
+    $t.Skip.Visible = $i -lt $TourSteps.Count - 1
+    $t.Back.Text = T 'Back'; $t.Skip.Text = T 'Skip'   # this window is made after the app's translation hook, so translate here
+}
+function Show-Tour {
+    $w = New-Object Windows.Forms.Form
+    $w.Text = 'PC Tune-Up'; $w.FormBorderStyle = 'FixedDialog'; $w.MaximizeBox = $false; $w.MinimizeBox = $false; $w.ShowInTaskbar = $false
+    $w.StartPosition = 'CenterParent'; $w.ClientSize = New-Object Drawing.Size((Px 560), (Px 290)); $w.BackColor = $Theme.Bg; $w.ForeColor = $Theme.Text; $w.Font = $Font
+    if ($form.Icon) { $w.Icon = $form.Icon }
+    $step = New-Object Windows.Forms.Label; $step.Dock = 'Top'; $step.Height = (Px 34); $step.Padding = New-Object Windows.Forms.Padding((Px 24), (Px 14), 0, 0); $step.ForeColor = $Theme.Dim
+    $title = New-Object Windows.Forms.Label; $title.Dock = 'Top'; $title.Height = (Px 44); $title.Font = $FontTitle; $title.Padding = New-Object Windows.Forms.Padding((Px 22), 0, 0, 0)
+    $text = New-Object Windows.Forms.Label; $text.Dock = 'Fill'; $text.Padding = New-Object Windows.Forms.Padding((Px 24), (Px 4), (Px 24), 0)
+    $bar = New-Object Windows.Forms.FlowLayoutPanel; $bar.Dock = 'Bottom'; $bar.Height = (Px 56); $bar.FlowDirection = 'RightToLeft'; $bar.Padding = New-Object Windows.Forms.Padding((Px 16), (Px 8), (Px 16), 0)
+    $next = New-Button 'Next'; $back = New-Button 'Back'; $skip = New-Button 'Skip'
+    Set-Primary $next
+    $bar.Controls.AddRange(@($next, $back, $skip))
+    $w.Controls.AddRange(@($text, $bar, $title, $step))
+    # Kept in a script variable (not closures): click handlers then still see the app's functions such as T.
+    $script:Tour = @{ W = $w; Step = $step; Title = $title; Text = $text; Next = $next; Back = $back; Skip = $skip; I = 0 }
+    $next.Add_Click({ if ($script:Tour.I -ge $TourSteps.Count - 1) { $script:Tour.W.Close() } else { $script:Tour.I++; Show-TourStep } })
+    $back.Add_Click({ $script:Tour.I = [Math]::Max(0, $script:Tour.I - 1); Show-TourStep })
+    $skip.Add_Click({ $script:Tour.W.Close() })
+    $w.AcceptButton = $next; $w.CancelButton = $skip
+    Show-TourStep
+    $w.Add_HandleCreated({ if ($Dark) { $on = 1; try { [void][PcTuneUp.Native]::DwmSetWindowAttribute($this.Handle, 20, [ref]$on, 4) } catch { } } })
+    [void]$w.ShowDialog($form)
+    $Settings.TourShown = $true; Save-Settings
+}
+
+Add-SetSection 'Move to another PC' 'Saves your choices to one file: settings, keep list, privacy settings you turned off, and the scheduled tasks, startup apps and services you switched off. Import it on another PC - only what exists there is changed, with undo.'
+$btnExport = New-Button 'Export settings...'; $btnImport = New-Button 'Import settings...'
+Add-SetRow @($btnExport, $btnImport)
+$btnExport.Add_Click({ Export-PcSettings })
+$btnImport.Add_Click({ Import-PcSettings })
+
+Add-SetSection 'Help and feedback' 'Something not working, or an idea? It opens a report on GitHub with the version, Windows and recent errors already filled in (your name, folders and PC name are blanked out) - you see everything before you send it.'
+$btnBug = New-Button 'Report a problem...'; $btnIdea = New-Button 'Suggest an idea...'; $btnTour = New-Button 'Show the tour again'; $btnSite = New-Button 'Website'
+Add-SetRow @($btnBug, $btnIdea, $btnTour, $btnSite)
+$btnBug.Add_Click({ Open-ProblemReport 'bug' })
+$btnIdea.Add_Click({ Open-ProblemReport 'idea' })
+$btnTour.Add_Click({ Show-Tour })
+$btnSite.Add_Click({ Start-Process "https://$(($UpdateRepo -split '/')[0]).github.io/$(($UpdateRepo -split '/')[1])/" })
+
+Add-SetSection 'Keyboard' 'Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the first nine pages      Ctrl+PageDown / Ctrl+PageUp  next / previous page      Space  check or uncheck a row      Enter  open a search result'
 
 Add-SetSection 'About' "PC Tune-Up $AppVersion - free and open source (MIT licence). Privacy: everything runs on this PC. The only internet use is the update check (GitHub), the speed test (Cloudflare) and winget's program list; nothing about this PC is sent anywhere."
 $lnkRepo = New-Object Windows.Forms.LinkLabel
@@ -6281,7 +6484,7 @@ $appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.Au
 $appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 2)
 # Search box (Ctrl+F): results appear on the Search page as you type.
 $txtSearch = New-Object Windows.Forms.TextBox
-$txtSearch.Width = 178; $txtSearch.Margin = New-Object Windows.Forms.Padding(0, 4, 0, 4); $txtSearch.BorderStyle = 'FixedSingle'
+$txtSearch.Width = 178; $txtSearch.Margin = New-Object Windows.Forms.Padding(0, 4, 0, 4); $txtSearch.BorderStyle = 'FixedSingle'; $txtSearch.AccessibleName = 'Search'
 $txtSearch.BackColor = $Theme.Input; $txtSearch.ForeColor = $Theme.Text
 $txtSearch.Add_HandleCreated({   # grey hint text inside the empty box (EM_SETCUEBANNER)
     $h = [Runtime.InteropServices.Marshal]::StringToHGlobalUni((T 'Search  (Ctrl+F)'))
@@ -6299,7 +6502,14 @@ $nav.Controls.AddRange(@($appName, $txtSearch))
 # Keyboard: Ctrl+F searches, F5 reloads the page you are on.
 $form.KeyPreview = $true
 $form.Add_KeyDown({
+    $order = @($NavGroups | ForEach-Object { $_.Pages } | Where-Object { $_ -and $script:NavButtons[$_] } | ForEach-Object { $script:NavButtons[$_].Tag })
+    $cur = $script:Pages | Where-Object Visible | Select-Object -First 1
     if ($_.Control -and $_.KeyCode -eq 'F') { [void]$txtSearch.Focus(); $txtSearch.SelectAll(); $_.SuppressKeyPress = $true }
+    elseif ($_.Control -and $_.KeyCode -ge 'D1' -and $_.KeyCode -le 'D9') { $k = [int]$_.KeyCode - [int][Windows.Forms.Keys]::D1; if ($k -lt $order.Count) { Show-Page $order[$k] }; $_.SuppressKeyPress = $true }
+    elseif ($_.Control -and $_.KeyCode -in 'Next', 'PageDown', 'Prior', 'PageUp') {
+        $i = [array]::IndexOf($order, $cur); $d = if ($_.KeyCode -in 'Next', 'PageDown') { 1 } else { -1 }
+        Show-Page $order[(($i + $d) % $order.Count + $order.Count) % $order.Count]; $_.SuppressKeyPress = $true
+    }
     elseif ($_.KeyCode -eq 'F5') {
         $cur = $script:Pages | Where-Object Visible | Select-Object -First 1
         if ($cur -eq $pgHealth) { Update-Health } elseif ($cur -eq $pgHist) { Update-History } elseif ($cur -and $script:PageLoaders.ContainsKey($cur.Name)) { & $script:PageLoaders[$cur.Name] }
@@ -6307,7 +6517,7 @@ $form.Add_KeyDown({
     }
 })
 $navBottom = New-Object Windows.Forms.FlowLayoutPanel
-$navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(12, 2, 12, 0)
+$navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(8, 2, 0, 0)
 foreach ($g in $NavGroups) {
     if ($g.Title) {
         $cap = New-Object Windows.Forms.Label
@@ -6324,8 +6534,12 @@ foreach ($g in $NavGroups) {
         $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
         $b.Cursor = [Windows.Forms.Cursors]::Hand
         $b.Add_Click({ Show-Page $this.Tag })
+        $b.AccessibleName = $name
+        # Flat buttons show no focus rectangle: outline the one that has keyboard focus.
+        $b.Add_GotFocus({ $this.FlatAppearance.BorderSize = 1; $this.FlatAppearance.BorderColor = $Theme.Accent })
+        $b.Add_LostFocus({ $this.FlatAppearance.BorderSize = 0 })
         $script:NavButtons[$name] = $b
-        if ($g.Bottom) { $b.Width = 89; $b.Padding = New-Object Windows.Forms.Padding(6, 0, 0, 0); $navBottom.Controls.Add($b) } else { $nav.Controls.Add($b) }
+        if ($g.Bottom) { $b.AutoSize = $true; $b.MinimumSize = New-Object Drawing.Size(60, 23); $b.Width = 60; $b.Padding = New-Object Windows.Forms.Padding(4, 0, 4, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 2, 1); $navBottom.Controls.Add($b) } else { $nav.Controls.Add($b) }   # bottom buttons are sized to their (translated) text
     }
 }
 $sidebar.Controls.Add($nav)
@@ -6335,7 +6549,7 @@ if (-not $IsAdmin) {
     # Kept small: with 20+ pages the sidebar needs the room.
     $adm.Dock = 'Bottom'; $adm.Height = 74; $adm.Padding = New-Object Windows.Forms.Padding(16, 4, 14, 10)
     $admT = New-Object Windows.Forms.Label
-    $admT.Text = 'Limited mode - some fixes need administrator rights.'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 30; $admT.Font = $FontSmall
+    $admT.Text = 'Limited mode - some fixes need administrator rights.'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 30; $admT.Font = $FontSmall; $admT.AutoEllipsis = $true
     $admB = New-Button 'Restart as admin'
     $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
     $admB.Add_Click({
@@ -6523,6 +6737,7 @@ $form.Add_Shown({
         $q = "Install PC Tune-Up on this PC?`n`nIt adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.`n`nYou can also do this later in Settings."
         if ((Show-Msg $q 'YesNo' 'Question') -eq 'Yes') { Install-App -Launch }
     }
+    if (-not $Settings.TourShown -and $form.Visible) { Show-Tour }
 })
 # Grow every control by the screen scaling (fonts already scale on their own; list columns, row heights and grid
 # columns were sized with Px). Then cap the window to the screen.

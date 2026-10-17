@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.13.0
+
+- **Deutsch and Français**: the whole app is now also available in German and French (Settings > Language, or automatic from the Windows language), with the menu names German and French Windows really use.
+- **Report a problem** and **Suggest an idea** (Settings > Help and feedback): opens a GitHub issue with the app version, Windows version and recent errors already filled in - your name, folders and PC name are blanked out, and you see everything before you send it. When something goes wrong inside the app, it offers to report it.
+- **Move to another PC** (Settings): export your settings, keep list, privacy choices and the scheduled tasks, startup apps and services you switched off to one file, and import it on another PC - only what exists there is changed, with undo.
+- **First-run tour**: three short screens the first time PC Tune-Up starts (Settings > Show the tour again).
+- **Keyboard**: Ctrl+1 to Ctrl+9 open the first nine pages, Ctrl+PageDown / Ctrl+PageUp the next or previous page, and Tab moves through each page from top to bottom; the sidebar shows which page has keyboard focus, and lists have names for screen readers.
+- **Website in Dutch**: https://michaelkloprogge-gif.github.io/pc-tuneup/nl/
+- Every release is now also tested in German and French.
 ## 1.12.0
 
 - **Search** (Ctrl+F): a search box at the top of the sidebar finds pages, settings and rows on every page as you type - "battery", "Chrome", "hibernation", "Steam" - and Enter or a double-click takes you straight to the row. F5 reloads the page you are on.

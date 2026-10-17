@@ -1,0 +1,35 @@
+﻿name: Problem
+description: Something in PC Tune-Up doesn't work, shows something wrong, or crashes.
+title: "Problem: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! The version, Windows and recent errors below were filled in by PC Tune-Up (Settings > Help and feedback). Your name, folders and PC name are blanked out - check them anyway before you submit.
+  - type: textarea
+    id: what
+    attributes:
+      label: What went wrong?
+      description: What did you do, what did you expect, and what happened instead? A screenshot helps.
+      placeholder: "On the Programs page I clicked Uninstall checked, and ..."
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: PC Tune-Up version
+      placeholder: "1.13.0 (installed, normal user, language en)"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 Pro 25H2 (build 26200.1234)"
+  - type: textarea
+    id: errors
+    attributes:
+      label: Recent errors from PC Tune-Up's error log
+      description: Filled in automatically (Settings > Files > Error log). Remove anything you don't want to share.
+      render: text

@@ -20,7 +20,7 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Windows.Forms.Application]::EnableVisualStyles()
 
-$AppVersion = '1.4.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.5.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -164,79 +164,123 @@ $JobTimer.Add_Tick({
 $JobTimer.Start()
 
 # ---------------------------------------------------------------------------
-# Window + layout helpers
+# Window, theme and layout helpers
 # ---------------------------------------------------------------------------
-$Font = New-Object Drawing.Font('Segoe UI', 9.5)
+$Theme = @{
+    Accent = [Drawing.Color]::FromArgb(0, 103, 192); AccentDark = [Drawing.Color]::FromArgb(0, 84, 160); AccentSoft = [Drawing.Color]::FromArgb(222, 236, 250)
+    Side = [Drawing.Color]::FromArgb(243, 244, 246); Hover = [Drawing.Color]::FromArgb(229, 231, 235)
+    Text = [Drawing.Color]::FromArgb(32, 32, 32); Dim = [Drawing.Color]::FromArgb(105, 105, 110)
+    Border = [Drawing.Color]::FromArgb(206, 209, 214); Soft = [Drawing.Color]::FromArgb(246, 247, 249)
+    WarnBg = [Drawing.Color]::FromArgb(255, 245, 219); WarnText = [Drawing.Color]::FromArgb(128, 68, 0)
+}
+$Font = New-Object Drawing.Font('Segoe UI', 9.75)
+$FontBold = New-Object Drawing.Font('Segoe UI Semibold', 9.75)
+$FontSmall = New-Object Drawing.Font('Segoe UI Semibold', 8.25)
+$FontTitle = New-Object Drawing.Font('Segoe UI Semibold', 16)
 $form = New-Object Windows.Forms.Form
 $form.Text = "PC Tune-Up $AppVersion" + $(if ($IsAdmin) { '  (Administrator)' } else { '' })
-$form.ClientSize = New-Object Drawing.Size(980, 660)
-$form.MinimumSize = New-Object Drawing.Size(780, 500)
+$form.ClientSize = New-Object Drawing.Size(1140, 740)
+$form.MinimumSize = New-Object Drawing.Size(960, 600)
 $form.StartPosition = 'CenterScreen'
-$form.Font = $Font
+$form.Font = $Font; $form.BackColor = [Drawing.Color]::White; $form.ForeColor = $Theme.Text
 if ($RunningAsExe) { try { $form.Icon = [Drawing.Icon]::ExtractAssociatedIcon($SelfExe) } catch { } }
 
-$tabs = New-Object Windows.Forms.TabControl
-$tabs.Dock = 'Fill'
-$form.Controls.Add($tabs)
-
-if (-not $IsAdmin) {
-    $banner = New-Object Windows.Forms.Panel
-    $banner.Dock = 'Top'; $banner.Height = 40; $banner.BackColor = [Drawing.Color]::FromArgb(255, 244, 206)
-    $bl = New-Object Windows.Forms.Label
-    $bl.Text = 'Some fixes (Windows temp, update cache, services, all-user startup apps, restore points) need administrator rights.'
-    $bl.Dock = 'Fill'; $bl.TextAlign = 'MiddleLeft'; $bl.Padding = New-Object Windows.Forms.Padding(6, 0, 0, 0)
-    $bb = New-Object Windows.Forms.Button
-    $bb.Text = 'Restart as administrator'; $bb.Dock = 'Right'; $bb.Width = 190
-    $bb.Add_Click({
-        try {
-            if ($RunningAsExe) { Start-Process $SelfExe -Verb RunAs }
-            else { Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
-            $form.Close()
-        } catch { }   # user said no to the UAC prompt
-    })
-    $banner.Controls.AddRange(@($bl, $bb))
-    $form.Controls.Add($banner)
-}
+# A sidebar on the left picks which page shows in the content area (see Build-Sidebar at the end).
+$content = New-Object Windows.Forms.Panel
+$content.Dock = 'Fill'; $content.BackColor = [Drawing.Color]::White
+$sidebar = New-Object Windows.Forms.Panel
+$sidebar.Dock = 'Left'; $sidebar.Width = 204; $sidebar.BackColor = $Theme.Side
+$form.Controls.Add($content); $form.Controls.Add($sidebar)
+$script:Pages = New-Object System.Collections.ArrayList
 
 function New-Page([string]$Title, [string]$IntroText) {
-    $page = New-Object Windows.Forms.TabPage $Title
-    $page.Padding = New-Object Windows.Forms.Padding(8)
-    [void]$tabs.TabPages.Add($page)
-    $intro = New-Object Windows.Forms.Label
-    $intro.Text = $IntroText; $intro.Dock = 'Top'; $intro.Height = 38; $intro.ForeColor = [Drawing.Color]::DimGray
-    $page.Tag = $intro
+    $page = New-Object Windows.Forms.Panel
+    $page.Name = $Title; $page.Text = $Title; $page.Dock = 'Fill'; $page.Visible = $false
+    $page.Padding = New-Object Windows.Forms.Padding(26, 16, 26, 12); $page.BackColor = [Drawing.Color]::White
+    $content.Controls.Add($page)
+    [void]$script:Pages.Add($page)
+    $head = New-Object Windows.Forms.Panel
+    $head.Dock = 'Top'; $head.Height = 80
+    $t = New-Object Windows.Forms.Label
+    $t.Text = $Title; $t.Font = $FontTitle; $t.Dock = 'Top'; $t.Height = 36
+    $d = New-Object Windows.Forms.Label
+    $d.Text = $IntroText; $d.ForeColor = $Theme.Dim; $d.Dock = 'Fill'
+    $head.Controls.Add($d); $head.Controls.Add($t)
+    $page.Tag = $head
     $page
 }
 # Docking is laid out last-added-first, so: Fill control, then bottom, then
 # top controls from the lowest one upward.
 function Set-PageLayout($Page, $Fill, [object[]]$Tops, $Bottom) {
     $Page.Controls.Add($Fill)
-    if ($Bottom) { $Page.Controls.Add($Bottom) }
+    if ($Bottom) { $Page.Controls.Add($(if ($Bottom.Wrapper) { $Bottom.Wrapper } else { $Bottom })) }
     [array]::Reverse($Tops)
     foreach ($t in $Tops) { $Page.Controls.Add($t) }
     $Page.Controls.Add($Page.Tag)
 }
 function New-ButtonBar([object[]]$Buttons) {
     $bar = New-Object Windows.Forms.FlowLayoutPanel
-    $bar.Dock = 'Top'; $bar.Height = 42; $bar.WrapContents = $false
+    $bar.Dock = 'Top'; $bar.Height = 50; $bar.WrapContents = $false; $bar.Padding = New-Object Windows.Forms.Padding(0, 2, 0, 8)
     foreach ($b in $Buttons) { $bar.Controls.Add($b) }
     $bar
 }
 function New-Button([string]$Text) {
     $b = New-Object Windows.Forms.Button
-    $b.Text = $Text; $b.AutoSize = $true; $b.Height = 32; $b.Padding = New-Object Windows.Forms.Padding(6, 0, 6, 0)
+    $b.Text = $Text; $b.AutoSize = $true; $b.MinimumSize = New-Object Drawing.Size(0, 34)
+    $b.Padding = New-Object Windows.Forms.Padding(10, 0, 10, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 0, 8, 0)
+    $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.Cursor = [Windows.Forms.Cursors]::Hand
+    $b.BackColor = [Drawing.Color]::White; $b.FlatAppearance.BorderColor = $Theme.Border; $b.FlatAppearance.MouseOverBackColor = $Theme.Soft
     $b
+}
+# The main action of a page: filled blue.
+function Set-Primary($Button) {
+    $Button.Font = $FontBold; $Button.FlatAppearance.MouseOverBackColor = $Theme.AccentDark
+    $Button.Add_EnabledChanged({ Update-PrimaryLook $this })
+    Update-PrimaryLook $Button
+}
+# Blue when usable; plain grey when disabled (grey text on blue is hard to read).
+function Update-PrimaryLook($Button) {
+    if ($Button.Enabled) { $Button.BackColor = $Theme.Accent; $Button.ForeColor = [Drawing.Color]::White; $Button.FlatAppearance.BorderSize = 0 }
+    else { $Button.BackColor = $Theme.Soft; $Button.ForeColor = $Theme.Dim; $Button.FlatAppearance.BorderSize = 1 }
 }
 function New-ListView([bool]$Checks, [object[]]$Columns) {
     $lv = New-Object Windows.Forms.ListView
-    $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.GridLines = $true; $lv.Dock = 'Fill'
+    $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.Dock = 'Fill'
+    $lv.BorderStyle = 'None'; $lv.HeaderStyle = 'Nonclickable'
+    $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, 26)   # taller rows
+    $lv.SmallImageList = $rows
     for ($i = 0; $i -lt $Columns.Count; $i += 2) { [void]$lv.Columns.Add($Columns[$i], $Columns[$i + 1]) }
+    $lv.Tag = @($lv.Columns | ForEach-Object Width)   # designed widths
+    $lv.Add_Resize({ Resize-LastColumn $this })
     $lv
+}
+# Let the last column take the remaining width, so lists never scroll sideways.
+function Resize-LastColumn($Lv) {
+    $n = $Lv.Columns.Count
+    if ($n -lt 2) { return }
+    $avail = $Lv.ClientSize.Width - [Windows.Forms.SystemInformation]::VerticalScrollBarWidth - 2
+    $design = @($Lv.Tag)
+    $fixed = 0; for ($i = 0; $i -lt $n - 1; $i++) { $fixed += $design[$i] }
+    $scale = [Math]::Min(1.0, [Math]::Max(0.3, ($avail - 160) / [Math]::Max(1, $fixed)))   # leave the last column at least ~160 px
+    $used = 0
+    for ($i = 0; $i -lt $n - 1; $i++) { $w = [int]($design[$i] * $scale); $Lv.Columns[$i].Width = $w; $used += $w }
+    $Lv.Columns[$n - 1].Width = [Math]::Max(120, $avail - $used)
 }
 function New-Status {
     $l = New-Object Windows.Forms.Label
-    $l.Dock = 'Bottom'; $l.Height = 30; $l.TextAlign = 'MiddleLeft'
+    $l.Dock = 'Bottom'; $l.Height = 32; $l.TextAlign = 'BottomLeft'; $l.ForeColor = $Theme.Dim
     $l
+}
+# Read-only details area under a list, on a light background.
+function New-DetailBox([int]$Height = 110) {
+    $wrap = New-Object Windows.Forms.Panel
+    $wrap.Dock = 'Bottom'; $wrap.Height = $Height; $wrap.BackColor = $Theme.Soft; $wrap.Padding = New-Object Windows.Forms.Padding(12, 10, 12, 8)
+    $box = New-Object Windows.Forms.TextBox
+    $box.Multiline = $true; $box.ReadOnly = $true; $box.Dock = 'Fill'; $box.ScrollBars = 'Vertical'
+    $box.BorderStyle = 'None'; $box.BackColor = $Theme.Soft
+    $wrap.Controls.Add($box)
+    $box | Add-Member -NotePropertyName Wrapper -NotePropertyValue $wrap
+    $box
 }
 function Add-Row($Lv, [object[]]$Cells, $Tag = $null, [bool]$Checked = $false) {
     $it = New-Object Windows.Forms.ListViewItem([string]$Cells[0])
@@ -249,27 +293,45 @@ function Add-Row($Lv, [object[]]$Cells, $Tag = $null, [bool]$Checked = $false) {
 # ===========================================================================
 # 1. Health
 # ===========================================================================
-$pgHealth = New-Page 'Health' 'A quick check of how the PC is doing right now. "Fix my PC" runs all the safe fixes in one go and shows you the list first.'
-$btnFix = New-Button 'Fix my PC'
-$btnFix.FlatStyle = 'Flat'; $btnFix.BackColor = [Drawing.Color]::FromArgb(0, 103, 192); $btnFix.ForeColor = [Drawing.Color]::White
-$btnFix.Font = New-Object Drawing.Font('Segoe UI', 9.5, [Drawing.FontStyle]::Bold)
+$pgHealth = New-Page 'Health' 'How the PC is doing right now. "Fix my PC" runs all the safe fixes in one go - it shows you the list first.'
+$btnFix = New-Button 'Fix my PC'; Set-Primary $btnFix
 $btnRefresh = New-Button 'Refresh'
 $btnSpeed = New-Button 'Speed test'
 $btnWU = New-Button 'Windows Update'
 $btnReport = New-Button 'Save report'
 $btnLog = New-Button 'Change log'
 $btnKeep = New-Button 'Keep list'
-$MonoFont = New-Object Drawing.Font('Consolas', 10.5)
-$lblHealth = New-Object Windows.Forms.Label
-$lblHealth.Dock = 'Top'; $lblHealth.Height = 200; $lblHealth.Font = $MonoFont
+# Readings as a two-column grid: grey label, value.
+$gridHealth = New-Object Windows.Forms.TableLayoutPanel
+$gridHealth.Dock = 'Top'; $gridHealth.AutoSize = $true; $gridHealth.AutoSizeMode = 'GrowAndShrink'; $gridHealth.ColumnCount = 2
+[void]$gridHealth.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', 110)))
+[void]$gridHealth.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
+$gridHealth.Padding = New-Object Windows.Forms.Padding(0, 0, 0, 8)
 $lblAdvice = New-Object Windows.Forms.Label
-$lblAdvice.Dock = 'Top'; $lblAdvice.Height = 0; $lblAdvice.ForeColor = [Drawing.Color]::DarkRed
-$lblAdvice.Font = New-Object Drawing.Font('Segoe UI', 9.5, [Drawing.FontStyle]::Bold)
+$lblAdvice.Dock = 'Top'; $lblAdvice.Height = 0; $lblAdvice.BackColor = $Theme.WarnBg; $lblAdvice.ForeColor = $Theme.WarnText
+$lblAdvice.Padding = New-Object Windows.Forms.Padding(12, 8, 12, 8)
 $lblSpeed = New-Object Windows.Forms.Label
-$lblSpeed.Dock = 'Top'; $lblSpeed.Height = 30; $lblSpeed.Font = $MonoFont
-$lblSpeed.Text = 'Internet:  (not tested yet)'
+$lblSpeed.Dock = 'Top'; $lblSpeed.Height = 34; $lblSpeed.TextAlign = 'MiddleLeft'; $lblSpeed.ForeColor = $Theme.Dim
+$lblSpeed.Text = 'Internet:  not tested yet - click Speed test'
+$lblProcCap = New-Object Windows.Forms.Label
+$lblProcCap.Dock = 'Top'; $lblProcCap.Height = 30; $lblProcCap.TextAlign = 'BottomLeft'; $lblProcCap.Font = $FontBold
+$lblProcCap.Text = 'Programs using the most memory'
 $lvProc = New-ListView $false @('Program', 300, 'Memory (MB)', 120, 'Processes', 100)
-Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $lblHealth, $lblAdvice, $lblSpeed)
+Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $gridHealth, $lblAdvice, $lblSpeed, $lblProcCap)
+
+function Set-KeyValues($Grid, [string[]]$Lines) {
+    $Grid.SuspendLayout()
+    $Grid.Controls.Clear(); $Grid.RowStyles.Clear(); $Grid.RowCount = 0
+    foreach ($l in $Lines) {
+        $k, $v = if ($l -match '^([^:]+):\s+(.*)$') { $Matches[1], $Matches[2] } else { '', $l }
+        $kl = New-Object Windows.Forms.Label
+        $kl.Text = $k; $kl.ForeColor = $Theme.Dim; $kl.AutoSize = $true; $kl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
+        $vl = New-Object Windows.Forms.Label
+        $vl.Text = $v; $vl.AutoSize = $true; $vl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
+        $Grid.Controls.Add($kl, 0, $Grid.RowCount); $Grid.Controls.Add($vl, 1, $Grid.RowCount); $Grid.RowCount++
+    }
+    $Grid.ResumeLayout()
+}
 
 $cs = Get-CimInstance Win32_ComputerSystem
 $PcName = ('{0} {1}' -f $cs.Manufacturer, $cs.Model).Trim()
@@ -371,11 +433,12 @@ function Update-Health([switch]$Quick) {
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
     foreach ($k in 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
-    $lblHealth.Text = $lines -join "`r`n"
-    $lblHealth.Height = $MonoFont.Height * $lines.Count + 8
-    $lblAdvice.Text = ($advice | ForEach-Object { "!  $_" }) -join "`r`n"
-    $lblAdvice.Height = if ($advice) { 21 * $advice.Count + 8 } else { 0 }
+    $script:HealthLines = $lines
+    Set-KeyValues $gridHealth $lines
+    $lblAdvice.Text = ($advice | ForEach-Object { [char]0x2022 + "  $_" }) -join "`r`n"
+    $lblAdvice.Height = if ($advice) { ($Font.Height + 3) * $advice.Count + 16 } else { 0 }
     $script:HealthAdvice = $advice
+    if ($script:NavButtons) { Update-NavBadges }
 
     $lvProc.BeginUpdate(); $lvProc.Items.Clear()
     $procs | Select-Object -First 20 | ForEach-Object { [void](Add-Row $lvProc @($_.Name, $_.MB, $_.Count)) }
@@ -1034,7 +1097,7 @@ $btnSvcRestore.Add_Click({ Set-Services 'Restore' })
 # ===========================================================================
 $pgDisk = New-Page 'Disk' 'Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. This only looks - it never deletes.'
 $txtDisk = New-Object Windows.Forms.TextBox
-$txtDisk.Width = 330; $txtDisk.Text = $env:USERPROFILE; $txtDisk.Margin = New-Object Windows.Forms.Padding(3, 7, 3, 3)
+$txtDisk.Width = 270; $txtDisk.Text = $env:USERPROFILE; $txtDisk.Margin = New-Object Windows.Forms.Padding(3, 7, 3, 3)
 $btnDiskBrowse = New-Button 'Browse...'
 $btnDiskScan = New-Button 'Scan'
 $btnDiskUp = New-Button 'Up'
@@ -1232,9 +1295,7 @@ $btnSecScan = New-Button 'Check again'
 $btnSecOpen = New-Button 'Open setting'
 $btnSecWS = New-Button 'Open Windows Security'
 $lvSec = New-ListView $false @('Check', 190, 'Status', 80, 'Result', 360, 'What to do', 600)
-$txtSec = New-Object Windows.Forms.TextBox
-$txtSec.Multiline = $true; $txtSec.ReadOnly = $true; $txtSec.Dock = 'Bottom'; $txtSec.Height = 90; $txtSec.ScrollBars = 'Vertical'
-$txtSec.BackColor = [Drawing.SystemColors]::Window
+$txtSec = New-DetailBox 104
 Set-PageLayout $pgSec $lvSec @((New-ButtonBar @($btnSecScan, $btnSecOpen, $btnSecWS))) $txtSec
 $lblSec = New-Status; $pgSec.Controls.Add($lblSec)
 
@@ -1419,9 +1480,7 @@ $btnStabScan = New-Button 'Refresh'
 $btnStabRel = New-Button 'Open Reliability Monitor'
 $btnStabWeb = New-Button 'Search selected online'
 $lvStab = New-ListView $false @('Problem', 160, 'What', 300, 'Times', 60, 'Last', 130, 'What to do', 600)
-$txtStab = New-Object Windows.Forms.TextBox
-$txtStab.Multiline = $true; $txtStab.ReadOnly = $true; $txtStab.Dock = 'Bottom'; $txtStab.Height = 100; $txtStab.ScrollBars = 'Vertical'
-$txtStab.BackColor = [Drawing.SystemColors]::Window
+$txtStab = New-DetailBox 114
 Set-PageLayout $pgStab $lvStab @((New-ButtonBar @($btnStabScan, $btnStabRel, $btnStabWeb))) $txtStab
 $lblStab = New-Status; $pgStab.Controls.Add($lblStab)
 
@@ -1582,9 +1641,7 @@ $btnUpgSupport = New-Button 'Open support page'
 $btnUpgManual = New-Button 'Find service manual'
 $btnUpgCopy = New-Button 'Copy shopping list'
 $lvUpg = New-ListView $false @('Part', 110, 'You have now', 290, 'Upgrade option', 220, 'Worth it?', 260, 'What to buy', 600)
-$txtUpg = New-Object Windows.Forms.TextBox
-$txtUpg.Multiline = $true; $txtUpg.ReadOnly = $true; $txtUpg.Dock = 'Bottom'; $txtUpg.Height = 150; $txtUpg.ScrollBars = 'Vertical'
-$txtUpg.BackColor = [Drawing.SystemColors]::Window
+$txtUpg = New-DetailBox 164
 Set-PageLayout $pgUpg $lvUpg @((New-ButtonBar @($btnUpgReload, $btnUpgSupport, $btnUpgManual, $btnUpgCopy))) $txtUpg
 
 # Two parts: $UpgradeCollectWork gathers raw hardware facts in the background (works on any make,
@@ -1988,7 +2045,7 @@ th{background:#f4f6f8} .advice li{color:#a00000;margin:4px 0} .ok{color:#0a7a2f}
 </style></head><body>
 <h1>PC Tune-Up report</h1>
 <p class="sub">$(& $enc $PcName) - $(Get-Date -Format 'dddd d MMMM yyyy, HH:mm')</p>
-<h2>Health</h2><pre>$(& $enc $lblHealth.Text)
+<h2>Health</h2><pre>$(& $enc ($script:HealthLines -join "`r`n"))
 $(& $enc $lblSpeed.Text)</pre>
 <h2>Advice</h2>$advice
 <h2>Junk files that can be cleaned</h2>$(ConvertTo-HtmlRows @('What', 'Size', 'Files', 'Note') $lvClean.Items @(0, 1, 2, 3))
@@ -2138,6 +2195,90 @@ $OldExeCleanupWork = {
     }
 }
 
+# ===========================================================================
+# Sidebar: the page list (grouped), with counts, and the administrator notice
+# ===========================================================================
+$NavGroups = @(
+    @{ Title = $null;      Pages = @('Health') }
+    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Disk') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Security', 'Stability', 'Upgrades') }
+    @{ Title = 'RECORD';   Pages = @('History') }
+)
+$script:NavButtons = @{}
+function Show-Page($Page) {
+    foreach ($p in $script:Pages) { $p.Visible = ($p -eq $Page) }
+    foreach ($b in $script:NavButtons.Values) {
+        $on = $b.Tag -eq $Page
+        $b.BackColor = if ($on) { $Theme.AccentSoft } else { $Theme.Side }
+        $b.ForeColor = if ($on) { $Theme.Accent } else { $Theme.Text }
+        $b.Font = if ($on) { $FontBold } else { $Font }
+    }
+}
+function Set-NavBadge([string]$Name, $Count) {
+    $b = $script:NavButtons[$Name]
+    if ($b) { $b.Text = if ($Count) { "$Name  ($Count)" } else { $Name } }
+}
+# Counts next to page names: things waiting for attention.
+function Update-NavBadges {
+    Set-NavBadge 'Updates' @($lvUpd.Items).Count
+    Set-NavBadge 'Security' @($lvSec.Items | Where-Object { $_.Tag.Level -in 'Problem', 'Warning' }).Count
+    Set-NavBadge 'Stability' @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
+    Set-NavBadge 'Bloatware' @($lvBloat.Items).Count
+}
+
+$nav = New-Object Windows.Forms.FlowLayoutPanel
+$nav.Dock = 'Fill'; $nav.FlowDirection = 'TopDown'; $nav.WrapContents = $false; $nav.AutoScroll = $true
+$nav.Padding = New-Object Windows.Forms.Padding(12, 18, 12, 8)
+$appName = New-Object Windows.Forms.Label
+$appName.Text = 'PC Tune-Up'; $appName.Font = New-Object Drawing.Font('Segoe UI Semibold', 13); $appName.AutoSize = $true
+$appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
+$appVer = New-Object Windows.Forms.Label
+$appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.AutoSize = $true
+$appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 8)
+$nav.Controls.AddRange(@($appName, $appVer))
+foreach ($g in $NavGroups) {
+    if ($g.Title) {
+        $cap = New-Object Windows.Forms.Label
+        $cap.Text = $g.Title; $cap.Font = $FontSmall; $cap.ForeColor = $Theme.Dim; $cap.AutoSize = $true
+        $cap.Margin = New-Object Windows.Forms.Padding(10, 14, 0, 4)
+        $nav.Controls.Add($cap)
+    }
+    foreach ($name in $g.Pages) {
+        $page = $script:Pages | Where-Object Name -eq $name | Select-Object -First 1
+        if (-not $page) { continue }
+        $b = New-Object Windows.Forms.Button
+        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 34; $b.TextAlign = 'MiddleLeft'
+        $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
+        $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
+        $b.Cursor = [Windows.Forms.Cursors]::Hand
+        $b.Add_Click({ Show-Page $this.Tag })
+        $script:NavButtons[$name] = $b
+        $nav.Controls.Add($b)
+    }
+}
+$sidebar.Controls.Add($nav)
+if (-not $IsAdmin) {
+    $adm = New-Object Windows.Forms.Panel
+    $adm.Dock = 'Bottom'; $adm.Height = 120; $adm.Padding = New-Object Windows.Forms.Padding(16, 10, 14, 16)
+    $admT = New-Object Windows.Forms.Label
+    $admT.Text = 'Limited mode'; $admT.Font = $FontBold; $admT.Dock = 'Top'; $admT.Height = 22
+    $admD = New-Object Windows.Forms.Label
+    $admD.Text = 'Some fixes need administrator rights.'; $admD.ForeColor = $Theme.Dim; $admD.Dock = 'Top'; $admD.Height = 40
+    $admB = New-Button 'Restart as admin'
+    $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
+    $admB.Add_Click({
+        try {
+            if ($RunningAsExe) { Start-Process $SelfExe -Verb RunAs }
+            else { Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
+            $form.Close()
+        } catch { }   # user said no to the UAC prompt
+    })
+    $adm.Controls.Add($admB); $adm.Controls.Add($admD); $adm.Controls.Add($admT)
+    $sidebar.Controls.Add($adm)
+}
+# Each page's main action stands out.
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo)) { Set-Primary $b }
+Show-Page $pgHealth
 # ---------------------------------------------------------------------------
 $form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Security; Update-Stability; Start-UpdScan; Update-Upgrades; Update-History; Start-UpdateCheck -Silent
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')

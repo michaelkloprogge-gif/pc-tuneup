@@ -15,7 +15,7 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [Windows.Forms.Application]::EnableVisualStyles()
 
-$AppVersion = '1.1.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.1.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -150,8 +150,6 @@ $JobTimer.Start()
 $Font = New-Object Drawing.Font('Segoe UI', 9.5)
 $form = New-Object Windows.Forms.Form
 $form.Text = "PC Tune-Up $AppVersion" + $(if ($IsAdmin) { '  (Administrator)' } else { '' })
-# A previous self-update leaves the old exe behind (it was still running); tidy it up.
-if ($RunningAsExe) { Remove-Item ([IO.Path]::ChangeExtension($SelfExe, '.old.exe')) -Force -ErrorAction SilentlyContinue }
 $form.ClientSize = New-Object Drawing.Size(980, 660)
 $form.MinimumSize = New-Object Drawing.Size(780, 500)
 $form.StartPosition = 'CenterScreen'
@@ -1333,8 +1331,20 @@ function Start-UpdateCheck([switch]$Silent) {
     }
 }
 $btnUpdate.Add_Click({ Start-UpdateCheck })
+# A self-update leaves the previous exe behind as .old.exe. It is usually still closing when the new
+# version starts, so keep retrying in the background for up to a minute.
+$OldExeCleanupWork = {
+    param($old)
+    for ($i = 0; $i -lt 30 -and (Test-Path -LiteralPath $old); $i++) {
+        Start-Sleep 2
+        Remove-Item -LiteralPath $old -Force -ErrorAction SilentlyContinue
+    }
+}
 
 # ---------------------------------------------------------------------------
-$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-History; Start-UpdateCheck -Silent })
+$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-History; Start-UpdateCheck -Silent
+    $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
+    if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
+})
 [void]$form.ShowDialog()
 $JobTimer.Stop()

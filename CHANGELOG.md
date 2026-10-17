@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.1
+
+- Ready for **winget** (`winget install MichaelKloprogge.PCTuneUp`): an app installed with winget doesn't offer to install itself again, and its updates go through `winget upgrade` so winget stays in charge. Automatic maintenance works from the winget location too.
+
 ## 1.9.0
 
 - New **Battery** page (laptops): how much charge the battery still holds, a graph of its wear since it was new, wear over the last year, time on a full charge, and where your PC maker hides the "stop charging at 80%" setting (Dell, Lenovo, HP, ASUS, Acer, MSI, Samsung, Surface, Razer, Framework). Links to battery use per app, the full battery report and a replacement search.

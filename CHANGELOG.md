@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.2
+
+- Programs page: games and other programs started through a launcher (Steam, Wargaming, Epic...) no longer look unused - a recent change in the program's own files now counts as use too. The label now says "no sign of use" instead of "not opened", because some programs (such as 7-Zip from the right-click menu) are used without being opened.
+
 ## 1.9.1
 
 - Ready for **winget** (`winget install MichaelKloprogge.PCTuneUp`): an app installed with winget doesn't offer to install itself again, and its updates go through `winget upgrade` so winget stays in charge. Automatic maintenance works from the winget location too.

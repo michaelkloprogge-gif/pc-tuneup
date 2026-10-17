@@ -57,7 +57,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.9.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.9.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1167,7 +1167,7 @@ Remove these forced browser settings?	Deze afgedwongen browserinstellingen verwi
 Restart the browser afterwards. You can undo this from the History page.	Start de browser daarna opnieuw. Terugdraaien kan via Geschiedenis.
 forced setting removed	afgedwongen instelling verwijderd
 {0} forced setting(s) removed. Restart the browser to see the change.	{0} afgedwongen instelling(en) verwijderd. Start de browser opnieuw om het resultaat te zien.
-Every installed program with its size and when you last opened it (from Windows' own record of what you start). Check the ones you don't need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.	Elk geïnstalleerd programma met zijn grootte en wanneer je het voor het laatst opende (uit de eigen administratie van Windows van wat je start). Vink aan wat je niet nodig hebt en verwijder alles in één keer; achtergebleven mappen worden daarna opgeruimd. Store-apps staan op de pagina Bloatware.
+Every installed program with its size and when you last used it (from Windows' own record of what you start, and when the program last wrote its own files). Check the ones you don't need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.	Elk geïnstalleerd programma met zijn grootte en wanneer je het voor het laatst gebruikte (uit de eigen administratie van Windows van wat je start, en wanneer het programma voor het laatst zijn eigen bestanden schreef). Vink aan wat je niet nodig hebt en verwijder alles in één keer; achtergebleven mappen worden daarna opgeruimd. Store-apps staan op de pagina Bloatware.
 Sort: size	Sorteren: grootte
 Sort: last used	Sorteren: laatst gebruikt
 Sort: name	Sorteren: naam
@@ -1179,10 +1179,10 @@ now (running)	nu (actief)
 no record	niet vastgelegd
 on the keep list	op de bewaarlijst
 used by other programs - keep	gebruikt door andere programma's - laten staan
-not opened for {0} days	al {0} dagen niet geopend
+no sign of use for {0} days	al {0} dagen niet gebruikt
 never opened from Start or the desktop (may run in the background)	nooit geopend via Start of het bureaublad (draait misschien op de achtergrond)
 language pack - shares its files (and size) with the main program	taalpakket - deelt zijn bestanden (en grootte) met het hoofdprogramma
-{0} programs, {1} in total. {2} not opened for 6 months or more.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.
   Use is recorded since {0}.	  Gebruik wordt bijgehouden sinds {0}.
   (Windows is set not to record program use: Settings > Privacy > General.)	  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
 Check one or more programs first.	Vink eerst een of meer programma's aan.
@@ -1320,8 +1320,8 @@ Health over time	Gezondheid door de tijd
 The score appears once all checks have run.	De score verschijnt zodra alle controles klaar zijn.
 No history yet.	Nog geen geschiedenis.
 PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)	PC-TuneUp.exe /auto                 het automatische onderhoud (opruimen, controleren, melden)
-{0} programs, {1} in total. {2} not opened for 6 months or more.  Use is recorded since {3}.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.  Gebruik wordt bijgehouden sinds {3}.
-{0} programs, {1} in total. {2} not opened for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.  Use is recorded since {3}.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  Gebruik wordt bijgehouden sinds {3}.
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
 {0}; {1}	{0}; {1}
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
@@ -4234,7 +4234,7 @@ $btnBrwReload.Add_Click({ Update-Browsers })
 # ===========================================================================
 # Programs: everything installed, its size, and when it was last used
 # ===========================================================================
-$pgProg = New-Page 'Programs' 'Every installed program with its size and when you last opened it (from Windows'' own record of what you start). Check the ones you don''t need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.'
+$pgProg = New-Page 'Programs' 'Every installed program with its size and when you last used it (from Windows'' own record of what you start, and when the program last wrote its own files). Check the ones you don''t need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.'
 $btnProgUn = New-Button 'Uninstall checked'
 $btnProgSort = New-Button 'Sort: size'
 $btnProgSet = New-Button 'Open Installed apps'
@@ -4298,6 +4298,20 @@ $ProgramsWork = {
                 Support = ($name -match $support); Keep = (("$name $($v.Publisher)" -match $cfg.Keep) -or ($cfg.UserKeep -and "$name $($v.Publisher)" -match $cfg.UserKeep)) })
         }
     }
+    # Programs started through a launcher (games via Steam or their own launcher) never show up in UserAssist, but they write
+    # logs and settings into their own folder when they run - so a recent change there also counts as use.
+    $busy = [Diagnostics.Stopwatch]::StartNew()
+    foreach ($r in $rows | Where-Object { $_.Location -and -not $_.Now }) {
+        if ($busy.Elapsed.TotalSeconds -gt 15) { break }
+        try {
+            $root = [IO.DirectoryInfo]::new($r.Location); if (-not $root.Exists) { continue }
+            $newest = $null
+            foreach ($d in @($root) + @($root.EnumerateDirectories() | Select-Object -First 40)) {
+                foreach ($fi in $d.EnumerateFiles()) { if (-not $newest -or $fi.LastWriteTime -gt $newest) { $newest = $fi.LastWriteTime } }
+            }
+            if ($newest -and $newest -le (Get-Date) -and (-not $r.Last -or $newest -gt $r.Last)) { $r.Last = $newest }
+        } catch { }
+    }
     # Folder size for programs that don't report one (capped, so a huge folder can't stall the list)
     $budget = [Diagnostics.Stopwatch]::StartNew()
     foreach ($r in $rows | Where-Object { -not $_.Bytes -and $_.Location }) {
@@ -4326,18 +4340,18 @@ function Show-Programs {
         $usedTxt = if ($r.Now) { 'now (running)' } elseif ($r.Last) { $r.Last.ToString('d') } else { 'no record' }
         $pack = & $isPack $r
         $note = if ($r.Keep) { 'on the keep list' } elseif ($pack) { 'language pack - shares its files (and size) with the main program' } elseif ($r.Support) { 'used by other programs - keep' }
-                elseif ($r.Last -and $r.Last -lt $old -and -not $r.Now) { $unused++; "not opened for $([int]((Get-Date) - $r.Last).TotalDays) days" }
+                elseif ($r.Last -and $r.Last -lt $old -and -not $r.Now) { $unused++; "no sign of use for $([int]((Get-Date) - $r.Last).TotalDays) days" }
                 elseif (-not $r.Last -and -not $r.Now -and $r.Installed -and $r.Installed -lt $old -and $p.Since -and $p.Since -lt $old) { 'never opened from Start or the desktop (may run in the background)' }
                 else { '' }
         $it = Add-Row $lvProg @($r.Name, $r.Publisher, $(if ($pack) { 'shared' } elseif ($r.Bytes) { Format-Size $r.Bytes } else { '' }), $(if ($r.Installed) { $r.Installed.ToString('d') } else { '' }), $usedTxt, $note) $r
-        $it.ForeColor = if ($note -like 'not opened*') { $Theme.Warn } elseif ($r.Keep -or $r.Support -or $pack) { $Theme.Muted } else { $Theme.Text }
+        $it.ForeColor = if ($note -like 'no sign of use*') { $Theme.Warn } elseif ($r.Keep -or $r.Support -or $pack) { $Theme.Muted } else { $Theme.Text }
     }
     $lvProg.EndUpdate()
     # Count each folder once: language packs share one folder, and games sit inside their launcher's folder (Steam).
     $sized = @($p.Rows | Where-Object Bytes | Group-Object { "$($_.Location)|$($_.Bytes)" } | ForEach-Object { $_.Group[0] })
     $locs = @($sized | Where-Object Location | ForEach-Object { $_.Location.ToLower() + '\' })
     $total = (@($sized | Where-Object { $l = "$($_.Location)".ToLower(); -not $l -or -not ($locs | Where-Object { $l.StartsWith($_) -and $l + '\' -ne $_ }) }) | Measure-Object Bytes -Sum).Sum
-    $lblProg.Text = "$(@($p.Rows).Count) programs, $(Format-Size $total) in total. $unused not opened for 6 months or more." +
+    $lblProg.Text = "$(@($p.Rows).Count) programs, $(Format-Size $total) in total. $unused with no sign of use for 6 months or more." +
         $(if (-not $p.Tracking) { '  (Windows is set not to record program use: Settings > Privacy > General.)' } elseif ($p.Since) { "  Use is recorded since $($p.Since.ToString('d'))." })
 }
 function Update-Programs {

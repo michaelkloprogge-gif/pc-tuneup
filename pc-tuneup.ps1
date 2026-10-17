@@ -18,9 +18,35 @@
 # Release a new version: bump $AppVersion, then .\publish-release.ps1 -Notes "...".
 
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+# Tell Windows this app scales itself, so it is drawn sharp at 125%/150% instead of being stretched (blurry).
+# Must happen before the first window is created.
+Add-Type -Namespace PcTuneUp -Name Native -ErrorAction SilentlyContinue -MemberDefinition @'
+[DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
+[DllImport("kernel32.dll")] public static extern bool AttachConsole(int pid);
+[DllImport("dwmapi.dll")] public static extern int DwmSetWindowAttribute(System.IntPtr h, int attr, ref int value, int size);
+[DllImport("uxtheme.dll", CharSet = CharSet.Unicode)] public static extern int SetWindowTheme(System.IntPtr h, string app, string idList);
+[DllImport("user32.dll")] public static extern System.IntPtr SendMessage(System.IntPtr h, int msg, System.IntPtr w, System.IntPtr l);
+'@
+try { [void][PcTuneUp.Native]::SetProcessDPIAware() } catch { }
 [Windows.Forms.Application]::EnableVisualStyles()
+$DpiScale = try { [Drawing.Graphics]::FromHwnd([IntPtr]::Zero).DpiX / 96 } catch { 1 }
+function Px([double]$Pixels) { [int][Math]::Round($Pixels * $DpiScale) }   # for sizes WinForms doesn't scale itself
 
-$AppVersion = '1.5.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+# Command line (PC-TuneUp.exe /fix /report[:file] /install /uninstall /?). The exe host passes $AppArgs.
+$CliArgs = if ($AppArgs) { @($AppArgs) } else { @($args) }
+$Cli = @{ Fix = $false; Report = $null; Help = $false; Install = $false; Uninstall = $false }
+foreach ($a in $CliArgs) {
+    switch -Regex ("$a") {
+        '^[/-](\?|h|help)$' { $Cli.Help = $true }
+        '^[/-]fix$' { $Cli.Fix = $true }
+        '^[/-]report(:(.+))?$' { $Cli.Report = "$($Matches[2])" }
+        '^[/-]install$' { $Cli.Install = $true }
+        '^[/-]uninstall$' { $Cli.Uninstall = $true }
+    }
+}
+$CliMode = $Cli.Help -or $Cli.Fix -or ($null -ne $Cli.Report)
+
+$AppVersion = '1.6.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -34,6 +60,775 @@ $LogFile = Join-Path $DataDir 'changes.log'
 $ServiceStateFile = Join-Path $DataDir 'services-original.json'
 $KeepFile = Join-Path $DataDir 'keep.txt'
 $HistoryFile = Join-Path $DataDir 'history.jsonl'   # one JSON entry per change; drives the History tab
+$SettingsFile = Join-Path $DataDir 'settings.json'
+$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false }
+if (Test-Path $SettingsFile) {
+    try { (Get-Content $SettingsFile -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($Settings.Contains($_.Name)) { $Settings[$_.Name] = $_.Value } } } catch { }
+}
+function Save-Settings { $Settings | ConvertTo-Json | Set-Content -Path $SettingsFile -Encoding UTF8 }
+# ---------------------------------------------------------------------------
+# Language. Code and data stay English; T() translates text on its way to the screen.
+# Table: English <TAB> Dutch, one per line; {0}, {1}... stand for values filled in at run time.
+# ---------------------------------------------------------------------------
+$Lang = switch ($Settings.Language) { 'nl' { 'nl' } 'en' { 'en' } default { if ((Get-UICulture).TwoLetterISOLanguageName -eq 'nl') { 'nl' } else { 'en' } } }
+$NLTable = @'
+Health	Gezondheid
+Clean	Opruimen
+Startup	Opstarten
+Bloatware	Bloatware
+Services	Services
+Disk	Schijf
+Updates	Updates
+Security	Beveiliging
+Stability	Stabiliteit
+Upgrades	Uitbreiden
+History	Geschiedenis
+Settings	Instellingen
+CLEAN UP	OPRUIMEN
+CHECK	CONTROLEREN
+MORE	MEER
+{0}  ({1})	{0}  ({1})
+Version {0}	Versie {0}
+Limited mode	Beperkte modus
+Some fixes need administrator rights.	Sommige oplossingen hebben beheerdersrechten nodig.
+Restart as admin	Opnieuw als beheerder
+Restart as administrator	Opnieuw starten als beheerder
+Cancel	Annuleren
+Stopping...	Stoppen...
+{0}      ({1} more waiting)	{0}      (nog {1} in de wachtrij)
+{0}: {1}	{0}: {1}
+How the PC is doing right now. "Fix my PC" runs all the safe fixes in one go - it shows you the list first.	Hoe het nu met de pc gaat. "Pc repareren" voert alle veilige oplossingen in één keer uit - je ziet eerst de lijst.
+Fix my PC	Pc repareren
+Fixing...	Bezig...
+Refresh	Vernieuwen
+Speed test	Snelheidstest
+Windows Update	Windows Update
+Save report	Rapport opslaan
+Change log	Wijzigingslog
+Keep list	Bewaarlijst
+This PC	Deze pc
+CPU load	Processorbelasting
+Memory	Geheugen
+Uptime	Aan sinds
+Power	Energie
+Drive	Schijf
+Battery	Accu
+Disk {0}	Schijf {0}
+{0} GB free of {1} GB ({2}% used)	{0} GB vrij van {1} GB ({2}% in gebruik)
+{0} free of {1} ({2}% free)	{0} vrij van {1} ({2}% vrij)
+{0}d {1}h {2}m	{0}d {1}u {2}m
+holds {0}% of its original charge	houdt nog {0}% van de oorspronkelijke lading vast
+last Windows update {0} day(s) ago	laatste Windows-update {0} dag(en) geleden
+last Windows update {0} day(s) ago - restart needed to finish	laatste Windows-update {0} dag(en) geleden - herstart nodig om af te ronden
+could not read update history	updategeschiedenis kon niet worden gelezen
+{0} plan	schema {0}
+{0} plan, {1} mode	schema {0}, modus {1}
+{0} plan, plugged in	schema {0}, aangesloten op netstroom
+{0} plan, on battery	schema {0}, op de accu
+{0} plan, {1} mode, plugged in	schema {0}, modus {1}, aangesloten op netstroom
+{0} plan, {1} mode, on battery	schema {0}, modus {1}, op de accu
+Balanced	Gebalanceerd
+Power saver	Energiebesparing
+High performance	Hoge prestaties
+best power efficiency	beste energie-efficiëntie
+better performance	betere prestaties
+best performance	beste prestaties
+{0} ({1} {2}) - Healthy	{0} ({1} {2}) - in orde
+{0} ({1} {2}) - Healthy, {3}% worn	{0} ({1} {2}) - in orde, {3}% versleten
+Checking drive, battery and updates...	Schijf, accu en updates controleren...
+Internet:  not tested yet - click Speed test	Internet:  nog niet getest - klik op Snelheidstest
+Internet:  testing... (about 10 seconds)	Internet:  bezig met testen... (ongeveer 10 seconden)
+Internet:  {0} Mbps download	Internet:  {0} Mbps download
+Internet:  {0} Mbps download, {1} ms ping	Internet:  {0} Mbps download, {1} ms ping
+Internet:  {0} Mbps download, {1} ms ping   (a VPN is running - it can lower this)	Internet:  {0} Mbps download, {1} ms ping   (er draait een VPN - dat kan de snelheid verlagen)
+Internet:  download failed - {0}	Internet:  download mislukt - {0}
+Programs using the most memory	Programma's die het meeste geheugen gebruiken
+Program	Programma
+Memory (MB)	Geheugen (MB)
+Processes	Processen
+Drive '{0}' reports '{1}' - back up your files now and have the drive checked.	Schijf '{0}' meldt '{1}' - maak nu een back-up van je bestanden en laat de schijf nakijken.
+The battery only holds {0}% of its original charge - short battery life is the battery wearing out, not the PC. A new battery fixes it.	De accu houdt nog maar {0}% van de oorspronkelijke lading vast - een korte accuduur komt door slijtage van de accu, niet door de pc. Een nieuwe accu lost het op.
+Windows hasn't installed an update in {0} days - click Windows Update and check for updates.	Windows heeft al {0} dagen geen update geïnstalleerd - klik op Windows Update en zoek naar updates.
+Windows is waiting for a restart to finish installing updates - restart when you can.	Windows wacht op een herstart om updates af te ronden - start opnieuw op wanneer het uitkomt.
+Memory is {0}% full, which slows everything down - closing {1} ({2} MB) would help most.	Het geheugen is voor {0}% vol, en dat vertraagt alles - {1} sluiten ({2} MB) helpt het meest.
+Drive {0} is getting full ({1}% free) - use Fix my PC, then the Clean and Disk tabs.	Schijf {0} raakt vol ({1}% vrij) - gebruik Pc repareren en daarna Opruimen en Schijf.
+The PC is plugged in but set to save energy - set Power mode to Balanced in Settings > System > Power for more speed.	De pc zit aan de netstroom maar staat op energie besparen - zet de energiemodus op Gebalanceerd in Instellingen > Systeem > Energie voor meer snelheid.
+The PC hasn't restarted in {0} days - a restart clears out a lot of slowness.	De pc is al {0} dagen niet opnieuw opgestart - een herstart verhelpt veel traagheid.
+Stability: {0} ({1}x) - see the Stability tab.	Stabiliteit: {0} ({1}x) - zie Stabiliteit.
+Security: {0} problem(s) - see the Security tab.	Beveiliging: {0} probleem/problemen - zie Beveiliging.
+{0} program update(s) available - see the Updates tab.	{0} programma-update(s) beschikbaar - zie Updates.
+Deletes junk Windows and apps re-create on their own. Files changed in the last 24 hours and files in use are skipped. Browser caches are only cleaned while that browser is closed.	Verwijdert rommel die Windows en apps zelf opnieuw aanmaken. Bestanden die de afgelopen 24 uur zijn gewijzigd of in gebruik zijn, worden overgeslagen. Browsercaches worden alleen opgeruimd als die browser dicht is.
+Scan	Scannen
+Clean checked items	Aangevinkte items opruimen
+Open Windows Disk Cleanup	Windows Schijfopruiming openen
+What	Wat
+Size	Grootte
+Files	Bestanden
+Note	Opmerking
+Your temp files	Je tijdelijke bestanden
+Windows temp files	Tijdelijke Windows-bestanden
+Windows Update download cache	Downloadcache van Windows Update
+App crash dumps	Crashgegevens van apps
+Windows error reports	Windows-foutrapporten
+Chrome cache	Chrome-cache
+Edge cache	Edge-cache
+Brave cache	Brave-cache
+Firefox cache	Firefox-cache
+Previous Windows installation (Windows.old)	Vorige Windows-installatie (Windows.old)
+Old Windows update files	Oude Windows-updatebestanden
+Old driver packages	Oude stuurprogrammapakketten
+Delivery Optimization cache	Cache voor Delivery Optimization
+Windows upgrade leftovers	Restanten van Windows-upgrades
+Thumbnail cache	Miniaturencache
+Recycle Bin	Prullenbak
+needs administrator	beheerder nodig
+permanently empties it	maakt hem definitief leeg
+removes the option to go back to your old Windows version	je kunt daarna niet meer terug naar je oude Windows-versie
+Windows works out the size	Windows berekent de grootte
+keeps the drivers in use now	houdt de stuurprogramma's die nu in gebruik zijn
+update pieces shared with other PCs	updatestukjes die met andere pc's worden gedeeld
+{0} is open - close it to clean this	{0} is geopend - sluit het om dit op te ruimen
+Chrome is open - close it to clean this	Chrome is geopend - sluit het om dit op te ruimen
+Edge is open - close it to clean this	Edge is geopend - sluit het om dit op te ruimen
+Firefox is open - close it to clean this	Firefox is geopend - sluit het om dit op te ruimen
+Checked items add up to about {0}.	De aangevinkte items zijn samen ongeveer {0}.
+Scanning...	Bezig met scannen...
+Cleaning...	Bezig met opruimen...
+Skipped because the browser is open: {0}	Overgeslagen omdat de browser geopend is: {0}
+Nothing to clean - check at least one item (admin-only items need "Restart as administrator").	Niets om op te ruimen - vink minstens één item aan (items voor beheerders vragen om "Opnieuw starten als beheerder").
+Windows Disk Cleanup will run for the Windows items - this can take several minutes.	Voor de Windows-items draait Windows Schijfopruiming - dat kan enkele minuten duren.
+Delete the junk in:	De rommel verwijderen in:
+This can't be undone (it's all re-creatable).	Dit kan niet ongedaan worden gemaakt (alles wordt vanzelf opnieuw aangemaakt).
+freed {0}, {1} in-use files skipped	{0} vrijgemaakt, {1} bestanden in gebruik overgeslagen
+Freed {0}. {1} files were in use and left alone.	{0} vrijgemaakt. {1} bestanden waren in gebruik en zijn blijven staan.
+freed {0} (Fix my PC)	{0} vrijgemaakt (Pc repareren)
+Checked apps start when you sign in. Uncheck to stop them auto-starting (the app itself stays installed) and click Apply. Same switch as Task Manager > Startup.	Aangevinkte apps starten als je je aanmeldt. Vink uit om automatisch starten te stoppen (de app blijft geïnstalleerd) en klik op Wijzigingen toepassen. Dezelfde schakelaar als Taakbeheer > Opstarten.
+Reload	Opnieuw laden
+Apply changes	Wijzigingen toepassen
+Open Task Manager	Taakbeheer openen
+App	App
+For	Voor
+Advice	Advies
+Command	Opdracht
+You	Jij
+All users	Alle gebruikers
+keep (your keep list)	houden (je bewaarlijst)
+keep (security/VPN/drivers)	houden (beveiliging/VPN/stuurprogramma's)
+safe to turn off	veilig om uit te zetten
+{0} startup apps, {1} turned on.	{0} opstart-apps, {1} ingeschakeld.
+{0} starting with Windows ({1})	{0} met Windows starten ({1})
+allowed starting with Windows ({0})	mag met Windows starten ({0})
+stopped starting with Windows ({0})	start niet meer met Windows ({0})
+{0} change(s) saved. They take effect next time you sign in.	{0} wijziging(en) opgeslagen. Ze gaan in als je je de volgende keer aanmeldt.
+Couldn't change (needs administrator): {0}	Kon niet wijzigen (beheerder nodig): {0}
+Pre-installed extras found on this PC. Junk is pre-checked; Optional means fine to remove if you never use it. Uninstalling is permanent (reinstall from the Store or maker's site).	Vooraf geïnstalleerde extra's op deze pc. Rommel is al aangevinkt; Optioneel betekent: prima om weg te halen als je het nooit gebruikt. Verwijderen is definitief (opnieuw installeren via de Store of de site van de fabrikant).
+Rescan	Opnieuw scannen
+Uninstall checked	Aangevinkte verwijderen
+Create restore point	Herstelpunt maken
+Open Settings > Apps	Instellingen > Apps openen
+Name	Naam
+Type	Type
+Category	Categorie
+Why	Waarom
+Publisher	Uitgever
+Program	Programma
+Store app	Store-app
+Junk	Rommel
+Optional	Optioneel
+Trial AV	Proef-antivirus
+cleaner / driver-updater / adware - Windows does this itself	opschoner / driver-updater / adware - Windows doet dit zelf
+pre-installed promo / trial	vooraf geïnstalleerde reclame / proefversie
+antivirus - remove if you did not pay for it; Windows Security takes over	antivirus - verwijder het als je er niet voor betaald hebt; Windows-beveiliging neemt het over
+pre-installed game / ad	vooraf geïnstalleerde game / reclame
+pre-installed promo app	vooraf geïnstalleerde reclame-app
+pre-installed app - remove if you do not use it	vooraf geïnstalleerde app - verwijder het als je het niet gebruikt
+Windows extra - reinstall from the Store any time	Windows-extraatje - altijd opnieuw te installeren via de Store
+PC maker promo / registration / telemetry	reclame / registratie / telemetrie van de pc-fabrikant
+Dell utility - get drivers from dell.com/support when needed	Dell-hulpprogramma - haal stuurprogramma's van dell.com/support als je ze nodig hebt
+HP utility - get drivers from support.hp.com when needed	HP-hulpprogramma - haal stuurprogramma's van support.hp.com als je ze nodig hebt
+Lenovo utility (Vantage also sets battery charge limits - keep it if you use that)	Lenovo-hulpprogramma (Vantage stelt ook laadlimieten voor de accu in - houd het als je dat gebruikt)
+ASUS utility (Armoury Crate controls fans/RGB on gaming models)	ASUS-hulpprogramma (Armoury Crate regelt ventilatoren/RGB op gamingmodellen)
+Acer utility	Acer-hulpprogramma
+MSI utility (controls fans/RGB on gaming models)	MSI-hulpprogramma (regelt ventilatoren/RGB op gamingmodellen)
+driver updater / network tweaker - Windows Update covers drivers	driver-updater / netwerkversneller - Windows Update regelt stuurprogramma's al
+pre-installed media software	vooraf geïnstalleerde mediasoftware
+removed	verwijderd
+exit code {0}	afsluitcode {0}
+uninstaller closed (exit code {0})	verwijderprogramma gesloten (afsluitcode {0})
+Looking for bloatware...	Zoeken naar bloatware...
+Found {0} item(s). Check what you want gone and click Uninstall.	{0} item(s) gevonden. Vink aan wat weg mag en klik op Aangevinkte verwijderen.
+No known bloatware found - nice and clean.	Geen bekende bloatware gevonden - netjes.
+Creating a restore point (can take a minute)...	Herstelpunt maken (kan een minuut duren)...
+Restore point created (Windows skips it if one was made in the last 24 hours).	Herstelpunt gemaakt (Windows slaat het over als er de afgelopen 24 uur al een is gemaakt).
+Restore point failed: {0} - System Protection may be off for C:.	Herstelpunt mislukt: {0} - Systeembeveiliging staat misschien uit voor C:.
+Check at least one item first.	Vink eerst minstens één item aan.
+Uninstall these {0} item(s)?	Deze {0} item(s) verwijderen?
+Some uninstallers open their own window or ask for permission - follow along. This can't be undone here; you'd reinstall from the Store or the maker's website.	Sommige verwijderprogramma's openen een eigen venster of vragen om toestemming - volg de stappen. Dit kan hier niet ongedaan worden gemaakt; je installeert het dan opnieuw via de Store of de site van de fabrikant.
+Uninstalling... (watch for uninstaller windows)	Bezig met verwijderen... (let op vensters van verwijderprogramma's)
+Done. {0} of {1} uninstalled.	Klaar. {0} van {1} verwijderd.
+Problems:	Problemen:
+Non-Microsoft background services. Known bloat is listed first; "review" rows are other third-party services that start with Windows - only change those if you know what they are.	Achtergrondservices die niet van Microsoft zijn. Bekende bloat staat bovenaan; rijen met "controleren" zijn andere services die met Windows starten - wijzig die alleen als je weet wat ze doen.
+Apply suggestion to checked	Advies toepassen op aangevinkte
+Set checked to Manual	Aangevinkte op Handmatig zetten
+Restore checked	Aangevinkte herstellen
+Service	Service
+What it is	Wat het is
+Company	Bedrijf
+Starts	Start
+Running	Actief
+Stopped	Gestopt
+Suggested	Advies
+Original	Oorspronkelijk
+Automatic	Automatisch
+Manual	Handmatig
+Disabled	Uitgeschakeld
+Looking at services...	Services bekijken...
+{0}  (review: {1})	{0}  (controleren: {1})
+third-party, starts with Windows	van een andere maker, start met Windows
+on your keep list	op je bewaarlijst
+changed by PC Tune-Up	gewijzigd door PC Tune-Up
+looks important (security/driver/VPN)	lijkt belangrijk (beveiliging/stuurprogramma/VPN)
+looks like an updater or telemetry	lijkt een updater of telemetrie
+View only - restart as administrator to change services. {0} could be trimmed.	Alleen bekijken - start opnieuw als beheerder om services te wijzigen. {0} kunnen worden ingeperkt.
+{0} service(s) could be trimmed. Grey rows are already done.	{0} service(s) kunnen worden ingeperkt. Grijze rijen zijn al gedaan.
+Nothing left to trim. Review rows are shown for information.	Niets meer om in te perken. Rijen met "controleren" staan er ter informatie.
+{0} service(s) updated.	{0} service(s) bijgewerkt.
+{0} service(s) updated. {1} were already set that way or had no suggestion (use 'Set checked to Manual').	{0} service(s) bijgewerkt. {1} stonden al zo of hadden geen advies (gebruik 'Aangevinkte op Handmatig zetten').
+Failed:	Mislukt:
+Dell SupportAssist	Dell SupportAssist
+Dell app installer	Dell-app-installatieprogramma
+Dell telemetry	Dell-telemetrie
+HP telemetry	HP-telemetrie
+HP support helper	HP-ondersteuningshulp
+HP promo	HP-reclame
+Lenovo Vantage (starts when opened)	Lenovo Vantage (start als je het opent)
+Lenovo telemetry	Lenovo-telemetrie
+ASUS phone link	ASUS-telefoonkoppeling
+ASUS updater	ASUS-updater
+ASUS diagnostics	ASUS-diagnose
+MyASUS helper	MyASUS-hulp
+MSI utility	MSI-hulpprogramma
+Intel telemetry	Intel-telemetrie
+Intel driver updater	Intel-driver-updater
+NVIDIA telemetry	NVIDIA-telemetrie
+Razer game scanner	Razer-gamescanner
+Adobe updater	Adobe-updater
+Adobe licence checker	Adobe-licentiecontrole
+Google updater (Chrome still updates when open)	Google-updater (Chrome werkt zichzelf nog steeds bij als het open is)
+Edge updater (Edge still updates when open)	Edge-updater (Edge werkt zichzelf nog steeds bij als het open is)
+Brave updater	Brave-updater
+Dropbox updater	Dropbox-updater
+EA Origin helper	EA Origin-hulp
+Wondershare helper	Wondershare-hulp
+McAfee promo	McAfee-reclame
+{0} - {1}	{0} - {1}
+Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. This only looks - it never deletes.	Zoek uit wat de schijf vult. Kies een plek en klik op Scannen; dubbelklik op een rij om erin te kijken. Dit kijkt alleen - er wordt nooit iets verwijderd.
+Browse...	Bladeren...
+Up	Omhoog
+Open in Explorer	Openen in Verkenner
+Folder	Map
+Share	Aandeel
+Quick pick...	Snel kiezen...
+Your user folder	Je gebruikersmap
+Downloads	Downloads
+Steam games	Steam-games
+Epic games	Epic-games
+Program Files	Program Files
+Program Files (x86)	Program Files (x86)
+Whole C: drive (slow)	Hele C:-schijf (traag)
+(files directly in this folder)	(bestanden direct in deze map)
+Folder not found:	Map niet gevonden:
+Scanning... big folders like C:\ can take a few minutes.	Bezig met scannen... grote mappen zoals C:\ kunnen enkele minuten duren.
+Total: {0}.	Totaal: {0}.
+Total: {0}.  Uninstall games/programs from their launcher or Settings > Apps, not by deleting folders.	Totaal: {0}.  Verwijder games/programma's via hun launcher of Instellingen > Apps, niet door mappen te wissen.
+Programs with a newer version available, via winget (built into Windows). Small updates are pre-checked; big version jumps, self-updating apps, very large updates and keep-list programs are not. Close a program before updating it.	Programma's waarvoor een nieuwere versie is, via winget (ingebouwd in Windows). Kleine updates zijn al aangevinkt; grote versiesprongen, apps die zichzelf bijwerken, heel grote updates en programma's op de bewaarlijst niet. Sluit een programma voordat je het bijwerkt.
+Check for updates	Zoeken naar updates
+Update checked	Aangevinkte bijwerken
+Store app updates	Updates voor Store-apps
+Installed	Geïnstalleerd
+Available	Beschikbaar
+winget took too long - try again later	winget deed er te lang over - probeer het later opnieuw
+stopped - you pressed Cancel	gestopt - je klikte op Annuleren
+took longer than 30 minutes - stopped	duurde langer dan 30 minuten - gestopt
+Asking winget which programs have updates (20-60 seconds)...	winget vragen welke programma's updates hebben (20-60 seconden)...
+winget is missing on this PC - install "App Installer" from the Microsoft Store, then check again.	winget ontbreekt op deze pc - installeer "App Installer" uit de Microsoft Store en controleer opnieuw.
+on the keep list - update it yourself if you want	op de bewaarlijst - werk het zelf bij als je wilt
+updates itself - just restart it	werkt zichzelf bij - start het gewoon opnieuw
+very large update - run it when you have time	heel grote update - doe het als je tijd hebt
+name cut off by winget - update it from the program itself	naam afgekapt door winget - werk het bij vanuit het programma zelf
+major new version - check it still suits you	grote nieuwe versie - controleer of die nog bij je past
+small update	kleine update
+{0} program(s) can be updated, {1} pre-checked.	{0} programma('s) kunnen worden bijgewerkt, {1} al aangevinkt.
+Everything winget knows about is up to date.	Alles wat winget kent is bijgewerkt.
+Check at least one program first.	Vink eerst minstens één programma aan.
+Update these {0} program(s)?	Deze {0} programma('s) bijwerken?
+Close them first. Some show a permission prompt - click Yes. This can take a few minutes.	Sluit ze eerst. Sommige vragen om toestemming - klik op Ja. Dit kan een paar minuten duren.
+Updating {0} program(s)... watch for permission prompts.	{0} programma('s) bijwerken... let op vragen om toestemming.
+{0} -> {1}: updated	{0} -> {1}: bijgewerkt
+{0} -> {1}: failed - {2}	{0} -> {1}: mislukt - {2}
+{0} of {1} program(s) updated.	{0} van {1} programma('s) bijgewerkt.
+Not updated (often because the program was open - close it and try again):	Niet bijgewerkt (vaak omdat het programma open was - sluit het en probeer opnieuw):
+Is this PC protected? Green is fine, orange is worth a look, red needs fixing. Double-click a row (or select it and click Open setting) to go to the right Windows setting.	Is deze pc beschermd? Groen is goed, oranje is het bekijken waard, rood moet worden opgelost. Dubbelklik op een rij (of selecteer hem en klik op Instelling openen) om naar de juiste Windows-instelling te gaan.
+Check again	Opnieuw controleren
+Open setting	Instelling openen
+Open Windows Security	Windows-beveiliging openen
+Check	Controle
+Status	Status
+Result	Resultaat
+What to do	Wat te doen
+Problem	Probleem
+Warning	Waarschuwing
+Info	Info
+OK	OK
+Windows version	Windows-versie
+{0} (long-term edition)	{0} (langetermijneditie)
+Long-term editions get security updates for years. Nothing to do.	Langetermijnedities krijgen jarenlang beveiligingsupdates. Niets te doen.
+Not a version this check knows. Open Windows Update to see if a newer one is offered.	Deze versie kent de controle niet. Open Windows Update om te zien of er een nieuwere wordt aangeboden.
+{0} - no longer supported	{0} - wordt niet meer ondersteund
+This Windows 10 version gets no security updates any more. See the Windows 11 check below for your options.	Deze Windows 10-versie krijgt geen beveiligingsupdates meer. Zie de Windows 11-controle hieronder voor je mogelijkheden.
+This version gets no more security updates. Open Windows Update and install the newest Windows 11 version (free).	Deze versie krijgt geen beveiligingsupdates meer. Open Windows Update en installeer de nieuwste Windows 11-versie (gratis).
+Windows 10 stopped getting security updates. Upgrade to Windows 11 for free if the PC qualifies (see below), sign up for Extended Security Updates, or plan a replacement.	Windows 10 krijgt geen beveiligingsupdates meer. Upgrade gratis naar Windows 11 als de pc geschikt is (zie hieronder), meld je aan voor Extended Security Updates, of plan een vervanger.
+{0} - security updates ended {1}	{0} - beveiligingsupdates gestopt op {1}
+{0} - security updates end {1}	{0} - beveiligingsupdates stoppen op {1}
+Install the newest Windows version from Windows Update before then (free).	Installeer voor die tijd de nieuwste Windows-versie via Windows Update (gratis).
+{0} - supported until about {1}	{0} - ondersteund tot ongeveer {1}
+{0} - supported until {1}	{0} - ondersteund tot {1}
+Nothing to do - Windows Update keeps it patched.	Niets te doen - Windows Update houdt het bij.
+Nothing to do.	Niets te doen.
+Secure Boot	Beveiligd opstarten
+PC starts in old "legacy BIOS" mode	Pc start in de oude "legacy BIOS"-modus
+Modern UEFI mode with Secure Boot blocks malware that loads before Windows. Switching needs care (the disk must be converted with MBR2GPT) - get help if unsure.	De moderne UEFI-modus met beveiligd opstarten blokkeert malware die vóór Windows laadt. Overschakelen vraagt zorg (de schijf moet worden omgezet met MBR2GPT) - vraag hulp als je twijfelt.
+On	Aan
+Off	Uit
+Switch Secure Boot on in the firmware (BIOS/UEFI) settings - usually F2, F10 or Del while the PC starts.	Zet beveiligd opstarten aan in de firmware-instellingen (BIOS/UEFI) - meestal F2, F10 of Del tijdens het opstarten.
+TPM security chip	TPM-beveiligingschip
+TPM {0} present	TPM {0} aanwezig
+Old TPM {0}	Oude TPM {0}
+Windows 11 needs TPM 2.0. Some PCs can switch to 2.0 with a firmware update from the maker.	Windows 11 heeft TPM 2.0 nodig. Sommige pc's kunnen naar 2.0 met een firmware-update van de fabrikant.
+None found	Niet gevonden
+Many PCs have one that is switched off - look for TPM, PTT (Intel) or fTPM (AMD) in the firmware settings.	Veel pc's hebben er een die uit staat - zoek naar TPM, PTT (Intel) of fTPM (AMD) in de firmware-instellingen.
+Could not check	Kon niet controleren
+Run "tpm.msc" to see the TPM status.	Voer "tpm.msc" uit om de TPM-status te zien.
+Windows 11 ready?	Klaar voor Windows 11?
+No - missing: {0}	Nee - ontbreekt: {0}
+If only TPM or Secure Boot is missing, switch them on in the firmware settings and check again. Otherwise: Extended Security Updates for Windows 10, or a new or refurbished PC.	Als alleen TPM of beveiligd opstarten ontbreekt, zet ze aan in de firmware-instellingen en controleer opnieuw. Anders: Extended Security Updates voor Windows 10, of een nieuwe of refurbished pc.
+Probably - processor not recognised ({0}); confirm with Microsoft's PC Health Check	Waarschijnlijk - processor niet herkend ({0}); controleer het met Pc-statuscontrole van Microsoft
+Yes - this PC can run Windows 11	Ja - deze pc kan Windows 11 draaien
+Upgrade for free: Settings > Windows Update > Upgrade to Windows 11. Back up your files first.	Gratis upgraden: Instellingen > Windows Update > Upgraden naar Windows 11. Maak eerst een back-up van je bestanden.
+Antivirus	Antivirus
+{0} - on and up to date	{0} - aan en bijgewerkt
+{0} - on but out of date	{0} - aan maar verouderd
+Open it and update it. If that fails, check the internet connection or whether its subscription ran out.	Open het en werk het bij. Lukt dat niet, controleer dan de internetverbinding of het abonnement verlopen is.
+{0} - switched off	{0} - uitgeschakeld
+Switch it on. If a paid antivirus expired, uninstall it - Microsoft Defender then takes over for free.	Zet het aan. Is een betaalde antivirus verlopen, verwijder hem dan - Microsoft Defender neemt het gratis over.
+No antivirus found	Geen antivirus gevonden
+Open Windows Security and switch on Microsoft Defender.	Open Windows-beveiliging en zet Microsoft Defender aan.
+Firewall	Firewall
+Windows Firewall is on	Windows Firewall staat aan
+{0} firewall is on	Firewall van {0} staat aan
+Windows Firewall is off ({0})	Windows Firewall staat uit ({0})
+Switch it on in Windows Security > Firewall & network protection.	Zet hem aan in Windows-beveiliging > Firewall- en netwerkbeveiliging.
+Open Windows Security > Firewall & network protection.	Open Windows-beveiliging > Firewall- en netwerkbeveiliging.
+Drive encryption	Schijfversleuteling
+C: is encrypted (BitLocker / Device encryption)	C: is versleuteld (BitLocker / apparaatversleuteling)
+Know where the recovery key is: account.microsoft.com/devices/recoverykey - you need it if the PC ever asks for it.	Weet waar de herstelsleutel is: account.microsoft.com/devices/recoverykey - je hebt hem nodig als de pc er ooit om vraagt.
+Encryption is paused	Versleuteling is gepauzeerd
+It is usually paused during an update and resumes after a restart. If it stays paused, resume it in BitLocker settings.	Meestal is dat tijdens een update en gaat het na een herstart verder. Blijft het gepauzeerd, hervat het dan in de BitLocker-instellingen.
+C: is not encrypted	C: is niet versleuteld
+Anyone who steals the laptop can read its files. Turn on Device encryption (Settings > Privacy & security > Device encryption) or BitLocker on Pro. Know where the recovery key is: account.microsoft.com/devices/recoverykey - you need it if the PC ever asks for it.	Wie de laptop steelt, kan de bestanden lezen. Zet apparaatversleuteling aan (Instellingen > Privacy en beveiliging > Apparaatversleuteling) of BitLocker op Pro. Weet waar de herstelsleutel is: account.microsoft.com/devices/recoverykey - je hebt hem nodig als de pc er ooit om vraagt.
+Less important for a desktop that stays at home; worth it for business PCs.	Minder belangrijk voor een desktop die thuis blijft; wel zinvol voor zakelijke pc's.
+See Settings > Privacy & security > Device encryption.	Zie Instellingen > Privacy en beveiliging > Apparaatversleuteling.
+Memory integrity	Geheugenintegriteit
+Optional extra protection: Windows Security > Device security > Core isolation. Very old drivers can block it.	Optionele extra bescherming: Windows-beveiliging > Apparaatbeveiliging > Kernisolatie. Heel oude stuurprogramma's kunnen het blokkeren.
+User Account Control	Gebruikersaccountbeheer
+Off - every program runs with full rights	Uit - elk programma draait met volledige rechten
+Search "UAC" in Start, set the slider back to the default level and restart.	Zoek "UAC" in Start, zet de schuifregelaar terug op het standaardniveau en start opnieuw op.
+Old file sharing (SMB 1.0)	Oude bestandsdeling (SMB 1.0)
+Installed	Geïnstalleerd
+SMB 1.0 is what the WannaCry worm used. Remove it unless a very old NAS or printer needs it: Windows Features > untick "SMB 1.0/CIFS File Sharing Support".	SMB 1.0 is wat de WannaCry-worm gebruikte. Verwijder het tenzij een heel oude NAS of printer het nodig heeft: Windows-onderdelen > vink "Ondersteuning voor SMB 1.0/CIFS-bestandsdeling" uit.
+Remote Desktop	Extern bureaublad
+On - this PC accepts remote connections	Aan - deze pc accepteert externe verbindingen
+Fine if you use it. Otherwise switch it off: Settings > System > Remote Desktop.	Prima als je het gebruikt. Anders uitzetten: Instellingen > Systeem > Extern bureaublad.
+Out-of-support software	Software zonder ondersteuning
+{0} found: {1}	{0} gevonden: {1}
+These no longer get security fixes. Uninstall them in Settings > Apps; old .NET runtimes can go too - a program that still needs one will ask for it.	Deze krijgen geen beveiligingsupdates meer. Verwijder ze via Instellingen > Apps; oude .NET-runtimes mogen ook weg - een programma dat er nog een nodig heeft, vraagt er vanzelf om.
+None of the usual suspects (Flash, Java 6/7, QuickTime, Silverlight, old .NET)	Geen van de bekende boosdoeners (Flash, Java 6/7, QuickTime, Silverlight, oude .NET)
+Checking security settings...	Beveiligingsinstellingen controleren...
+{0} of {1} checks fine.	{0} van {1} controles in orde.
+{0} of {1} checks fine, {2} worth a look.	{0} van {1} controles in orde, {2} het bekijken waard.
+{0} of {1} checks fine, {2} problem(s).	{0} van {1} controles in orde, {2} probleem/problemen.
+{0} of {1} checks fine, {2} problem(s), {3} worth a look.	{0} van {1} controles in orde, {2} probleem/problemen, {3} het bekijken waard.
+Couldn't open {0}	Kon {0} niet openen
+This one is changed in the firmware (BIOS/UEFI) settings, not in Windows - see "What to do".	Dit wijzig je in de firmware-instellingen (BIOS/UEFI), niet in Windows - zie "Wat te doen".
+What to do: {0}	Wat te doen: {0}
+What went wrong in the last 30 days according to Windows' own logs - crashes, freezes, blue screens, errors - and what usually fixes it. Click a row for details.	Wat er de afgelopen 30 dagen misging volgens de logboeken van Windows zelf - crashes, vastlopers, blauwe schermen, fouten - en wat het meestal oplost. Klik op een rij voor details.
+Open Reliability Monitor	Betrouwbaarheidsmonitor openen
+Search selected online	Selectie online opzoeken
+Times	Keer
+Last	Laatst
+App crashes	App-crashes
+Freezes	Vastlopers
+Blue screens	Blauwe schermen
+Sudden shutdowns	Plotseling uitgevallen
+Graphics resets	Grafische herstarts
+Drive errors	Schijffouten
+Hardware errors	Hardwarefouten
+Windows Update	Windows Update
+Store app updates	Updates voor Store-apps
+NVIDIA nView	NVIDIA nView
+{0} crashed {1}	{0} liet {1} crashen
+{0} crashed	{0} is gecrasht
+NVIDIA nView (an old desktop-manager add-on) loads itself into other programs and crashes them. Turn it off: NVIDIA Control Panel > Desktop Management > Disable, or uninstall "NVIDIA nView" in Settings > Apps.	NVIDIA nView (een oude invoegtoepassing voor bureaubladbeheer) laadt zichzelf in andere programma's en laat ze crashen. Zet het uit: NVIDIA-configuratiescherm > Desktop Management > Disable, of verwijder "NVIDIA nView" via Instellingen > Apps.
+NVIDIA graphics driver	NVIDIA-grafisch stuurprogramma
+Update the NVIDIA driver from nvidia.com or the PC maker's support page (choose a clean install).	Werk het NVIDIA-stuurprogramma bij via nvidia.com of de ondersteuningspagina van de pc-fabrikant (kies een schone installatie).
+AMD graphics driver	AMD-grafisch stuurprogramma
+Update the AMD graphics driver from amd.com or the PC maker's support page.	Werk het AMD-grafische stuurprogramma bij via amd.com of de ondersteuningspagina van de pc-fabrikant.
+Intel graphics driver	Intel-grafisch stuurprogramma
+Update the Intel graphics driver (Windows Update > Advanced > Optional updates, or the PC maker's support page).	Werk het Intel-grafische stuurprogramma bij (Windows Update > Geavanceerd > Optionele updates, of de ondersteuningspagina van de pc-fabrikant).
+Visual C++ runtime	Visual C++-runtime
+Repair "Microsoft Visual C++ Redistributable" in Settings > Apps (Modify > Repair), then update the crashing programs.	Herstel "Microsoft Visual C++ Redistributable" via Instellingen > Apps (Wijzigen > Herstellen) en werk daarna de crashende programma's bij.
+an overlay or audio add-on	een overlay of audio-invoegtoepassing
+An overlay (Steam, Discord, RivaTuner) or audio enhancer (Nahimic, Sonic Studio) loads into other programs. Update it or switch its overlay off.	Een overlay (Steam, Discord, RivaTuner) of audioverbeteraar (Nahimic, Sonic Studio) laadt zich in andere programma's. Werk hem bij of zet de overlay uit.
+Update or reinstall {0}. If it keeps crashing, check the maker's support site (crash point: {1}).	Werk {0} bij of installeer het opnieuw. Blijft het crashen, kijk dan op de ondersteuningssite van de maker (crashpunt: {1}).
+{0} stopped responding	{0} reageerde niet meer
+If {0} freezes often, update it. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab.	Als {0} vaak vastloopt, werk het dan bij. Lopen veel verschillende programma's vast, dan wijst dat op vol geheugen of een trage of falende schijf - zie Gezondheid.
+{0} program(s) froze once ({1})	{0} programma('s) liepen één keer vast ({1})
+A one-off freeze is normal. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab.	Eén keer vastlopen is normaal. Lopen veel verschillende programma's vast, dan wijst dat op vol geheugen of een trage of falende schijf - zie Gezondheid.
+Windows crashed: {0}	Windows is gecrasht: {0}
+Usually caused by {0}. Install driver updates (Windows Update > Advanced options > Optional updates, or the PC maker's support page). If it keeps happening, test the memory: run mdsched.exe.	Meestal veroorzaakt door {0}. Installeer updates voor stuurprogramma's (Windows Update > Geavanceerde opties > Optionele updates, of de ondersteuningspagina van de pc-fabrikant). Blijft het gebeuren, test dan het geheugen: voer mdsched.exe uit.
+a driver	een stuurprogramma
+memory (RAM) or a driver	het geheugen (RAM) of een stuurprogramma
+memory or a driver	het geheugen of een stuurprogramma
+the drive or its connection	de schijf of de aansluiting ervan
+a driver during sleep or wake-up	een stuurprogramma tijdens slaapstand of ontwaken
+a driver (often network or Wi-Fi)	een stuurprogramma (vaak netwerk of wifi)
+damaged Windows files or the drive	beschadigde Windows-bestanden of de schijf
+the drive	de schijf
+the graphics driver	het grafische stuurprogramma
+hardware (processor, memory or overheating)	hardware (processor, geheugen of oververhitting)
+memory (RAM)	het geheugen (RAM)
+a storage or other driver	een opslag- of ander stuurprogramma
+a driver or memory	een stuurprogramma of het geheugen
+a driver or hardware	een stuurprogramma of hardware
+The PC switched off without shutting down properly	De pc ging uit zonder netjes af te sluiten
+A power cut, the battery running flat, the power button held down, or overheating. If it happens on its own, check the charger or power supply and clean the fans.	Een stroomstoring, een lege accu, de aan/uit-knop ingedrukt gehouden, of oververhitting. Gebeurt het vanzelf, controleer dan de oplader of voeding en maak de ventilatoren schoon.
+The graphics driver stopped responding and recovered	Het grafische stuurprogramma reageerde niet meer en herstelde zich
+Update the graphics driver. If it happens in games, check the GPU temperature and stop any overclocking.	Werk het grafische stuurprogramma bij. Gebeurt het in games, controleer dan de GPU-temperatuur en stop met overklokken.
+Storage errors ({0})	Opslagfouten ({0})
+Back up important files now. Then check drive health on the Health tab and run the drive maker's tool; frequent errors mean the drive or its cable is failing.	Maak nu een back-up van belangrijke bestanden. Controleer daarna de schijfgezondheid op Gezondheid en draai het hulpprogramma van de schijffabrikant; veel fouten betekenen dat de schijf of de kabel het begeeft.
+The processor, memory or a PCIe device reported errors	De processor, het geheugen of een PCIe-apparaat meldde fouten
+Make sure the PC isn't overheating (clean the fans). If blue screens happen too, test the memory: run mdsched.exe.	Zorg dat de pc niet oververhit raakt (maak de ventilatoren schoon). Komen er ook blauwe schermen voor, test dan het geheugen: voer mdsched.exe uit.
+{0} Store app update(s) kept waiting ({1}...)	{0} Store-app-update(s) moesten wachten ({1}...)
+Usually because the app was open at the time - they install by themselves later. To force it: Microsoft Store > Library > Get updates.	Meestal omdat de app op dat moment open was - ze installeren later vanzelf. Forceren: Microsoft Store > Bibliotheek > Updates ophalen.
+Couldn't install: {0}	Kon niet installeren: {0}
+Restart and try Windows Update again. If it keeps failing: Settings > System > Troubleshoot > Other troubleshooters > Windows Update. (Error {0})	Start opnieuw op en probeer Windows Update nog eens. Blijft het mislukken: Instellingen > Systeem > Probleemoplossing > Andere probleemoplossers > Windows Update. (Fout {0})
+Reading Windows' logs...	Logboeken van Windows lezen...
+Windows rates stability {0} out of 10. {1} kind(s) of trouble in the last 30 days.	Windows geeft de stabiliteit een {0} op 10. {1} soort(en) problemen in de afgelopen 30 dagen.
+Windows rates stability {0} out of 10. {1} kind(s) of trouble in the last 30 days, {2} worth fixing.	Windows geeft de stabiliteit een {0} op 10. {1} soort(en) problemen in de afgelopen 30 dagen, {2} het oplossen waard.
+Windows rates stability {0} out of 10. Nothing went wrong in the last 30 days.	Windows geeft de stabiliteit een {0} op 10. Er ging niets mis in de afgelopen 30 dagen.
+{0} kind(s) of trouble in the last 30 days.	{0} soort(en) problemen in de afgelopen 30 dagen.
+{0} kind(s) of trouble in the last 30 days, {1} worth fixing.	{0} soort(en) problemen in de afgelopen 30 dagen, {1} het oplossen waard.
+Nothing went wrong in the last 30 days.	Er ging niets mis in de afgelopen 30 dagen.
+No crashes, freezes or errors found.	Geen crashes, vastlopers of fouten gevonden.
+{0}: {1} - {2} time(s) in 30 days, last on {3}	{0}: {1} - {2} keer in 30 dagen, laatst op {3}
+What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.	Wat je in deze pc kunt toevoegen of vervangen, met de specificatie om te kopen. Klik op een rij voor alle details. Controleer het altijd in de servicehandleiding voordat je iets koopt.
+Open support page	Ondersteuningspagina openen
+Find service manual	Servicehandleiding zoeken
+Find motherboard manual	Handleiding moederbord zoeken
+Copy shopping list	Boodschappenlijst kopiëren
+Part	Onderdeel
+You have now	Wat je nu hebt
+Upgrade option	Mogelijke uitbreiding
+Worth it?	De moeite waard?
+What to buy	Wat te kopen
+Memory / disk	Geheugen / schijf
+{0} GB memory - this is a virtual machine	{0} GB geheugen - dit is een virtuele machine
+Change the VM settings	Instellingen van de VM wijzigen
+Nothing to buy - give the virtual machine more memory or disk space in VMware / VirtualBox / Hyper-V settings.	Niets te kopen - geef de virtuele machine meer geheugen of schijfruimte in de instellingen van VMware / VirtualBox / Hyper-V.
+Physical upgrades belong to the computer that runs the VM.	Fysieke uitbreidingen horen bij de computer waarop de VM draait.
+Not upgradeable	Niet uit te breiden
+Nothing to buy - this memory is soldered to the motherboard.	Niets te kopen - dit geheugen is op het moederbord gesoldeerd.
+Already at the maximum	Al het maximum
+Not needed	Niet nodig
+Nothing to buy - {0} GB is the most this PC supports.	Niets te kopen - {0} GB is het maximum voor deze pc.
+The firmware reports a maximum of {0} GB.	De firmware meldt een maximum van {0} GB.
+Add {0} x {1} GB (total {2} GB)	{0} x {1} GB toevoegen (totaal {2} GB)
+Replace with {0} x {1} GB (total {2} GB)	Vervangen door {0} x {1} GB (totaal {2} GB)
+Recommended - one module means single-channel; a matching second module roughly doubles memory speed	Aanbevolen - één module betekent single-channel; een tweede, gelijke module verdubbelt ongeveer de geheugensnelheid
+Strongly recommended	Sterk aanbevolen
+Recommended	Aanbevolen
+Recommended - memory is {0}% full right now	Aanbevolen - het geheugen is nu voor {0}% vol
+Optional - worth it for virtual machines, big spreadsheets, photo/video/CAD work or many browser tabs	Optioneel - de moeite waard voor virtuele machines, grote spreadsheets, foto/video/CAD-werk of veel browsertabbladen
+Replace with an SSD	Vervangen door een SSD
+Strongly recommended - the biggest speed-up an older PC can get	Sterk aanbevolen - de grootste versnelling die een oudere pc kan krijgen
+Optional - only matters for files on this disk	Optioneel - alleen van belang voor bestanden op deze schijf
+Hard disks are 20-50x slower than SSDs at the small reads Windows does all the time.	Harde schijven zijn 20-50x trager dan SSD's bij de kleine leesacties die Windows steeds doet.
+Recommended - C: is only {0}% free	Aanbevolen - C: is nog maar voor {0}% vrij
+Recommended - small drive	Aanbevolen - kleine schijf
+Bigger or second SSD	Grotere of tweede SSD
+Windows cannot see empty slots, so check the manual for a free one. Gen4 drives fall back to the slot's speed, so they are always a safe pick.	Windows ziet geen lege sloten, dus controleer de handleiding op een vrij slot. Gen4-schijven passen zich aan de snelheid van het slot aan, dus die zijn altijd een veilige keuze.
+External drive	Externe schijf
+This PC has a USB4/Thunderbolt port	Deze pc heeft een USB4/Thunderbolt-poort
+USB ports	USB-poorten
+External SSD	Externe SSD
+Optional - no screwdriver needed, good for games, photos and backups	Optioneel - geen schroevendraaier nodig, handig voor games, foto's en back-ups
+External NVMe SSD (or an NVMe enclosure) for USB4/Thunderbolt, 1-2 TB: up to ~3,000 MB/s on this PC.	Externe NVMe-SSD (of een NVMe-behuizing) voor USB4/Thunderbolt, 1-2 TB: tot ~3.000 MB/s op deze pc.
+USB 3.2 Gen 2 external SSD, 1-2 TB (about 1,000 MB/s) - use a blue or "SS 10" USB port.	Externe USB 3.2 Gen 2-SSD, 1-2 TB (ongeveer 1.000 MB/s) - gebruik een blauwe of "SS 10"-USB-poort.
+Use the fastest port: USB4/Thunderbolt (lightning symbol) > USB-C 10 Gbps > blue USB-A.	Gebruik de snelste poort: USB4/Thunderbolt (bliksemsymbool) > USB-C 10 Gbps > blauwe USB-A.
+Recommended - battery life is roughly halved	Aanbevolen - de accuduur is ongeveer gehalveerd
+{0} Wh {1} battery ({2}), now holds {3}% of its original charge	{0} Wh {1}-accu ({2}), houdt nu nog {3}% van de oorspronkelijke lading vast
+Replacement battery	Vervangende accu
+Batteries wear with age and charge cycles. A worn battery doesn't slow the PC down, it just runs out sooner.	Accu's slijten door ouderdom en laadcycli. Een versleten accu maakt de pc niet trager, hij is alleen sneller leeg.
+Recommended - Wi-Fi 4 is slow and crowded	Aanbevolen - wifi 4 is traag en druk
+Optional - faster and steadier on a Wi-Fi 6 router	Optioneel - sneller en stabieler met een wifi 6-router
+Optional - check which Wi-Fi standard this card supports	Optioneel - controleer welke wifi-standaard deze kaart ondersteunt
+Nothing to buy - this Wi-Fi is already current.	Niets te kopen - deze wifi is al actueel.
+Already modern	Al modern
+Wi-Fi 6E card	Wifi 6E-kaart
+Faster Wi-Fi only helps if your router supports it too.	Snellere wifi helpt alleen als je router het ook ondersteunt.
+No Wi-Fi adapter	Geen wifi-adapter
+Add Wi-Fi	Wifi toevoegen
+Optional - only if you can't use a cable	Optioneel - alleen als je geen kabel kunt gebruiken
+A network cable is still the fastest and steadiest connection.	Een netwerkkabel is nog steeds de snelste en stabielste verbinding.
+Not read - Windows didn't answer in time (busy with a game?). Click Refresh later.	Niet gelezen - Windows antwoordde niet op tijd (bezig met een game?). Klik later op Vernieuwen.
+Processor	Processor
+Nothing to buy - laptop processors are soldered to the motherboard.	Niets te kopen - laptopprocessors zijn op het moederbord gesoldeerd.
+If the processor is too slow, the upgrade path is a new laptop.	Is de processor te traag, dan is een nieuwe laptop de enige uitbreiding.
+Graphics	Grafisch
+Nothing to buy - laptop graphics are soldered.	Niets te kopen - laptopgrafische chips zijn gesoldeerd.
+An external graphics box over USB4/Thunderbolt is possible but costly.	Een externe grafische kast via USB4/Thunderbolt kan, maar is duur.
+Depends on the motherboard	Hangt af van het moederbord
+Rarely worth it	Zelden de moeite waard
+A new processor only fits the same socket and often needs a BIOS update first.	Een nieuwe processor past alleen in dezelfde socket en heeft vaak eerst een BIOS-update nodig.
+Add a graphics card	Een videokaart toevoegen
+Faster graphics card	Snellere videokaart
+Optional - for gaming, video editing or 3D	Optioneel - voor gamen, videobewerking of 3D
+Depends on use	Hangt af van het gebruik
+Needs a free PCIe x16 slot, enough power-supply wattage and connectors, and room in the case - check all three first.	Heeft een vrij PCIe x16-slot nodig, genoeg vermogen en aansluitingen op de voeding, en ruimte in de kast - controleer eerst alle drie.
+Office PCs from HP, Dell and Lenovo often have small power supplies; a low-profile card that needs no power cable is the safe choice there.	Kantoor-pc's van HP, Dell en Lenovo hebben vaak een kleine voeding; een low-profile kaart zonder voedingskabel is daar de veilige keuze.
+Looking at this PC's hardware...	De hardware van deze pc bekijken...
+Could not read the hardware details.	De hardwaregegevens konden niet worden gelezen.
+Nothing worth upgrading was found.	Er is niets gevonden dat het uitbreiden waard is.
+Shopping list copied - paste it into an email, a note or a shop's chat.	Boodschappenlijst gekopieerd - plak hem in een e-mail, een notitie of de chat van een winkel.
+The serial number ({0}) is copied - paste it into the support page's search box to see this exact PC's parts.	Het serienummer ({0}) is gekopieerd - plak het in het zoekvak van de ondersteuningspagina om de onderdelen van precies deze pc te zien.
+Worth it? {0}	De moeite waard? {0}
+You have now: {0}	Wat je nu hebt: {0}
+What to buy: {0}	Wat te kopen: {0}
+Good to know: {0}	Goed om te weten: {0}
+Every change PC Tune-Up made on this PC, newest first. Check rows and click Undo to put them back. Cleaned files and uninstalled programs can't be undone; removed Store apps can be reinstalled.	Elke wijziging die PC Tune-Up op deze pc heeft gemaakt, nieuwste eerst. Vink rijen aan en klik op Aangevinkte ongedaan maken om ze terug te zetten. Opgeruimde bestanden en verwijderde programma's kunnen niet terug; verwijderde Store-apps kun je opnieuw installeren.
+Undo checked	Aangevinkte ongedaan maken
+Open text log	Tekstlog openen
+When	Wanneer
+Item	Item
+Change	Wijziging
+Undo	Ongedaan maken
+undone	ongedaan gemaakt
+reinstall from Store	opnieuw installeren via de Store
+can undo	kan ongedaan worden
+Update	Update
+Uninstall	Verwijderd
+Restore point	Herstelpunt
+created	gemaakt
+created before {0}	gemaakt vóór {0}
+Fix my PC	Pc repareren
+{0} change(s) recorded, {1} can be undone.	{0} wijziging(en) vastgelegd, {1} kunnen ongedaan worden gemaakt.
+No changes yet. (Changes from before this version are in the text log.)	Nog geen wijzigingen. (Wijzigingen van voor deze versie staan in het tekstlog.)
+Check one or more rows that say "can undo" first.	Vink eerst een of meer rijen aan met "kan ongedaan worden".
+Undoing service changes needs administrator rights - use "Restart as administrator" first.	Wijzigingen aan services ongedaan maken vraagt beheerdersrechten - gebruik eerst "Opnieuw starten als beheerder".
+Undo these changes?	Deze wijzigingen ongedaan maken?
+allowed to start with Windows again	mag weer met Windows starten
+stopped starting with Windows again	start weer niet meer met Windows
+service back to {0}	service terug op {0}
+{0} change(s) undone.	{0} wijziging(en) ongedaan gemaakt.
+{0} change(s) undone. Startup changes take effect next time you sign in.	{0} wijziging(en) ongedaan gemaakt. Wijzigingen aan opstarten gaan in als je je de volgende keer aanmeldt.
+How PC Tune-Up looks and behaves, where its files are, and what it is. Changes are saved straight away.	Hoe PC Tune-Up eruitziet en werkt, waar de bestanden staan, en wat het is. Wijzigingen worden meteen opgeslagen.
+Language	Taal
+Takes effect when PC Tune-Up restarts.	Gaat in als PC Tune-Up opnieuw start.
+Automatic (Windows language)	Automatisch (taal van Windows)
+Restart now	Nu opnieuw starten
+Theme	Thema
+Light, dark, or the same as Windows. Takes effect when PC Tune-Up restarts.	Licht, donker, of hetzelfde als Windows. Gaat in als PC Tune-Up opnieuw start.
+Same as Windows	Hetzelfde als Windows
+Light	Licht
+Dark	Donker
+You have version {0}. New versions come from github.com/{1} and are checked against GitHub's checksum before they are installed.	Je hebt versie {0}. Nieuwe versies komen van github.com/{1} en worden gecontroleerd met de controlesom van GitHub voordat ze worden geïnstalleerd.
+Check for updates when PC Tune-Up starts	Zoeken naar updates als PC Tune-Up start
+Check for updates now	Nu zoeken naar updates
+Safety	Veiligheid
+A restore point lets Windows roll the whole PC back to before a change (Settings > System > Recovery, or search "restore point"). Windows makes at most one per day.	Met een herstelpunt zet Windows de hele pc terug naar vóór een wijziging (Instellingen > Systeem > Herstel, of zoek op "herstelpunt"). Windows maakt er maximaal één per dag.
+Create a restore point before Fix my PC, uninstalling and service changes (needs administrator)	Een herstelpunt maken vóór Pc repareren, verwijderen en wijzigingen aan services (beheerder nodig)
+Installation	Installatie
+Installed for you in {0} - it appears in the Start menu and in Settings > Apps.	Voor jou geïnstalleerd in {0} - het staat in het menu Start en in Instellingen > Apps.
+Running from {0} without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed).	Draait vanaf {0} zonder installatie. Installeer het voor een plek in het menu Start en om het te verwijderen zoals elke andere app (geen beheerder nodig).
+Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.	Draait als PowerShell-script (ontwikkelaarsmodus) - installeer in plaats daarvan vanuit PC-TuneUp.exe.
+Uninstall PC Tune-Up	PC Tune-Up verwijderen
+Install on this PC	Op deze pc installeren
+Files	Bestanden
+Settings, history, the keep list and the change log are kept in {0}.	Instellingen, geschiedenis, de bewaarlijst en het wijzigingslog staan in {0}.
+Open data folder	Gegevensmap openen
+Command line	Opdrachtregel
+For scripts and IT use (use "start /wait" so the window waits for it):	Voor scripts en IT-gebruik (gebruik "start /wait" zodat het venster erop wacht):
+About	Over
+PC Tune-Up {0} - free and open source (MIT licence). Privacy: everything runs on this PC. The only internet use is the update check (GitHub), the speed test (Cloudflare) and winget's program list; nothing about this PC is sent anywhere.	PC Tune-Up {0} - gratis en open source (MIT-licentie). Privacy: alles draait op deze pc. Internet wordt alleen gebruikt voor de updatecontrole (GitHub), de snelheidstest (Cloudflare) en de programmalijst van winget; er wordt niets over deze pc verstuurd.
+Install from PC-TuneUp.exe, not from the script.	Installeer vanuit PC-TuneUp.exe, niet vanuit het script.
+Installing failed: {0}	Installeren mislukt: {0}
+PC Tune-Up is installed. It is in the Start menu and on the desktop, and you can uninstall it in Settings > Apps.	PC Tune-Up is geïnstalleerd. Het staat in het menu Start en op het bureaublad, en je kunt het verwijderen via Instellingen > Apps.
+The installed copy opens now; you can delete the file you started this from.	De geïnstalleerde versie opent nu; je kunt het bestand waarmee je dit startte verwijderen.
+Remove PC Tune-Up from this PC?	PC Tune-Up van deze pc verwijderen?
+Also delete its settings, keep list and change history?	Ook de instellingen, bewaarlijst en wijzigingsgeschiedenis verwijderen?
+PC Tune-Up has been removed.	PC Tune-Up is verwijderd.
+Install PC Tune-Up on this PC?	PC Tune-Up op deze pc installeren?
+It adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.	Het zet PC Tune-Up in het menu Start en in Instellingen > Apps (zodat je het kunt verwijderen zoals elke app), en het houdt zichzelf up-to-date. Geen beheerdersrechten nodig.
+You can also do this later in Settings.	Je kunt dit ook later doen via Instellingen.
+Still checking services - try again in a few seconds.	Services worden nog gecontroleerd - probeer het over een paar seconden opnieuw.
+PC Tune-Up will:	PC Tune-Up gaat:
+Clean junk files: {0}	Rommel opruimen: {0}
+(skipping {0} - close the browser first to include it)	({0} overslaan - sluit eerst de browser om het mee te nemen)
+Stop {0} app(s) starting with Windows: {1}	{0} app(s) niet meer met Windows laten starten: {1}
+Set {0} background service(s) to their suggested setting: {1}	{0} achtergrondservice(s) op de aanbevolen instelling zetten: {1}
+Create a restore point first	Eerst een herstelpunt maken
+Tip: "Restart as admin" first to also clean Windows files and trim background services.	Tip: kies eerst "Opnieuw als beheerder" om ook Windows-bestanden op te ruimen en achtergrondservices in te perken.
+Nothing gets uninstalled. Startup and service changes can be undone from the History page.	Er wordt niets verwijderd. Wijzigingen aan opstarten en services kun je ongedaan maken via Geschiedenis.
+Done!	Klaar!
+Stopped early.	Vroegtijdig gestopt.
+Freed {0} of junk files	{0} aan rommel vrijgemaakt
+{0} app(s) no longer start with Windows	{0} app(s) starten niet meer met Windows
+{0} background service(s) trimmed	{0} achtergrondservice(s) ingeperkt
+{0} junk app(s) found - see the Bloatware page if you want them gone	{0} rommel-app(s) gevonden - zie Bloatware als je ze weg wilt hebben
+Startup changes take effect next time you sign in. Undo anything from the History page.	Wijzigingen aan opstarten gaan in als je je de volgende keer aanmeldt. Maak alles ongedaan via Geschiedenis.
+Updates are not set up in this build.	Updates zijn in deze versie niet ingesteld.
+Couldn't check for updates:	Kon niet zoeken naar updates:
+You have the latest version ({0}).	Je hebt de nieuwste versie ({0}).
+PC Tune-Up {0} is available (you have {1}).	PC Tune-Up {0} is beschikbaar (je hebt {1}).
+Open the download page?	De downloadpagina openen?
+Update now? The app restarts by itself.	Nu bijwerken? De app start vanzelf opnieuw.
+Update failed: {0}	Bijwerken mislukt: {0}
+Couldn't replace the app file ({0}). Download it yourself from:	Kon het app-bestand niet vervangen ({0}). Download het zelf via:
+Something went wrong:	Er ging iets mis:
+Checking drive, battery and updates	Schijf, accu en updates controleren
+Testing internet speed	Internetsnelheid testen
+Measuring junk files	Rommel meten
+Cleaning	Opruimen
+Looking for bloatware	Zoeken naar bloatware
+Creating a restore point	Herstelpunt maken
+Creating a restore point first	Eerst een herstelpunt maken
+Uninstalling	Verwijderen
+Reading services	Services lezen
+Measuring folders	Mappen meten
+Checking for program updates	Zoeken naar programma-updates
+Updating programs	Programma's bijwerken
+Checking security	Beveiliging controleren
+Reading Windows logs	Logboeken van Windows lezen
+Reading the hardware	Hardware lezen
+Fix my PC: cleaning	Pc repareren: opruimen
+Downloading the update	Update downloaden
+PC Tune-Up report	PC Tune-Up-rapport
+Junk files that can be cleaned	Rommel die kan worden opgeruimd
+Apps that start with Windows ({0} on)	Apps die met Windows starten ({0} aan)
+Bloatware found	Gevonden bloatware
+Background services	Achtergrondservices
+Stability (last 30 days)	Stabiliteit (afgelopen 30 dagen)
+Program updates available	Beschikbare programma-updates
+Upgrade options	Mogelijke uitbreidingen
+Changes made by PC Tune-Up	Wijzigingen door PC Tune-Up
+Nothing found.	Niets gevonden.
+No problems spotted.	Geen problemen gevonden.
+Worth a look:	Het bekijken waard:
+A matched kit of {0} x {1} GB {2}. The current modules come out (keep or sell them). Faster-rated {3} modules also work and simply run at {4} MT/s. Most supported: {5} GB.	Een bij elkaar passende set van {0} x {1} GB {2}. De huidige modules gaan eruit (bewaar of verkoop ze). Sneller geclassificeerde {3}-modules werken ook en lopen dan gewoon op {4} MT/s. Maximaal ondersteund: {5} GB.
+A matched kit of {0} x {1} GB {2}. The current modules come out (keep or sell them). Faster-rated {3} modules also work and simply run at {4} MT/s.	Een bij elkaar passende set van {0} x {1} GB {2}. De huidige modules gaan eruit (bewaar of verkoop ze). Sneller geclassificeerde {3}-modules werken ook en lopen dan gewoon op {4} MT/s.
+{0} x {1} GB {2} - match the module already fitted. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s. Most supported: {6} GB.	{0} x {1} GB {2} - gelijk aan de module die er al in zit. Daarna in totaal: {3} GB. Sneller geclassificeerde {4}-modules werken ook en lopen dan gewoon op {5} MT/s. Maximaal ondersteund: {6} GB.
+{0} x {1} GB {2} - match the module already fitted. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s.	{0} x {1} GB {2} - gelijk aan de module die er al in zit. Daarna in totaal: {3} GB. Sneller geclassificeerde {4}-modules werken ook en lopen dan gewoon op {5} MT/s.
+{0} x {1} GB {2} - same speed as the built-in memory. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s. Most supported: {6} GB.	{0} x {1} GB {2} - dezelfde snelheid als het ingebouwde geheugen. Daarna in totaal: {3} GB. Sneller geclassificeerde {4}-modules werken ook en lopen dan gewoon op {5} MT/s. Maximaal ondersteund: {6} GB.
+{0} x {1} GB {2} - same speed as the built-in memory. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s.	{0} x {1} GB {2} - dezelfde snelheid als het ingebouwde geheugen. Daarna in totaal: {3} GB. Sneller geclassificeerde {4}-modules werken ook en lopen dan gewoon op {5} MT/s.
+{0} SO-DIMM (laptop size), {1}-pin, {2}, {3}	{0} SO-DIMM (laptopformaat), {1} pinnen, {2}, {3}
+{0} DIMM (desktop size), {1}-pin, {2}, {3}	{0} DIMM (desktopformaat), {1} pinnen, {2}, {3}
+non-ECC	zonder ECC
+registered ECC (RDIMM)	registered ECC (RDIMM)
+unbuffered ECC	unbuffered ECC
+{0} GB: {1} ({2}), {3}	{0} GB: {1} ({2}), {3}
+all {0} slot(s) used	alle {0} sloten bezet
+{0} of {1} slot(s) free	{0} van {1} sloten vrij
+{0} GB soldered, {1} of {2} slot(s) free	{0} GB gesoldeerd, {1} van {2} sloten vrij
+{0} GB soldered, all {1} slot(s) used	{0} GB gesoldeerd, alle {1} sloten bezet
+soldered to the motherboard	op het moederbord gesoldeerd
+Memory is {0}% used right now. Modules must match the type ({1}) and size ({2}). Crucial's free System Scanner (crucial.com) or the service manual lists the exact modules this PC accepts.	Het geheugen is nu voor {0}% in gebruik. Modules moeten passen bij het type ({1}) en formaat ({2}). De gratis System Scanner van Crucial (crucial.com) of de servicehandleiding noemt precies welke modules deze pc accepteert.
+SO-DIMM (laptop size)	SO-DIMM (laptopformaat)
+DIMM (desktop size)	DIMM (desktopformaat)
+{0}: {1} GB {2} {3}, holds Windows (C: {4}% free)	{0}: {1} GB {2} {3}, met Windows erop (C: {4}% vrij)
+{0}, 1 TB or 2 TB. If the laptop has a free M.2 slot, add it as a second drive; if not, replace this drive with the bigger one and clone it.	{0}, 1 TB of 2 TB. Heeft de laptop een vrij M.2-slot, zet hem er dan bij als tweede schijf; zo niet, vervang deze schijf door de grotere en kloon hem.
+{0}, 1 TB or 2 TB. Desktops usually have spare M.2 slots or 2.5/3.5-inch bays - add it as a second drive.	{0}, 1 TB of 2 TB. Desktops hebben meestal vrije M.2-sloten of 2,5/3,5-inch-ruimtes - zet hem erbij als tweede schijf.
+M.2 2280 NVMe SSD, PCIe Gen4 x4 (also works in Gen3 slots)	M.2 2280 NVMe-SSD, PCIe Gen4 x4 (werkt ook in Gen3-sloten)
+2.5-inch SATA SSD, or M.2 NVMe if the motherboard has an M.2 slot	2,5-inch SATA-SSD, of M.2 NVMe als het moederbord een M.2-slot heeft
+2.5-inch SATA SSD, or M.2 if the laptop has an M.2 slot (check whether it takes SATA or NVMe M.2)	2,5-inch SATA-SSD, of M.2 als de laptop een M.2-slot heeft (controleer of het SATA of NVMe M.2 is)
+SSD of the same type as the current one	SSD van hetzelfde type als de huidige
+1 TB 2.5-inch SATA SSD (7 mm) in place of this hard disk, or an M.2 SSD if the laptop has an M.2 slot. Copy ("clone") the old drive with the SSD maker's free tool.	1 TB 2,5-inch SATA-SSD (7 mm) in plaats van deze harde schijf, of een M.2-SSD als de laptop een M.2-slot heeft. Kopieer ("kloon") de oude schijf met het gratis hulpprogramma van de SSD-fabrikant.
+1 TB SSD: M.2 NVMe if the motherboard has an M.2 slot (fastest), otherwise a 2.5-inch SATA SSD. Put Windows on it and keep the hard disk for files.	1 TB SSD: M.2 NVMe als het moederbord een M.2-slot heeft (snelst), anders een 2,5-inch SATA-SSD. Zet Windows erop en houd de harde schijf voor bestanden.
+Replacement battery for the {0}: {1} Wh {2}. It reports itself as '{3}' - search that, or the serial number, to find the exact part. Prefer the maker's original.	Vervangende accu voor de {0}: {1} Wh {2}. Hij meldt zich als '{3}' - zoek daarop, of op het serienummer, om het precieze onderdeel te vinden. Kies bij voorkeur het origineel van de fabrikant.
+{0} - {1} cores / {2} threads	{0} - {1} kernen / {2} threads
+M.2 2230 Wi-Fi 6E card with Bluetooth (e.g. Intel AX210). Most laptops let you swap it; a few have it soldered or only accept approved cards - check the manual.	M.2 2230 wifi 6E-kaart met Bluetooth (bijv. Intel AX210). Bij de meeste laptops kun je hem wisselen; bij enkele zit hij vastgesoldeerd of werken alleen goedgekeurde kaarten - controleer de handleiding.
+PCIe Wi-Fi 6E card with Bluetooth (e.g. Intel AX210 based), or a USB Wi-Fi 6 adapter if you'd rather not open the case.	PCIe wifi 6E-kaart met Bluetooth (bijv. op basis van Intel AX210), of een USB wifi 6-adapter als je de kast liever niet openmaakt.
+PCIe Wi-Fi 6E card with Bluetooth, or a USB Wi-Fi 6 adapter.	PCIe wifi 6E-kaart met Bluetooth, of een USB wifi 6-adapter.
+Check the CPU support list of the motherboard ({0}) on its maker's website.	Bekijk de lijst met ondersteunde processors van het moederbord ({0}) op de site van de fabrikant.
+1 x {0} GB {1} in place of the current module.	1 x {0} GB {1} in plaats van de huidige module.
+1 x {0} GB {1} in place of the current module (the {2} GB soldered memory stays).	1 x {0} GB {1} in plaats van de huidige module (het {2} GB gesoldeerde geheugen blijft).
+Upgrade shopping list for {0}	Boodschappenlijst voor uitbreidingen van {0}
+Upgrade shopping list for {0} (serial {1})	Boodschappenlijst voor uitbreidingen van {0} (serienummer {1})
+{0} ({1}):	{0} ({1}):
+'@
+# Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
+$script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
+$script:TCache = New-Object Collections.Hashtable([StringComparer]::Ordinal)
+$script:TPatterns = @()
+# Dates and numbers in the chosen language too (3,5 / okt 2028).
+$UiCulture = if ($Lang -eq 'nl') { [Globalization.CultureInfo]::GetCultureInfo('nl-NL') } else { [Globalization.CultureInfo]::CurrentCulture }
+[Threading.Thread]::CurrentThread.CurrentCulture = $UiCulture
+if ($Lang -eq 'nl') {
+    $pats = foreach ($line in $NLTable -split "`r?`n") {
+        if (-not $line.Trim()) { continue }
+        $en, $nl = $line -split "`t", 2
+        if ($en -notmatch '\{\d+\}') { $script:TExact[$en] = $nl; continue }
+        $rx = '^' + ([regex]::Escape($en) -replace '\\\{(\d+)}', '(?<p$1>.+?)') + '$'
+        @{ Rx = [regex]::new($rx); Nl = $nl; N = ([regex]::Matches($en, '\{\d+\}')).Count; Lit = ($en -replace '\{\d+\}', '').Length }
+    }
+    $script:TPatterns = @($pats | Sort-Object { $_.Lit } -Descending)   # most specific first; "{0}: {1}" comes last
+}
+function T([string]$Text, [int]$Depth = 0) {
+    if ($Lang -ne 'nl' -or -not $Text -or $Depth -gt 3) { return $Text }
+    if ($script:TCache.ContainsKey($Text)) { return $script:TCache[$Text] }
+    $out = $Text
+    if ($Text -match "`n") { $out = (($Text -split "`r?`n") | ForEach-Object { T $_ $Depth }) -join "`r`n" }
+    elseif ($Text -match '^(\s*(?:(?:[-!]|\u2022)\s+)?)(.*?)(\s*)$' -and $Matches[2]) {
+        $pre = $Matches[1]; $core = $Matches[2]; $post = $Matches[3]
+        if ($script:TExact.ContainsKey($core)) { $out = $pre + $script:TExact[$core] + $post }
+        else {
+            foreach ($p in $script:TPatterns) {
+                $m = $p.Rx.Match($core)
+                if (-not $m.Success) { continue }
+                $vals = @(for ($i = 0; $i -lt $p.N; $i++) { T $m.Groups["p$i"].Value ($Depth + 1) })
+                $out = $pre + ($p.Nl -f $vals) + $post
+                break
+            }
+        }
+    }
+    if ($script:TCache.Count -lt 20000) { $script:TCache[$Text] = $out }
+    $out
+}
+# Translate a window's controls now, and again whenever their text changes later.
+function Enable-Translation($Control) {
+    if ($Lang -ne 'nl') { return }
+    $translatable = $Control -is [Windows.Forms.Label] -or $Control -is [Windows.Forms.ButtonBase] -or
+                    ($Control -is [Windows.Forms.TextBox] -and $Control.ReadOnly)
+    if ($translatable) {
+        $Control.Text = T $Control.Text
+        $Control.Add_TextChanged({ if (-not $script:InT) { $script:InT = $true; $t = T $this.Text; if ($t -ne $this.Text) { $this.Text = $t }; $script:InT = $false } })
+    }
+    if ($Control -is [Windows.Forms.ListView]) { foreach ($c in $Control.Columns) { $c.Text = T $c.Text } }
+    foreach ($child in $Control.Controls) { Enable-Translation $child }
+}
+# Installed copy: per user, no administrator needed (like most modern apps).
+$InstallDir = Join-Path $env:LOCALAPPDATA 'Programs\PC Tune-Up'
+$InstalledExe = Join-Path $InstallDir 'PC-TuneUp.exe'
+$IsInstalled = $RunningAsExe -and ($SelfExe -eq $InstalledExe)
 
 function Write-Log([string]$Msg) {
     Add-Content -Path $LogFile -Value ('{0:yyyy-MM-dd HH:mm:ss}  {1}' -f (Get-Date), $Msg) -Encoding UTF8
@@ -44,7 +839,7 @@ function Format-Size([double]$Bytes) {
     else { '{0:N0} KB' -f ($Bytes / 1KB) }
 }
 function Show-Msg([string]$Text, [string]$Buttons = 'OK', [string]$Icon = 'Information') {
-    [Windows.Forms.MessageBox]::Show($Text, 'PC Tune-Up', $Buttons, $Icon)
+    [Windows.Forms.MessageBox]::Show((T $Text), 'PC Tune-Up', $Buttons, $Icon)
 }
 
 # History: every change, with what's needed to undo it (Undo = $null when it can't be).
@@ -120,12 +915,20 @@ function Invoke-Native([string]$Exe, [string]$Arguments, [int]$TimeoutSec = 600)
     $psi.StandardOutputEncoding = [Text.Encoding]::UTF8
     $p = [Diagnostics.Process]::Start($psi)
     $out = $p.StandardOutput.ReadToEndAsync(); $err = $p.StandardError.ReadToEndAsync()
-    if (-not $p.WaitForExit($TimeoutSec * 1000)) {
-        try { $p.Kill() } catch { }
-        return [pscustomobject]@{ Out = ''; Code = -1; TimedOut = $true }
+    $deadline = (Get-Date).AddSeconds($TimeoutSec)
+    while (-not $p.WaitForExit(500)) {   # check twice a second whether the user pressed Cancel
+        if (($Job -and $Job.Cancel) -or (Get-Date) -gt $deadline) {
+            try { $p.Kill() } catch { }
+            return [pscustomobject]@{ Out = ''; Code = -1; TimedOut = -not ($Job -and $Job.Cancel); Cancelled = [bool]($Job -and $Job.Cancel) }
+        }
     }
-    [pscustomobject]@{ Out = $out.Result + $err.Result; Code = $p.ExitCode; TimedOut = $false }
+    [pscustomobject]@{ Out = $out.Result + $err.Result; Code = $p.ExitCode; TimedOut = $false; Cancelled = $false }
 }
+# Report progress to the activity bar ($Job is shared with the window; it is $null in plain runs).
+function Set-JobProgress([string]$Text, [int]$Value = -1, [int]$Max = 0) {
+    if ($Job) { $Job.Text = $Text; $Job.Value = $Value; $Job.Max = $Max }
+}
+function Test-Cancelled { [bool]($Job -and $Job.Cancel) }
 # Every subfolder under Root (not Root itself), again never crossing a junction.
 function Get-DirsSafe([string]$Root) {
     if (-not [IO.Directory]::Exists($Root)) { return }
@@ -143,12 +946,21 @@ function Get-DirsSafe([string]$Root) {
 '@
 
 $script:Jobs = New-Object System.Collections.ArrayList
-function Start-Bg([scriptblock]$Work, $Arg, [scriptblock]$Done) {
+# -Label shows the job in the activity bar at the bottom of the window; -Cancellable adds a Cancel button.
+# The Done block gets the results, and the job's state as a second argument ($State.Cancel says if it was stopped).
+function Start-Bg([scriptblock]$Work, $Arg, [scriptblock]$Done, [string]$Label, [switch]$Cancellable) {
     # param() must come first in a script, so the work block runs as a nested block after the helpers.
     $code = "param(`$BgArg)`n$Helpers`n& {`n$Work`n} `$BgArg"
-    $ps = [powershell]::Create().AddScript($code).AddArgument($Arg)
-    [void]$script:Jobs.Add(@{ PS = $ps; Handle = $ps.BeginInvoke(); Done = $Done })
+    $state = [hashtable]::Synchronized(@{ Text = ''; Value = -1; Max = 0; Cancel = $false })
+    $rs = [runspacefactory]::CreateRunspace(); $rs.Open()
+    $rs.SessionStateProxy.SetVariable('Job', $state)
+    $ps = [powershell]::Create(); $ps.Runspace = $rs
+    [void]$ps.AddScript($code).AddArgument($Arg)
+    [void]$script:Jobs.Add(@{ PS = $ps; RS = $rs; Handle = $ps.BeginInvoke(); Done = $Done; Label = $Label; State = $state; Cancellable = [bool]$Cancellable })
+    if ($activity) { Update-ActivityBar }
 }
+# Page data is loaded in the background a couple of jobs at a time, so the window opens instantly.
+$script:LoadQueue = New-Object System.Collections.ArrayList
 $JobTimer = New-Object Windows.Forms.Timer
 $JobTimer.Interval = 250
 $JobTimer.Add_Tick({
@@ -157,21 +969,42 @@ $JobTimer.Add_Tick({
         [void]$script:Jobs.Remove($j)
         try { $result = @($j.PS.EndInvoke($j.Handle)) }
         catch { $result = @(); Show-Msg "Something went wrong:`n$($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
-        $j.PS.Dispose()
-        & $j.Done $result
+        $j.PS.Dispose(); $j.RS.Dispose()
+        & $j.Done $result $j.State
     }
+    while ($script:LoadQueue.Count -and $script:Jobs.Count -lt 2) {
+        $next = $script:LoadQueue[0]; $script:LoadQueue.RemoveAt(0)
+        Invoke-PageLoader $next
+    }
+    if ($activity) { Update-ActivityBar }
+    if ($script:ReportPending -and -not $script:Jobs.Count -and -not $script:LoadQueue.Count) { $script:ReportPending = $false; Save-ReportNow }
 })
 $JobTimer.Start()
 
 # ---------------------------------------------------------------------------
 # Window, theme and layout helpers
 # ---------------------------------------------------------------------------
-$Theme = @{
-    Accent = [Drawing.Color]::FromArgb(0, 103, 192); AccentDark = [Drawing.Color]::FromArgb(0, 84, 160); AccentSoft = [Drawing.Color]::FromArgb(222, 236, 250)
-    Side = [Drawing.Color]::FromArgb(243, 244, 246); Hover = [Drawing.Color]::FromArgb(229, 231, 235)
-    Text = [Drawing.Color]::FromArgb(32, 32, 32); Dim = [Drawing.Color]::FromArgb(105, 105, 110)
-    Border = [Drawing.Color]::FromArgb(206, 209, 214); Soft = [Drawing.Color]::FromArgb(246, 247, 249)
-    WarnBg = [Drawing.Color]::FromArgb(255, 245, 219); WarnText = [Drawing.Color]::FromArgb(128, 68, 0)
+# Light and dark palettes. Settings > Theme picks one; the default follows Windows.
+function Rgb([int]$R, [int]$G, [int]$B) { [Drawing.Color]::FromArgb($R, $G, $B) }
+$WindowsDark = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -ErrorAction SilentlyContinue).AppsUseLightTheme -eq 0
+$Dark = switch ($Settings.Theme) { 'dark' { $true } 'light' { $false } default { $WindowsDark } }
+$Theme = if (-not $Dark) {
+    @{  Bg = (Rgb 255 255 255); Input = (Rgb 255 255 255); Side = (Rgb 243 244 246); Hover = (Rgb 229 231 235)
+        Text = (Rgb 32 32 32); Dim = (Rgb 105 105 110); Border = (Rgb 206 209 214); Soft = (Rgb 246 247 249)
+        Accent = (Rgb 0 103 192); AccentDark = (Rgb 0 84 160); AccentSoft = (Rgb 222 236 250); AccentText = (Rgb 0 95 180)
+        WarnBg = (Rgb 255 245 219); WarnText = (Rgb 128 68 0)
+        Bad = (Rgb 176 32 32); Warn = (Rgb 196 98 0); Good = (Rgb 20 120 50); Muted = (Rgb 130 130 135) }
+} else {
+    @{  Bg = (Rgb 32 32 34); Input = (Rgb 45 45 48); Side = (Rgb 43 43 46); Hover = (Rgb 58 58 62)
+        Text = (Rgb 236 236 236); Dim = (Rgb 165 165 170); Border = (Rgb 82 82 88); Soft = (Rgb 44 44 48)
+        Accent = (Rgb 0 110 205); AccentDark = (Rgb 0 92 175); AccentSoft = (Rgb 36 58 86); AccentText = (Rgb 110 180 255)
+        WarnBg = (Rgb 64 50 22); WarnText = (Rgb 255 208 130)
+        Bad = (Rgb 255 120 110); Warn = (Rgb 255 178 80); Good = (Rgb 110 205 135); Muted = (Rgb 140 140 146) }
+}
+# Dark title bar, scrollbars and list headers (Windows 10 1809 and later).
+function Set-DarkChrome($Control, [string]$ThemeName = 'DarkMode_Explorer') {
+    if (-not $Dark) { return }
+    try { [void][PcTuneUp.Native]::SetWindowTheme($Control.Handle, $ThemeName, $null) } catch { }
 }
 $Font = New-Object Drawing.Font('Segoe UI', 9.75)
 $FontBold = New-Object Drawing.Font('Segoe UI Semibold', 9.75)
@@ -179,15 +1012,19 @@ $FontSmall = New-Object Drawing.Font('Segoe UI Semibold', 8.25)
 $FontTitle = New-Object Drawing.Font('Segoe UI Semibold', 16)
 $form = New-Object Windows.Forms.Form
 $form.Text = "PC Tune-Up $AppVersion" + $(if ($IsAdmin) { '  (Administrator)' } else { '' })
+# Sizes below are written for 100% scaling; Scale-ToScreen grows the whole window to the screen's scaling just before it opens.
+$form.AutoScaleMode = 'None'
 $form.ClientSize = New-Object Drawing.Size(1140, 740)
-$form.MinimumSize = New-Object Drawing.Size(960, 600)
 $form.StartPosition = 'CenterScreen'
-$form.Font = $Font; $form.BackColor = [Drawing.Color]::White; $form.ForeColor = $Theme.Text
+$form.Font = $Font; $form.BackColor = $Theme.Bg; $form.ForeColor = $Theme.Text
+$form.Add_HandleCreated({
+    if ($Dark) { $on = 1; try { [void][PcTuneUp.Native]::DwmSetWindowAttribute($form.Handle, 20, [ref]$on, 4) } catch { } }   # 20 = dark title bar
+})
 if ($RunningAsExe) { try { $form.Icon = [Drawing.Icon]::ExtractAssociatedIcon($SelfExe) } catch { } }
 
 # A sidebar on the left picks which page shows in the content area (see Build-Sidebar at the end).
 $content = New-Object Windows.Forms.Panel
-$content.Dock = 'Fill'; $content.BackColor = [Drawing.Color]::White
+$content.Dock = 'Fill'; $content.BackColor = $Theme.Bg
 $sidebar = New-Object Windows.Forms.Panel
 $sidebar.Dock = 'Left'; $sidebar.Width = 204; $sidebar.BackColor = $Theme.Side
 $form.Controls.Add($content); $form.Controls.Add($sidebar)
@@ -196,7 +1033,7 @@ $script:Pages = New-Object System.Collections.ArrayList
 function New-Page([string]$Title, [string]$IntroText) {
     $page = New-Object Windows.Forms.Panel
     $page.Name = $Title; $page.Text = $Title; $page.Dock = 'Fill'; $page.Visible = $false
-    $page.Padding = New-Object Windows.Forms.Padding(26, 16, 26, 12); $page.BackColor = [Drawing.Color]::White
+    $page.Padding = New-Object Windows.Forms.Padding(26, 16, 26, 12); $page.BackColor = $Theme.Bg
     $content.Controls.Add($page)
     [void]$script:Pages.Add($page)
     $head = New-Object Windows.Forms.Panel
@@ -220,16 +1057,25 @@ function Set-PageLayout($Page, $Fill, [object[]]$Tops, $Bottom) {
 }
 function New-ButtonBar([object[]]$Buttons) {
     $bar = New-Object Windows.Forms.FlowLayoutPanel
-    $bar.Dock = 'Top'; $bar.Height = 50; $bar.WrapContents = $false; $bar.Padding = New-Object Windows.Forms.Padding(0, 2, 0, 8)
+    $bar.Dock = 'Top'; $bar.AutoSize = $true; $bar.AutoSizeMode = 'GrowAndShrink'; $bar.WrapContents = $true
+    $bar.Padding = New-Object Windows.Forms.Padding(0, 2, 0, 6)
     foreach ($b in $Buttons) { $bar.Controls.Add($b) }
     $bar
 }
 function New-Button([string]$Text) {
     $b = New-Object Windows.Forms.Button
     $b.Text = $Text; $b.AutoSize = $true; $b.MinimumSize = New-Object Drawing.Size(0, 34)
-    $b.Padding = New-Object Windows.Forms.Padding(10, 0, 10, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 0, 8, 0)
+    $b.Padding = New-Object Windows.Forms.Padding(10, 0, 10, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 0, 8, 6)
     $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.Cursor = [Windows.Forms.Cursors]::Hand
-    $b.BackColor = [Drawing.Color]::White; $b.FlatAppearance.BorderColor = $Theme.Border; $b.FlatAppearance.MouseOverBackColor = $Theme.Soft
+    $b.BackColor = $Theme.Bg; $b.ForeColor = $Theme.Text; $b.FlatAppearance.BorderColor = $Theme.Border; $b.FlatAppearance.MouseOverBackColor = $Theme.Soft
+    # Windows draws disabled text in a fixed grey that is unreadable on dark backgrounds; draw it ourselves.
+    $b.Add_Paint({
+        param($sender, $e)
+        if ($sender.Enabled) { return }
+        $e.Graphics.Clear($sender.BackColor)
+        $pen = New-Object Drawing.Pen($Theme.Border); $e.Graphics.DrawRectangle($pen, 0, 0, $sender.Width - 1, $sender.Height - 1); $pen.Dispose()
+        [Windows.Forms.TextRenderer]::DrawText($e.Graphics, $sender.Text, $sender.Font, $sender.ClientRectangle, $Theme.Muted, 'HorizontalCenter, VerticalCenter, EndEllipsis')
+    })
     $b
 }
 # The main action of a page: filled blue.
@@ -246,10 +1092,26 @@ function Update-PrimaryLook($Button) {
 function New-ListView([bool]$Checks, [object[]]$Columns) {
     $lv = New-Object Windows.Forms.ListView
     $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.Dock = 'Fill'
-    $lv.BorderStyle = 'None'; $lv.HeaderStyle = 'Nonclickable'
-    $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, 26)   # taller rows
+    $lv.BorderStyle = 'None'; $lv.HeaderStyle = 'Nonclickable'; $lv.BackColor = $Theme.Bg; $lv.ForeColor = $Theme.Text
+    $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, (Px 26))   # taller rows
     $lv.SmallImageList = $rows
-    for ($i = 0; $i -lt $Columns.Count; $i += 2) { [void]$lv.Columns.Add($Columns[$i], $Columns[$i + 1]) }
+    for ($i = 0; $i -lt $Columns.Count; $i += 2) { [void]$lv.Columns.Add($Columns[$i], (Px $Columns[$i + 1])) }
+    if ($Dark) {   # the native header ignores colours, so draw it; rows still draw themselves
+        $lv.OwnerDraw = $true
+        $lv.Add_DrawColumnHeader({
+            param($sender, $e)
+            $brush = New-Object Drawing.SolidBrush($Theme.Side); $e.Graphics.FillRectangle($brush, $e.Bounds); $brush.Dispose()
+            $r = $e.Bounds; $r.X += (Px 5); $r.Width -= (Px 5)
+            [Windows.Forms.TextRenderer]::DrawText($e.Graphics, $e.Header.Text, $sender.Font, $r, $Theme.Dim, 'VerticalCenter, Left, EndEllipsis')
+        })
+        $lv.Add_DrawItem({ param($sender, $e) $e.DrawDefault = $true })
+        $lv.Add_DrawSubItem({ param($sender, $e) $e.DrawDefault = $true })
+    }
+    $lv.Add_HandleCreated({
+        Set-DarkChrome $this
+        $header = [PcTuneUp.Native]::SendMessage($this.Handle, 0x101F, [IntPtr]::Zero, [IntPtr]::Zero)   # LVM_GETHEADER
+        if ($Dark -and $header -ne [IntPtr]::Zero) { try { [void][PcTuneUp.Native]::SetWindowTheme($header, 'DarkMode_ItemsView', $null) } catch { } }
+    })
     $lv.Tag = @($lv.Columns | ForEach-Object Width)   # designed widths
     $lv.Add_Resize({ Resize-LastColumn $this })
     $lv
@@ -277,14 +1139,16 @@ function New-DetailBox([int]$Height = 110) {
     $wrap.Dock = 'Bottom'; $wrap.Height = $Height; $wrap.BackColor = $Theme.Soft; $wrap.Padding = New-Object Windows.Forms.Padding(12, 10, 12, 8)
     $box = New-Object Windows.Forms.TextBox
     $box.Multiline = $true; $box.ReadOnly = $true; $box.Dock = 'Fill'; $box.ScrollBars = 'Vertical'
-    $box.BorderStyle = 'None'; $box.BackColor = $Theme.Soft
+    $box.BorderStyle = 'None'; $box.BackColor = $Theme.Soft; $box.ForeColor = $Theme.Text
+    $box.Add_HandleCreated({ Set-DarkChrome $this })
     $wrap.Controls.Add($box)
     $box | Add-Member -NotePropertyName Wrapper -NotePropertyValue $wrap
     $box
 }
 function Add-Row($Lv, [object[]]$Cells, $Tag = $null, [bool]$Checked = $false) {
     $it = New-Object Windows.Forms.ListViewItem([string]$Cells[0])
-    foreach ($c in $Cells[1..($Cells.Count - 1)]) { [void]$it.SubItems.Add([string]$c) }
+    $it.Text = T ([string]$Cells[0])
+    foreach ($c in $Cells[1..($Cells.Count - 1)]) { [void]$it.SubItems.Add((T ([string]$c))) }
     $it.Tag = $Tag; $it.Checked = $Checked
     [void]$Lv.Items.Add($it)
     $it
@@ -304,12 +1168,20 @@ $btnKeep = New-Button 'Keep list'
 # Readings as a two-column grid: grey label, value.
 $gridHealth = New-Object Windows.Forms.TableLayoutPanel
 $gridHealth.Dock = 'Top'; $gridHealth.AutoSize = $true; $gridHealth.AutoSizeMode = 'GrowAndShrink'; $gridHealth.ColumnCount = 2
-[void]$gridHealth.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', 110)))
+[void]$gridHealth.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', (Px 110))))
 [void]$gridHealth.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
 $gridHealth.Padding = New-Object Windows.Forms.Padding(0, 0, 0, 8)
 $lblAdvice = New-Object Windows.Forms.Label
 $lblAdvice.Dock = 'Top'; $lblAdvice.Height = 0; $lblAdvice.BackColor = $Theme.WarnBg; $lblAdvice.ForeColor = $Theme.WarnText
 $lblAdvice.Padding = New-Object Windows.Forms.Padding(12, 8, 12, 8)
+# The advice box grows to fit its text at the current width (long lines wrap).
+function Resize-Advice {
+    if (-not $lblAdvice.Text) { $lblAdvice.Height = 0; return }
+    $w = [Math]::Max((Px 300), $lblAdvice.ClientSize.Width - $lblAdvice.Padding.Horizontal)
+    $sz = [Windows.Forms.TextRenderer]::MeasureText($lblAdvice.Text, $lblAdvice.Font, (New-Object Drawing.Size($w, 0)), 'WordBreak')
+    $lblAdvice.Height = $sz.Height + $lblAdvice.Padding.Vertical + 2
+}
+$lblAdvice.Add_SizeChanged({ if (-not $script:SizingAdvice) { $script:SizingAdvice = $true; Resize-Advice; $script:SizingAdvice = $false } })
 $lblSpeed = New-Object Windows.Forms.Label
 $lblSpeed.Dock = 'Top'; $lblSpeed.Height = 34; $lblSpeed.TextAlign = 'MiddleLeft'; $lblSpeed.ForeColor = $Theme.Dim
 $lblSpeed.Text = 'Internet:  not tested yet - click Speed test'
@@ -325,9 +1197,9 @@ function Set-KeyValues($Grid, [string[]]$Lines) {
     foreach ($l in $Lines) {
         $k, $v = if ($l -match '^([^:]+):\s+(.*)$') { $Matches[1], $Matches[2] } else { '', $l }
         $kl = New-Object Windows.Forms.Label
-        $kl.Text = $k; $kl.ForeColor = $Theme.Dim; $kl.AutoSize = $true; $kl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
+        $kl.Text = T $k; $kl.ForeColor = $Theme.Dim; $kl.AutoSize = $true; $kl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
         $vl = New-Object Windows.Forms.Label
-        $vl.Text = $v; $vl.AutoSize = $true; $vl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
+        $vl.Text = T $v; $vl.AutoSize = $true; $vl.Margin = New-Object Windows.Forms.Padding(0, 3, 0, 3)
         $Grid.Controls.Add($kl, 0, $Grid.RowCount); $Grid.Controls.Add($vl, 1, $Grid.RowCount); $Grid.RowCount++
     }
     $Grid.ResumeLayout()
@@ -436,7 +1308,7 @@ function Update-Health([switch]$Quick) {
     $script:HealthLines = $lines
     Set-KeyValues $gridHealth $lines
     $lblAdvice.Text = ($advice | ForEach-Object { [char]0x2022 + "  $_" }) -join "`r`n"
-    $lblAdvice.Height = if ($advice) { ($Font.Height + 3) * $advice.Count + 16 } else { 0 }
+    Resize-Advice
     $script:HealthAdvice = $advice
     if ($script:NavButtons) { Update-NavBadges }
 
@@ -445,7 +1317,7 @@ function Update-Health([switch]$Quick) {
     $lvProc.EndUpdate()
 
     if (-not $Quick) {   # refresh the slow checks too, then redraw with them
-        Start-Bg $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0] }; Update-Health -Quick }
+        Start-Bg -Label 'Checking drive, battery and updates' $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0] }; Update-Health -Quick }
     }
 }
 
@@ -468,7 +1340,7 @@ $btnRefresh.Add_Click({ Update-Health })
 $btnSpeed.Add_Click({
     $btnSpeed.Enabled = $false
     $lblSpeed.Text = 'Internet:  testing... (about 10 seconds)'
-    Start-Bg $SpeedWork $null {
+    Start-Bg -Label 'Testing internet speed' $SpeedWork $null {
         param($r)
         $r = $r[0]
         $txt = if ($r.Error) { "Internet:  download failed - $($r.Error)" } else { 'Internet:  {0:N0} Mbps download' -f $r.Mbps }
@@ -573,7 +1445,9 @@ foreach ($t in $CleanTargets) {
 $ScanCleanWork = {
     param($targets)
     $cutoff = (Get-Date).AddDays(-1)
+    $n = 0; $all = @($targets).Count
     foreach ($t in $targets) {
+        $n++; Set-JobProgress $t.Name $n $all
         $bytes = 0; $count = 0
         if (@($t.Path)[0] -eq 'RECYCLE') {
             try { foreach ($i in (New-Object -ComObject Shell.Application).NameSpace(10).Items()) { $bytes += $i.Size; $count++ } } catch { }
@@ -606,7 +1480,9 @@ $DoCleanWork = {
         foreach ($k in Get-ChildItem $base) { Remove-ItemProperty -LiteralPath $k.PSPath -Name StateFlags0777 -ErrorAction SilentlyContinue }
         [pscustomobject]@{ Name = ($win.Name -join ' + '); Freed = $freed; Skipped = 0 }
     }
+    $n = 0; $all = @($targets).Count
     foreach ($t in $targets) {
+        $n++; if (Test-Cancelled) { break }; Set-JobProgress $t.Name $n $all
         $freed = 0; $skipped = 0
         if (@($t.Path)[0] -eq 'CLEANMGR') { continue }
         if (@($t.Path)[0] -eq 'RECYCLE') {
@@ -614,7 +1490,7 @@ $DoCleanWork = {
         } else {
             foreach ($root in @($t.Path)) {
                 foreach ($f in @(Get-FilesSafe $root $t.Filter)) {
-                    if ($f.LastWriteTime -ge $cutoff) { continue }
+                    if (Test-Cancelled) { break }; if ($f.LastWriteTime -ge $cutoff) { continue }
                     try { $len = $f.Length; $f.Delete(); $freed += $len } catch { $skipped++ }
                 }
                 if ($t.Filter -eq '*') {
@@ -633,7 +1509,7 @@ $DoCleanWork = {
 function Start-CleanScan {
     $btnScan.Enabled = $false; $btnClean.Enabled = $false
     $lblClean.Text = 'Scanning...'
-    Start-Bg $ScanCleanWork $CleanTargets {
+    Start-Bg -Label 'Measuring junk files' $ScanCleanWork $CleanTargets {
         param($results)
         $total = 0
         foreach ($r in $results) {
@@ -642,7 +1518,7 @@ function Start-CleanScan {
                 $it.Tag.Bytes = $r.Bytes
                 $it.SubItems[1].Text = if ($r.Bytes -lt 0) { '?' } else { Format-Size $r.Bytes }
                 $it.SubItems[2].Text = if ($r.Count -lt 0) { '-' } else { '{0:N0}' -f $r.Count }
-                $it.SubItems[3].Text = if (Test-Open $it.Tag) { "$($it.Tag.Name -replace ' cache$', '') is open - close it to clean this" } else { $it.Tag.Note }
+                $it.SubItems[3].Text = T $(if (Test-Open $it.Tag) { "$($it.Tag.Name -replace ' cache$', '') is open - close it to clean this" } else { $it.Tag.Note })
                 if ($it.Checked -and $r.Bytes -gt 0) { $total += $r.Bytes }
             }
         }
@@ -662,7 +1538,7 @@ $btnClean.Add_Click({
     if ((Show-Msg "Delete the junk in:`n$names`n`nThis can't be undone (it's all re-creatable).$skipNote" 'YesNo' 'Question') -ne 'Yes') { return }
     $btnScan.Enabled = $false; $btnClean.Enabled = $false
     $lblClean.Text = 'Cleaning...'
-    Start-Bg $DoCleanWork $picked {
+    Start-Bg -Label 'Cleaning' -Cancellable $DoCleanWork $picked {
         param($results)
         $total = 0; $skip = 0
         foreach ($r in $results) { $total += $r.Freed; $skip += $r.Skipped; Add-History 'Clean' $r.Name ('freed {0}, {1} in-use files skipped' -f (Format-Size $r.Freed), $r.Skipped) }
@@ -745,8 +1621,8 @@ function Update-Startup {
                 if ($text -match $StartupSafeOff) { $advice = 'safe to turn off'; break }
             }
             $display = $e.Name -replace '_[0-9A-F]{32}$', ''
-            $it = Add-Row $lvStart @($display, $s.Scope, $advice, $e.Cmd) @{ Src = $s; Name = $e.Name; On = $on } $on
-            if ($advice -like 'keep*') { $it.ForeColor = [Drawing.Color]::DarkGreen }
+            $it = Add-Row $lvStart @($display, $s.Scope, $advice, $e.Cmd) @{ Src = $s; Name = $e.Name; On = $on; Advice = $advice } $on
+            if ($advice -like 'keep*') { $it.ForeColor = $Theme.Good }
         }
     }
     $lvStart.EndUpdate()
@@ -855,7 +1731,9 @@ $BloatScanWork = {
 }
 $BloatRemoveWork = {
     param($items)
+    $n = 0; $all = @($items).Count
     foreach ($i in $items) {
+        $n++; if (Test-Cancelled) { break }; Set-JobProgress $i.Name $n $all
         $ok = $false; $msg = ''
         try {
             if ($i.Package) {
@@ -884,15 +1762,15 @@ $BloatRemoveWork = {
 function Start-BloatScan {
     $btnBloatScan.Enabled = $false; $btnBloatRemove.Enabled = $false
     $lblBloat.Text = 'Looking for bloatware...'
-    Start-Bg $BloatScanWork @{ Catalog = $BloatCatalog; UserKeep = (Get-UserKeep) } {
+    Start-Bg -Label 'Looking for bloatware' $BloatScanWork @{ Catalog = $BloatCatalog; UserKeep = (Get-UserKeep) } {
         param($rows)
         $lvBloat.BeginUpdate(); $lvBloat.Items.Clear()
         $order = @{ 'Junk' = 0; 'Trial AV' = 1; 'Optional' = 2 }
         foreach ($r in $rows | Sort-Object { $order[$_.Cat] }, Name) {
             $size = if ($r.Bytes) { Format-Size $r.Bytes } else { '' }
             $it = Add-Row $lvBloat @($r.Name, $r.Type, $r.Cat, $r.Why, $size, $r.Publisher) $r ($r.Cat -eq 'Junk')
-            if ($r.Cat -eq 'Junk') { $it.ForeColor = [Drawing.Color]::DarkRed }
-            elseif ($r.Cat -eq 'Trial AV') { $it.ForeColor = [Drawing.Color]::DarkOrange }
+            if ($r.Cat -eq 'Junk') { $it.ForeColor = $Theme.Bad }
+            elseif ($r.Cat -eq 'Trial AV') { $it.ForeColor = $Theme.Warn }
         }
         $lvBloat.EndUpdate()
         $lblBloat.Text = if ($rows.Count) { "Found $($rows.Count) item(s). Check what you want gone and click Uninstall." }
@@ -905,7 +1783,7 @@ $btnBloatApps.Add_Click({ Start-Process 'ms-settings:appsfeatures' })
 $btnBloatRestore.Add_Click({
     $btnBloatRestore.Enabled = $false
     $lblBloat.Text = 'Creating a restore point (can take a minute)...'
-    Start-Bg { try { Checkpoint-Computer -Description 'PC Tune-Up' -RestorePointType APPLICATION_UNINSTALL -ErrorAction Stop; 'ok' } catch { $_.Exception.Message } } $null {
+    Start-Bg -Label 'Creating a restore point' { try { Checkpoint-Computer -Description 'PC Tune-Up' -RestorePointType APPLICATION_UNINSTALL -ErrorAction Stop; 'ok' } catch { $_.Exception.Message } } $null {
         param($r)
         $lblBloat.Text = if ("$($r[0])" -eq 'ok') { 'Restore point created (Windows skips it if one was made in the last 24 hours).' }
                          else { "Restore point failed: $($r[0]) - System Protection may be off for C:." }
@@ -922,7 +1800,8 @@ $btnBloatRemove.Add_Click({
     if ((Show-Msg $q 'YesNo' 'Warning') -ne 'Yes') { return }
     $btnBloatScan.Enabled = $false; $btnBloatRemove.Enabled = $false
     $lblBloat.Text = 'Uninstalling... (watch for uninstaller windows)'
-    Start-Bg $BloatRemoveWork $picked {
+    $script:BloatPicked = $picked
+    Start-WithRestorePoint 'uninstalling apps' { Start-Bg -Label 'Uninstalling' -Cancellable $BloatRemoveWork $script:BloatPicked {
         param($results)
         $bad = @()
         foreach ($r in $results) {
@@ -936,7 +1815,7 @@ $btnBloatRemove.Add_Click({
         if ($bad) { $msg += "`n`nProblems:`n" + ($bad -join "`n") }
         Show-Msg $msg | Out-Null
         Start-BloatScan
-    }
+    } }
 })
 
 # ===========================================================================
@@ -1044,7 +1923,7 @@ function Update-Services {
     $lblSvc.Text = 'Looking at services...'
     $orig = Get-ServiceOriginals
     $cfg = @{ Catalog = $ServiceCatalog; Keep = $KeepBuiltIn; Likely = $ServiceLikely; UserKeep = (Get-UserKeep); Changed = @($orig.Keys) }
-    Start-Bg $SvcScanWork $cfg {
+    Start-Bg -Label 'Reading services' $SvcScanWork $cfg {
         param($rows)
         $orig = Get-ServiceOriginals
         $order = @{ known = 0; likely = 1; review = 2 }
@@ -1054,8 +1933,8 @@ function Update-Services {
             $o = if ($orig.ContainsKey($r.Name)) { $orig[$r.Name] } else { '' }
             $what = if ($r.Kind -eq 'review') { "$($r.Display)  (review: $($r.Why))" } else { "$($r.Why) - $($r.Display)" }
             $it = Add-Row $lvSvc @($r.Name, $what, $r.Company, $r.Start, $r.State, $(if ($r.Suggest) { $r.Suggest } else { '-' }), $o) $r
-            if ($r.Suggest -and $r.Start -eq $r.Suggest) { $it.ForeColor = [Drawing.Color]::Gray }
-            elseif ($r.Kind -eq 'review') { $it.ForeColor = [Drawing.Color]::DimGray }
+            if ($r.Suggest -and $r.Start -eq $r.Suggest) { $it.ForeColor = $Theme.Muted }
+            elseif ($r.Kind -eq 'review') { $it.ForeColor = $Theme.Muted }
             elseif ($r.Suggest) { $todo++ }
         }
         $lvSvc.EndUpdate()
@@ -1070,7 +1949,7 @@ function Set-Services([string]$Mode) {
     $orig = Get-ServiceOriginals
     $done = 0; $failed = @(); $skipped = 0
     foreach ($it in $lvSvc.CheckedItems) {
-        $name = $it.Text
+        $name = $it.Tag.Name
         $target = switch ($Mode) {
             'Restore' { if ($orig.ContainsKey($name)) { $orig[$name] } else { 'Automatic' } }
             'Manual'  { 'Manual' }
@@ -1088,8 +1967,8 @@ function Set-Services([string]$Mode) {
     Show-Msg $msg | Out-Null
 }
 $btnSvcReload.Add_Click({ Update-Services })
-$btnSvcApply.Add_Click({ Set-Services 'Suggest' })
-$btnSvcManual.Add_Click({ Set-Services 'Manual' })
+$btnSvcApply.Add_Click({ Start-WithRestorePoint 'changing services' { Set-Services 'Suggest' } })
+$btnSvcManual.Add_Click({ Start-WithRestorePoint 'changing services' { Set-Services 'Manual' } })
 $btnSvcRestore.Add_Click({ Set-Services 'Restore' })
 
 # ===========================================================================
@@ -1120,7 +1999,8 @@ $DiskPicks = [ordered]@{
     'Program Files (x86)' = ${env:ProgramFiles(x86)}
     'Whole C: drive (slow)' = 'C:\'
 }
-foreach ($k in $DiskPicks.Keys) { if (-not $DiskPicks[$k] -or (Test-Path -LiteralPath $DiskPicks[$k])) { [void]$cmbDisk.Items.Add($k) } }
+$script:DiskPickKeys = @(foreach ($k in $DiskPicks.Keys) { if (-not $DiskPicks[$k] -or (Test-Path -LiteralPath $DiskPicks[$k])) { $k } })
+foreach ($k in $script:DiskPickKeys) { [void]$cmbDisk.Items.Add((T $k)) }
 $cmbDisk.SelectedIndex = 0
 
 $DiskWork = {
@@ -1129,7 +2009,9 @@ $DiskWork = {
     $loose = 0
     try { foreach ($f in [IO.DirectoryInfo]::new($root).EnumerateFiles()) { $loose += $f.Length } } catch { }
     $subdirs = try { @([IO.DirectoryInfo]::new($root).EnumerateDirectories()) } catch { @() }
+    $n = 0
     foreach ($d in $subdirs) {
+        $n++; if (Test-Cancelled) { break }; Set-JobProgress $d.Name $n $subdirs.Count
         if ($d.Attributes -band [IO.FileAttributes]::ReparsePoint) { continue }
         $sum = 0
         foreach ($f in Get-FilesSafe $d.FullName) { $sum += $f.Length }
@@ -1143,7 +2025,7 @@ function Start-DiskScan([string]$Path) {
     $txtDisk.Text = $Path
     $btnDiskScan.Enabled = $false; $lvDisk.Items.Clear()
     $lblDisk.Text = 'Scanning... big folders like C:\ can take a few minutes.'
-    Start-Bg $DiskWork $Path {
+    Start-Bg -Label 'Measuring folders' -Cancellable $DiskWork $Path {
         param($rows)
         $total = ($rows | Measure-Object Bytes -Sum).Sum
         $lvDisk.BeginUpdate()
@@ -1160,7 +2042,7 @@ function Start-DiskScan([string]$Path) {
 }
 $btnDiskScan.Add_Click({ Start-DiskScan $txtDisk.Text })
 $cmbDisk.Add_SelectedIndexChanged({
-    $p = $DiskPicks[[string]$cmbDisk.SelectedItem]
+    $p = $DiskPicks[$script:DiskPickKeys[$cmbDisk.SelectedIndex]]
     if ($p) { Start-DiskScan $p; $cmbDisk.SelectedIndex = 0 }   # reset so the same pick works again
 })
 $btnDiskUp.Add_Click({ $p = Split-Path $txtDisk.Text -Parent; if ($p) { Start-DiskScan $p } })
@@ -1223,18 +2105,20 @@ $UpdScanWork = {
 $UpdRunWork = {
     param($items)
     $wg = Get-Command winget.exe -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+    $n = 0; $all = @($items).Count
     foreach ($i in $items) {
+        $n++; if (Test-Cancelled) { break }; Set-JobProgress $i.Name $n $all
         $r = Invoke-Native $wg "upgrade --id `"$($i.Id)`" --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity" 1800
         $last = $r.Out -split "`n" | ForEach-Object { ($_.TrimEnd("`r") -split "`r")[-1].Trim() } |
                 Where-Object { $_ -and $_ -notmatch '^[\-\\|/\s]+$' -and $_ -notmatch '\d+(\.\d+)? ?[KMG]B ?/ ?\d' } | Select-Object -Last 1
         [pscustomobject]@{ Name = $i.Name; Id = $i.Id; From = $i.Version; To = $i.Available; Ok = ($r.Code -eq 0)
-                           Msg = $(if ($r.TimedOut) { 'took longer than 30 minutes - stopped' } else { $last }) }
+                           Msg = $(if ($r.Cancelled) { 'stopped - you pressed Cancel' } elseif ($r.TimedOut) { 'took longer than 30 minutes - stopped' } else { $last }) }
     }
 }
 function Start-UpdScan {
     $btnUpdScan.Enabled = $false; $btnUpdRun.Enabled = $false
     $lblUpd.Text = 'Asking winget which programs have updates (20-60 seconds)...'
-    Start-Bg $UpdScanWork $null {
+    Start-Bg -Label 'Checking for program updates' -Cancellable $UpdScanWork $null {
         param($r)
         $r = $r[0]
         $btnUpdScan.Enabled = $true; $btnUpdRun.Enabled = $true
@@ -1254,7 +2138,7 @@ function Start-UpdScan {
                     elseif ((Get-Major $u.Version) -ne (Get-Major $u.Available)) { 'major new version - check it still suits you' }
                     else { $on = $true; 'small update' }
             $it = Add-Row $lvUpd @($u.Name, $u.Version, $u.Available, $note) $u $on
-            if (-not $on) { $it.ForeColor = [Drawing.Color]::DimGray }
+            if (-not $on) { $it.ForeColor = $Theme.Muted }
         }
         $lvUpd.EndUpdate()
         $n = $r.Rows.Count
@@ -1273,7 +2157,7 @@ $btnUpdRun.Add_Click({
     if ((Show-Msg $q 'YesNo' 'Question') -ne 'Yes') { return }
     $btnUpdScan.Enabled = $false; $btnUpdRun.Enabled = $false
     $lblUpd.Text = "Updating $($picked.Count) program(s)... watch for permission prompts."
-    Start-Bg $UpdRunWork $picked {
+    Start-Bg -Label 'Updating programs' -Cancellable $UpdRunWork $picked {
         param($results)
         $bad = @()
         foreach ($r in $results) {
@@ -1300,6 +2184,8 @@ Set-PageLayout $pgSec $lvSec @((New-ButtonBar @($btnSecScan, $btnSecOpen, $btnSe
 $lblSec = New-Status; $pgSec.Controls.Add($lblSec)
 
 $SecScanWork = {
+    param($culture)
+    if ($culture) { [Threading.Thread]::CurrentThread.CurrentCulture = [Globalization.CultureInfo]::GetCultureInfo($culture) }
     $PSDefaultParameterValues = @{ 'Get-CimInstance:OperationTimeoutSec' = 15; 'Get-CimInstance:ErrorAction' = 'SilentlyContinue' }
     $rows = New-Object System.Collections.ArrayList
     function Add-Sec($Check, $Level, $Result, $Todo, $Link) { [void]$rows.Add([pscustomobject]@{ Check = $Check; Level = $Level; Result = $Result; Todo = $Todo; Link = $Link }) }
@@ -1440,13 +2326,13 @@ $SecLevels = @{ Problem = 0; Warning = 1; Info = 2; OK = 3 }
 function Update-Security {
     $btnSecScan.Enabled = $false
     $lblSec.Text = 'Checking security settings...'
-    Start-Bg $SecScanWork $null {
+    Start-Bg -Label 'Checking security' $SecScanWork $UiCulture.Name {
         param($rows)
         $btnSecScan.Enabled = $true
         $lvSec.BeginUpdate(); $lvSec.Items.Clear()
         foreach ($r in $rows | Sort-Object { $SecLevels[$_.Level] }) {
             $it = Add-Row $lvSec @($r.Check, $r.Level, $r.Result, $r.Todo) $r
-            $it.ForeColor = switch ($r.Level) { 'Problem' { [Drawing.Color]::DarkRed } 'Warning' { [Drawing.Color]::DarkOrange } 'OK' { [Drawing.Color]::DarkGreen } default { [Drawing.Color]::DimGray } }
+            $it.ForeColor = switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
         }
         $lvSec.EndUpdate()
         $p = @($rows | Where-Object Level -eq 'Problem').Count; $w = @($rows | Where-Object Level -eq 'Warning').Count
@@ -1601,14 +2487,14 @@ $StabLevels = @{ Problem = 0; Warning = 1; Info = 2 }
 function Update-Stability {
     $btnStabScan.Enabled = $false
     $lblStab.Text = 'Reading Windows'' logs...'
-    Start-Bg $StabScanWork $null {
+    Start-Bg -Label 'Reading Windows logs' $StabScanWork $null {
         param($r)
         $btnStabScan.Enabled = $true
         $r = $r[0]
         $lvStab.BeginUpdate(); $lvStab.Items.Clear()
         foreach ($s in $r.Rows | Sort-Object { $StabLevels[$_.Level] }, { - $_.Count }) {
             $it = Add-Row $lvStab @($s.Problem, $s.What, $s.Count, $(if ($s.Last) { $s.Last.ToString('g') } else { '' }), $s.Todo) $s
-            $it.ForeColor = switch ($s.Level) { 'Problem' { [Drawing.Color]::DarkRed } 'Warning' { [Drawing.Color]::DarkOrange } default { [Drawing.Color]::DimGray } }
+            $it.ForeColor = switch ($s.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } default { $Theme.Muted } }
         }
         $lvStab.EndUpdate()
         $score = if ($null -ne $r.Index) { 'Windows rates stability {0:0.0} out of 10. ' -f $r.Index } else { '' }
@@ -1901,7 +2787,7 @@ function Get-SupportInfo($Hw) {
 function Update-Upgrades {
     $btnUpgReload.Enabled = $false
     $txtUpg.Text = 'Looking at this PC''s hardware...'
-    Start-Bg $UpgradeCollectWork $null {
+    Start-Bg -Label 'Reading the hardware' $UpgradeCollectWork $null {
         param($r)
         $btnUpgReload.Enabled = $true
         if (-not $r) { $txtUpg.Text = 'Could not read the hardware details.'; return }
@@ -1912,8 +2798,8 @@ function Update-Upgrades {
         $lvUpg.BeginUpdate(); $lvUpg.Items.Clear()
         foreach ($u in (Get-UpgradeRows $script:UpgHw)) {
             $it = Add-Row $lvUpg @($u.Part, $u.Now, $u.Option, $u.Worth, $u.Spec) $u
-            if ($u.Worth -like 'Strongly*' -or $u.Worth -like 'Recommended*') { $it.ForeColor = [Drawing.Color]::DarkRed }
-            elseif ($u.Worth -in 'n/a', 'Not needed') { $it.ForeColor = [Drawing.Color]::Gray }
+            if ($u.Worth -like 'Strongly*' -or $u.Worth -like 'Recommended*') { $it.ForeColor = $Theme.Bad }
+            elseif ($u.Worth -in 'n/a', 'Not needed') { $it.ForeColor = $Theme.Muted }
         }
         $lvUpg.EndUpdate()
         if ($lvUpg.Items.Count) { $lvUpg.Items[0].Selected = $true } else { $txtUpg.Text = '' }
@@ -1950,10 +2836,9 @@ $pgHist = New-Page 'History' 'Every change PC Tune-Up made on this PC, newest fi
 $btnHistReload = New-Button 'Reload'
 $btnHistUndo = New-Button 'Undo checked'
 $btnHistLog = New-Button 'Open text log'
-$btnUpdate = New-Button 'Check for updates'
 $lvHist = New-ListView $true @('When', 140, 'What', 100, 'Item', 270, 'Change', 300, 'Undo', 150)
 $lblHist = New-Status
-Set-PageLayout $pgHist $lvHist @((New-ButtonBar @($btnHistReload, $btnHistUndo, $btnHistLog, $btnUpdate))) $lblHist
+Set-PageLayout $pgHist $lvHist @((New-ButtonBar @($btnHistReload, $btnHistUndo, $btnHistLog))) $lblHist
 
 function Get-UndoStatus($E) {
     if ($E.Undone) { 'undone' } elseif ($E.Undo.Type -eq 'Store') { 'reinstall from Store' } elseif ($E.Undo) { 'can undo' } else { '-' }
@@ -1964,7 +2849,7 @@ function Update-History {
     foreach ($e in $entries | Sort-Object Time -Descending) {
         $status = Get-UndoStatus $e
         $it = Add-Row $lvHist @(([datetime]$e.Time).ToString('g'), $e.Kind, $e.Item, $e.Change, $status) $e
-        if ($status -eq 'undone' -or $status -eq '-') { $it.ForeColor = [Drawing.Color]::Gray }
+        if ($status -eq 'undone' -or $status -eq '-') { $it.ForeColor = $Theme.Muted }
     }
     $lvHist.EndUpdate()
     $n = @($entries | Where-Object { (Get-UndoStatus $_) -eq 'can undo' }).Count
@@ -2016,21 +2901,189 @@ $btnHistUndo.Add_Click({
 })
 
 # ===========================================================================
+# Settings / About
+# ===========================================================================
+$pgSet = New-Page 'Settings' 'How PC Tune-Up looks and behaves, where its files are, and what it is. Changes are saved straight away.'
+$setFlow = New-Object Windows.Forms.FlowLayoutPanel
+$setFlow.Dock = 'Fill'; $setFlow.FlowDirection = 'TopDown'; $setFlow.WrapContents = $false; $setFlow.AutoScroll = $true
+Set-PageLayout $pgSet $setFlow @()
+function Add-SetSection([string]$Title, [string]$Hint) {
+    $t = New-Object Windows.Forms.Label
+    $t.Text = $Title; $t.Font = $FontBold; $t.AutoSize = $true; $t.Margin = New-Object Windows.Forms.Padding(0, 16, 0, 2)
+    $setFlow.Controls.Add($t)
+    if ($Hint) {
+        $h = New-Object Windows.Forms.Label
+        $h.Text = $Hint; $h.ForeColor = $Theme.Dim; $h.AutoSize = $true; $h.MaximumSize = New-Object Drawing.Size((Px 780), 0)
+        $h.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 4)
+        $setFlow.Controls.Add($h)
+    }
+}
+function Add-SetRow([object[]]$Controls) {
+    $row = New-Object Windows.Forms.FlowLayoutPanel
+    $row.AutoSize = $true; $row.WrapContents = $false; $row.Margin = New-Object Windows.Forms.Padding(0, 2, 0, 2)
+    foreach ($c in $Controls) { $row.Controls.Add($c) }
+    $setFlow.Controls.Add($row)
+}
+function New-Choice([string[]]$Labels, [string[]]$Values, [string]$Current) {
+    $c = New-Object Windows.Forms.ComboBox
+    $c.DropDownStyle = 'DropDownList'; $c.Width = 270; $c.FlatStyle = 'Flat'; $c.BackColor = $Theme.Input; $c.ForeColor = $Theme.Text
+    $c.Margin = New-Object Windows.Forms.Padding(0, 4, 10, 0)
+    foreach ($l in $Labels) { [void]$c.Items.Add((T $l)) }
+    $c.SelectedIndex = [Math]::Max(0, [array]::IndexOf($Values, $Current))
+    $c.Tag = $Values
+    $c.Add_HandleCreated({ Set-DarkChrome $this 'DarkMode_CFD' })
+    $c
+}
+function New-Check([string]$Text, [bool]$Checked) {
+    $c = New-Object Windows.Forms.CheckBox
+    $c.Text = $Text; $c.Checked = $Checked; $c.AutoSize = $true; $c.Margin = New-Object Windows.Forms.Padding(0, 6, 0, 0)
+    $c
+}
+function Restart-App {
+    if ($RunningAsExe) { Start-Process $SelfExe } else { Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
+    $form.Close()
+}
+
+Add-SetSection 'Language' 'Takes effect when PC Tune-Up restarts.'
+$cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands') @('auto', 'en', 'nl') $Settings.Language
+$btnLangRestart = New-Button 'Restart now'
+Add-SetRow @($cmbLang, $btnLangRestart)
+$cmbLang.Add_SelectedIndexChanged({ $Settings.Language = $this.Tag[$this.SelectedIndex]; Save-Settings })
+$btnLangRestart.Add_Click({ Restart-App })
+
+Add-SetSection 'Theme' 'Light, dark, or the same as Windows. Takes effect when PC Tune-Up restarts.'
+$cmbTheme = New-Choice @('Same as Windows', 'Light', 'Dark') @('system', 'light', 'dark') $Settings.Theme
+$btnThemeRestart = New-Button 'Restart now'
+Add-SetRow @($cmbTheme, $btnThemeRestart)
+$cmbTheme.Add_SelectedIndexChanged({ $Settings.Theme = $this.Tag[$this.SelectedIndex]; Save-Settings })
+$btnThemeRestart.Add_Click({ Restart-App })
+
+Add-SetSection 'Updates' "You have version $AppVersion. New versions come from github.com/$UpdateRepo and are checked against GitHub's checksum before they are installed."
+$chkUpd = New-Check 'Check for updates when PC Tune-Up starts' ([bool]$Settings.CheckUpdates)
+$chkUpd.Add_CheckedChanged({ $Settings.CheckUpdates = $this.Checked; Save-Settings })
+$btnUpdate = New-Button 'Check for updates now'
+Add-SetRow @($chkUpd); Add-SetRow @($btnUpdate)
+
+Add-SetSection 'Safety' 'A restore point lets Windows roll the whole PC back to before a change (Settings > System > Recovery, or search "restore point"). Windows makes at most one per day.'
+$chkRp = New-Check 'Create a restore point before Fix my PC, uninstalling and service changes (needs administrator)' ([bool]$Settings.RestorePoints)
+$chkRp.Add_CheckedChanged({ $Settings.RestorePoints = $this.Checked; Save-Settings })
+Add-SetRow @($chkRp)
+
+Add-SetSection 'Installation' $(if ($IsInstalled) { "Installed for you in $InstallDir - it appears in the Start menu and in Settings > Apps." }
+                                 elseif ($RunningAsExe) { "Running from $SelfExe without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed)." }
+                                 else { 'Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.' })
+$btnInstall = New-Button $(if ($IsInstalled) { 'Uninstall PC Tune-Up' } else { 'Install on this PC' })
+$btnInstall.Enabled = $RunningAsExe
+Add-SetRow @($btnInstall)
+$btnInstall.Add_Click({ if ($IsInstalled) { Uninstall-App } else { Install-App -Launch } })
+
+Add-SetSection 'Files' "Settings, history, the keep list and the change log are kept in $DataDir."
+$btnSetKeep = New-Button 'Keep list'; $btnSetLog = New-Button 'Change log'; $btnSetData = New-Button 'Open data folder'; $btnSetReport = New-Button 'Save report'
+Add-SetRow @($btnSetKeep, $btnSetLog, $btnSetData, $btnSetReport)
+$btnSetKeep.Add_Click({ $btnKeep.PerformClick() })
+$btnSetLog.Add_Click({ $btnLog.PerformClick() })
+$btnSetData.Add_Click({ Start-Process explorer.exe "`"$DataDir`"" })
+$btnSetReport.Add_Click({ Save-Report })
+
+Add-SetSection 'Command line' 'For scripts and IT use (use "start /wait" so the window waits for it):'
+$cliHelp = New-Object Windows.Forms.Label
+$cliHelp.Font = New-Object Drawing.Font('Consolas', 9.5); $cliHelp.AutoSize = $true; $cliHelp.ForeColor = $Theme.Dim
+$cliHelp.Text = "PC-TuneUp.exe /report[:file.html]   check everything and save a report`r`nPC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`r`nPC-TuneUp.exe /install | /uninstall  install or remove for this user"
+$setFlow.Controls.Add($cliHelp)
+
+Add-SetSection 'About' "PC Tune-Up $AppVersion - free and open source (MIT licence). Privacy: everything runs on this PC. The only internet use is the update check (GitHub), the speed test (Cloudflare) and winget's program list; nothing about this PC is sent anywhere."
+$lnkRepo = New-Object Windows.Forms.LinkLabel
+$lnkRepo.Text = "github.com/$UpdateRepo"; $lnkRepo.AutoSize = $true; $lnkRepo.LinkColor = $Theme.AccentText; $lnkRepo.ActiveLinkColor = $Theme.AccentText
+$lnkRepo.Margin = New-Object Windows.Forms.Padding(0, 4, 0, 12)
+$lnkRepo.Add_LinkClicked({ Start-Process "https://github.com/$UpdateRepo" })
+$setFlow.Controls.Add($lnkRepo)
+
+# --- Install / uninstall (per user, like most modern apps: no administrator, no installer program) ---
+$UninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\PCTuneUp'
+$StartMenuLink = Join-Path ([Environment]::GetFolderPath('Programs')) 'PC Tune-Up.lnk'
+$DesktopLink = Join-Path ([Environment]::GetFolderPath('Desktop')) 'PC Tune-Up.lnk'
+# COM objects are released straight away: left to the garbage collector, they can keep the process alive for a minute after it ends.
+function Get-ShortcutTarget([string]$Path) {
+    if (-not (Test-Path $Path)) { return $null }
+    $sh = New-Object -ComObject WScript.Shell
+    try { $sc = $sh.CreateShortcut($Path); $t = $sc.TargetPath; [void][Runtime.InteropServices.Marshal]::ReleaseComObject($sc); $t }
+    finally { [void][Runtime.InteropServices.Marshal]::ReleaseComObject($sh) }
+}
+function New-Shortcut([string]$Path, [string]$Target) {
+    $sh = New-Object -ComObject WScript.Shell
+    try {
+        $sc = $sh.CreateShortcut($Path)
+        $sc.TargetPath = $Target; $sc.WorkingDirectory = Split-Path $Target; $sc.IconLocation = "$Target,0"
+        $sc.Description = 'Check, clean and speed up this PC'
+        $sc.Save()
+        [void][Runtime.InteropServices.Marshal]::ReleaseComObject($sc)
+    } finally { [void][Runtime.InteropServices.Marshal]::ReleaseComObject($sh) }
+}
+function Set-UninstallEntry {
+    New-Item -Path $UninstallKey -Force | Out-Null
+    $vals = [ordered]@{ DisplayName = 'PC Tune-Up'; DisplayVersion = $AppVersion; Publisher = 'PC Tune-Up (open source)'; DisplayIcon = "$InstalledExe,0"
+                        InstallLocation = $InstallDir; UninstallString = "`"$InstalledExe`" /uninstall"; URLInfoAbout = "https://github.com/$UpdateRepo"
+                        HelpLink = "https://github.com/$UpdateRepo/issues" }
+    foreach ($k in $vals.Keys) { Set-ItemProperty -Path $UninstallKey -Name $k -Value $vals[$k] }
+    foreach ($k in 'NoModify', 'NoRepair') { Set-ItemProperty -Path $UninstallKey -Name $k -Value 1 -Type DWord }
+    $kb = [int]((Get-Item -LiteralPath $InstalledExe -ErrorAction SilentlyContinue).Length / 1KB)
+    Set-ItemProperty -Path $UninstallKey -Name EstimatedSize -Value $kb -Type DWord
+}
+function Install-App([switch]$Launch) {
+    if (-not $RunningAsExe) { Show-Msg 'Install from PC-TuneUp.exe, not from the script.' | Out-Null; return }
+    try {
+        New-Item -ItemType Directory -Force $InstallDir | Out-Null
+        if ($SelfExe -ne $InstalledExe) { Copy-Item -LiteralPath $SelfExe -Destination $InstalledExe -Force -ErrorAction Stop }
+        New-Shortcut $StartMenuLink $InstalledExe
+        New-Shortcut $DesktopLink $InstalledExe
+        Set-UninstallEntry
+        $Settings.AskedInstall = $true; Save-Settings
+        Write-Log "Installed PC Tune-Up $AppVersion in $InstallDir"
+    } catch { Show-Msg "Installing failed: $($_.Exception.Message)" 'OK' 'Warning' | Out-Null; return }
+    if ($Launch -and $SelfExe -ne $InstalledExe) {
+        Show-Msg "PC Tune-Up is installed. It is in the Start menu and on the desktop, and you can uninstall it in Settings > Apps.`n`nThe installed copy opens now; you can delete the file you started this from." | Out-Null
+        Start-Process $InstalledExe
+        $form.Close()
+    }
+}
+function Uninstall-App {
+    if ((Show-Msg 'Remove PC Tune-Up from this PC?' 'YesNo' 'Question') -ne 'Yes') { return }
+    $wipe = (Show-Msg 'Also delete its settings, keep list and change history?' 'YesNo' 'Question') -eq 'Yes'
+    foreach ($l in $StartMenuLink, $DesktopLink) {
+        try { if ((Get-ShortcutTarget $l) -eq $InstalledExe) { Remove-Item $l -Force } } catch { }
+    }
+    Remove-Item -Path $UninstallKey -Recurse -Force -ErrorAction SilentlyContinue
+    if ($wipe) { Remove-Item -LiteralPath $DataDir -Recurse -Force -ErrorAction SilentlyContinue }
+    $self = $SelfExe -eq $InstalledExe
+    if (-not $self) { Remove-Item -LiteralPath $InstallDir -Recurse -Force -ErrorAction SilentlyContinue }
+    Show-Msg 'PC Tune-Up has been removed.' | Out-Null
+    if ($self) {
+        # A running program can't delete itself: a hidden helper waits until this process has ended, then removes the folder.
+        # It retries for a while because antivirus often still holds the exe for a moment after it closes.
+        $dir = $InstallDir -replace "'", "''"
+        $cmd = "Wait-Process -Id $PID -Timeout 60 -ErrorAction SilentlyContinue; " +
+               "for (`$i = 0; `$i -lt 20 -and (Test-Path -LiteralPath '$dir'); `$i++) { Start-Sleep 1; Remove-Item -LiteralPath '$dir' -Recurse -Force -ErrorAction SilentlyContinue }"
+        Start-Process powershell.exe -ArgumentList "-NoProfile -WindowStyle Hidden -Command `"$cmd`"" -WindowStyle Hidden -WorkingDirectory $env:TEMP
+    }
+    $form.Close()
+}
+
+# ===========================================================================
 # Report: one HTML page with everything the tabs currently show, saved to Documents
 # ===========================================================================
 function ConvertTo-HtmlRows([object[]]$Headers, $Items, [int[]]$Cols) {
     $enc = { param($s) [Net.WebUtility]::HtmlEncode([string]$s) }
-    $h = ($Headers | ForEach-Object { "<th>$(& $enc $_)</th>" }) -join ''
+    $h = ($Headers | ForEach-Object { "<th>$(& $enc (T $_))</th>" }) -join ''
     $rows = foreach ($it in $Items) {
         '<tr>' + (($Cols | ForEach-Object { "<td>$(& $enc $it.SubItems[$_].Text)</td>" }) -join '') + '</tr>'
     }
-    if (-not $rows) { return '<p class="none">Nothing found.</p>' }
+    if (-not $rows) { return "<p class='none'>$(T 'Nothing found.')</p>" }
     "<table><tr>$h</tr>$($rows -join '')</table>"
 }
-function Save-Report {
+function Save-ReportNow([string]$Path, [switch]$NoOpen) {
     $enc = { param($s) [Net.WebUtility]::HtmlEncode([string]$s) }
-    $advice = if ($script:HealthAdvice) { '<ul class="advice">' + (($script:HealthAdvice | ForEach-Object { "<li>$(& $enc $_)</li>" }) -join '') + '</ul>' }
-              else { '<p class="ok">No problems spotted.</p>' }
+    $advice = if ($script:HealthAdvice) { '<ul class="advice">' + (($script:HealthAdvice | ForEach-Object { "<li>$(& $enc (T $_))</li>" }) -join '') + '</ul>' }
+              else { "<p class='ok'>$(T 'No problems spotted.')</p>" }
     $startOn = @($lvStart.Items | Where-Object Checked)
     $svcTodo = @($lvSvc.Items | Where-Object { $_.Tag.Kind -ne 'review' })
     $histRows = @($lvHist.Items | Select-Object -First 50)
@@ -2043,27 +3096,36 @@ h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:28px 0 8px;border-bot
 table{border-collapse:collapse;width:100%;font-size:13px} th,td{text-align:left;padding:5px 8px;border-bottom:1px solid #e3e3e3;vertical-align:top}
 th{background:#f4f6f8} .advice li{color:#a00000;margin:4px 0} .ok{color:#0a7a2f} .none{color:#666}
 </style></head><body>
-<h1>PC Tune-Up report</h1>
+<h1>$(T 'PC Tune-Up report')</h1>
 <p class="sub">$(& $enc $PcName) - $(Get-Date -Format 'dddd d MMMM yyyy, HH:mm')</p>
-<h2>Health</h2><pre>$(& $enc ($script:HealthLines -join "`r`n"))
+<h2>$(T 'Health')</h2><pre>$(& $enc (($script:HealthLines | ForEach-Object { if ($_ -match '^([^:]+):\s+(.*)$') { "$(T $Matches[1]):  $(T $Matches[2])" } else { T $_ } }) -join "`r`n"))
 $(& $enc $lblSpeed.Text)</pre>
-<h2>Advice</h2>$advice
-<h2>Junk files that can be cleaned</h2>$(ConvertTo-HtmlRows @('What', 'Size', 'Files', 'Note') $lvClean.Items @(0, 1, 2, 3))
-<h2>Apps that start with Windows ($($startOn.Count) on)</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
-<h2>Bloatware found</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
-<h2>Background services</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
-<h2>Security</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvSec.Items @(0, 1, 2, 3))
-<h2>Stability (last 30 days)</h2>$(ConvertTo-HtmlRows @('Problem', 'What', 'Times', 'Last', 'What to do') $lvStab.Items @(0, 1, 2, 3, 4))
-<h2>Program updates available</h2>$(ConvertTo-HtmlRows @('Program', 'Installed', 'Available', 'Note') $lvUpd.Items @(0, 1, 2, 3))
-<h2>Upgrade options</h2>$(ConvertTo-HtmlRows @('Part', 'You have now', 'Upgrade option', 'Worth it?', 'What to buy') $lvUpg.Items @(0, 1, 2, 3, 4))
-<h2>Changes made by PC Tune-Up</h2>$(ConvertTo-HtmlRows @('When', 'What', 'Item', 'Change', 'Undo') $histRows @(0, 1, 2, 3, 4))
+<h2>$(T 'Advice')</h2>$advice
+<h2>$(T 'Junk files that can be cleaned')</h2>$(ConvertTo-HtmlRows @('What', 'Size', 'Files', 'Note') $lvClean.Items @(0, 1, 2, 3))
+<h2>$(T "Apps that start with Windows ($($startOn.Count) on)")</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
+<h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
+<h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>$(T 'Security')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvSec.Items @(0, 1, 2, 3))
+<h2>$(T 'Stability (last 30 days)')</h2>$(ConvertTo-HtmlRows @('Problem', 'What', 'Times', 'Last', 'What to do') $lvStab.Items @(0, 1, 2, 3, 4))
+<h2>$(T 'Program updates available')</h2>$(ConvertTo-HtmlRows @('Program', 'Installed', 'Available', 'Note') $lvUpd.Items @(0, 1, 2, 3))
+<h2>$(T 'Upgrade options')</h2>$(ConvertTo-HtmlRows @('Part', 'You have now', 'Upgrade option', 'Worth it?', 'What to buy') $lvUpg.Items @(0, 1, 2, 3, 4))
+<h2>$(T 'Changes made by PC Tune-Up')</h2>$(ConvertTo-HtmlRows @('When', 'What', 'Item', 'Change', 'Undo') $histRows @(0, 1, 2, 3, 4))
 </body></html>
 "@
     $safeName = ($PcName -replace '[\\/:*?"<>|]', '').Trim()
-    $file = Join-Path ([Environment]::GetFolderPath('MyDocuments')) ("PC Tune-Up report - $safeName - $(Get-Date -Format 'yyyy-MM-dd HHmm').html")
+    $file = if ($Path) { [IO.Path]::GetFullPath($Path) }
+            else { Join-Path ([Environment]::GetFolderPath('MyDocuments')) ("PC Tune-Up report - $safeName - $(Get-Date -Format 'yyyy-MM-dd HHmm').html") }
     Set-Content -Path $file -Value $html -Encoding UTF8
     Write-Log "Report saved: $file"
-    Start-Process $file
+    if (-not $NoOpen) { Start-Process $file }
+    $file
+}
+# A report covers every page, so pages that haven't loaded yet are loaded first; the timer saves it when all is done.
+function Save-Report {
+    $missing = @($script:PageLoaders.Keys | Where-Object { -not $script:Loaded[$_] })
+    if (-not $missing -and -not $script:Jobs.Count) { [void](Save-ReportNow); return }
+    foreach ($m in $missing) { Invoke-PageLoader $m }
+    $script:ReportPending = $true
 }
 
 # ===========================================================================
@@ -2074,49 +3136,70 @@ $(& $enc $lblSpeed.Text)</pre>
 # Never uninstalls anything. Everything except cleaned files can be undone from History.
 # ===========================================================================
 $script:SvcLoaded = $false
-$btnFix.Add_Click({
-    if ($IsAdmin -and -not $script:SvcLoaded) { Show-Msg 'Still checking services - try again in a few seconds.' | Out-Null; return }
+# Restore point first (when running as administrator and allowed in Settings), then the change itself.
+function Start-WithRestorePoint([string]$Why, [scriptblock]$Then) {
+    if (-not ($IsAdmin -and $Settings.RestorePoints)) { & $Then; return }
+    $script:AfterRestorePoint = $Then; $script:RestorePointWhy = $Why
+    Start-Bg -Label 'Creating a restore point first' {
+        param($why)
+        try {
+            Checkpoint-Computer -Description "PC Tune-Up: before $why" -RestorePointType MODIFY_SETTINGS -ErrorAction Stop -WarningVariable w -WarningAction SilentlyContinue
+            if ($w) { "skipped: $($w[0])" } else { 'ok' }   # Windows allows one per 24 hours
+        } catch { "failed: $($_.Exception.Message)" }
+    } $Why {
+        param($r)
+        $msg = "$($r[0])"
+        if ($msg -eq 'ok') { Add-History 'Restore point' 'C:' "created before $($script:RestorePointWhy)" } else { Write-Log "Restore point $msg" }
+        & $script:AfterRestorePoint
+    }
+}
+function Invoke-FixMyPc {
+    if ($IsAdmin -and -not $script:SvcLoaded) { Invoke-PageLoader 'Services'; Show-Msg 'Still checking services - try again in a few seconds.' | Out-Null; return }
     $clean = @($CleanTargets | Where-Object { $_.Fix -and -not ($_.Admin -and -not $IsAdmin) -and -not (Test-Open $_) })
     $openBrowsers = @($CleanTargets | Where-Object { $_.Fix -and (Test-Open $_) } | ForEach-Object Name)
-    $startup = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.SubItems[2].Text -eq 'safe to turn off' })
+    $startup = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' })
     $svc = if ($IsAdmin) {
         @($lvSvc.Items | Where-Object { $_.Tag.Kind -eq 'known' -and $_.Tag.Suggest -and $StartRank[$_.Tag.Start] -gt $StartRank[$_.Tag.Suggest] })
     } else { @() }
-
     $plan = @('PC Tune-Up will:', " - Clean junk files: $(($clean | ForEach-Object Name) -join ', ')")
     if ($openBrowsers) { $plan += "     (skipping $($openBrowsers -join ', ') - close the browser first to include it)" }
-    if ($startup) { $plan += " - Stop $($startup.Count) app(s) starting with Windows: $(($startup | ForEach-Object Text) -join ', ')" }
+    if ($startup) { $plan += " - Stop $($startup.Count) app(s) starting with Windows: $(($startup | ForEach-Object { $_.Tag.Name -replace '_[0-9A-F]{32}$', '' }) -join ', ')" }
     if ($svc) { $plan += " - Set $($svc.Count) background service(s) to their suggested setting: $(($svc | ForEach-Object Text) -join ', ')" }
-    if (-not $IsAdmin) { $plan += '', 'Tip: "Restart as administrator" first to also clean Windows files and trim background services.' }
-    $plan += '', 'Nothing gets uninstalled. Startup and service changes can be undone from the History tab.'
+    if ($IsAdmin -and $Settings.RestorePoints) { $plan += ' - Create a restore point first' }
+    if (-not $IsAdmin) { $plan += '', 'Tip: "Restart as admin" first to also clean Windows files and trim background services.' }
+    $plan += '', 'Nothing gets uninstalled. Startup and service changes can be undone from the History page.'
     if ((Show-Msg ($plan -join "`n") 'OKCancel' 'Question') -ne 'OK') { return }
-
-    $nStart = 0; foreach ($it in $startup) { try { Set-StartupEntry $it.Tag $false; $nStart++ } catch { } }
+    $script:FixPlan = @{ Clean = $clean; Startup = $startup; Svc = $svc }
+    $btnFix.Enabled = $false; $btnFix.Text = 'Fixing...'
+    Start-WithRestorePoint 'Fix my PC' { Invoke-FixApply }
+}
+function Invoke-FixApply {
+    $p = $script:FixPlan
+    $nStart = 0; foreach ($it in $p.Startup) { try { Set-StartupEntry $it.Tag $false; $nStart++ } catch { } }
     $nSvc = 0
-    if ($svc) {
+    if ($p.Svc) {
         $orig = Get-ServiceOriginals
-        foreach ($it in $svc) { try { Set-ServiceStart $it.Text $it.Tag.Suggest $it.Tag.Start $orig; $nSvc++ } catch { } }
+        foreach ($it in $p.Svc) { try { Set-ServiceStart $it.Tag.Name $it.Tag.Suggest $it.Tag.Start $orig; $nSvc++ } catch { } }
         Save-ServiceOriginals $orig
     }
     $script:FixCounts = @{ Startup = $nStart; Services = $nSvc }
-    $btnFix.Enabled = $false; $btnFix.Text = 'Fixing...'
-    Start-Bg $DoCleanWork $clean {
-        param($results)
+    Start-Bg -Label 'Fix my PC: cleaning' -Cancellable $DoCleanWork $p.Clean {
+        param($results, $state)
         $freed = 0
         foreach ($r in $results) { $freed += $r.Freed; Add-History 'Clean' $r.Name ('freed {0} (Fix my PC)' -f (Format-Size $r.Freed)) }
         $junk = @($lvBloat.Items | Where-Object { $_.Tag.Cat -eq 'Junk' }).Count
-        $lines = @('Done!', '',
+        $lines = @($(if ($state.Cancel) { 'Stopped early.' } else { 'Done!' }), '',
             " - Freed $(Format-Size $freed) of junk files",
             " - $($script:FixCounts.Startup) app(s) no longer start with Windows")
         if ($IsAdmin) { $lines += " - $($script:FixCounts.Services) background service(s) trimmed" }
-        if ($junk) { $lines += " - $junk junk app(s) found - see the Bloatware tab if you want them gone" }
-        $lines += '', 'Startup changes take effect next time you sign in. Undo anything from the History tab.'
+        if ($junk) { $lines += " - $junk junk app(s) found - see the Bloatware page if you want them gone" }
+        $lines += '', 'Startup changes take effect next time you sign in. Undo anything from the History page.'
         $btnFix.Text = 'Fix my PC'; $btnFix.Enabled = $true
         Update-Health; Start-CleanScan; Update-Startup; Update-Services; Update-History
         Show-Msg ($lines -join "`n") | Out-Null
     }
-})
-
+}
+$btnFix.Add_Click({ Invoke-FixMyPc })
 # ===========================================================================
 # Updates: compare with the latest GitHub release, download it, verify it, swap the exe.
 # ===========================================================================
@@ -2162,7 +3245,7 @@ function Start-UpdateCheck([switch]$Silent) {
         if ((Show-Msg "PC Tune-Up $($r.Version) is available (you have $AppVersion).`n`n$notes`n`nUpdate now? The app restarts by itself." 'YesNo' 'Information') -ne 'Yes') { return }
         $btnUpdate.Enabled = $false; $btnUpdate.Text = 'Downloading...'
         $script:UpdateInfo = $r
-        Start-Bg $UpdateDownloadWork $r {
+        Start-Bg -Label 'Downloading the update' $UpdateDownloadWork $r {
             param($d)
             $d = $d[0]
             $btnUpdate.Text = 'Check for updates'; $btnUpdate.Enabled = $true
@@ -2202,7 +3285,7 @@ $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
     @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Disk') }
     @{ Title = 'CHECK';    Pages = @('Updates', 'Security', 'Stability', 'Upgrades') }
-    @{ Title = 'RECORD';   Pages = @('History') }
+    @{ Title = 'MORE';     Pages = @('History', 'Settings') }
 )
 $script:NavButtons = @{}
 function Show-Page($Page) {
@@ -2210,9 +3293,10 @@ function Show-Page($Page) {
     foreach ($b in $script:NavButtons.Values) {
         $on = $b.Tag -eq $Page
         $b.BackColor = if ($on) { $Theme.AccentSoft } else { $Theme.Side }
-        $b.ForeColor = if ($on) { $Theme.Accent } else { $Theme.Text }
+        $b.ForeColor = if ($on) { $Theme.AccentText } else { $Theme.Text }
         $b.Font = if ($on) { $FontBold } else { $Font }
     }
+    Invoke-PageLoader $Page.Name   # load a page's data the first time it is opened
 }
 function Set-NavBadge([string]$Name, $Count) {
     $b = $script:NavButtons[$Name]
@@ -2259,11 +3343,11 @@ foreach ($g in $NavGroups) {
 $sidebar.Controls.Add($nav)
 if (-not $IsAdmin) {
     $adm = New-Object Windows.Forms.Panel
-    $adm.Dock = 'Bottom'; $adm.Height = 120; $adm.Padding = New-Object Windows.Forms.Padding(16, 10, 14, 16)
+    $adm.Dock = 'Bottom'; $adm.Height = 140; $adm.Padding = New-Object Windows.Forms.Padding(16, 10, 14, 16)
     $admT = New-Object Windows.Forms.Label
     $admT.Text = 'Limited mode'; $admT.Font = $FontBold; $admT.Dock = 'Top'; $admT.Height = 22
     $admD = New-Object Windows.Forms.Label
-    $admD.Text = 'Some fixes need administrator rights.'; $admD.ForeColor = $Theme.Dim; $admD.Dock = 'Top'; $admD.Height = 40
+    $admD.Text = 'Some fixes need administrator rights.'; $admD.ForeColor = $Theme.Dim; $admD.Dock = 'Top'; $admD.Height = 58
     $admB = New-Button 'Restart as admin'
     $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
     $admB.Add_Click({
@@ -2278,11 +3362,108 @@ if (-not $IsAdmin) {
 }
 # Each page's main action stands out.
 foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo)) { Set-Primary $b }
-Show-Page $pgHealth
+
 # ---------------------------------------------------------------------------
-$form.Add_Shown({ Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Security; Update-Stability; Start-UpdScan; Update-Upgrades; Update-History; Start-UpdateCheck -Silent
+# Activity bar: what is running in the background, its progress, and Cancel
+# ---------------------------------------------------------------------------
+$activity = New-Object Windows.Forms.Panel
+$activity.Dock = 'Bottom'; $activity.Height = 42; $activity.BackColor = $Theme.Soft; $activity.Visible = $false
+$activity.Padding = New-Object Windows.Forms.Padding(26, 7, 26, 7)
+$actText = New-Object Windows.Forms.Label
+$actText.Dock = 'Fill'; $actText.TextAlign = 'MiddleLeft'; $actText.AutoEllipsis = $true
+$actBar = New-Object Windows.Forms.ProgressBar
+$actBar.Dock = 'Right'; $actBar.Width = 220; $actBar.Style = 'Marquee'; $actBar.MarqueeAnimationSpeed = 30
+$actGap = New-Object Windows.Forms.Panel; $actGap.Dock = 'Right'; $actGap.Width = 10
+$actCancel = New-Button 'Cancel'
+$actCancel.AutoSize = $false; $actCancel.Dock = 'Right'; $actCancel.Width = 96
+$activity.Controls.Add($actText); $activity.Controls.Add($actBar); $activity.Controls.Add($actGap); $activity.Controls.Add($actCancel)
+$content.Controls.Add($activity); $activity.SendToBack()   # docked before the pages, so they fill the space above it
+$actCancel.Add_Click({ if ($this.Tag) { $this.Tag.State.Cancel = $true; Update-ActivityBar } })
+function Update-ActivityBar {
+    $running = @($script:Jobs | Where-Object { $_.Label } | Sort-Object { -[int]$_.Cancellable })
+    if (-not $running) { if ($activity.Visible) { $activity.Visible = $false }; return }
+    $j = $running[0]
+    $more = $running.Count - 1 + $script:LoadQueue.Count
+    $t = $j.Label + $(if ($j.State.Text) { ": $($j.State.Text)" }) + $(if ($more -gt 0) { "      ($more more waiting)" })
+    if ($actText.Text -ne $t) { $actText.Text = $t }
+    if ($j.State.Max -gt 0) {
+        if ($actBar.Style -ne 'Continuous') { $actBar.Style = 'Continuous' }
+        $actBar.Maximum = $j.State.Max; $actBar.Value = [Math]::Min($j.State.Max, [Math]::Max(0, $j.State.Value))
+    } elseif ($actBar.Style -ne 'Marquee') { $actBar.Style = 'Marquee' }
+    $actCancel.Visible = $j.Cancellable; $actCancel.Tag = $j
+    $actCancel.Enabled = -not $j.State.Cancel
+    $actCancel.Text = if ($j.State.Cancel) { 'Stopping...' } else { 'Cancel' }
+    if (-not $activity.Visible) { $activity.Visible = $true }
+}
+
+# ---------------------------------------------------------------------------
+# Page data loads in the background after the window opens, or straight away when a page is opened
+# ---------------------------------------------------------------------------
+$script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-Stability }; Bloatware = { Start-BloatScan }; Services = { Update-Services }
+                         Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades } }
+$script:Loaded = @{}
+function Invoke-PageLoader([string]$Name) {
+    if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
+    $script:Loaded[$Name] = $true
+    [void]$script:LoadQueue.Remove($Name)
+    & $script:PageLoaders[$Name]
+}
+function Start-Everything {
+    Update-Health; Update-Startup; Update-History
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Bloatware', 'Services', 'Clean', 'Updates', 'Upgrades'))
+}
+Enable-Translation $form
+Show-Page $pgHealth
+
+# ---------------------------------------------------------------------------
+# Command line: /install, /uninstall, /? and the windowless /report and /fix
+# ---------------------------------------------------------------------------
+function Write-Cli([string]$Text) { try { [Console]::Out.WriteLine((T $Text)) } catch { } }
+if ($Cli.Install) { Install-App; Write-Cli "PC Tune-Up installed in $InstallDir"; return }
+if ($Cli.Uninstall) { Uninstall-App; return }
+if ($CliMode) {
+    if ($RunningAsExe -and [PcTuneUp.Native]::AttachConsole(-1)) {   # print into the console the exe was started from
+        $w = New-Object IO.StreamWriter([Console]::OpenStandardOutput()); $w.AutoFlush = $true; [Console]::SetOut($w)
+    }
+    if ($Cli.Help) {
+        Write-Cli "PC Tune-Up $AppVersion`n`n  PC-TuneUp.exe /report[:file.html]   check everything and save a report (default: Documents)`n  PC-TuneUp.exe /fix                  run the safe Fix my PC steps without asking`n  PC-TuneUp.exe /fix /report          both`n  PC-TuneUp.exe /install | /uninstall  install or remove for this user`n`nRun as administrator to include Windows files and services. Use 'start /wait' in a command prompt."
+        return
+    }
+    # No window: messages go to the console, and questions are answered Yes.
+    function Show-Msg([string]$Text, [string]$Buttons = 'OK', [string]$Icon = 'Information') { Write-Cli $Text; if ($Buttons -eq 'YesNo') { 'Yes' } else { 'OK' } }
+    function Wait-Idle([int]$Seconds = 900) {
+        $deadline = (Get-Date).AddSeconds($Seconds)
+        do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while (($script:Jobs.Count -or $script:LoadQueue.Count) -and (Get-Date) -lt $deadline)
+    }
+    Write-Cli "PC Tune-Up $AppVersion - checking this PC$(if (-not $IsAdmin) { ' (not as administrator: Windows files and services are skipped)' })..."
+    Start-Everything; Wait-Idle
+    if ($Cli.Fix) { Invoke-FixMyPc; Wait-Idle }
+    if ($null -ne $Cli.Report) { Write-Cli "Report saved: $(Save-ReportNow -Path $Cli.Report -NoOpen)" }
+    Write-Cli ''
+    if ($script:HealthAdvice) { Write-Cli 'Worth a look:'; $script:HealthAdvice | ForEach-Object { Write-Cli "  - $_" } } else { Write-Cli 'No problems spotted.' }
+    $JobTimer.Stop()
+    return
+}
+
+# ---------------------------------------------------------------------------
+$form.Add_Shown({
+    Start-Everything
+    if ($Settings.CheckUpdates) { Start-UpdateCheck -Silent }
+    if ($IsInstalled) { try { Set-ItemProperty -Path $UninstallKey -Name DisplayVersion -Value $AppVersion -ErrorAction Stop } catch { } }   # keep Settings > Apps current after self-updates
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
     if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
+    # First start from a downloaded file: offer to install (once).
+    if ($RunningAsExe -and -not $IsInstalled -and -not $Settings.AskedInstall) {
+        $Settings.AskedInstall = $true; Save-Settings
+        $q = "Install PC Tune-Up on this PC?`n`nIt adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.`n`nYou can also do this later in Settings."
+        if ((Show-Msg $q 'YesNo' 'Question') -eq 'Yes') { Install-App -Launch }
+    }
 })
+# Grow every control by the screen scaling (fonts already scale on their own; list columns, row heights and grid
+# columns were sized with Px). Then cap the window to the screen.
+if ($DpiScale -ne 1) { $form.Scale((New-Object Drawing.SizeF($DpiScale, $DpiScale))) }
+$work = [Windows.Forms.Screen]::PrimaryScreen.WorkingArea
+$form.Size = New-Object Drawing.Size([Math]::Min($form.Width, $work.Width - 40), [Math]::Min($form.Height, $work.Height - 40))
+$form.MinimumSize = New-Object Drawing.Size((Px 960), (Px 600))
 [void]$form.ShowDialog()
 $JobTimer.Stop()

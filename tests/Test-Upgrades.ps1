@@ -1,6 +1,8 @@
 ﻿# Runs PC Tune-Up's upgrade advice against this PC and a set of made-up PCs.
-# Usage: .\tests\Test-Upgrades.ps1   (prints the advice for each made-up PC; read it for anything wrong)
-param([string]$App = (Join-Path $PSScriptRoot '..\pc-tuneup.ps1'))
+# Usage: .\tests\Test-Upgrades.ps1          prints the advice for each made-up PC (read it for anything odd)
+#        .\tests\Test-Upgrades.ps1 -Check   checks the key answers and exits 1 if any is wrong (used by the GitHub build)
+param([string]$App, [switch]$Check)
+if (-not $App) { $App = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\pc-tuneup.ps1' }
 $ast = [Management.Automation.Language.Parser]::ParseFile($App, [ref]$null, [ref]$null)
 foreach ($f in $ast.FindAll({ $args[0] -is [Management.Automation.Language.FunctionDefinitionAst] }, $false)) {
     if ($f.Name -in 'Get-PcIdentity', 'Get-UpgradeRows', 'Get-SupportInfo') { Invoke-Expression $f.Extent.Text }
@@ -38,9 +40,40 @@ $cases = [ordered]@{
         Batteries = @([pscustomobject]@{ Wh = 45; Pct = 38; Chem = 'Li-I'; Maker = 'Panasonic'; Id = 'PA5185U' }) }
     'Virtual machine' = Pc @{ Maker = 'VMware, Inc.'; Model = 'VMware7,1'; Modules = @(Mod 8 0 0 0); Disks = @(Disk 'VMware Virtual disk' 60 'SAS' 'Unspecified') }
 }
-foreach ($name in $cases.Keys) {
-    $hw = $cases[$name]
-    $si = Get-SupportInfo $hw
-    "`n==================== $name ====================`nPC: $($si.Name)   support: $(if ($si.Url) { $si.Url } else { '(search)' })   serial: '$($si.Serial)'"
-    foreach ($u in (Get-UpgradeRows $hw)) { "  [$($u.Part)] $($u.Option) -> $($u.Worth)`n      now: $($u.Now)`n      buy: $($u.Spec)" }
+if (-not $Check) {
+    foreach ($name in $cases.Keys) {
+        $hw = $cases[$name]
+        $si = Get-SupportInfo $hw
+        "`n==================== $name ====================`nPC: $($si.Name)   support: $(if ($si.Url) { $si.Url } else { '(search)' })   serial: '$($si.Serial)'"
+        foreach ($u in (Get-UpgradeRows $hw)) { "  [$($u.Part)] $($u.Option) -> $($u.Worth)`n      now: $($u.Now)`n      buy: $($u.Spec)" }
+    }
+    return
 }
+
+# Expected answers: case, part, which field, wildcard it must match.
+$expect = @(
+    ,@('Old office desktop: 1x4GB DDR3 + HDD', 'Drive', 'Option', 'Replace with an SSD')
+    ,@('Old office desktop: 1x4GB DDR3 + HDD', 'Drive', 'Worth', 'Strongly recommended*')
+    ,@('Old office desktop: 1x4GB DDR3 + HDD', 'Memory', 'Option', 'Add 1 x 4 GB*')
+    ,@('Custom gaming desktop: 2x8 DDR4, 4 slots', 'Drive', 'Worth', 'Recommended - C: is only 9% free')
+    ,@('Custom gaming desktop: 2x8 DDR4, 4 slots', 'Wi-Fi', 'Option', 'Already modern')
+    ,@('Thin laptop: soldered LPDDR5 16GB', 'Memory', 'Option', 'Not upgradeable')
+    ,@('Budget laptop: 8GB soldered + 1 free slot', 'Memory', 'Spec', '*same speed as the built-in memory*')
+    ,@('Laptop: single 8GB module, 2 slots', 'Memory', 'Worth', 'Recommended - one module*')
+    ,@('Workstation: ECC registered, firmware max wrong', 'Memory', 'Spec', '*registered ECC*')
+    ,@('Old laptop: DDR type not reported, Wi-Fi 4', 'Memory', 'Spec', '*worked out from the speed*')
+    ,@('Old laptop: DDR type not reported, Wi-Fi 4', 'Wi-Fi', 'Worth', 'Recommended*')
+    ,@('Old laptop: DDR type not reported, Wi-Fi 4', 'Battery', 'Worth', 'Recommended*')
+    ,@('Virtual machine', 'Memory / disk', 'Option', 'Change the VM settings')
+)
+$fail = 0
+foreach ($e in $expect) {
+    $rows = @(foreach ($r in (Get-UpgradeRows $cases[$e[0]])) { $r })   # the function returns its list as one object
+    $row = $rows | Where-Object Part -eq $e[1] | Select-Object -First 1
+    $got = if ($row) { $row.($e[2]) } else { '(no such row)' }
+    if ($got -like $e[3]) { "PASS  $($e[0]) / $($e[1]).$($e[2])" } else { $fail++; "FAIL  $($e[0]) / $($e[1]).$($e[2]): expected '$($e[3])', got '$got'" }
+}
+$si = Get-SupportInfo $cases['Custom gaming desktop: 2x8 DDR4, 4 slots']
+if ($si.Name -like '*custom-built PC*' -and -not $si.Serial) { 'PASS  custom PC identity and placeholder serial' } else { $fail++; "FAIL  custom PC identity: '$($si.Name)' serial '$($si.Serial)'" }
+"$fail failure(s)"
+exit [int]($fail -gt 0)

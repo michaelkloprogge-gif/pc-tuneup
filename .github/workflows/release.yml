@@ -1,0 +1,88 @@
+# Builds and tests PC Tune-Up on every push, and publishes a GitHub release when a v* tag is pushed
+# (publish-release.ps1 does the tagging). Copies of the app update themselves from these releases.
+name: Build and release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      HAS_CERT: ${{ secrets.SIGNING_CERT_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check script syntax
+        shell: powershell
+        run: |
+          $bad = 0
+          foreach ($f in Get-ChildItem -Recurse -Filter *.ps1) {
+            $err = $null
+            [void][Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$err)
+            foreach ($e in $err) { $bad++; Write-Output "::error file=$($f.Name),line=$($e.Extent.StartLineNumber)::$($e.Message)" }
+          }
+          if ($bad) { exit 1 }
+
+      - name: Test upgrade advice
+        shell: powershell
+        run: .\tests\Test-Upgrades.ps1 -Check; exit $LASTEXITCODE
+
+      - name: Test Dutch translation
+        shell: powershell
+        run: .\tests\Test-Translation.ps1; exit $LASTEXITCODE
+
+      - name: Build PC-TuneUp.exe
+        shell: powershell
+        run: .\build-exe.ps1
+
+      - name: Version in the script must match the tag
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: powershell
+        run: |
+          $v = (Get-Item dist\PC-TuneUp.exe).VersionInfo.ProductVersion -replace '\.0$', ''
+          if ("v$v" -ne $env:GITHUB_REF_NAME) { Write-Output "::error::Tag $env:GITHUB_REF_NAME but the app says $v"; exit 1 }
+
+      # Dormant until a code-signing certificate is added as repository secrets
+      # SIGNING_CERT_BASE64 (the .pfx, base64) and SIGNING_CERT_PASSWORD.
+      - name: Sign the exe
+        if: env.HAS_CERT == 'true'
+        shell: powershell
+        env:
+          CERT_B64: ${{ secrets.SIGNING_CERT_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP 'sign.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CERT_B64))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+            Where-Object FullName -match '\\x64\\' | Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /f $pfx /p $env:CERT_PASSWORD /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 dist\PC-TuneUp.exe
+          $code = $LASTEXITCODE
+          Remove-Item $pfx -Force
+          exit $code
+
+      - name: Keep the exe with this build
+        uses: actions/upload-artifact@v4
+        with:
+          name: PC-TuneUp
+          path: dist/PC-TuneUp.exe
+
+      - name: Publish the release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Release notes = this version's section of CHANGELOG.md
+          $v = $env:GITHUB_REF_NAME -replace '^v', ''
+          $log = Get-Content CHANGELOG.md -Raw
+          $m = [regex]::Match($log, "(?ms)^## $([regex]::Escape($v))\s*\r?\n(.*?)(?=^## |\z)")
+          $notes = if ($m.Success) { $m.Groups[1].Value.Trim() } else { "PC Tune-Up $v" }
+          Set-Content release-notes.md $notes -Encoding UTF8
+          gh release create $env:GITHUB_REF_NAME dist\PC-TuneUp.exe --title "PC Tune-Up $env:GITHUB_REF_NAME" --notes-file release-notes.md

@@ -74,7 +74,7 @@ using System.Windows.Forms;
 static class Program
 {
     [STAThread]
-    static int Main()
+    static int Main(string[] args)
     {
         string script;
         using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("pc-tuneup.ps1"))
@@ -88,6 +88,7 @@ static class Program
             rs.ApartmentState = System.Threading.ApartmentState.STA;
             rs.ThreadOptions = PSThreadOptions.UseCurrentThread;
             rs.Open();
+            rs.SessionStateProxy.SetVariable("AppArgs", args);   // command-line options (/fix, /report, ...)
             using (var ps = PowerShell.Create())
             {
                 ps.Runspace = rs;
@@ -106,7 +107,27 @@ static class Program
 '@
 (Get-Content $cs -Raw).Replace('APPVERSION', $version) | Set-Content $cs -Encoding UTF8
 
-& $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$exe" "/win32icon:$ico" `
+# --- Manifest: normal user rights, sharp on scaled screens, Windows 10/11 ---
+$manifest = Join-Path $work 'app.manifest'
+Set-Content -Path $manifest -Encoding UTF8 -Value @'
+<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="PCTuneUp.app" />
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
+    <security><requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+      <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+    </requestedPrivileges></security>
+  </trustInfo>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application><supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" /></application>
+  </compatibility>
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings><dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true</dpiAware></windowsSettings>
+  </application>
+</assembly>
+'@
+
+& $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$exe" "/win32icon:$ico" "/win32manifest:$manifest" `
     "/reference:$sma" /reference:System.Windows.Forms.dll /reference:System.Core.dll `
     "/resource:$script,pc-tuneup.ps1" $cs
 if ($LASTEXITCODE) { throw "Compile failed (exit $LASTEXITCODE)" }

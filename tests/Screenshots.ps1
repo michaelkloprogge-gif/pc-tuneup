@@ -1,4 +1,4 @@
-# Opens PC Tune-Up off-screen without taking focus, runs every check, and saves a PNG of each page.
+﻿# Opens PC Tune-Up off-screen without taking focus, runs every check, and saves a PNG of each page.
 # Usage: powershell -STA -File .\tests\Screenshots.ps1 -Out <folder>
 param([Parameter(Mandatory)][string]$Out, [string]$App, [int]$TimeoutSec = 240)
 # ($PSScriptRoot is empty in parameter defaults of advanced scripts on Windows PowerShell 5.1.)
@@ -12,9 +12,10 @@ Add-Type -Namespace Shot -Name Win -MemberDefinition @"
 "@
 $form.StartPosition = 'Manual'; $form.Location = New-Object Drawing.Point(-4000, 40)
 [void][Shot.Win]::ShowWindow($form.Handle, 4)    # SW_SHOWNOACTIVATE: visible, but never steals focus
-Update-Health; Update-Startup; Start-CleanScan; Start-BloatScan; Update-Services; Update-Security; Update-Stability; Start-UpdScan; Update-Upgrades; Update-History
+# Same start-up as the real window: load every page in the background, then wait until all is quiet.
+Start-Everything; foreach ($n in @($script:LoadQueue)) { Invoke-PageLoader $n }
 $deadline = (Get-Date).AddSeconds(__TIMEOUT__)
-do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while ($script:Jobs.Count -gt 0 -and (Get-Date) -lt $deadline)
+do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while (($script:Jobs.Count -gt 0 -or $script:LoadQueue.Count -gt 0) -and (Get-Date) -lt $deadline)
 $pages = if (Get-Command Show-Page -ErrorAction SilentlyContinue) { $script:Pages } else { @($tabs.TabPages) }
 $i = 0
 foreach ($p in $pages) {

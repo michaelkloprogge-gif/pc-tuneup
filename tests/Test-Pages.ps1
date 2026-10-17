@@ -47,6 +47,16 @@ foreach ($name in @($NavGroups | ForEach-Object { $_.Pages } | Where-Object { $_
     if (-not $b -or -not ($nav.Controls.Contains($b) -or $navBottom.Controls.Contains($b))) { Fail "sidebar has no button for $name" }
 }
 foreach ($name in $script:PageLoaders.Keys) { if (-not $script:Loaded[$name] -and $name -ne 'Battery') { Fail "page $name never loaded its data" } }
+# Simple view: the status, the list of problems and the help screen
+Set-ViewMode 'simple'; Pump 50
+if (-not $sHead.Text -or $sHead.Text -eq (T 'Checking your PC...')) { Fail "simple view status still says: $($sHead.Text)" }
+Show-SimpleProblems; Pump 50   # (buttons can't be clicked in a hidden window, so call what they call)
+if (-not $sList.Controls.Count) { Fail 'simple view: "Check for problems" shows nothing' }
+Show-SimpleHelp; Pump 50
+if ($sList.Controls.Count -lt 3) { Fail 'simple view: "Get help" shows too little' }
+[void](Get-PlainSummary)
+Write-Output "      simple view: $($sHead.Text)"
+Set-ViewMode 'full'; Pump 50
 # 3. The report has every section
 $rep = Join-Path $DataDir 'test-report.html'
 try { [void](Save-ReportNow -Path $rep -NoOpen) } catch { Fail "report: $($_.Exception.Message)" }

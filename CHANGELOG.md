@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.14.0
+
+- **Simple view** - for people who don't want 23 pages: one calm screen with a big status in plain words (green: "Your PC is in good shape", orange: "5 things could be better", red: "Something needs attention") and three big buttons: **Make my PC faster**, **Check for problems** (each finding in one everyday sentence, with "Fix this" only for safe changes that can be undone) and **Get help**. New users start in simple view; "Show all tools" (or Settings > View) switches to the full app.
+- **Plain words**: hover over a row to see what technical terms mean in one everyday sentence ("Service: a program that runs in the background without a window"). Fix my PC and the clean-up confirmations say plainly what is NOT touched: your documents, photos and programs.
+- **Send a report to someone who helps you** (Get help, or Settings > Help and feedback): saves a report in Documents and starts an email - with the report attached when classic Outlook is installed, otherwise with the file ready to drag in - or copies a short summary to paste into WhatsApp or a text message.
+- All of it in English, Nederlands, Deutsch and Français.
 ## 1.13.0
 
 - **Deutsch and Français**: the whole app is now also available in German and French (Settings > Language, or automatic from the Windows language), with the menu names German and French Windows really use.

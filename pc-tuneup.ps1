@@ -60,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.13.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.14.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -93,7 +93,7 @@ function Get-AppErrors([int]$Days = 14) {
     Get-Content $ErrorLogFile -Encoding UTF8 -Tail 300 | Where-Object { $_.Length -ge 19 -and $_.Substring(0, 19) -ge $since }
 }   # one JSON entry per change; drives the History tab
 $SettingsFile = Join-Path $DataDir 'settings.json'
-$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = ''; AutoNotify = 'changes'; TourShown = $false }
+$Settings = [ordered]@{ Language = 'auto'; Theme = 'system'; CheckUpdates = $true; RestorePoints = $true; AskedInstall = $false; AutoMaintenance = 'off'; LastAuto = ''; AutoNotify = 'changes'; TourShown = $false; View = '' }
 if (Test-Path $SettingsFile) {
     try { (Get-Content $SettingsFile -Raw | ConvertFrom-Json).PSObject.Properties | ForEach-Object { if ($Settings.Contains($_.Name)) { $Settings[$_.Name] = $_.Value } } } catch { }
 }
@@ -1567,6 +1567,110 @@ Show the tour again	Rondleiding opnieuw tonen
 Website	Website
 Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the first nine pages      Ctrl+PageDown / Ctrl+PageUp  next / previous page      Space  check or uncheck a row      Enter  open a search result	Ctrl+F  alles doorzoeken      F5  deze pagina opnieuw laden      Ctrl+1 ... Ctrl+9  de eerste negen pagina's      Ctrl+PageDown / Ctrl+PageUp  volgende / vorige pagina      Spatie  rij aan- of uitvinken      Enter  zoekresultaat openen
 Report this problem? (Opens GitHub with the details filled in - you see everything before you send it.)	Dit probleem melden? (Opent GitHub met de details ingevuld - je ziet alles voordat je het verstuurt.)
+Your PC's protection has a gap ({0} problem(s)). It is worth letting someone who knows computers take a look.	De beveiliging van je pc heeft een gat ({0} probleem/problemen). Laat iemand die verstand heeft van computers er even naar kijken.
+Your photos and documents are not backed up anywhere. If the PC breaks or is stolen, they are gone.	Er is nergens een back-up van je foto's en documenten. Gaat de pc kapot of wordt hij gestolen, dan zijn ze weg.
+Your web browser has add-ons that look like advertising software.	Je webbrowser heeft uitbreidingen die op reclamesoftware lijken.
+A part of your PC (a device) is not working properly.	Een onderdeel van je pc (een apparaat) werkt niet goed.
+Programs or Windows crashed several times recently.	Programma's of Windows zijn de laatste tijd een paar keer vastgelopen of gecrasht.
+Your PC is almost full - only {0} is left. That makes it slow.	Je pc is bijna vol - er is nog maar {0} over. Daardoor wordt hij traag.
+Your internet connection has a problem.	Je internetverbinding heeft een probleem.
+There are {0} of leftover files you don't need.	Er staat {0} aan overbodige restbestanden.
+Windows keeps up to {0} for things you may not need.	Windows houdt tot {0} vast voor dingen die je misschien niet nodig hebt.
+{0} app(s) start by themselves every time you turn on the PC, which makes starting slower.	{0} app(s) starten vanzelf elke keer dat je de pc aanzet, waardoor opstarten langer duurt.
+{0} program(s) have a newer version with fixes.	Van {0} programma('s) is er een nieuwere versie met verbeteringen.
+Windows shows you ads and tips, and shares more about you than needed ({0} settings).	Windows laat je advertenties en tips zien en deelt meer over je dan nodig is ({0} instellingen).
+{0} helper program(s) from other companies run in the background by themselves.	{0} hulpprogramma('s) van andere bedrijven draaien vanzelf op de achtergrond.
+Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
+Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
+Show all tools	Alle hulpmiddelen tonen
+Checking your PC...	Je pc wordt gecontroleerd...
+This takes about half a minute.	Dit duurt ongeveer een halve minuut.
+Make my PC faster	Maak mijn pc sneller
+Removes leftover files and stops apps you don't need	Verwijdert restbestanden en stopt apps die je niet nodig hebt
+Check for problems	Controleer op problemen
+Shows what could be better, in plain words	Laat in gewone woorden zien wat beter kan
+Get help	Hulp vragen
+Send a report to someone who helps you	Stuur een rapport naar iemand die je helpt
+What could be better	Wat beter kan
+Nothing to do	Niets te doen
+Everything looks fine. PC Tune-Up checks again next time you open it.	Alles ziet er goed uit. PC Tune-Up controleert opnieuw als je het weer opent.
+Fix this	Oplossen
+Show me	Laat zien
+Send a report about this PC to a family member or friend who helps you - by email, with the report attached.	Stuur een rapport over deze pc naar een familielid of vriend die je helpt - per e-mail, met het rapport als bijlage.
+Send by email	Per e-mail sturen
+Copy a short summary to paste into WhatsApp, a text message or a chat.	Kopieer een korte samenvatting om in WhatsApp, een sms of een chat te plakken.
+Copy summary	Samenvatting kopiëren
+Something in PC Tune-Up itself not working? Tell the people who make it.	Werkt er iets in PC Tune-Up zelf niet? Laat het de makers weten.
+Report a problem	Probleem melden
+See the short introduction again.	Bekijk de korte uitleg nog eens.
+Show the tour	Rondleiding tonen
+Something needs attention	Er vraagt iets om aandacht
+{0} thing(s) could be better	{0} punt(en) kunnen beter
+Click "Check for problems" to see them - most can be fixed with one click.	Klik op "Controleer op problemen" om ze te zien - de meeste los je op met één klik.
+Your PC is in good shape	Je pc is in goede staat
+Nothing needs doing right now.	Er hoeft nu niets te gebeuren.
+(Still checking...)	(Nog bezig met controleren...)
+Stop these apps from starting by themselves?	Deze apps niet meer vanzelf laten starten?
+They stay installed - you can still open them whenever you want. You can undo this on the History page.	Ze blijven geïnstalleerd - je kunt ze nog steeds openen wanneer je wilt. Terugdraaien kan op de pagina Geschiedenis.
+Done. Your PC will start a little faster next time.	Klaar. Je pc start de volgende keer iets sneller.
+Turn off Windows ads, tips and extra data sharing?	Advertenties, tips en extra gegevensdeling van Windows uitzetten?
+Your files and programs are not touched. You can undo this on the History page.	Je bestanden en programma's worden niet aangeraakt. Terugdraaien kan op de pagina Geschiedenis.
+Switch off helper programs from other companies that run in the background by themselves (updaters and data collection)?	Hulpprogramma's van andere bedrijven uitzetten die vanzelf op de achtergrond draaien (updaters en gegevensverzameling)?
+The programs themselves keep working. You can undo this on the History page.	De programma's zelf blijven gewoon werken. Terugdraaien kan op de pagina Geschiedenis.
+PC Tune-Up report for {0}	PC Tune-Up-rapport voor {0}
+Date: {0}	Datum: {0}
+Memory: {0}% used, drive C: {1} free	Geheugen: {0}% in gebruik, schijf C: {1} vrij
+Could be better:	Kan beter:
+Everything looks fine.	Alles ziet er goed uit.
+A short summary is copied. Paste it (Ctrl+V) into WhatsApp, a text message or an email to the person who helps you.	Er is een korte samenvatting gekopieerd. Plak die (Ctrl+V) in WhatsApp, een sms of een e-mail aan degene die je helpt.
+Couldn't copy: {0}	Kon niet kopiëren: {0}
+This saves a report about this PC in Documents and starts an email to the person who helps you.	Dit bewaart een rapport over deze pc in Documenten en begint een e-mail aan degene die je helpt.
+The report shows how the PC is doing, what it found and which programs are installed. It contains no passwords, no files and no browsing history.	Het rapport laat zien hoe het met de pc gaat, wat er is gevonden en welke programma's er zijn geïnstalleerd. Er staan geen wachtwoorden, bestanden of surfgeschiedenis in.
+Couldn't save the report: {0}	Kon het rapport niet opslaan: {0}
+My PC - report from PC Tune-Up	Mijn pc - rapport van PC Tune-Up
+Hi, could you have a look at my PC? The report from PC Tune-Up is attached.	Hoi, wil je even naar mijn pc kijken? Het rapport van PC Tune-Up zit als bijlage bij.
+(The full report is the file "{0}" in my Documents folder - I will attach it.)	(Het volledige rapport is het bestand "{0}" in mijn map Documenten - ik voeg het toe.)
+An email has been started, and the report is selected in File Explorer.	Er is een e-mail begonnen, en het rapport is geselecteerd in Verkenner.
+Drag the file "{0}" into the email (or use the paperclip), then send it.	Sleep het bestand "{0}" naar de e-mail (of gebruik de paperclip) en verstuur hem.
+Help	Hulp
+Report	Rapport
+saved to Documents for sending ({0})	opgeslagen in Documenten om te versturen ({0})
+Telemetry: information about how you use your PC that is sent to the maker.	Telemetrie: informatie over hoe je je pc gebruikt die naar de maker wordt gestuurd.
+Scheduled task: a small job Windows starts by itself at set times, often an updater.	Geplande taak: een klein klusje dat Windows zelf op vaste tijden start, vaak een updater.
+Service: a program that runs in the background without a window.	Service: een programma dat zonder venster op de achtergrond draait.
+DNS: the internet's phone book - it turns website names into addresses.	DNS: het telefoonboek van internet - het zet namen van websites om in adressen.
+Hibernation file: a hidden file where Windows saves everything when the PC goes into deep sleep.	Slaapstandbestand: een verborgen bestand waarin Windows alles bewaart als de pc in diepe slaap gaat.
+Paging file: space on the drive that Windows uses when the memory is full.	Wisselbestand: ruimte op de schijf die Windows gebruikt als het geheugen vol is.
+BIOS: the built-in software that starts the PC before Windows.	BIOS: de ingebouwde software die de pc start vóór Windows.
+Driver: the small program that lets Windows talk to a part of the PC, such as the screen or Wi-Fi.	Stuurprogramma: het kleine programma waarmee Windows met een onderdeel van de pc praat, zoals het scherm of de wifi.
+Restore point: a snapshot of Windows' settings you can go back to if something goes wrong.	Herstelpunt: een momentopname van de instellingen van Windows waar je naar terug kunt als er iets misgaat.
+Reserved storage: disk space Windows keeps free so updates always have room.	Gereserveerde opslag: schijfruimte die Windows vrijhoudt zodat updates altijd ruimte hebben.
+Storage Sense: Windows' own automatic clean-up.	Opslaginzicht: het eigen automatische opruimen van Windows.
+winget: Windows' built-in tool for installing and updating programs.	winget: het ingebouwde hulpmiddel van Windows om programma's te installeren en bij te werken.
+Policy: a setting that is forced on the PC, normally by a company's IT department.	Beleid: een instelling die de pc wordt opgelegd, normaal door de IT-afdeling van een bedrijf.
+Extension: an add-on for a web browser.	Extensie: een uitbreiding voor een webbrowser.
+Fast startup: Windows saves part of itself when you shut down, so it starts quicker.	Snel opstarten: Windows bewaart een deel van zichzelf bij het afsluiten, zodat het sneller start.
+Bloatware: programs the PC maker installed that most people never use.	Bloatware: programma's die de pc-maker heeft geïnstalleerd en die de meeste mensen nooit gebruiken.
+Cache: copies a program keeps to work faster. Safe to delete - they come back when needed.	Cache: kopieën die een programma bewaart om sneller te werken. Veilig om te verwijderen - ze komen terug als ze nodig zijn.
+Crash dump: a record saved when a program crashed, only useful to its makers.	Crashgegevens: een verslag dat wordt bewaard als een programma crasht, alleen nuttig voor de makers.
+GPU: the graphics card - the part that draws everything on the screen.	GPU: de videokaart - het onderdeel dat alles op het scherm tekent.
+Adware: software that shows you advertisements or changes your browser to make money.	Adware: software die je advertenties laat zien of je browser aanpast om geld te verdienen.
+Firmware: software built into a part of the PC, such as the BIOS or the drive.	Firmware: software die in een onderdeel van de pc is ingebouwd, zoals het BIOS of de schijf.
+PC Tune-Up will now:	PC Tune-Up gaat nu:
+ - delete leftover files that Windows and apps make again by themselves	 - restbestanden verwijderen die Windows en apps vanzelf opnieuw aanmaken
+ - stop {0} app(s) from starting by themselves (they stay installed)	 - {0} app(s) niet meer vanzelf laten starten (ze blijven geïnstalleerd)
+ - switch off background programs from the PC maker that are not needed	 - onnodige achtergrondprogramma's van de pc-maker uitzetten
+Your documents, photos and programs are not touched. You can undo the other changes on the History page.	Je documenten, foto's en programma's worden niet aangeraakt. De andere wijzigingen kun je terugdraaien op de pagina Geschiedenis.
+Done! {0} of leftover files removed.	Klaar! {0} aan restbestanden verwijderd.
+Your PC will start a little faster next time.	Je pc start de volgende keer iets sneller.
+Your PC is tidier now.	Je pc is nu opgeruimder.
+Your documents, photos and programs are not touched.	Je documenten, foto's en programma's worden niet aangeraakt.
+View	Weergave
+Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. All tools shows every page.	De eenvoudige weergave toont één rustig scherm met drie grote knoppen en alleen veilige oplossingen - het beste voor de meeste mensen. Alle hulpmiddelen toont elke pagina.
+Simple view	Eenvoudige weergave
+All tools	Alle hulpmiddelen
+Send a report to someone who helps you...	Rapport sturen naar iemand die je helpt...
+Copy a short summary	Korte samenvatting kopiëren
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1913,7 +2017,7 @@ function Update-PrimaryLook($Button) {
 }
 function New-ListView([bool]$Checks, [object[]]$Columns) {
     $lv = New-Object Windows.Forms.ListView
-    $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.Dock = 'Fill'
+    $lv.View = 'Details'; $lv.FullRowSelect = $true; $lv.CheckBoxes = $Checks; $lv.Dock = 'Fill'; $lv.ShowItemToolTips = $true
     $lv.BorderStyle = 'None'; $lv.HeaderStyle = 'Nonclickable'; $lv.BackColor = $Theme.Bg; $lv.ForeColor = $Theme.Text
     $rows = New-Object Windows.Forms.ImageList; $rows.ImageSize = New-Object Drawing.Size(1, (Px 26))   # taller rows
     $lv.SmallImageList = $rows
@@ -2033,6 +2137,7 @@ function Add-Row($Lv, [object[]]$Cells, $Tag = $null, [bool]$Checked = $false) {
     $it.Text = T ([string]$Cells[0])
     foreach ($c in $Cells[1..($Cells.Count - 1)]) { [void]$it.SubItems.Add((T ([string]$c))) }
     $it.Tag = $Tag; $it.Checked = $Checked
+    if ($script:GlossaryRx) { $tip = Get-GlossaryTip $Cells; if ($tip) { $it.ToolTipText = $tip } }   # plain-words explanation on hover
     [void]$Lv.Items.Add($it)
     $it
 }
@@ -2494,7 +2599,7 @@ $btnClean.Add_Click({
     if (-not $picked) { Show-Msg "Nothing to clean - check at least one item (admin-only items need `"Restart as administrator`").$skipNote" | Out-Null; return }
     $names = ($picked | ForEach-Object { " - $($_.Name)" }) -join "`n"
     if ($picked | Where-Object { $_.Path -eq 'CLEANMGR' }) { $skipNote += "`n`nWindows Disk Cleanup will run for the Windows items - this can take several minutes." }
-    if ((Show-Msg "Delete the junk in:`n$names`n`nThis can't be undone (it's all re-creatable).$skipNote" 'YesNo' 'Question') -ne 'Yes') { return }
+    if ((Show-Msg "Delete the junk in:`n$names`n`nThis can't be undone (it's all re-creatable).$skipNote`n`nYour documents, photos and programs are not touched." 'YesNo' 'Question') -ne 'Yes') { return }
     $btnScan.Enabled = $false; $btnClean.Enabled = $false
     $lblClean.Text = 'Cleaning...'
     Start-Bg -Label 'Cleaning' -Cancellable $DoCleanWork $picked {
@@ -4124,7 +4229,7 @@ function Set-Privacy([bool]$Off) {
     if ($locked) { $msg += "`n`nThese need administrator rights (click ""Restart as admin""): $(($locked | ForEach-Object Name) -join ', ')" }
     if ($failed) { $msg += "`n`nCouldn't change: $($failed -join '; ')" }
     Show-Msg $msg | Out-Null
-    if ($explorer -and (Show-Msg "Restart Explorer now so the Start menu, search and taskbar pick up the change?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
+    if ($explorer -and -not $script:SimpleRun -and (Show-Msg "Restart Explorer now so the Start menu, search and taskbar pick up the change?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
         Get-Process -Name explorer -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue   # Windows starts it again by itself
     }
 }
@@ -5027,7 +5132,7 @@ function Set-ContextEntries([bool]$Hide) {
     $msg = "$done entr(y/ies) $(if ($Hide) { 'hidden' } else { 'shown again' }). Undo from the History page."
     if ($failed) { $msg += "`n`nCouldn't change: $($failed -join '; ')" }
     Show-Msg $msg | Out-Null
-    if ((Show-Msg "Restart Explorer now so the menu updates?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
+    if (-not $script:SimpleRun -and (Show-Msg "Restart Explorer now so the menu updates?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
         Get-Process -Name explorer -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     }
 }
@@ -5857,6 +5962,11 @@ function Restart-App {
     $form.Close()
 }
 
+Add-SetSection 'View' 'Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. All tools shows every page.'
+$cmbView = New-Choice @('Simple view', 'All tools') @('simple', 'full') $Settings.View
+Add-SetRow @($cmbView)
+$cmbView.Add_SelectedIndexChanged({ $v = $this.Tag[$this.SelectedIndex]; if ($v -ne $Settings.View) { Set-ViewMode $v } })
+
 Add-SetSection 'Language' 'Takes effect when PC Tune-Up restarts.'
 $cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands', 'Deutsch', 'Français') @('auto', 'en', 'nl', 'de', 'fr') $Settings.Language
 $btnLangRestart = New-Button 'Restart now'
@@ -6081,7 +6191,11 @@ $btnImport.Add_Click({ Import-PcSettings })
 
 Add-SetSection 'Help and feedback' 'Something not working, or an idea? It opens a report on GitHub with the version, Windows and recent errors already filled in (your name, folders and PC name are blanked out) - you see everything before you send it.'
 $btnBug = New-Button 'Report a problem...'; $btnIdea = New-Button 'Suggest an idea...'; $btnTour = New-Button 'Show the tour again'; $btnSite = New-Button 'Website'
+$btnHelper = New-Button 'Send a report to someone who helps you...'; $btnCopySum = New-Button 'Copy a short summary'
+Add-SetRow @($btnHelper, $btnCopySum)
 Add-SetRow @($btnBug, $btnIdea, $btnTour, $btnSite)
+$btnHelper.Add_Click({ Send-HelperReport })
+$btnCopySum.Add_Click({ Copy-PlainSummary })
 $btnBug.Add_Click({ Open-ProblemReport 'bug' })
 $btnIdea.Add_Click({ Open-ProblemReport 'idea' })
 $btnTour.Add_Click({ Show-Tour })
@@ -6280,6 +6394,13 @@ function Invoke-FixMyPc {
     if ($IsAdmin -and $Settings.RestorePoints) { $plan += ' - Create a restore point first' }
     if (-not $IsAdmin) { $plan += '', 'Tip: "Restart as admin" first to also clean Windows files and trim background services.' }
     $plan += '', 'Nothing gets uninstalled. Startup and service changes can be undone from the History page.'
+    $script:FixSimple = [bool]$script:SimpleRun
+    if ($script:SimpleRun) {
+        $plan = @('PC Tune-Up will now:', ' - delete leftover files that Windows and apps make again by themselves')
+        if ($startup) { $plan += " - stop $($startup.Count) app(s) from starting by themselves (they stay installed)" }
+        if ($svc) { $plan += ' - switch off background programs from the PC maker that are not needed' }
+        $plan += '', 'Your documents, photos and programs are not touched. You can undo the other changes on the History page.'
+    }
     if ((Show-Msg ($plan -join "`n") 'OKCancel' 'Question') -ne 'OK') { return }
     $script:FixPlan = @{ Clean = $clean; Startup = $startup; Svc = $svc }
     $btnFix.Enabled = $false; $btnFix.Text = 'Fixing...'
@@ -6307,6 +6428,7 @@ function Invoke-FixApply {
         if ($IsAdmin) { $lines += " - $($script:FixCounts.Services) background service(s) trimmed" }
         if ($junk) { $lines += " - $junk junk app(s) found - see the Bloatware page if you want them gone" }
         $lines += '', 'Startup changes take effect next time you sign in. Undo anything from the History page.'
+        if ($script:FixSimple) { $lines = @("Done! $(Format-Size $freed) of leftover files removed.", '', $(if ($script:FixCounts.Startup) { 'Your PC will start a little faster next time.' } else { 'Your PC is tidier now.' })) }
         $btnFix.Text = 'Fix my PC'; $btnFix.Enabled = $true
         Update-Health; Start-CleanScan; Update-Startup; Update-Services; Update-History
         Show-Msg ($lines -join "`n") | Out-Null
@@ -6425,25 +6547,9 @@ function Set-NavBadge([string]$Name, $Count) {
 # The three most useful next steps, most urgent first. Buttons only open the page - every change is still made there.
 function Update-StartHere {
     if (-not $script:StartRows) { return }
-    $c = New-Object System.Collections.ArrayList
-    $add = { param($p, $text, $btn, $page) [void]$c.Add([pscustomobject]@{ P = $p; Text = $text; Btn = $btn; Page = $page }) }
-    $n = @($lvSec.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;      if ($n) { & $add 10 "Security: $n problem(s) to fix" 'Fix' $pgSec }
-    if ($script:ExtraAdvice['Backup']) { & $add 15 'Nothing backs up your files yet' 'Set up backup' $pgBackup }
-    if ($script:BrowserRisky) { & $add 20 "$($script:BrowserRisky) browser item(s) look like adware" 'Review' $pgBrw }
-    $n = @($lvDrv.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;      if ($n) { & $add 25 "$n device(s) have a driver problem" 'Check' $pgDrv }
-    $n = @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count;     if ($n) { & $add 30 "$n kind(s) of crashes or errors keep happening" 'See fixes' $pgStab }
-    $c0 = @($script:HealthQuick.Disks | Where-Object { $_.Id -eq 'C:' })[0]
-    if ($c0 -and $c0.Size -and $c0.Free / $c0.Size -lt 0.1) { & $add 35 "Drive C: is almost full ($(Format-Size $c0.Free) free)" 'Free up space' $pgSpace }
-    if ($script:NetProblems) { & $add 40 'The network has a problem' 'Check' $pgNet }
-    if ($script:JunkBytes -gt 1GB) { & $add 45 "Clean up $(Format-Size $script:JunkBytes) of junk files" 'Clean' $pgClean }
-    if ($script:SpaceFree -gt 3GB) { & $add 48 "Free up to $(Format-Size $script:SpaceFree) with space savers" 'Review' $pgSpace }
-    $n = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' }).Count; if ($n) { & $add 50 "Stop $n app(s) starting with Windows" 'Review' $pgStartup }
-    $n = @($lvUpd.Items).Count;                                                    if ($n) { & $add 55 "$n program update(s) available" 'Update' $pgUpd }
-    if ($script:PrivacyOn) { & $add 60 "Turn off $($script:PrivacyOn) Windows ads, tips and tracking settings" 'Turn off' $pgPriv }
-    if ($script:TasksActive) { & $add 65 "Switch off $($script:TasksActive) junk scheduled task(s)" 'Review' $pgTasks }
-    if ($script:BatteryWorn) { & $add 70 'The battery is worn out - see how to replace it' 'See' $pgBatt }
-    if ($script:CtxLeftovers) { & $add 75 "Hide $($script:CtxLeftovers) leftover right-click menu entr(y/ies)" 'Review' $pgCtx }
-    $top = @($c | Sort-Object P | Select-Object -First 3)
+    if ($simple) { Update-SimpleView }
+    $c = @(Get-NextSteps)
+    $top = @($c | Select-Object -First 3)
     $key = ($top | ForEach-Object { $_.Text }) -join '|'
     if ($key -eq $script:StartDrawn) { return }
     $script:StartDrawn = $key
@@ -6620,6 +6726,252 @@ function Start-Everything {
     [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Gaming', 'Clean'))
     if ($HasBattery) { [void]$script:LoadQueue.Insert(5, 'Battery') }
 }
+# ===========================================================================
+# Simple mode: one calm screen for people who don't want 23 pages - a status in plain words, three big buttons,
+# and only safe fixes that can be undone. "Show all tools" switches to the full app (Settings > View switches back).
+# ===========================================================================
+# Everything worth doing, most urgent first, for both "Start here" (full view) and simple mode.
+# Plain = one everyday sentence; Fix = a safe change with undo that simple mode may offer as "Fix this".
+function Get-NextSteps {
+    $c = New-Object System.Collections.ArrayList
+    $add = { param($p, $text, $btn, $page, $plain, $fix) [void]$c.Add([pscustomobject]@{ P = $p; Text = $text; Btn = $btn; Page = $page; Plain = $plain; Fix = $fix }) }
+    $n = @($lvSec.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
+    if ($n) { & $add 10 "Security: $n problem(s) to fix" 'Fix' $pgSec "Your PC's protection has a gap ($n problem(s)). It is worth letting someone who knows computers take a look." $null }
+    if ($script:ExtraAdvice['Backup']) { & $add 15 'Nothing backs up your files yet' 'Set up backup' $pgBackup 'Your photos and documents are not backed up anywhere. If the PC breaks or is stolen, they are gone.' $null }
+    if ($script:BrowserRisky) { & $add 20 "$($script:BrowserRisky) browser item(s) look like adware" 'Review' $pgBrw 'Your web browser has add-ons that look like advertising software.' $null }
+    $n = @($lvDrv.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
+    if ($n) { & $add 25 "$n device(s) have a driver problem" 'Check' $pgDrv 'A part of your PC (a device) is not working properly.' $null }
+    $n = @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
+    if ($n) { & $add 30 "$n kind(s) of crashes or errors keep happening" 'See fixes' $pgStab 'Programs or Windows crashed several times recently.' $null }
+    $c0 = @($script:HealthQuick.Disks | Where-Object { $_.Id -eq 'C:' })[0]
+    if ($c0 -and $c0.Size -and $c0.Free / $c0.Size -lt 0.1) { & $add 35 "Drive C: is almost full ($(Format-Size $c0.Free) free)" 'Free up space' $pgSpace "Your PC is almost full - only $(Format-Size $c0.Free) is left. That makes it slow." 'clean' }
+    if ($script:NetProblems) { & $add 40 'The network has a problem' 'Check' $pgNet 'Your internet connection has a problem.' $null }
+    if ($script:JunkBytes -gt 1GB) { & $add 45 "Clean up $(Format-Size $script:JunkBytes) of junk files" 'Clean' $pgClean "There are $(Format-Size $script:JunkBytes) of leftover files you don't need." 'clean' }
+    if ($script:SpaceFree -gt 3GB) { & $add 48 "Free up to $(Format-Size $script:SpaceFree) with space savers" 'Review' $pgSpace "Windows keeps up to $(Format-Size $script:SpaceFree) for things you may not need." $null }
+    $n = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' }).Count
+    if ($n) { & $add 50 "Stop $n app(s) starting with Windows" 'Review' $pgStartup "$n app(s) start by themselves every time you turn on the PC, which makes starting slower." 'startup' }
+    $n = @($lvUpd.Items).Count
+    if ($n) { & $add 55 "$n program update(s) available" 'Update' $pgUpd "$n program(s) have a newer version with fixes." 'updates' }
+    if ($script:PrivacyOn) { & $add 60 "Turn off $($script:PrivacyOn) Windows ads, tips and tracking settings" 'Turn off' $pgPriv "Windows shows you ads and tips, and shares more about you than needed ($($script:PrivacyOn) settings)." 'privacy' }
+    if ($script:TasksActive) { & $add 65 "Switch off $($script:TasksActive) junk scheduled task(s)" 'Review' $pgTasks "$($script:TasksActive) helper program(s) from other companies run in the background by themselves." 'tasks' }
+    if ($script:BatteryWorn) { & $add 70 'The battery is worn out - see how to replace it' 'See' $pgBatt "Your battery is worn out and doesn't last as long any more. A new battery fixes that." $null }
+    if ($script:CtxLeftovers) { & $add 75 "Hide $($script:CtxLeftovers) leftover right-click menu entr(y/ies)" 'Review' $pgCtx 'Removed programs left old entries in your right-click menu.' 'context' }
+    @($c | Sort-Object P)
+}
+
+$SimpleFont = New-Object Drawing.Font('Segoe UI', 11)
+$SimpleBig = New-Object Drawing.Font('Segoe UI Semibold', 20)
+$simple = New-Object Windows.Forms.Panel
+$simple.Dock = 'Fill'; $simple.BackColor = $Theme.Bg; $simple.Visible = $false; $simple.Font = $SimpleFont
+$sCol = New-Object Windows.Forms.Panel   # the centred column
+$sCol.Width = 820; $sCol.Height = 700; $sCol.Font = $SimpleFont
+$simple.Controls.Add($sCol)
+$simple.Add_Resize({
+    $w = [Math]::Min($sCol.Width, $simple.ClientSize.Width - 32)
+    $sCol.Width = [Math]::Max(300, $w); $sCol.Left = [Math]::Max(16, ($simple.ClientSize.Width - $sCol.Width) / 2)
+    $sCol.Top = 12; $sCol.Height = [Math]::Max(300, $simple.ClientSize.Height - 24)
+})
+# Top: name and "Show all tools"
+$sTop = New-Object Windows.Forms.Panel; $sTop.Dock = 'Top'; $sTop.Height = 44
+$sName = New-Object Windows.Forms.Label; $sName.Text = 'PC Tune-Up'; $sName.Font = $FontTitle; $sName.AutoSize = $true; $sName.Location = New-Object Drawing.Point(0, 4)
+$sAll = New-Object Windows.Forms.LinkLabel; $sAll.Text = 'Show all tools'; $sAll.AutoSize = $true; $sAll.Dock = 'Right'; $sAll.Padding = New-Object Windows.Forms.Padding(0, 12, 0, 0)
+$sAll.LinkColor = $Theme.AccentText; $sAll.ActiveLinkColor = $Theme.AccentText
+$sAll.Add_LinkClicked({ Set-ViewMode 'full' })
+$sTop.Controls.AddRange(@($sName, $sAll))
+# Status: a coloured circle and one sentence
+$sStatus = New-Object Windows.Forms.Panel; $sStatus.Dock = 'Top'; $sStatus.Height = 112; $sStatus.BackColor = $Theme.Soft; $sStatus.Padding = New-Object Windows.Forms.Padding(18, 14, 14, 14)
+$sDot = New-Object Windows.Forms.PictureBox; $sDot.Dock = 'Left'; $sDot.Width = 84; $sDot.BackColor = $Theme.Soft
+$script:SimpleColor = $Theme.Muted
+$sDot.Add_Paint({ param($s, $e) $e.Graphics.SmoothingMode = 'AntiAlias'; $d = [Math]::Min($s.Width, $s.Height) - 8
+    $br = New-Object Drawing.SolidBrush($script:SimpleColor); $e.Graphics.FillEllipse($br, 2, [int](($s.Height - $d) / 2), $d, $d); $br.Dispose() })
+$sText = New-Object Windows.Forms.Panel; $sText.Dock = 'Fill'; $sText.Padding = New-Object Windows.Forms.Padding(12, 6, 0, 0); $sText.BackColor = $Theme.Soft
+$sHead = New-Object Windows.Forms.Label; $sHead.Dock = 'Top'; $sHead.Height = 42; $sHead.Font = $SimpleBig; $sHead.Text = 'Checking your PC...'
+$sSub = New-Object Windows.Forms.Label; $sSub.Dock = 'Fill'; $sSub.ForeColor = $Theme.Dim; $sSub.Text = 'This takes about half a minute.'
+$sText.Controls.AddRange(@($sSub, $sHead)); $sStatus.Controls.AddRange(@($sText, $sDot))
+# Three big buttons
+$sTiles = New-Object Windows.Forms.TableLayoutPanel; $sTiles.Dock = 'Top'; $sTiles.Height = 118; $sTiles.ColumnCount = 3; $sTiles.Padding = New-Object Windows.Forms.Padding(0, 14, 0, 6)
+foreach ($k in 1..3) { [void]$sTiles.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 33.3))) }
+function New-Tile([string]$Text) {
+    $b = New-Button $Text; $b.AutoSize = $false; $b.Dock = 'Fill'; $b.Margin = New-Object Windows.Forms.Padding(0, 0, 10, 0); $b.Font = $SimpleFont
+    $b.TextAlign = 'MiddleLeft'; $b.Padding = New-Object Windows.Forms.Padding(14, 0, 8, 0); $b
+}
+$sFast = New-Tile "Make my PC faster`nRemoves leftover files and stops apps you don't need"
+$sCheck = New-Tile "Check for problems`nShows what could be better, in plain words"
+$sHelp = New-Tile "Get help`nSend a report to someone who helps you"
+Set-Primary $sFast
+$sTiles.Controls.Add($sFast, 0, 0); $sTiles.Controls.Add($sCheck, 1, 0); $sTiles.Controls.Add($sHelp, 2, 0)
+# Below: what the last button showed
+$sArea = New-Object Windows.Forms.Panel; $sArea.Dock = 'Fill'; $sArea.Padding = New-Object Windows.Forms.Padding(0, 10, 0, 0)
+$sAreaHead = New-Object Windows.Forms.Label; $sAreaHead.Dock = 'Top'; $sAreaHead.Height = 34; $sAreaHead.Font = $FontBold
+$sList = New-Object Windows.Forms.FlowLayoutPanel; $sList.Dock = 'Fill'; $sList.FlowDirection = 'TopDown'; $sList.WrapContents = $false; $sList.AutoScroll = $true
+$sArea.Controls.AddRange(@($sList, $sAreaHead))
+$sCol.Controls.AddRange(@($sArea, $sTiles, $sStatus, $sTop))
+$form.Controls.Add($simple); $simple.BringToFront()
+
+# One row in the list: a sentence and (maybe) a button. Made at run time, so texts are translated here.
+function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $Tag) {
+    $row = New-Object Windows.Forms.Panel
+    $row.Width = $sList.ClientSize.Width - (Px 24); $row.Height = (Px 62); $row.Margin = New-Object Windows.Forms.Padding(0, 0, 0, (Px 6)); $row.BackColor = $Theme.Soft
+    $row.Padding = New-Object Windows.Forms.Padding((Px 14), (Px 8), (Px 10), (Px 8))
+    $l = New-Object Windows.Forms.Label; $l.Dock = 'Fill'; $l.Text = T $Text; $l.TextAlign = 'MiddleLeft'; $l.AutoEllipsis = $true; $l.BackColor = $Theme.Soft
+    if ($Button) {
+        $b = New-Button (T $Button); $b.Dock = 'Right'; $b.AutoSize = $false; $b.Width = (Px 150); $b.Margin = New-Object Windows.Forms.Padding(0); $b.Tag = $Tag
+        $b.Add_Click($OnClick); $row.Controls.Add($b)
+        if ($Button -eq 'Fix this') { Set-Primary $b }
+    }
+    $row.Controls.Add($l); $l.BringToFront()
+    $sList.Controls.Add($row)
+}
+$sList.Add_Resize({ foreach ($r in $sList.Controls) { $r.Width = $sList.ClientSize.Width - (Px 24) } })
+function Show-SimpleProblems {
+    $sList.SuspendLayout(); $sList.Controls.Clear()
+    $steps = @(Get-NextSteps)
+    $sAreaHead.Text = if ($steps) { T 'What could be better' } else { T 'Nothing to do' }
+    if (-not $steps) { Add-SimpleRow 'Everything looks fine. PC Tune-Up checks again next time you open it.' $null $null $null }
+    foreach ($s in $steps) {
+        if ($s.Fix) { Add-SimpleRow $s.Plain 'Fix this' { Invoke-SimpleFix $this.Tag } $s }
+        else { Add-SimpleRow $s.Plain 'Show me' { Set-ViewMode 'full'; Show-Page $this.Tag.Page } $s }
+    }
+    $sList.ResumeLayout()
+}
+function Show-SimpleHelp {
+    $sList.SuspendLayout(); $sList.Controls.Clear()
+    $sAreaHead.Text = T 'Get help'
+    Add-SimpleRow 'Send a report about this PC to a family member or friend who helps you - by email, with the report attached.' 'Send by email' { Send-HelperReport } $null
+    Add-SimpleRow 'Copy a short summary to paste into WhatsApp, a text message or a chat.' 'Copy summary' { Copy-PlainSummary } $null
+    Add-SimpleRow 'Something in PC Tune-Up itself not working? Tell the people who make it.' 'Report a problem' { Open-ProblemReport 'bug' } $null
+    Add-SimpleRow 'See the short introduction again.' 'Show the tour' { Show-Tour } $null
+    $sList.ResumeLayout()
+}
+# The big status: red when something needs attention, orange when things could be better, green when all is well.
+function Update-SimpleView {
+    if ($Settings.View -ne 'simple') { return }   # (not .Visible: that is false while the window itself is hidden)
+    $steps = @(Get-NextSteps)
+    $busy = $script:Jobs.Count -or $script:LoadQueue.Count -or -not $script:EverythingStarted
+    $urgent = @($steps | Where-Object { $_.P -le 35 })
+    if ($urgent) { $script:SimpleColor = $Theme.Bad; $sHead.Text = T 'Something needs attention'; $sSub.Text = T $urgent[0].Plain }
+    elseif ($steps) { $script:SimpleColor = $Theme.Warn; $sHead.Text = (T '{0} thing(s) could be better').Replace('{0}', "$($steps.Count)"); $sSub.Text = T 'Click "Check for problems" to see them - most can be fixed with one click.' }
+    elseif ($busy) { $script:SimpleColor = $Theme.Muted; $sHead.Text = T 'Checking your PC...'; $sSub.Text = T 'This takes about half a minute.' }
+    else { $script:SimpleColor = $Theme.Good; $sHead.Text = T 'Your PC is in good shape'; $sSub.Text = T 'Nothing needs doing right now.' }
+    if ($busy -and ($steps -or $urgent)) { $sSub.Text += '  ' + (T '(Still checking...)') }
+    $sDot.Invalidate()
+    if ($sAreaHead.Text -eq (T 'What could be better') -or $sAreaHead.Text -eq (T 'Nothing to do')) { Show-SimpleProblems }   # keep the open list current
+}
+# Safe fixes, each with a plain question first. All of them can be undone from History.
+function Invoke-SimpleFix($Step) {
+    $script:SimpleRun = $true
+    try {
+        switch ($Step.Fix) {
+            'clean' { Invoke-FixMyPc }
+            'updates' { $btnUpdRun.PerformClick() }
+            'startup' {
+                $items = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' })
+                $names = ($items | ForEach-Object { $_.Tag.Name -replace '_[0-9A-F]{32}$', '' }) -join ', '
+                if ((Show-Msg "Stop these apps from starting by themselves?`n`n$names`n`nThey stay installed - you can still open them whenever you want. You can undo this on the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+                foreach ($it in $items) { try { Set-StartupEntry $it.Tag $false } catch { } }
+                Update-History; Update-Startup
+                Show-Msg 'Done. Your PC will start a little faster next time.' | Out-Null
+            }
+            'privacy' {
+                if ((Show-Msg "Turn off Windows ads, tips and extra data sharing?`n`nYour files and programs are not touched. You can undo this on the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+                foreach ($it in $lvPriv.Items) { $it.Checked = $it.Tag.Rec -and -not ($it.Tag.Admin -and -not $IsAdmin) -and (Get-PrivacyState $it.Tag) -ne 'Off' }
+                Set-Privacy $true
+            }
+            'tasks' {
+                if ((Show-Msg "Switch off helper programs from other companies that run in the background by themselves (updaters and data collection)?`n`nThe programs themselves keep working. You can undo this on the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+                foreach ($it in $lvTasks.Items) { $it.Checked = $it.Tag.Kind -eq 'known' -and $it.Tag.State -ne 'Disabled' }
+                Set-Tasks $false
+            }
+            'context' {
+                foreach ($it in $lvCtx.Items) { $it.Checked = $it.Tag.Missing -and -not $it.Tag.Hidden }
+                Set-ContextEntries $true
+            }
+        }
+    } finally { $script:SimpleRun = $false; Update-SimpleView }
+}
+function Set-ViewMode([string]$Mode) {
+    $Settings.View = $Mode; Save-Settings
+    $isSimple = $Mode -eq 'simple'
+    $simple.Visible = $isSimple; $content.Visible = -not $isSimple; $sidebar.Visible = -not $isSimple
+    if ($isSimple) { $simple.BringToFront(); Update-SimpleView } else { $content.BringToFront(); $sidebar.BringToFront() }
+    if ($cmbView) { $cmbView.SelectedIndex = [Math]::Max(0, [array]::IndexOf($cmbView.Tag, $Mode)) }
+}
+$sFast.Add_Click({ $script:SimpleRun = $true; try { Invoke-FixMyPc } finally { $script:SimpleRun = $false } })
+$sCheck.Add_Click({ Show-SimpleProblems })
+$sHelp.Add_Click({ Show-SimpleHelp })
+
+# ===========================================================================
+# Send a report to the person who helps you: by email with the report attached, or a short summary to paste
+# ===========================================================================
+function Get-PlainSummary {
+    $steps = @(Get-NextSteps)
+    $q = $script:HealthQuick
+    $lines = @((T 'PC Tune-Up report for {0}').Replace('{0}', $PcName), (T 'Date: {0}').Replace('{0}', (Get-Date).ToString('g')), '')
+    if ($q) { $lines += (T 'Memory: {0}% used, drive C: {1} free').Replace('{0}', "$([int](100 * (1 - $q.FreeKB / $q.TotalKB)))").Replace('{1}', $(@($q.Disks | Where-Object Id -eq 'C:' | ForEach-Object { Format-Size $_.Free })[0])) }
+    $lines += $(if ($steps) { T 'Could be better:' } else { T 'Everything looks fine.' })
+    foreach ($s in $steps | Select-Object -First 8) { $lines += " - $(T $s.Plain)" }
+    $lines -join "`r`n"
+}
+function Copy-PlainSummary {
+    try { [Windows.Forms.Clipboard]::SetText((Get-PlainSummary)); Show-Msg 'A short summary is copied. Paste it (Ctrl+V) into WhatsApp, a text message or an email to the person who helps you.' | Out-Null }
+    catch { Show-Msg "Couldn't copy: $($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+}
+function Send-HelperReport {
+    $name = 'PC Tune-Up report {0} {1}.html' -f ($PcName -replace '[\\/:*?"<>|]', ''), (Get-Date -Format 'yyyy-MM-dd')
+    $file = Join-Path ([Environment]::GetFolderPath('MyDocuments')) $name
+    if ((Show-Msg "This saves a report about this PC in Documents and starts an email to the person who helps you.`n`nThe report shows how the PC is doing, what it found and which programs are installed. It contains no passwords, no files and no browsing history." 'OKCancel' 'Information') -ne 'OK') { return }
+    try { [void](Save-ReportNow -Path $file -NoOpen) } catch { Show-Msg "Couldn't save the report: $($_.Exception.Message)" 'OK' 'Warning' | Out-Null; return }
+    $subject = T 'My PC - report from PC Tune-Up'
+    $body = (T 'Hi, could you have a look at my PC? The report from PC Tune-Up is attached.') + "`r`n`r`n" + (Get-PlainSummary)
+    # Outlook (the classic app) can attach the file itself; other mail apps get the text and an Explorer window with the file.
+    $sent = $false
+    try {
+        $ol = New-Object -ComObject Outlook.Application -ErrorAction Stop
+        $mail = $ol.CreateItem(0); $mail.Subject = $subject; $mail.Body = $body; [void]$mail.Attachments.Add($file); $mail.Display()
+        [void][Runtime.InteropServices.Marshal]::ReleaseComObject($mail); [void][Runtime.InteropServices.Marshal]::ReleaseComObject($ol); $sent = $true
+    } catch { }
+    if (-not $sent) {
+        $body2 = $body + "`r`n`r`n" + (T '(The full report is the file "{0}" in my Documents folder - I will attach it.)').Replace('{0}', $name)
+        try { Start-Process ("mailto:?subject=$([uri]::EscapeDataString($subject))&body=$([uri]::EscapeDataString($body2.Substring(0, [Math]::Min(1500, $body2.Length))))") } catch { }
+        Start-Process explorer.exe "/select,`"$file`""
+        Show-Msg "An email has been started, and the report is selected in File Explorer.`n`nDrag the file ""$name"" into the email (or use the paperclip), then send it." | Out-Null
+    }
+    Add-History 'Help' 'Report' "saved to Documents for sending ($name)"; Update-History
+}
+
+# ===========================================================================
+# Plain words: hovering over a row that uses a technical term explains it in one everyday sentence
+# ===========================================================================
+$Glossary = [ordered]@{
+    'telemetry'            = 'Telemetry: information about how you use your PC that is sent to the maker.'
+    'scheduled task'       = 'Scheduled task: a small job Windows starts by itself at set times, often an updater.'
+    'service'              = 'Service: a program that runs in the background without a window.'
+    'DNS'                  = 'DNS: the internet''s phone book - it turns website names into addresses.'
+    'hibernat'             = 'Hibernation file: a hidden file where Windows saves everything when the PC goes into deep sleep.'
+    'paging file'          = 'Paging file: space on the drive that Windows uses when the memory is full.'
+    'BIOS'                 = 'BIOS: the built-in software that starts the PC before Windows.'
+    'driver'               = 'Driver: the small program that lets Windows talk to a part of the PC, such as the screen or Wi-Fi.'
+    'restore point'        = 'Restore point: a snapshot of Windows'' settings you can go back to if something goes wrong.'
+    'reserved storage'     = 'Reserved storage: disk space Windows keeps free so updates always have room.'
+    'Storage Sense'        = 'Storage Sense: Windows'' own automatic clean-up.'
+    'winget'               = 'winget: Windows'' built-in tool for installing and updating programs.'
+    'policy'               = 'Policy: a setting that is forced on the PC, normally by a company''s IT department.'
+    'extension'            = 'Extension: an add-on for a web browser.'
+    'Fast startup'         = 'Fast startup: Windows saves part of itself when you shut down, so it starts quicker.'
+    'bloatware'            = 'Bloatware: programs the PC maker installed that most people never use.'
+    'cache'                = 'Cache: copies a program keeps to work faster. Safe to delete - they come back when needed.'
+    'crash dump'           = 'Crash dump: a record saved when a program crashed, only useful to its makers.'
+    'GPU'                  = 'GPU: the graphics card - the part that draws everything on the screen.'
+    'adware'               = 'Adware: software that shows you advertisements or changes your browser to make money.'
+    'firmware'             = 'Firmware: software built into a part of the PC, such as the BIOS or the drive.'
+}
+$GlossaryRx = @(foreach ($k in $Glossary.Keys) { @{ Rx = [regex]::new('(?i)\b' + [regex]::Escape($k)); Text = $Glossary[$k] } })
+function Get-GlossaryTip([object[]]$Cells) {
+    $all = ($Cells | ForEach-Object { "$_" }) -join ' '
+    $tips = @(foreach ($g in $GlossaryRx) { if ($g.Rx.IsMatch($all)) { T $g.Text } }) | Select-Object -First 2
+    $tips -join "`n"
+}
+
 Enable-Translation $form
 Show-Page $pgHealth
 
@@ -6725,6 +7077,9 @@ if ($CliMode) {
 }
 
 # ---------------------------------------------------------------------------
+# New users start in simple view; people who already used PC Tune-Up keep all tools.
+if ($Settings.View -notin 'simple', 'full') { $Settings.View = if ($Settings.TourShown -or $Settings.AskedInstall -or (Test-Path $HistoryFile)) { 'full' } else { 'simple' }; Save-Settings }
+Set-ViewMode $Settings.View
 $form.Add_Shown({
     Start-Everything
     if ($Settings.CheckUpdates) { Start-UpdateCheck -Silent }

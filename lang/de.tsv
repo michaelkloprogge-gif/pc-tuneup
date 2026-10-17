@@ -1457,3 +1457,107 @@ Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the 
 Report this problem? (Opens GitHub with the details filled in - you see everything before you send it.)	Dieses Problem melden? (Öffnet GitHub mit den eingetragenen Details - Sie sehen alles, bevor Sie es senden.)
 on	ein
 off	aus
+Your PC's protection has a gap ({0} problem(s)). It is worth letting someone who knows computers take a look.	Der Schutz Ihres PCs hat eine Lücke ({0} Problem(e)). Lassen Sie am besten jemanden darauf schauen, der sich mit Computern auskennt.
+Your photos and documents are not backed up anywhere. If the PC breaks or is stolen, they are gone.	Von Ihren Fotos und Dokumenten gibt es nirgends eine Sicherung. Geht der PC kaputt oder wird er gestohlen, sind sie weg.
+Your web browser has add-ons that look like advertising software.	Ihr Webbrowser hat Erweiterungen, die nach Werbesoftware aussehen.
+A part of your PC (a device) is not working properly.	Ein Teil Ihres PCs (ein Gerät) funktioniert nicht richtig.
+Programs or Windows crashed several times recently.	Programme oder Windows sind in letzter Zeit mehrmals abgestürzt.
+Your PC is almost full - only {0} is left. That makes it slow.	Ihr PC ist fast voll - nur noch {0} frei. Das macht ihn langsam.
+Your internet connection has a problem.	Ihre Internetverbindung hat ein Problem.
+There are {0} of leftover files you don't need.	Es gibt {0} an überflüssigen Restdateien.
+Windows keeps up to {0} for things you may not need.	Windows hält bis zu {0} für Dinge frei, die Sie vielleicht nicht brauchen.
+{0} app(s) start by themselves every time you turn on the PC, which makes starting slower.	{0} App(s) starten bei jedem Einschalten von selbst, dadurch dauert der Start länger.
+{0} program(s) have a newer version with fixes.	Für {0} Programm(e) gibt es eine neuere Version mit Verbesserungen.
+Windows shows you ads and tips, and shares more about you than needed ({0} settings).	Windows zeigt Ihnen Werbung und Tipps und gibt mehr über Sie weiter als nötig ({0} Einstellungen).
+{0} helper program(s) from other companies run in the background by themselves.	{0} Hilfsprogramm(e) anderer Firmen laufen von selbst im Hintergrund.
+Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Ihr Akku ist verschlissen und hält nicht mehr so lange. Ein neuer Akku behebt das.
+Removed programs left old entries in your right-click menu.	Entfernte Programme haben alte Einträge im Rechtsklickmenü hinterlassen.
+Show all tools	Alle Werkzeuge anzeigen
+Checking your PC...	Ihr PC wird geprüft...
+This takes about half a minute.	Das dauert etwa eine halbe Minute.
+Make my PC faster	Meinen PC schneller machen
+Removes leftover files and stops apps you don't need	Entfernt Restdateien und stoppt Apps, die Sie nicht brauchen
+Check for problems	Nach Problemen suchen
+Shows what could be better, in plain words	Zeigt in einfachen Worten, was besser sein könnte
+Get help	Hilfe holen
+Send a report to someone who helps you	Bericht an jemanden senden, der Ihnen hilft
+What could be better	Was besser sein könnte
+Nothing to do	Nichts zu tun
+Everything looks fine. PC Tune-Up checks again next time you open it.	Alles sieht gut aus. PC Tune-Up prüft beim nächsten Öffnen erneut.
+Fix this	Beheben
+Show me	Anzeigen
+Send a report about this PC to a family member or friend who helps you - by email, with the report attached.	Senden Sie einen Bericht über diesen PC an ein Familienmitglied oder einen Freund, der Ihnen hilft - per E-Mail, mit dem Bericht im Anhang.
+Send by email	Per E-Mail senden
+Copy a short summary to paste into WhatsApp, a text message or a chat.	Eine kurze Zusammenfassung kopieren, um sie in WhatsApp, eine SMS oder einen Chat einzufügen.
+Copy summary	Zusammenfassung kopieren
+Something in PC Tune-Up itself not working? Tell the people who make it.	Funktioniert etwas in PC Tune-Up selbst nicht? Sagen Sie es den Entwicklern.
+Report a problem	Problem melden
+See the short introduction again.	Die kurze Einführung noch einmal ansehen.
+Show the tour	Einführung zeigen
+Something needs attention	Etwas braucht Aufmerksamkeit
+{0} thing(s) could be better	{0} Punkt(e) könnten besser sein
+Click "Check for problems" to see them - most can be fixed with one click.	Klicken Sie auf „Nach Problemen suchen“, um sie zu sehen - die meisten lassen sich mit einem Klick beheben.
+Your PC is in good shape	Ihr PC ist in gutem Zustand
+Nothing needs doing right now.	Im Moment ist nichts zu tun.
+(Still checking...)	(Prüfung läuft noch...)
+Stop these apps from starting by themselves?	Sollen diese Apps nicht mehr von selbst starten?
+They stay installed - you can still open them whenever you want. You can undo this on the History page.	Sie bleiben installiert - Sie können sie jederzeit selbst öffnen. Rückgängig machen können Sie das auf der Seite „Verlauf“.
+Done. Your PC will start a little faster next time.	Fertig. Ihr PC startet beim nächsten Mal etwas schneller.
+Turn off Windows ads, tips and extra data sharing?	Werbung, Tipps und zusätzliche Datenweitergabe von Windows ausschalten?
+Your files and programs are not touched. You can undo this on the History page.	Ihre Dateien und Programme werden nicht angerührt. Rückgängig machen können Sie das auf der Seite „Verlauf“.
+Switch off helper programs from other companies that run in the background by themselves (updaters and data collection)?	Hilfsprogramme anderer Firmen ausschalten, die von selbst im Hintergrund laufen (Updater und Datensammlung)?
+The programs themselves keep working. You can undo this on the History page.	Die Programme selbst funktionieren weiter. Rückgängig machen können Sie das auf der Seite „Verlauf“.
+PC Tune-Up report for {0}	PC Tune-Up-Bericht für {0}
+Date: {0}	Datum: {0}
+Memory: {0}% used, drive C: {1} free	Arbeitsspeicher: {0}% belegt, Laufwerk C: {1} frei
+Could be better:	Könnte besser sein:
+Everything looks fine.	Alles sieht gut aus.
+A short summary is copied. Paste it (Ctrl+V) into WhatsApp, a text message or an email to the person who helps you.	Eine kurze Zusammenfassung wurde kopiert. Fügen Sie sie (Strg+V) in WhatsApp, eine SMS oder eine E-Mail an die Person ein, die Ihnen hilft.
+Couldn't copy: {0}	Kopieren nicht möglich: {0}
+This saves a report about this PC in Documents and starts an email to the person who helps you.	Damit wird ein Bericht über diesen PC unter „Dokumente“ gespeichert und eine E-Mail an die Person begonnen, die Ihnen hilft.
+The report shows how the PC is doing, what it found and which programs are installed. It contains no passwords, no files and no browsing history.	Der Bericht zeigt, wie es dem PC geht, was gefunden wurde und welche Programme installiert sind. Er enthält keine Kennwörter, keine Dateien und keinen Browserverlauf.
+Couldn't save the report: {0}	Der Bericht konnte nicht gespeichert werden: {0}
+My PC - report from PC Tune-Up	Mein PC - Bericht von PC Tune-Up
+Hi, could you have a look at my PC? The report from PC Tune-Up is attached.	Hallo, könntest du dir meinen PC ansehen? Der Bericht von PC Tune-Up ist angehängt.
+(The full report is the file "{0}" in my Documents folder - I will attach it.)	(Der vollständige Bericht ist die Datei „{0}“ in meinem Ordner „Dokumente“ - ich hänge sie an.)
+An email has been started, and the report is selected in File Explorer.	Eine E-Mail wurde begonnen, und der Bericht ist im Explorer markiert.
+Drag the file "{0}" into the email (or use the paperclip), then send it.	Ziehen Sie die Datei „{0}“ in die E-Mail (oder verwenden Sie die Büroklammer) und senden Sie sie.
+Help	Hilfe
+Report	Bericht
+saved to Documents for sending ({0})	unter „Dokumente“ zum Senden gespeichert ({0})
+Telemetry: information about how you use your PC that is sent to the maker.	Telemetrie: Daten darüber, wie Sie Ihren PC nutzen, die an den Hersteller gesendet werden.
+Scheduled task: a small job Windows starts by itself at set times, often an updater.	Geplante Aufgabe: ein kleiner Auftrag, den Windows zu festen Zeiten selbst startet, oft ein Updater.
+Service: a program that runs in the background without a window.	Dienst: ein Programm, das ohne Fenster im Hintergrund läuft.
+DNS: the internet's phone book - it turns website names into addresses.	DNS: das Telefonbuch des Internets - es übersetzt Website-Namen in Adressen.
+Hibernation file: a hidden file where Windows saves everything when the PC goes into deep sleep.	Ruhezustandsdatei: eine versteckte Datei, in der Windows alles speichert, wenn der PC in den Tiefschlaf geht.
+Paging file: space on the drive that Windows uses when the memory is full.	Auslagerungsdatei: Platz auf dem Laufwerk, den Windows nutzt, wenn der Arbeitsspeicher voll ist.
+BIOS: the built-in software that starts the PC before Windows.	BIOS: die eingebaute Software, die den PC vor Windows startet.
+Driver: the small program that lets Windows talk to a part of the PC, such as the screen or Wi-Fi.	Treiber: das kleine Programm, mit dem Windows mit einem Teil des PCs spricht, etwa dem Bildschirm oder dem WLAN.
+Restore point: a snapshot of Windows' settings you can go back to if something goes wrong.	Wiederherstellungspunkt: eine Momentaufnahme der Windows-Einstellungen, zu der Sie zurückkehren können, wenn etwas schiefgeht.
+Reserved storage: disk space Windows keeps free so updates always have room.	Reservierter Speicher: Speicherplatz, den Windows freihält, damit Updates immer Platz haben.
+Storage Sense: Windows' own automatic clean-up.	Speicheroptimierung: die automatische Bereinigung von Windows selbst.
+winget: Windows' built-in tool for installing and updating programs.	winget: das eingebaute Werkzeug von Windows zum Installieren und Aktualisieren von Programmen.
+Policy: a setting that is forced on the PC, normally by a company's IT department.	Richtlinie: eine Einstellung, die dem PC vorgeschrieben wird, normalerweise von der IT-Abteilung einer Firma.
+Extension: an add-on for a web browser.	Erweiterung: ein Zusatz für einen Webbrowser.
+Fast startup: Windows saves part of itself when you shut down, so it starts quicker.	Schnellstart: Windows speichert beim Herunterfahren einen Teil von sich, damit es schneller startet.
+Bloatware: programs the PC maker installed that most people never use.	Bloatware: Programme, die der PC-Hersteller installiert hat und die die meisten nie benutzen.
+Cache: copies a program keeps to work faster. Safe to delete - they come back when needed.	Cache: Kopien, die ein Programm aufbewahrt, um schneller zu arbeiten. Gefahrlos löschbar - sie kommen bei Bedarf wieder.
+Crash dump: a record saved when a program crashed, only useful to its makers.	Absturzabbild: ein Protokoll, das beim Absturz eines Programms gespeichert wird und nur für dessen Entwickler nützlich ist.
+GPU: the graphics card - the part that draws everything on the screen.	GPU: die Grafikkarte - der Teil, der alles auf den Bildschirm zeichnet.
+Adware: software that shows you advertisements or changes your browser to make money.	Adware: Software, die Ihnen Werbung zeigt oder Ihren Browser verändert, um Geld zu verdienen.
+Firmware: software built into a part of the PC, such as the BIOS or the drive.	Firmware: Software, die in einen Teil des PCs eingebaut ist, etwa das BIOS oder das Laufwerk.
+PC Tune-Up will now:	PC Tune-Up wird jetzt:
+ - delete leftover files that Windows and apps make again by themselves	 - Restdateien löschen, die Windows und Apps von selbst neu anlegen
+ - stop {0} app(s) from starting by themselves (they stay installed)	 - {0} App(s) nicht mehr von selbst starten lassen (sie bleiben installiert)
+ - switch off background programs from the PC maker that are not needed	 - unnötige Hintergrundprogramme des PC-Herstellers ausschalten
+Your documents, photos and programs are not touched. You can undo the other changes on the History page.	Ihre Dokumente, Fotos und Programme werden nicht angerührt. Die übrigen Änderungen können Sie auf der Seite „Verlauf“ rückgängig machen.
+Done! {0} of leftover files removed.	Fertig! {0} an Restdateien entfernt.
+Your PC will start a little faster next time.	Ihr PC startet beim nächsten Mal etwas schneller.
+Your PC is tidier now.	Ihr PC ist jetzt aufgeräumter.
+Your documents, photos and programs are not touched.	Ihre Dokumente, Fotos und Programme werden nicht angerührt.
+View	Ansicht
+Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. All tools shows every page.	Die einfache Ansicht zeigt einen ruhigen Bildschirm mit drei großen Schaltflächen und nur sicheren Korrekturen - am besten für die meisten. „Alle Werkzeuge“ zeigt jede Seite.
+Simple view	Einfache Ansicht
+All tools	Alle Werkzeuge
+Send a report to someone who helps you...	Bericht an jemanden senden, der Ihnen hilft...
+Copy a short summary	Kurze Zusammenfassung kopieren

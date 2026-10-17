@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.14.1
+## 1.14.2
 
 - Fixed: in 1.14.0 the left edge of every page was hidden under the sidebar (the page title, the first buttons and the start of each line). The page test now checks that pages always start next to the sidebar.
 

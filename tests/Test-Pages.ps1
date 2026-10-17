@@ -49,6 +49,7 @@ foreach ($name in @($NavGroups | ForEach-Object { $_.Pages } | Where-Object { $_
 foreach ($name in $script:PageLoaders.Keys) { if (-not $script:Loaded[$name] -and $name -ne 'Battery') { Fail "page $name never loaded its data" } }
 # Layout: the page must start where the sidebar ends (both after start-up and after switching views)
 function Test-Layout([string]$When) {
+    if ($Settings.View -ne 'full') { return }   # in simple view the full page is hidden and not laid out
     $form.PerformLayout()
     if ($sidebar.Right -gt $content.Left) { Fail "layout ($When): the page starts at x=$($content.Left), under the sidebar (ends at x=$($sidebar.Right))" }
     if ($content.Right -gt $form.ClientSize.Width) { Fail "layout ($When): the page is wider than the window" }

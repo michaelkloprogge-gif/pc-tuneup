@@ -60,7 +60,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.14.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.14.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.

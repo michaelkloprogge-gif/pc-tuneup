@@ -6,8 +6,13 @@
 #   Bloatware - find pre-installed junk (OEM tools, trial antivirus, promo apps) and uninstall it
 #   Services  - background services from PC makers, updaters and telemetry, with one-click restore
 #   Tasks     - scheduled tasks from other companies (updaters, telemetry), switch off/on with undo
+#   Programs  - installed programs with size and last use; uninstall several, leftovers to the Recycle Bin
+#   Right-click - Explorer menu entries from other programs (leftovers pre-checked), hide with undo
 #   Privacy   - Windows ads, tips and tracking settings, switch off with undo
 #   Drivers   - devices with problems, and the age of the drivers that matter most
+#   Browsers  - extensions, search engine, home page and forced policies (adware) in Chrome/Edge/Brave/Vivaldi/Firefox
+#   Network   - Wi-Fi signal, delays, DNS speed, dropped connections, network reset
+#   Battery   - wear, wear speed, runtime, charge-limit advice (laptops only)
 #   Disk      - find the folders eating your drive
 #   Updates   - outdated programs, updated through winget
 #   Security  - Windows support status, Windows 11 readiness, antivirus, firewall, encryption, Secure Boot, TPM...
@@ -52,7 +57,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.8.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.9.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -238,7 +243,6 @@ Type	Type
 Category	Categorie
 Why	Waarom
 Publisher	Uitgever
-Program	Programma
 Store app	Store-app
 Junk	Rommel
 Optional	Optioneel
@@ -451,7 +455,6 @@ User Account Control	Gebruikersaccountbeheer
 Off - every program runs with full rights	Uit - elk programma draait met volledige rechten
 Search "UAC" in Start, set the slider back to the default level and restart.	Zoek "UAC" in Start, zet de schuifregelaar terug op het standaardniveau en start opnieuw op.
 Old file sharing (SMB 1.0)	Oude bestandsdeling (SMB 1.0)
-Installed	Geïnstalleerd
 SMB 1.0 is what the WannaCry worm used. Remove it unless a very old NAS or printer needs it: Windows Features > untick "SMB 1.0/CIFS File Sharing Support".	SMB 1.0 is wat de WannaCry-worm gebruikte. Verwijder het tenzij een heel oude NAS of printer het nodig heeft: Windows-onderdelen > vink "Ondersteuning voor SMB 1.0/CIFS-bestandsdeling" uit.
 Remote Desktop	Extern bureaublad
 On - this PC accepts remote connections	Aan - deze pc accepteert externe verbindingen
@@ -1039,6 +1042,285 @@ Cleaned {0}. Everything looks fine.	{0} opgeruimd. Alles ziet er goed uit.
 freed {0}, {1} thing(s) worth a look	{0} vrijgemaakt, {1} punt(en) om naar te kijken
 freed {0} (automatic)	{0} vrijgemaakt (automatisch)
 Maintenance	Onderhoud
+Browsers	Browsers
+Programs	Programma's
+Right-click	Rechtsklik
+Right-click menu	Rechtsklikmenu
+How much charge the battery still holds, how fast it is wearing, and how to make it last longer. From Windows' own battery report.	Hoeveel lading de accu nog vasthoudt, hoe snel hij slijt en hoe je hem langer laat meegaan. Uit het eigen accurapport van Windows.
+Battery usage per app	Accugebruik per app
+Power & battery settings	Instellingen voor energie en accu
+Full battery report	Volledig accurapport
+Find a replacement	Vervanging zoeken
+Reading	Meting
+Value	Waarde
+What it means	Wat het betekent
+Reading the battery report	Accurapport lezen
+Reading the battery report...	Accurapport lezen...
+Making the battery report	Accurapport maken
+Windows could not make a battery report.	Windows kon geen accurapport maken.
+Could not read the battery.	Kon de accu niet uitlezen.
+Battery health	Accuconditie
+Good - normal for its age.	Goed - normaal voor zijn leeftijd.
+Worn: you get noticeably less time on battery than when it was new.	Versleten: je kunt merkbaar korter op de accu werken dan toen hij nieuw was.
+Worn out: it holds less than two thirds of its charge. A new battery brings back the original battery life - see "Replacement" below.	Op: hij houdt minder dan twee derde van zijn lading vast. Een nieuwe accu geeft de oorspronkelijke gebruiksduur terug - zie "Vervanging" hieronder.
+Capacity	Capaciteit
+{0} Wh now, {1} Wh when new	{0} Wh nu, {1} Wh toen hij nieuw was
+Wh (watt-hours) is how much energy the battery can store.	Wh (wattuur) is hoeveel energie de accu kan opslaan.
+Wear over the last year	Slijtage het afgelopen jaar
+no loss	geen verlies
+loses about {0}% a year	verliest ongeveer {0}% per jaar
+Faster than normal (about 5-10% a year). Usually heat, or the battery being kept at 100% while plugged in all day - a charge limit helps (below).	Sneller dan normaal (ongeveer 5-10% per jaar). Meestal door warmte, of doordat de accu de hele dag op 100% aan de lader zit - een laadlimiet helpt (hieronder).
+Normal.	Normaal.
+Time on a full charge	Gebruiksduur op een volle accu
+about {0} ({1} when new)	ongeveer {0} ({1} toen hij nieuw was)
+about {0}	ongeveer {0}
+Windows' estimate for the way you normally use the PC.	De schatting van Windows voor hoe je de pc normaal gebruikt.
+Charge cycles	Laadcycli
+One cycle = 100% used in total. Most laptop batteries are made for 300-1000 cycles.	Eén cyclus = in totaal 100% verbruikt. De meeste laptopaccu's zijn gemaakt voor 300-1000 cycli.
+lithium polymer	lithium-polymeer
+lithium-ion	lithium-ion
+{0}, made by {1} ({2})	{0}, gemaakt door {1} ({2})
+{0}, made by {1}	{0}, gemaakt door {1}
+Needed when you look for a replacement.	Nodig als je een vervanger zoekt.
+Charge limit	Laadlimiet
+plugged in now	nu aan de lader
+on battery now	nu op de accu
+If the PC is plugged in most of the time, stopping charging at about 80% slows wear a lot. {0}	Zit de pc meestal aan de lader, dan vertraagt stoppen met laden bij ongeveer 80% de slijtage flink. {0}
+Look in the PC maker's app or in the BIOS for "charge limit", "battery care" or "conservation mode" (usually 80%).	Zoek in de app van de pc-maker of in het BIOS naar "laadlimiet", "battery care" of "conservation mode" (meestal 80%).
+Dell Optimizer or Dell Power Manager > Battery > "Primarily AC use" (or Custom, e.g. 50-80%). Also in the BIOS (F2 at start-up) > Power > Battery Charge Configuration.	Dell Optimizer of Dell Power Manager > Accu > "Voornamelijk netstroom" (of Aangepast, bijv. 50-80%). Ook in het BIOS (F2 bij het opstarten) > Power > Battery Charge Configuration.
+Lenovo Vantage > Device > Power > Battery Charge Threshold, or "Conservation mode".	Lenovo Vantage > Apparaat > Energie > Laaddrempel accu, of "Conservation mode".
+In the BIOS (F10 at start-up) > Advanced > Power Management Options > Battery Health Manager: "Maximize my battery health".	In het BIOS (F10 bij het opstarten) > Advanced > Power Management Options > Battery Health Manager: "Maximize my battery health".
+MyASUS > Customization > Battery Health Charging: "Balanced" (80%) or "Maximum lifespan" (60%).	MyASUS > Aanpassen > Battery Health Charging: "Gebalanceerd" (80%) of "Maximale levensduur" (60%).
+Acer Care Center or Acer Quick Access > Battery charge limit (80%).	Acer Care Center of Acer Quick Access > Laadlimiet accu (80%).
+MSI Center > Features > Battery Master: "Best for Battery".	MSI Center > Features > Battery Master: "Best for Battery".
+Samsung Settings > Battery > "Protect battery" (charges to 85%).	Samsung Settings > Batterij > "Batterij beschermen" (laadt tot 85%).
+Surface app > Battery > Smart Charging, or the UEFI "Enable Battery Limit" mode.	Surface-app > Batterij > Slim opladen, of de UEFI-modus "Enable Battery Limit".
+Razer Synapse > System > Battery Health Optimizer.	Razer Synapse > System > Battery Health Optimizer.
+In the BIOS > Advanced > Battery Charge Limit.	In het BIOS > Advanced > Battery Charge Limit.
+Replacement	Vervanging
+worth it	de moeite waard
+Search for "{0} battery"{1} - preferably the PC maker's own part. On many laptops it is a 10-20 minute job with a screwdriver; the Upgrades page has the service manual.	Zoek naar "{0} battery"{1} - het liefst het originele onderdeel van de pc-maker. Bij veel laptops is het een klus van 10-20 minuten met een schroevendraaier; de pagina Upgrades heeft de servicehandleiding.
+ (battery {0})	 (accu {0})
+see button above	zie de knop hierboven
+Which apps used the most battery in the last day or week (Windows Settings).	Welke apps de afgelopen dag of week de meeste accu gebruikten (Windows-instellingen).
+Battery history since {0}.	Accugeschiedenis sinds {0}.
+Charge it holds (% of new)	Lading die hij vasthoudt (% van nieuw)
+Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren't installed from a store, and settings forced through browser "policies" on a home PC.	Extensies in Chrome, Edge, Brave, Vivaldi en Firefox, plus de zoekmachine, startpagina en opstartpagina's. Hier verstopt adware zich: extensies die niet uit een store komen, en instellingen die op een thuis-pc via browser-"beleid" worden afgedwongen.
+Open extensions page	Extensiepagina openen
+Remove checked policies	Aangevinkt beleid verwijderen
+Reset browser settings	Browserinstellingen herstellen
+Browser	Browser
+Details	Details
+Extension	Extensie
+Search	Zoeken
+Home page	Startpagina
+Start-up	Opstarten
+Policy	Beleid
+Risky	Riskant
+Review	Nakijken
+Checking browsers	Browsers controleren
+Reading browser settings...	Browserinstellingen lezen...
+No supported browsers found.	Geen ondersteunde browsers gevonden.
+from the store	uit de store
+from the add-ons site	van de add-onssite
+changes {0}	wijzigt {0}
+your search engine	je zoekmachine
+your home page	je startpagina
+your start-up pages	je opstartpagina's
+the new-tab page	de nieuwe-tabbladpagina
+can read and change every website you visit	kan elke website die je bezoekt lezen en wijzigen
+extra powers: {0}	extra rechten: {0}
+installed by a policy	geïnstalleerd via beleid
+not from a store (added by a program or by hand)	niet uit een store (toegevoegd door een programma of handmatig)
+added by a program, not from the add-ons site	toegevoegd door een programma, niet van de add-onssite
+Remove it unless you installed it yourself on purpose: open the extensions page (button above) > Remove. If it comes back, a program keeps adding it - look on the Programs and Bloatware pages.	Verwijder hem, tenzij je hem zelf bewust hebt geïnstalleerd: open de extensiepagina (knop hierboven) > Verwijderen. Komt hij terug, dan voegt een programma hem steeds toe - kijk op de pagina's Programma's en Bloatware.
+Keep it if you know it and use it; otherwise remove it from the extensions page (button above).	Houd hem als je hem kent en gebruikt; verwijder hem anders via de extensiepagina (knop hierboven).
+Switched off. Remove it if you don't need it any more.	Uitgeschakeld. Verwijder hem als je hem niet meer nodig hebt.
+Search engine: {0}	Zoekmachine: {0}
+a well-known search engine	een bekende zoekmachine
+not a well-known search engine - adware often swaps it	geen bekende zoekmachine - adware verwisselt die vaak
+Change it back in the browser: Settings > Search engine. If it changes again, use "Reset browser settings".	Zet hem terug in de browser: Instellingen > Zoekmachine. Verandert hij weer, gebruik dan "Browserinstellingen herstellen".
+Home page: {0}	Startpagina: {0}
+Fine if you chose it.	Prima als je die zelf hebt gekozen.
+Start-up pages: {0}	Opstartpagina's: {0}
+Fine if you chose them; otherwise change them in Settings > On start-up.	Prima als je ze zelf hebt gekozen; wijzig ze anders bij Instellingen > Bij opstarten.
+Policy: {0}	Beleid: {0}
+Forced extension: {0}	Afgedwongen extensie: {0}
+Forced start-up page: {0}	Afgedwongen opstartpagina: {0}
+forced through {0}	afgedwongen via {0}
+Set by your organisation (this PC is managed) - leave it.	Ingesteld door je organisatie (deze pc wordt beheerd) - laat het staan.
+Nobody manages this home PC, so a program forced this. Check it and click "Remove checked policies" (needs administrator).	Niemand beheert deze thuis-pc, dus een programma heeft dit afgedwongen. Vink het aan en klik op "Aangevinkt beleid verwijderen" (beheerder nodig).
+Policy file: policies.json	Beleidsbestand: policies.json
+forced settings in {0}	afgedwongen instellingen in {0}
+Open about:policies in Firefox to see what it forces. On a home PC you can delete the file (needs administrator).	Open about:policies in Firefox om te zien wat er wordt afgedwongen. Op een thuis-pc kun je het bestand verwijderen (beheerder nodig).
+Policy: settings forced in the registry	Beleid: instellingen afgedwongen in het register
+Open about:policies in Firefox to see what it forces.	Open about:policies in Firefox om te zien wat er wordt afgedwongen.
+Browsers: {0} thing(s) look like adware - see the Browsers page.	Browsers: {0} onderdeel/onderdelen lijken op adware - zie de pagina Browsers.
+Select a row first.	Selecteer eerst een rij.
+Select a row of the browser to reset first.	Selecteer eerst een rij van de browser die je wilt herstellen.
+Couldn't start {0}.	Kon {0} niet starten.
+Open {0}'s reset page?	De herstelpagina van {0} openen?
+Resetting puts the search engine, home page, start-up pages and pinned tabs back to normal and switches extensions off. Bookmarks, history and saved passwords stay.	Herstellen zet de zoekmachine, startpagina, opstartpagina's en vastgemaakte tabbladen terug en schakelt extensies uit. Favorieten, geschiedenis en opgeslagen wachtwoorden blijven.
+Check one or more policy rows first (extensions are removed in the browser itself - use "Open extensions page").	Vink eerst een of meer beleidsrijen aan (extensies verwijder je in de browser zelf - gebruik "Extensiepagina openen").
+Removing browser policies needs administrator rights - click "Restart as admin" first.	Browserbeleid verwijderen vereist beheerdersrechten - klik eerst op "Opnieuw als beheerder".
+Remove these forced browser settings?	Deze afgedwongen browserinstellingen verwijderen?
+Restart the browser afterwards. You can undo this from the History page.	Start de browser daarna opnieuw. Terugdraaien kan via Geschiedenis.
+forced setting removed	afgedwongen instelling verwijderd
+{0} forced setting(s) removed. Restart the browser to see the change.	{0} afgedwongen instelling(en) verwijderd. Start de browser opnieuw om het resultaat te zien.
+Every installed program with its size and when you last opened it (from Windows' own record of what you start). Check the ones you don't need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.	Elk geïnstalleerd programma met zijn grootte en wanneer je het voor het laatst opende (uit de eigen administratie van Windows van wat je start). Vink aan wat je niet nodig hebt en verwijder alles in één keer; achtergebleven mappen worden daarna opgeruimd. Store-apps staan op de pagina Bloatware.
+Sort: size	Sorteren: grootte
+Sort: last used	Sorteren: laatst gebruikt
+Sort: name	Sorteren: naam
+Open Installed apps	Geïnstalleerde apps openen
+Last used	Laatst gebruikt
+Reading installed programs	Geïnstalleerde programma's lezen
+Reading installed programs...	Geïnstalleerde programma's lezen...
+now (running)	nu (actief)
+no record	niet vastgelegd
+on the keep list	op de bewaarlijst
+used by other programs - keep	gebruikt door andere programma's - laten staan
+not opened for {0} days	al {0} dagen niet geopend
+never opened from Start or the desktop (may run in the background)	nooit geopend via Start of het bureaublad (draait misschien op de achtergrond)
+language pack - shares its files (and size) with the main program	taalpakket - deelt zijn bestanden (en grootte) met het hoofdprogramma
+{0} programs, {1} in total. {2} not opened for 6 months or more.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.
+  Use is recorded since {0}.	  Gebruik wordt bijgehouden sinds {0}.
+  (Windows is set not to record program use: Settings > Privacy > General.)	  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
+Check one or more programs first.	Vink eerst een of meer programma's aan.
+Uninstall these programs?	Deze programma's verwijderen?
+Careful - other programs may need: {0}	Let op - andere programma's hebben misschien nodig: {0}
+Each program's own uninstaller runs, one after another; some show a window or ask for administrator rights.	Het eigen verwijderprogramma van elk programma draait, na elkaar; sommige tonen een venster of vragen om beheerdersrechten.
+Uninstalling programs	Programma's verwijderen
+uninstalling {0}	{0} verwijderen
+{0} program(s) uninstalled.	{0} programma('s) verwijderd.
+Still installed (cancelled, or the uninstaller failed): {0}	Nog geïnstalleerd (geannuleerd, of het verwijderen mislukte): {0}
+These leftover folders are still there:	Deze achtergebleven mappen staan er nog:
+Move them to the Recycle Bin?	Naar de Prullenbak verplaatsen?
+{0} folder(s) moved to the Recycle Bin. Couldn't move (in use, or needs administrator): {1}	{0} map(pen) naar de Prullenbak verplaatst. Kon niet verplaatsen (in gebruik, of beheerder nodig): {1}
+leftover folder moved to the Recycle Bin	achtergebleven map naar de Prullenbak verplaatst
+uninstalled	verwijderd
+measuring {0}	{0} meten
+Wi-Fi signal and speed, delays to the router and the internet, how fast names are looked up (DNS), and how often the connection dropped in the last 30 days.	Wifi-signaal en -snelheid, vertraging naar de router en het internet, hoe snel namen worden opgezocht (DNS), en hoe vaak de verbinding de afgelopen 30 dagen wegviel.
+Flush DNS cache	DNS-cache leegmaken
+Reset network	Netwerk opnieuw instellen
+Wi-Fi settings	Wifi-instellingen
+Network troubleshooter	Netwerkprobleemoplosser
+Checking the network	Netwerk controleren
+Checking the network (about 15 seconds)...	Netwerk controleren (ongeveer 15 seconden)...
+Checking the network: {0}	Netwerk controleren: {0}
+connection	verbinding
+router	router
+internet	internet
+Connection	Verbinding
+Not connected	Niet verbonden
+Plug in the network cable or connect to Wi-Fi (the network icon at the bottom right).	Sluit de netwerkkabel aan of maak verbinding met wifi (het netwerkpictogram rechtsonder).
+Wi-Fi	Wifi
+shared	gedeeld
+Cable (Ethernet)	Kabel (ethernet)
+VPN	VPN
+On: {0}	Aan: {0}
+Everything below goes through the VPN, so delays are higher than without it. That is normal.	Alles hieronder gaat via de VPN, dus de vertraging is hoger dan zonder. Dat is normaal.
+Wi-Fi signal	Wifi-signaal
+{0}% on "{1}"{2}	{0}% op "{1}"{2}
+Weak signal: move closer to the router, put the router higher and out in the open, or add a mesh point or repeater. Walls and floors weaken Wi-Fi a lot.	Zwak signaal: ga dichter bij de router zitten, zet de router hoger en vrij, of voeg een mesh-punt of repeater toe. Muren en vloeren verzwakken wifi flink.
+Wi-Fi band	Wifi-band
+2.4 GHz (channel {0})	2,4 GHz (kanaal {0})
+This Wi-Fi card can use 5 GHz (faster, less crowded). If the router offers a separate 5 GHz network, connect to that one - or turn on "band steering" in the router.	Deze wifikaart kan 5 GHz gebruiken (sneller, minder druk). Biedt de router een apart 5 GHz-netwerk, maak daar dan verbinding mee - of zet "band steering" aan in de router.
+Router	Router
+{0} ms on average, worst {1} ms	gemiddeld {0} ms, slechtst {1} ms
+{0} ms on average, worst {1} ms, {2}% lost	gemiddeld {0} ms, slechtst {1} ms, {2}% verloren
+does not answer pings	beantwoordt geen pings
+no answer, {0}% lost	geen antwoord, {0}% verloren
+Some routers never answer pings - fine if the internet line is OK.	Sommige routers beantwoorden nooit pings - prima als de regel Internet in orde is.
+The problem is between this PC and the router: usually weak or crowded Wi-Fi. Move closer, use 5 GHz or a cable, and restart the router.	Het probleem zit tussen deze pc en de router: meestal zwakke of drukke wifi. Ga dichterbij zitten, gebruik 5 GHz of een kabel, en start de router opnieuw.
+Internet	Internet
+If the router line above is fine, the delay comes from the internet connection itself: restart the modem/router; if it keeps happening, contact your internet provider.	Is de regel Router in orde, dan komt de vertraging van de internetverbinding zelf: start het modem/de router opnieuw; blijft het gebeuren, neem dan contact op met je provider.
+DNS	DNS
+{0}: {1} ms per look-up ({2}: {3} ms)	{0}: {1} ms per opzoeking ({2}: {3} ms)
+{0}: {1} ms per look-up	{0}: {1} ms per opzoeking
+{0} doesn't answer	{0} antwoordt niet
+Names can't be looked up, so websites won't open. Restart the router, or set DNS to 1.1.1.1 in Settings > Network & internet > (your connection) > DNS server assignment.	Namen kunnen niet worden opgezocht, dus websites openen niet. Start de router opnieuw, of stel DNS in op 1.1.1.1 via Instellingen > Netwerk en internet > (je verbinding) > DNS-servertoewijzing.
+Your DNS server is slow - every new website waits for it. Switching to {0} helps: Settings > Network & internet > (your connection) > DNS server assignment > Edit.	Je DNS-server is traag - elke nieuwe website wacht erop. Overstappen naar {0} helpt: Instellingen > Netwerk en internet > (je verbinding) > DNS-servertoewijzing > Bewerken.
+Wi-Fi drops (30 days)	Wifi-onderbrekingen (30 dagen)
+{0} disconnect(s), {1} failed connection(s)	{0} keer verbroken, {1} mislukte verbinding(en)
+Normal - disconnects also happen at sleep, shutdown and when you move between networks.	Normaal - de verbinding valt ook weg bij slaapstand, afsluiten en wisselen van netwerk.
+More than normal. Update the Wi-Fi driver (Drivers page), turn off "Allow the computer to turn off this device to save power" for the Wi-Fi card in Device Manager, and restart the router.	Meer dan normaal. Werk het wifistuurprogramma bij (pagina Stuurprogramma's), zet in Apparaatbeheer "De computer mag dit apparaat uitschakelen om energie te besparen" uit voor de wifikaart, en start de router opnieuw.
+Errors on {0}	Fouten op {0}
+{0} damaged packets ({1})	{0} beschadigde pakketten ({1})
+Usually a bad cable or a failing port. Try another cable or port; for Wi-Fi, update the driver.	Meestal een slechte kabel of een kapotte poort. Probeer een andere kabel of poort; bij wifi: werk het stuurprogramma bij.
+Network: {0} - see the Network page.	Netwerk: {0} - zie de pagina Netwerk.
+DNS cache	DNS-cache
+flushed	leeggemaakt
+DNS cache flushed. Websites that wouldn't open because of an old address should work now.	DNS-cache leeggemaakt. Websites die niet openden door een oud adres zouden nu moeten werken.
+Resetting the network needs administrator rights - click "Restart as admin" first. (Or: Settings > Network & internet > Advanced network settings > Network reset.)	Het netwerk opnieuw instellen vereist beheerdersrechten - klik eerst op "Opnieuw als beheerder". (Of: Instellingen > Netwerk en internet > Geavanceerde netwerkinstellingen > Netwerk opnieuw instellen.)
+Reset the network?	Het netwerk opnieuw instellen?
+This resets Windows' network settings (Winsock and TCP/IP) to factory state and clears the DNS cache - the standard fix when nothing connects although the router works. Wi-Fi passwords and VPN apps stay, but a manually set IP address or DNS server is cleared.	Dit zet de netwerkinstellingen van Windows (Winsock en TCP/IP) terug naar de fabrieksinstellingen en maakt de DNS-cache leeg - de standaardoplossing als er niets verbindt terwijl de router werkt. Wifiwachtwoorden en VPN-apps blijven, maar een handmatig ingesteld IP-adres of DNS-server wordt gewist.
+The PC needs a restart afterwards.	De pc moet daarna opnieuw opstarten.
+Resetting the network	Netwerk opnieuw instellen
+Winsock and TCP/IP	Winsock en TCP/IP
+reset ({0})	opnieuw ingesteld ({0})
+The network has been reset. Restart the PC now to finish?	Het netwerk is opnieuw ingesteld. De pc nu opnieuw opstarten om af te ronden?
+Entries other programs add to Explorer's right-click menu (under "Show more options" on Windows 11). Leftovers of removed programs are pre-checked. Hiding an entry can be undone from History or with "Show checked".	Items die andere programma's toevoegen aan het rechtsklikmenu van Verkenner (onder "Meer opties weergeven" in Windows 11). Restanten van verwijderde programma's zijn al aangevinkt. Een item verbergen kun je terugdraaien via Geschiedenis of met "Aangevinkte tonen".
+Hide checked	Aangevinkte verbergen
+Show checked	Aangevinkte tonen
+Entry	Item
+Shown on	Te zien bij
+Hidden	Verborgen
+Shown	Zichtbaar
+files	bestanden
+folders	mappen
+files and folders	bestanden en mappen
+folder background	mapachtergrond
+drives	stations
+desktop	bureaublad
+leftover: the program is gone{0}	restant: het programma is weg{0}
+Reading the right-click menu	Rechtsklikmenu lezen
+Reading the right-click menu...	Rechtsklikmenu lezen...
+{0} entries from other programs; {1} leftover(s) of removed programs (pre-checked).	{0} items van andere programma's; {1} restant(en) van verwijderde programma's (aangevinkt).
+Check one or more entries that are shown first.	Vink eerst een of meer zichtbare items aan.
+Check one or more hidden entries first.	Vink eerst een of meer verborgen items aan.
+hidden from the menu	verborgen in het menu
+shown in the menu again	weer zichtbaar in het menu
+{0} entr(y/ies) hidden. Undo from the History page.	{0} item(s) verborgen. Terugdraaien via Geschiedenis.
+{0} entr(y/ies) shown again. Undo from the History page.	{0} item(s) weer zichtbaar. Terugdraaien via Geschiedenis.
+Restart Explorer now so the menu updates?	Verkenner nu herstarten zodat het menu wordt bijgewerkt?
+Large files	Grote bestanden
+Duplicate files	Dubbele bestanden
+Recycle checked	Aangevinkte naar Prullenbak
+File	Bestand
+Modified	Gewijzigd
+Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. "Large files" and "Duplicate files" look for files you may not need - they only go to the Recycle Bin when you say so.	Zoek uit wat de schijf vult. Kies een plek en klik op Scannen; dubbelklik op een rij om erin te kijken. "Grote bestanden" en "Dubbele bestanden" zoeken bestanden die je misschien niet nodig hebt - ze gaan alleen naar de Prullenbak als jij dat zegt.
+That is a very big or system folder - this can take a long time. Program and Windows files are never pre-checked. Continue?	Dat is een heel grote map of systeemmap - dit kan lang duren. Programma- en Windows-bestanden worden nooit vooraf aangevinkt. Doorgaan?
+Looking for files of 100 MB or more in {0}...	Bestanden van 100 MB of meer zoeken in {0}...
+Looking for identical files of 1 MB or more in {0} (it compares contents, so this can take a while)...	Identieke bestanden van 1 MB of meer zoeken in {0} (de inhoud wordt vergeleken, dus dit kan even duren)...
+Finding large files	Grote bestanden zoeken
+Finding duplicate files	Dubbele bestanden zoeken
+comparing files ({0} of {1})	bestanden vergelijken ({0} van {1})
+in Downloads - often safe to remove	in Downloads - vaak veilig om weg te halen
+installer or archive - often not needed any more	installatiebestand of archief - vaak niet meer nodig
+{0} large file(s), {1} together. Check what you don't need and click Recycle checked (they go to the Recycle Bin).	{0} groot/grote bestand(en), samen {1}. Vink aan wat je niet nodig hebt en klik op Aangevinkte naar Prullenbak.
+kept (1 of {0} identical copies)	bewaard (1 van {0} identieke kopieën)
+identical copy of {0}	identieke kopie van {0}
+{0} set(s) of identical files; the extra copies take {1}. One copy of each is kept (grey); the others are pre-checked.	{0} groep(en) identieke bestanden; de extra kopieën nemen {1} in beslag. Van elk wordt één kopie bewaard (grijs); de andere zijn aangevinkt.
+Stopped. {0}	Gestopt. {0}
+Check one or more files first.	Vink eerst een of meer bestanden aan.
+All copies of {0} are checked - leave at least one unchecked.	Alle kopieën van {0} zijn aangevinkt - laat er minstens één uit.
+Move {0} file(s) ({1}) to the Recycle Bin?	{0} bestand(en) ({1}) naar de Prullenbak verplaatsen?
+You can get them back from the Recycle Bin until you empty it.	Je kunt ze terughalen uit de Prullenbak tot je die leegmaakt.
+{0} file(s)	{0} bestand(en)
+moved to the Recycle Bin ({0})	naar de Prullenbak verplaatst ({0})
+{0} file(s) moved to the Recycle Bin ({1}). Empty the Recycle Bin to free the space.	{0} bestand(en) naar de Prullenbak verplaatst ({1}). Maak de Prullenbak leeg om de ruimte vrij te maken.
+Couldn't move: {0}	Kon niet verplaatsen: {0}
+PC Tune-Up score	PC Tune-Up-score
+Windows stability x10	Windows-stabiliteit x10
+Score {0}/100 (was {1})	Score {0}/100 (was {1})
+Score {0}/100	Score {0}/100
+Health over time	Gezondheid door de tijd
+The score appears once all checks have run.	De score verschijnt zodra alle controles klaar zijn.
+No history yet.	Nog geen geschiedenis.
+PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)	PC-TuneUp.exe /auto                 het automatische onderhoud (opruimen, controleren, melden)
+{0} programs, {1} in total. {2} not opened for 6 months or more.  Use is recorded since {3}.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.  Gebruik wordt bijgehouden sinds {3}.
+{0} programs, {1} in total. {2} not opened for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programma's, samen {1}. {2} al 6 maanden of langer niet geopend.  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
+{0}; {1}	{0}; {1}
 '@
 # Case-sensitive lookups: "Claude" (a program) and "claude" (a process) are different texts.
 $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
@@ -1243,6 +1525,7 @@ $JobTimer.Add_Tick({
     }
     if ($activity) { Update-ActivityBar }
     if ($script:ReportPending -and -not $script:Jobs.Count -and -not $script:LoadQueue.Count) { $script:ReportPending = $false; Save-ReportNow }
+    if ($script:EverythingStarted -and -not $script:ScoreSaved -and -not $script:Jobs.Count -and -not $script:LoadQueue.Count) { $script:ScoreSaved = $true; Save-Score }
 })
 $JobTimer.Start()
 
@@ -1410,6 +1693,67 @@ function New-DetailBox([int]$Height = 110) {
     $box | Add-Member -NotePropertyName Wrapper -NotePropertyValue $wrap
     $box
 }
+# A small line chart (Battery wear, Health over time). Set-Chart gives it series of points with a date X and a value Y.
+$FontChart = New-Object Drawing.Font('Segoe UI', 8.25)
+function New-Chart([int]$Height = 150) {
+    $c = New-Object Windows.Forms.PictureBox
+    $c.Dock = 'Top'; $c.Height = $Height; $c.BackColor = $Theme.Bg
+    $c.Tag = @{ Series = @(); Max = 100; Suffix = ''; Title = ''; Empty = 'No history yet.' }
+    $c.Add_Paint({ param($s, $e) Draw-Chart $s $e.Graphics })
+    $c.Add_Resize({ $this.Invalidate() })
+    $c
+}
+function Set-Chart($Chart, [object[]]$Series, [double]$Max = 100, [string]$Suffix = '', [string]$Title = '', [string]$Empty = '') {
+    $Chart.Tag.Series = $Series; $Chart.Tag.Max = $Max; $Chart.Tag.Suffix = $Suffix; $Chart.Tag.Title = $Title
+    if ($Empty) { $Chart.Tag.Empty = $Empty }
+    $Chart.Invalidate()
+}
+function Draw-Chart($C, $G) {
+    $d = $C.Tag
+    $G.SmoothingMode = 'AntiAlias'; $G.TextRenderingHint = 'ClearTypeGridFit'
+    $L = Px 40; $R = Px 12; $Tp = Px 26; $B = Px 20
+    $w = $C.ClientSize.Width - $L - $R; $h = $C.ClientSize.Height - $Tp - $B
+    if ($w -lt 60 -or $h -lt 30) { return }
+    $dim = New-Object Drawing.SolidBrush($Theme.Dim)
+    $x = $L
+    if ($d.Title) { $G.DrawString((T $d.Title), $FontBold, (New-Object Drawing.SolidBrush($Theme.Text)), [single]0, [single]0); $x = $L + $G.MeasureString((T $d.Title), $FontBold).Width + (Px 16) }
+    $pts = @($d.Series | ForEach-Object { $_.Points } | Where-Object { $_ })
+    if (-not $pts) { $G.DrawString((T $d.Empty), $FontChart, $dim, [single]$L, [single]($Tp + $h / 2 - 8)); $dim.Dispose(); return }
+    # Legend
+    foreach ($s in $d.Series) {
+        if (-not @($s.Points).Count) { continue }
+        $br = New-Object Drawing.SolidBrush($s.Color)
+        $G.FillRectangle($br, [single]$x, [single](Px 5), [single](Px 10), [single](Px 10)); $br.Dispose()
+        $G.DrawString((T $s.Name), $FontChart, $dim, [single]($x + (Px 14)), [single](Px 1))
+        $x += (Px 26) + $G.MeasureString((T $s.Name), $FontChart).Width
+    }
+    $minX = ($pts | Measure-Object -Property X -Minimum).Minimum; $maxX = ($pts | Measure-Object -Property X -Maximum).Maximum
+    if ($maxX -le $minX) { $minX = $maxX.AddDays(-1) }
+    $span = ($maxX - $minX).TotalSeconds
+    $grid = New-Object Drawing.Pen($Theme.Border, 1); $grid.DashStyle = 'Dot'
+    foreach ($f in 0, 0.25, 0.5, 0.75, 1) {
+        $y = $Tp + $h - $f * $h
+        $G.DrawLine($grid, [single]$L, [single]$y, [single]($L + $w), [single]$y)
+        $lbl = "$([int]($f * $d.Max))$($d.Suffix)"
+        $G.DrawString($lbl, $FontChart, $dim, [single]($L - (Px 6) - $G.MeasureString($lbl, $FontChart).Width), [single]($y - (Px 7)))
+    }
+    $grid.Dispose()
+    foreach ($pair in @(@($minX, 0), @($maxX, 1))) {
+        $lbl = ([datetime]$pair[0]).ToString('d MMM yyyy', $UiCulture)
+        $lw = $G.MeasureString($lbl, $FontChart).Width
+        $G.DrawString($lbl, $FontChart, $dim, [single]($L + $pair[1] * ($w - $lw)), [single]($Tp + $h + (Px 3)))
+    }
+    foreach ($s in $d.Series) {
+        $ps = @($s.Points | Sort-Object X)
+        if (-not $ps) { continue }
+        $pen = New-Object Drawing.Pen($s.Color, [single](Px 2))
+        $xy = @(foreach ($p in $ps) { New-Object Drawing.PointF([single]($L + (([datetime]$p.X - $minX).TotalSeconds / $span) * $w), [single]($Tp + $h - [Math]::Min([double]1, [Math]::Max([double]0, [double]$p.Y / [double]$d.Max)) * $h)) })
+        if ($xy.Count -ge 2) { $G.DrawLines($pen, [Drawing.PointF[]]$xy) }
+        $br = New-Object Drawing.SolidBrush($s.Color); $last = $xy[-1]
+        $G.FillEllipse($br, [single]($last.X - (Px 3)), [single]($last.Y - (Px 3)), [single](Px 6), [single](Px 6)); $br.Dispose(); $pen.Dispose()
+    }
+    $dim.Dispose()
+}
 function Add-Row($Lv, [object[]]$Cells, $Tag = $null, [bool]$Checked = $false) {
     $it = New-Object Windows.Forms.ListViewItem([string]$Cells[0])
     $it.Text = T ([string]$Cells[0])
@@ -1454,7 +1798,40 @@ $lblProcCap = New-Object Windows.Forms.Label
 $lblProcCap.Dock = 'Top'; $lblProcCap.Height = 30; $lblProcCap.TextAlign = 'BottomLeft'; $lblProcCap.Font = $FontBold
 $lblProcCap.Text = 'Programs using the most memory'
 $lvProc = New-ListView $false @('Program', 300, 'Memory (MB)', 120, 'Processes', 100)
-Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $gridHealth, $lblAdvice, $lblSpeed, $lblProcCap)
+# Readings on the left, "Health over time" chart on the right.
+$healthTop = New-Object Windows.Forms.TableLayoutPanel
+$healthTop.Dock = 'Top'; $healthTop.AutoSize = $true; $healthTop.AutoSizeMode = 'GrowAndShrink'; $healthTop.ColumnCount = 2; $healthTop.RowCount = 1
+[void]$healthTop.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
+[void]$healthTop.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Absolute', (Px 430))))
+$chartScore = New-Chart 200
+$chartScore.Dock = 'Fill'; $chartScore.Margin = New-Object Windows.Forms.Padding(12, 0, 0, 8)
+$healthTop.Controls.Add($gridHealth, 0, 0); $healthTop.Controls.Add($chartScore, 1, 0)
+Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $healthTop, $lblAdvice, $lblSpeed, $lblProcCap)
+
+# Health score: 100, minus points for each thing worth a look and for a low Windows stability rating. Saved once a day.
+$ScoreFile = Join-Path $DataDir 'scores.jsonl'
+function Get-Scores { if (Test-Path $ScoreFile) { Get-Content $ScoreFile -Encoding UTF8 | Where-Object { $_.Trim() } | ForEach-Object { try { $_ | ConvertFrom-Json } catch { } } } }
+function Get-HealthScore {
+    $sc = 100 - [Math]::Min(48, 8 * @($script:HealthAdvice).Count)
+    if ($null -ne $script:StabIndex) { $sc -= [Math]::Min(30, [int](3 * (10 - $script:StabIndex))) }
+    [Math]::Max(0, [Math]::Min(100, $sc))
+}
+function Save-Score {
+    $today = (Get-Date).ToString('yyyy-MM-dd')
+    $all = @(Get-Scores | Where-Object { $_.Date -ne $today })
+    $all += [pscustomobject]@{ Date = $today; Score = (Get-HealthScore); Stability = $script:StabIndex; Advice = @($script:HealthAdvice).Count }
+    try { Set-Content -Path $ScoreFile -Value @($all | Select-Object -Last 400 | ForEach-Object { $_ | ConvertTo-Json -Compress }) -Encoding UTF8 } catch { }
+    Update-ScoreChart
+}
+function Update-ScoreChart {
+    $sc = @(Get-Scores)
+    $series = @(@{ Name = 'PC Tune-Up score'; Color = $Theme.Accent; Points = @($sc | ForEach-Object { [pscustomobject]@{ X = [datetime]::ParseExact($_.Date, 'yyyy-MM-dd', $null); Y = [double]$_.Score } }) })
+    if ($script:StabHistory) { $series += @{ Name = 'Windows stability x10'; Color = $Theme.Warn; Points = @($script:StabHistory | ForEach-Object { [pscustomobject]@{ X = $_.D; Y = 10 * [double]$_.V } }) } }
+    $now = if ($sc) { [int]$sc[-1].Score } else { $null }
+    $prev = @($sc | Where-Object { [datetime]::ParseExact($_.Date, 'yyyy-MM-dd', $null) -le (Get-Date).AddDays(-7) }) | Select-Object -Last 1
+    $title = if ($null -ne $now) { "Score $now/100$(if ($prev) { " (was $([int]$prev.Score))" })" } else { 'Health over time' }
+    Set-Chart $chartScore $series 100 '' $title 'The score appears once all checks have run.'
+}
 
 function Set-KeyValues($Grid, [string[]]$Lines) {
     $Grid.SuspendLayout()
@@ -1583,7 +1960,7 @@ function Render-Health {
     } else { $lines += "This PC:   $PcName"; $lines += 'Checking this PC...' }
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
-    foreach ($k in 'Drivers', 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
+    foreach ($k in 'Browsers', 'Network', 'Drivers', 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $key = ($lines + $advice) -join '|'
     if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
         $script:HealthDrawn = $key
@@ -2262,7 +2639,7 @@ $btnSvcRestore.Add_Click({ Set-Services 'Restore' })
 # ===========================================================================
 # 6. Disk usage
 # ===========================================================================
-$pgDisk = New-Page 'Disk' 'Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. This only looks - it never deletes.'
+$pgDisk = New-Page 'Disk' 'Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. "Large files" and "Duplicate files" look for files you may not need - they only go to the Recycle Bin when you say so.'
 $txtDisk = New-Object Windows.Forms.TextBox
 $txtDisk.Width = 270; $txtDisk.Text = $env:USERPROFILE; $txtDisk.Margin = New-Object Windows.Forms.Padding(3, 7, 3, 3)
 $btnDiskBrowse = New-Button 'Browse...'
@@ -2311,6 +2688,7 @@ $DiskWork = {
 function Start-DiskScan([string]$Path) {
     if (-not (Test-Path -LiteralPath $Path -PathType Container)) { Show-Msg "Folder not found:`n$Path" 'OK' 'Warning' | Out-Null; return }
     $txtDisk.Text = $Path
+    Show-DiskList $false
     $btnDiskScan.Enabled = $false; $lvDisk.Items.Clear()
     $lblDisk.Text = 'Scanning... big folders like C:\ can take a few minutes.'
     Start-Bg -Label 'Measuring folders' -Cancellable $DiskWork $Path {
@@ -2335,6 +2713,7 @@ $cmbDisk.Add_SelectedIndexChanged({
 })
 $btnDiskUp.Add_Click({ $p = Split-Path $txtDisk.Text -Parent; if ($p) { Start-DiskScan $p } })
 $btnDiskOpen.Add_Click({
+    if ($lvFiles.Visible -and $lvFiles.SelectedItems.Count) { Start-Process explorer.exe "/select,`"$($lvFiles.SelectedItems[0].Tag.Path)`""; return }
     $p = if ($lvDisk.SelectedItems.Count) { $lvDisk.SelectedItems[0].Tag } else { $txtDisk.Text }
     Start-Process explorer.exe "`"$p`""
 })
@@ -2343,6 +2722,113 @@ $btnDiskBrowse.Add_Click({
     $dlg.SelectedPath = $txtDisk.Text
     if ($dlg.ShowDialog() -eq 'OK') { Start-DiskScan $dlg.SelectedPath }
 })
+# --- Large and duplicate files in the chosen folder (a second list on the Disk page) ---
+$btnDiskLarge = New-Button 'Large files'
+$btnDiskDup = New-Button 'Duplicate files'
+$btnDiskRecycle = New-Button 'Recycle checked'; $btnDiskRecycle.Visible = $false
+$lvFiles = New-ListView $true @('File', 280, 'Folder', 380, 'Size', 90, 'Modified', 100, 'Note', 260)
+$lvFiles.Visible = $false
+$pgDisk.Controls.Add($lvFiles); $lvFiles.BringToFront()
+$diskBar = $btnDiskScan.Parent
+foreach ($b in $btnDiskLarge, $btnDiskDup, $btnDiskRecycle) { $diskBar.Controls.Add($b) }
+$diskBar.Controls.SetChildIndex($cmbDisk, $diskBar.Controls.Count - 1)
+function Show-DiskList([bool]$Files) {
+    $lvFiles.Visible = $Files; $lvDisk.Visible = -not $Files; $btnDiskRecycle.Visible = $Files
+    if ($Files) { $lvFiles.BringToFront() } else { $lvDisk.BringToFront() }
+}
+# Files never touched: cloud-only OneDrive files (opening them would download them), app data, and Windows' own folders.
+$FileScanWork = {
+    param($a)
+    $skip = '\\AppData\\|\\\.git\\|\\node_modules\\|^[A-Za-z]:\\(Windows|ProgramData|\$Recycle\.Bin|System Volume Information)\\'
+    $cloud = 0x400000 -bor 0x40000 -bor 0x1000   # recall-on-access, recall-on-open, offline
+    $files = foreach ($f in Get-FilesSafe $a.Root) {
+        if (Test-Cancelled) { break }
+        if ($f.Length -lt $a.Min -or ([int]$f.Attributes -band $cloud) -or $f.FullName -match $skip) { continue }
+        $f
+    }
+    if ($a.Mode -eq 'large') {
+        return $files | Sort-Object Length -Descending | Select-Object -First 300 | ForEach-Object { [pscustomobject]@{ Path = $_.FullName; Name = $_.Name; Dir = $_.DirectoryName; Bytes = $_.Length; Modified = $_.LastWriteTime; Group = 0; Keep = $false } }
+    }
+    # Duplicates: same size, then the same first 64 KB, then the same full SHA-256.
+    $head = { param($p) try { $s = [IO.File]::OpenRead($p); $buf = New-Object byte[] 65536; $n = $s.Read($buf, 0, 65536); $s.Dispose()
+        [BitConverter]::ToString([Security.Cryptography.MD5]::Create().ComputeHash($buf, 0, $n)) } catch { $null } }
+    $sizeGroups = @($files | Group-Object Length | Where-Object Count -gt 1)
+    $g = 0; $i = 0; $out = New-Object System.Collections.ArrayList
+    foreach ($sg in $sizeGroups) {
+        $i++; if (Test-Cancelled) { break }
+        Set-JobProgress "comparing files ($i of $($sizeGroups.Count))" $i $sizeGroups.Count
+        foreach ($hg in @($sg.Group | Group-Object { & $head $_.FullName } | Where-Object { $_.Count -gt 1 -and $_.Name })) {
+            foreach ($fg in @($hg.Group | Group-Object { try { (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash } catch { '' } } | Where-Object { $_.Count -gt 1 -and $_.Name })) {
+                $g++
+                # Keep the copy outside Downloads/Temp with the shortest path (usually the "real" one).
+                $keep = $fg.Group | Sort-Object { $_.FullName -match '\\(Downloads|Temp|tmp)\\' }, { $_.FullName.Length }, CreationTime | Select-Object -First 1
+                foreach ($f in $fg.Group) {
+                    [void]$out.Add([pscustomobject]@{ Path = $f.FullName; Name = $f.Name; Dir = $f.DirectoryName; Bytes = $f.Length; Modified = $f.LastWriteTime; Group = $g; Keep = ($f.FullName -eq $keep.FullName); Copies = $fg.Count })
+                }
+            }
+        }
+    }
+    $out
+}
+function Start-FileScan([string]$Mode) {
+    $root = $txtDisk.Text
+    if (-not (Test-Path -LiteralPath $root -PathType Container)) { Show-Msg "Folder not found:`n$root" 'OK' 'Warning' | Out-Null; return }
+    if ($root -match '^[A-Za-z]:\\?$|^[A-Za-z]:\\(Windows|Program Files)') { if ((Show-Msg 'That is a very big or system folder - this can take a long time. Program and Windows files are never pre-checked. Continue?' 'YesNo' 'Question') -ne 'Yes') { return } }
+    Show-DiskList $true
+    $lvFiles.Items.Clear(); $btnDiskLarge.Enabled = $false; $btnDiskDup.Enabled = $false
+    $script:FileMode = $Mode
+    $lblDisk.Text = if ($Mode -eq 'large') { "Looking for files of 100 MB or more in $root..." } else { "Looking for identical files of 1 MB or more in $root (it compares contents, so this can take a while)..." }
+    Start-Bg -Label $(if ($Mode -eq 'large') { 'Finding large files' } else { 'Finding duplicate files' }) -Cancellable $FileScanWork @{ Root = $root; Mode = $Mode; Min = $(if ($Mode -eq 'large') { 100MB } else { 1MB }) } {
+        param($rows, $state)
+        $btnDiskLarge.Enabled = $true; $btnDiskDup.Enabled = $true
+        $rows = @($rows)
+        $sys = '^[A-Za-z]:\\(Windows|Program Files|Program Files \(x86\))\\'
+        $lvFiles.BeginUpdate()
+        if ($script:FileMode -eq 'large') {
+            foreach ($r in $rows) {
+                $note = if ($r.Path -match '\\Downloads\\') { 'in Downloads - often safe to remove' } elseif ($r.Path -match '\.(iso|zip|7z|rar|msi|exe)$') { 'installer or archive - often not needed any more' } else { '' }
+                [void](Add-Row $lvFiles @($r.Name, $r.Dir, (Format-Size $r.Bytes), $r.Modified.ToString('d'), $note) $r)
+            }
+            $lblDisk.Text = "$($rows.Count) large file(s), $(Format-Size (($rows | Measure-Object Bytes -Sum).Sum)) together. Check what you don't need and click Recycle checked (they go to the Recycle Bin)."
+        } else {
+            $wasted = 0
+            foreach ($grp in $rows | Group-Object Group | Sort-Object { [int64]$_.Group[0].Bytes * ($_.Count - 1) } -Descending) {
+                foreach ($r in $grp.Group | Sort-Object { -not $_.Keep }) {
+                    $note = if ($r.Keep) { "kept (1 of $($r.Copies) identical copies)" } else { "identical copy of $($grp.Group | Where-Object Keep | ForEach-Object Name)" }
+                    $it = Add-Row $lvFiles @($r.Name, $r.Dir, (Format-Size $r.Bytes), $r.Modified.ToString('d'), $note) $r (-not $r.Keep -and $r.Path -notmatch $sys)
+                    if ($r.Keep) { $it.ForeColor = $Theme.Muted } else { $wasted += $r.Bytes }
+                }
+            }
+            $lblDisk.Text = "$(@($rows | Group-Object Group).Count) set(s) of identical files; the extra copies take $(Format-Size $wasted). One copy of each is kept (grey); the others are pre-checked."
+        }
+        $lvFiles.EndUpdate()
+        if ($state.Cancel) { $lblDisk.Text = 'Stopped. ' + $lblDisk.Text }
+    }
+}
+$btnDiskLarge.Add_Click({ Start-FileScan 'large' })
+$btnDiskDup.Add_Click({ Start-FileScan 'dup' })
+$btnDiskRecycle.Add_Click({
+    $picked = @($lvFiles.CheckedItems | ForEach-Object { $_.Tag })
+    if (-not $picked) { Show-Msg 'Check one or more files first.' | Out-Null; return }
+    if ($script:FileMode -eq 'dup') {   # never all copies of one file
+        foreach ($g in $picked | Group-Object Group) {
+            $all = @($lvFiles.Items | Where-Object { $_.Tag.Group -eq [int]$g.Name })
+            if ($g.Count -ge $all.Count) { Show-Msg "All copies of $($g.Group[0].Name) are checked - leave at least one unchecked." 'OK' 'Warning' | Out-Null; return }
+        }
+    }
+    $bytes = ($picked | Measure-Object Bytes -Sum).Sum
+    if ((Show-Msg "Move $($picked.Count) file(s) ($(Format-Size $bytes)) to the Recycle Bin?`n`nYou can get them back from the Recycle Bin until you empty it." 'YesNo' 'Question') -ne 'Yes') { return }
+    Add-Type -AssemblyName Microsoft.VisualBasic
+    $n = 0; $freed = 0; $bad = @()
+    foreach ($f in $picked) {
+        try { [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($f.Path, 'OnlyErrorDialogs', 'SendToRecycleBin'); $n++; $freed += $f.Bytes } catch { $bad += $f.Name }
+    }
+    Add-History 'Files' "$n file(s)" "moved to the Recycle Bin ($(Format-Size $freed))"; Update-History
+    foreach ($it in @($lvFiles.CheckedItems)) { if (-not (Test-Path -LiteralPath $it.Tag.Path)) { $lvFiles.Items.Remove($it) } }
+    Show-Msg "$n file(s) moved to the Recycle Bin ($(Format-Size $freed)). Empty the Recycle Bin to free the space.$(if ($bad) { "`n`nCouldn't move: $($bad -join ', ')" })" | Out-Null
+})
+$lvFiles.Add_DoubleClick({ if ($lvFiles.SelectedItems.Count) { Start-Process explorer.exe "/select,`"$($lvFiles.SelectedItems[0].Tag.Path)`"" } })
+
 $lvDisk.Add_DoubleClick({
     if ($lvDisk.SelectedItems.Count -and $lvDisk.SelectedItems[0].Tag -ne $txtDisk.Text) { Start-DiskScan $lvDisk.SelectedItems[0].Tag }
 })
@@ -2798,8 +3284,14 @@ $StabScanWork = {
     }
 
     $index = $null
-    try { $index = (Get-CimInstance Win32_ReliabilityStabilityMetrics -OperationTimeoutSec 15 -ErrorAction Stop | Sort-Object TimeGenerated -Descending | Select-Object -First 1).SystemStabilityIndex } catch { }
-    [pscustomobject]@{ Rows = $rows; Index = $index }
+    $hist = @()
+    try {
+        $m = @(Get-CimInstance Win32_ReliabilityStabilityMetrics -OperationTimeoutSec 15 -ErrorAction Stop | Sort-Object TimeGenerated)
+        $index = ($m | Select-Object -Last 1).SystemStabilityIndex
+        $hist = @($m | Where-Object { $_.TimeGenerated -gt (Get-Date).AddDays(-90) } | Group-Object { $_.TimeGenerated.ToString('yyyy-MM-dd') } |
+                  ForEach-Object { [pscustomobject]@{ D = [datetime]::ParseExact($_.Name, 'yyyy-MM-dd', $null); V = ($_.Group | Select-Object -Last 1).SystemStabilityIndex } })
+    } catch { }
+    [pscustomobject]@{ Rows = $rows; Index = $index; History = $hist }
 }
 $StabLevels = @{ Problem = 0; Warning = 1; Info = 2 }
 function Update-Stability {
@@ -2815,6 +3307,7 @@ function Update-Stability {
             $it.ForeColor = switch ($s.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } default { $Theme.Muted } }
         }
         $lvStab.EndUpdate()
+        $script:StabIndex = $r.Index; $script:StabHistory = @($r.History); if ($chartScore) { Update-ScoreChart }
         $score = if ($null -ne $r.Index) { 'Windows rates stability {0:0.0} out of 10. ' -f $r.Index } else { '' }
         $p = @($r.Rows | Where-Object Level -eq 'Problem')
         $lblStab.Text = $score + $(if ($r.Rows.Count) { "$($r.Rows.Count) kind(s) of trouble in the last 30 days$(if ($p) { ", $($p.Count) worth fixing" })." } else { 'Nothing went wrong in the last 30 days.' })
@@ -3412,6 +3905,779 @@ $btnDrvWeb.Add_Click({
 $btnDrvReload.Add_Click({ Update-Drivers })
 
 # ===========================================================================
+# Battery: how worn it is, how fast it wears, and how to make it last
+# ===========================================================================
+$PowerNow = [Windows.Forms.SystemInformation]::PowerStatus
+$HasBattery = -not (([int]$PowerNow.BatteryChargeStatus -band 128) -or [int]$PowerNow.BatteryChargeStatus -eq 255)   # 128 = no battery
+$pgBatt = New-Page 'Battery' 'How much charge the battery still holds, how fast it is wearing, and how to make it last longer. From Windows'' own battery report.'
+$btnBattUsage = New-Button 'Battery usage per app'
+$btnBattSet = New-Button 'Power & battery settings'; $btnBattSet.UseMnemonic = $false
+$btnBattReport = New-Button 'Full battery report'
+$btnBattBuy = New-Button 'Find a replacement'
+$btnBattReload = New-Button 'Reload'
+$chartBatt = New-Chart 170
+$lvBatt = New-ListView $false @('Reading', 200, 'Value', 300, 'What it means', 560)
+$lblBatt = New-Status
+Set-PageLayout $pgBatt $lvBatt @((New-ButtonBar @($btnBattUsage, $btnBattSet, $btnBattReport, $btnBattBuy, $btnBattReload)), $chartBatt) $lblBatt
+$BatteryWork = {
+    $x = Join-Path $env:TEMP "pctuneup-battery-$([guid]::NewGuid().ToString('N')).xml"
+    [void](Invoke-Native "$env:windir\System32\powercfg.exe" "/batteryreport /xml /output `"$x`"" 60)
+    if (-not (Test-Path $x)) { return [pscustomobject]@{ Error = 'Windows could not make a battery report.' } }
+    try { [xml]$b = [IO.File]::ReadAllText($x) } finally { Remove-Item $x -ErrorAction SilentlyContinue }
+    $bats = @($b.BatteryReport.Batteries.Battery)
+    $design = ($bats | ForEach-Object { [double]$_.DesignCapacity } | Measure-Object -Sum).Sum
+    $full = ($bats | ForEach-Object { [double]$_.FullChargeCapacity } | Measure-Object -Sum).Sum
+    $hist = @(foreach ($h in $b.BatteryReport.History.HistoryEntry) {
+        $d = [double]$h.DesignCapacity; $f = [double]$h.FullChargeCapacity
+        if ($d -gt 0 -and $f -gt 0) { [pscustomobject]@{ X = ([datetime]$h.StartDate).Date; Y = [Math]::Round(100 * $f / $d, 1) } }
+    })
+    # Wear speed: change over the last 12 months of history
+    $year = @($hist | Where-Object { $_.X -ge (Get-Date).AddDays(-365) })
+    $perYear = $null
+    if ($year.Count -ge 4) {
+        $days = ($year[-1].X - $year[0].X).TotalDays
+        if ($days -ge 90) { $perYear = [Math]::Round(($year[0].Y - $year[-1].Y) / $days * 365, 1) }
+    }
+    $rt = { param($s) try { if ($s) { [Xml.XmlConvert]::ToTimeSpan("$s") } } catch { $null } }
+    [pscustomobject]@{
+        Error = $null; Design = $design; Full = $full; Pct = $(if ($design) { [Math]::Round(100 * $full / $design) } else { $null })
+        Cycles = [int]($bats | ForEach-Object { [int]$_.CycleCount } | Measure-Object -Maximum).Maximum
+        Chem = "$($bats[0].Chemistry)"; Maker = "$($bats[0].Manufacturer)".Trim(); Id = "$($bats[0].Id)".Trim()
+        Runtime = (& $rt $b.BatteryReport.RuntimeEstimates.FullChargeCapacity.ActiveRuntime)
+        RuntimeNew = (& $rt $b.BatteryReport.RuntimeEstimates.DesignCapacity.ActiveRuntime)
+        History = $hist; PerYear = $perYear; Since = $(if ($hist) { $hist[0].X })
+    }
+}
+# Where each PC maker hides the "stop charging at 80%" setting.
+$ChargeLimitTips = [ordered]@{
+    'Dell'                = 'Dell Optimizer or Dell Power Manager > Battery > "Primarily AC use" (or Custom, e.g. 50-80%). Also in the BIOS (F2 at start-up) > Power > Battery Charge Configuration.'
+    'Lenovo'              = 'Lenovo Vantage > Device > Power > Battery Charge Threshold, or "Conservation mode".'
+    'HP|Hewlett'          = 'In the BIOS (F10 at start-up) > Advanced > Power Management Options > Battery Health Manager: "Maximize my battery health".'
+    'ASUS'                = 'MyASUS > Customization > Battery Health Charging: "Balanced" (80%) or "Maximum lifespan" (60%).'
+    'Acer'                = 'Acer Care Center or Acer Quick Access > Battery charge limit (80%).'
+    'Micro-Star|MSI'      = 'MSI Center > Features > Battery Master: "Best for Battery".'
+    'Samsung'             = 'Samsung Settings > Battery > "Protect battery" (charges to 85%).'
+    'Microsoft'           = 'Surface app > Battery > Smart Charging, or the UEFI "Enable Battery Limit" mode.'
+    'Razer'               = 'Razer Synapse > System > Battery Health Optimizer.'
+    'Framework'           = 'In the BIOS > Advanced > Battery Charge Limit.'
+}
+function Update-Battery {
+    if (-not $HasBattery) { return }
+    $btnBattReload.Enabled = $false
+    $lblBatt.Text = 'Reading the battery report...'
+    Start-Bg -Label 'Reading the battery report' $BatteryWork $null {
+        param($r)
+        $btnBattReload.Enabled = $true
+        $r = @($r)[0]
+        $lvBatt.BeginUpdate(); $lvBatt.Items.Clear()
+        if (-not $r -or $r.Error) { $lvBatt.EndUpdate(); $lblBatt.Text = if ($r) { $r.Error } else { 'Could not read the battery.' }; return }
+        $script:Battery = $r
+        $add = { param($what, $value, $means, $color) $it = Add-Row $lvBatt @($what, $value, $means) $null; if ($color) { $it.ForeColor = $color } }
+        $pct = $r.Pct
+        $healthMeans = if ($pct -ge 80) { 'Good - normal for its age.' } elseif ($pct -ge 60) { 'Worn: you get noticeably less time on battery than when it was new.' } else { 'Worn out: it holds less than two thirds of its charge. A new battery brings back the original battery life - see "Replacement" below.' }
+        & $add 'Battery health' "holds $pct% of its original charge" $healthMeans $(if ($pct -lt 60) { $Theme.Bad } elseif ($pct -lt 80) { $Theme.Warn } else { $Theme.Good })
+        & $add 'Capacity' ('{0:N1} Wh now, {1:N1} Wh when new' -f ($r.Full / 1000), ($r.Design / 1000)) 'Wh (watt-hours) is how much energy the battery can store.' $null
+        if ($null -ne $r.PerYear) {
+            $fast = $r.PerYear -gt 12
+            & $add 'Wear over the last year' $(if ($r.PerYear -le 0) { 'no loss' } else { "loses about $($r.PerYear)% a year" }) `
+                $(if ($fast) { 'Faster than normal (about 5-10% a year). Usually heat, or the battery being kept at 100% while plugged in all day - a charge limit helps (below).' } else { 'Normal.' }) $(if ($fast) { $Theme.Warn } else { $null })
+        }
+        if ($r.Runtime) {
+            $fmt = { param($t) '{0} h {1:00} min' -f [int][Math]::Floor($t.TotalHours), $t.Minutes }
+            & $add 'Time on a full charge' "about $(& $fmt $r.Runtime)$(if ($r.RuntimeNew) { " ($(& $fmt $r.RuntimeNew) when new)" })" 'Windows'' estimate for the way you normally use the PC.' $null
+        }
+        if ($r.Cycles -gt 0) { & $add 'Charge cycles' "$($r.Cycles)" 'One cycle = 100% used in total. Most laptop batteries are made for 300-1000 cycles.' $(if ($r.Cycles -ge 800) { $Theme.Warn } else { $null }) }
+        $chem = switch -Regex ($r.Chem) { '^LiP' { 'lithium polymer'; break } '^Li' { 'lithium-ion'; break } default { $r.Chem } }
+        & $add 'Type' "$chem$(if ($r.Maker) { ", made by $($r.Maker)" })$(if ($r.Id) { " ($($r.Id))" })" 'Needed when you look for a replacement.' $null
+        $tip = 'Look in the PC maker''s app or in the BIOS for "charge limit", "battery care" or "conservation mode" (usually 80%).'
+        foreach ($k in $ChargeLimitTips.Keys) { if ($PcName -match $k) { $tip = $ChargeLimitTips[$k]; break } }
+        & $add 'Charge limit' $(if ([Windows.Forms.SystemInformation]::PowerStatus.PowerLineStatus -eq 'Online') { 'plugged in now' } else { 'on battery now' }) `
+            "If the PC is plugged in most of the time, stopping charging at about 80% slows wear a lot. $tip" $null
+        if ($pct -lt 70) { & $add 'Replacement' 'worth it' "Search for ""$PcName battery""$(if ($r.Id) { " (battery $($r.Id))" }) - preferably the PC maker's own part. On many laptops it is a 10-20 minute job with a screwdriver; the Upgrades page has the service manual." $Theme.Bad }
+        & $add 'Battery usage per app' 'see button above' 'Which apps used the most battery in the last day or week (Windows Settings).' $null
+        $lvBatt.EndUpdate()
+        Set-Chart $chartBatt @(@{ Name = 'Charge it holds (% of new)'; Color = $Theme.Accent; Points = @($r.History) }) 100 '%'
+        $lblBatt.Text = if ($r.Since) { "Battery history since $($r.Since.ToString('d'))." } else { '' }
+        $script:BatteryWorn = [int]($pct -lt 60)
+        if ($script:NavButtons) { Update-NavBadges }
+    }
+}
+$btnBattUsage.Add_Click({ Start-Process 'ms-settings:batterysaver-usagedetails' })
+$btnBattSet.Add_Click({ Start-Process 'ms-settings:batterysaver' })
+$btnBattReport.Add_Click({
+    $file = Join-Path $DataDir 'battery-report.html'
+    $btnBattReport.Enabled = $false
+    Start-Bg -Label 'Making the battery report' { param($f) [void](Invoke-Native "$env:windir\System32\powercfg.exe" "/batteryreport /output `"$f`"" 60); Test-Path $f } $file {
+        param($ok) $btnBattReport.Enabled = $true
+        if (@($ok)[0]) { Start-Process (Join-Path $DataDir 'battery-report.html') } else { Show-Msg 'Windows could not make a battery report.' 'OK' 'Warning' | Out-Null }
+    }
+})
+$btnBattBuy.Add_Click({ Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString("$PcName battery $(if ($script:Battery) { $script:Battery.Id })")) })
+$btnBattReload.Add_Click({ Update-Battery })
+
+# ===========================================================================
+# Browsers: extensions, search engine, home page, and settings forced by "policies"
+# ===========================================================================
+$pgBrw = New-Page 'Browsers' 'Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren''t installed from a store, and settings forced through browser "policies" on a home PC.'
+$btnBrwExt = New-Button 'Open extensions page'
+$btnBrwPol = New-Button 'Remove checked policies'
+$btnBrwReset = New-Button 'Reset browser settings'
+$btnBrwReload = New-Button 'Reload'
+$lvBrw = New-ListView $true @('Item', 290, 'Browser', 130, 'Kind', 110, 'Status', 80, 'Details', 560)
+$txtBrw = New-DetailBox 104
+Set-PageLayout $pgBrw $lvBrw @((New-ButtonBar @($btnBrwExt, $btnBrwPol, $btnBrwReset, $btnBrwReload))) $txtBrw
+$BrowserWork = {
+    param($cfg)
+    Add-Type -AssemblyName System.Web.Extensions
+    $json = New-Object Web.Script.Serialization.JavaScriptSerializer; $json.MaxJsonLength = [int]::MaxValue
+    $read = { param($p) try { if (Test-Path -LiteralPath $p) { $json.DeserializeObject([IO.File]::ReadAllText($p)) } } catch { $null } }
+    $get = { param($o, [string[]]$path) foreach ($k in $path) { if ($o -is [Collections.IDictionary] -and $o.ContainsKey($k)) { $o = $o[$k] } else { return $null } }; $o }
+    $rows = New-Object System.Collections.ArrayList
+    function Add-B($Item, $Browser, $Kind, $Level, $Detail, $Todo, $Extra) {
+        [void]$rows.Add([pscustomobject]@{ Item = $Item; Browser = $Browser; Kind = $Kind; Level = $Level; Detail = $Detail; Todo = $Todo; Extra = $Extra })
+    }
+    $knownSearch = 'google\.|bing\.com|duckduckgo\.|ecosia\.|startpage\.|yahoo\.|qwant\.|search\.brave\.com|yandex\.|baidu\.|naver\.|seznam\.|you\.com|perplexity\.ai|kagi\.com|msn\.com'
+    $hostOf = { param($u) try { ([uri]"$u").Host -replace '^www\.', '' } catch { "$u" } }
+    $allSites = '^(<all_urls>|\*://\*/\*|https?://\*/\*|\*://\*\.?[^/]*/\*)$'
+    $todoRisky = 'Remove it unless you installed it yourself on purpose: open the extensions page (button above) > Remove. If it comes back, a program keeps adding it - look on the Programs and Bloatware pages.'
+    $todoReview = 'Keep it if you know it and use it; otherwise remove it from the extensions page (button above).'
+    $todoOk = 'Nothing to do.'
+    $browsers = @(
+        @{ Name = 'Chrome'; Root = "$env:LOCALAPPDATA\Google\Chrome\User Data"; Pol = 'Google\Chrome'; Stores = 'clients2\.google\.com/service/update2/crx' }
+        @{ Name = 'Edge'; Root = "$env:LOCALAPPDATA\Microsoft\Edge\User Data"; Pol = 'Microsoft\Edge'; Stores = 'edge\.microsoft\.com/extensionwebstorebase|clients2\.google\.com/service/update2/crx' }
+        @{ Name = 'Brave'; Root = "$env:LOCALAPPDATA\BraveSoftware\Brave-Browser\User Data"; Pol = 'BraveSoftware\Brave'; Stores = 'clients2\.google\.com/service/update2/crx' }
+        @{ Name = 'Vivaldi'; Root = "$env:LOCALAPPDATA\Vivaldi\User Data"; Pol = $null; Stores = 'clients2\.google\.com/service/update2/crx' }
+    )
+    foreach ($b in $browsers) {
+        if (-not (Test-Path $b.Root)) { continue }
+        $names = & $get (& $read (Join-Path $b.Root 'Local State')) @('profile', 'info_cache')
+        $profiles = @(Get-ChildItem -LiteralPath $b.Root -Directory -ErrorAction SilentlyContinue | Where-Object { ($_.Name -eq 'Default' -or $_.Name -like 'Profile *') -and (Test-Path (Join-Path $_.FullName 'Preferences')) })
+        foreach ($p in $profiles) {
+            Set-JobProgress "$($b.Name): $($p.Name)"
+            $label = $b.Name; $pn = & $get $names @($p.Name, 'name')
+            if ($profiles.Count -gt 1) { $label = "$($b.Name) ($(if ($pn) { $pn } else { $p.Name }))" }
+            $prefs = & $read (Join-Path $p.FullName 'Preferences')
+            $sec = & $read (Join-Path $p.FullName 'Secure Preferences')
+            $exts = @{}
+            foreach ($src in (& $get $sec @('extensions', 'settings')), (& $get $prefs @('extensions', 'settings'))) {
+                if ($src -is [Collections.IDictionary]) { foreach ($k in $src.Keys) { if (-not $exts[$k] -or $src[$k].ContainsKey('location')) { $exts[$k] = $src[$k] } } }
+            }
+            foreach ($id in $exts.Keys) {
+                $s = $exts[$id]; $loc = $s['location']
+                if ($null -eq $loc -or [int]$loc -in 5, 10) { continue }   # built into the browser
+                $man = $s['manifest']
+                $dir = Join-Path $p.FullName "Extensions\$id"
+                if (-not $man -and (Test-Path $dir)) {
+                    $v = Get-ChildItem -LiteralPath $dir -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+                    if ($v) { $man = & $read (Join-Path $v.FullName 'manifest.json'); $dir = $v.FullName }
+                } elseif ($man -and (Test-Path $dir)) { $v = Get-ChildItem -LiteralPath $dir -Directory -ErrorAction SilentlyContinue | Select-Object -First 1; if ($v) { $dir = $v.FullName } }
+                if (-not $man) { continue }
+                $name = "$($man['name'])"
+                if ($name -match '^__MSG_(.+)__$') {   # translated name: look it up in the extension's own language files
+                    $key = $Matches[1]; $lang = if ($man['default_locale']) { $man['default_locale'] } else { 'en' }
+                    $msgs = & $read (Join-Path $dir "_locales\$lang\messages.json")
+                    if ($msgs) { foreach ($mk in $msgs.Keys) { if ($mk -ieq $key) { $name = "$($msgs[$mk]['message'])"; break } } }
+                }
+                if (-not $name -or $name -match '^__MSG_') { $name = $id }
+                $dr = $s['disable_reasons']
+                $on = -not ($dr -and ((($dr -is [array]) -and $dr.Count) -or ($dr -isnot [array] -and [int]$dr -ne 0))) -and "$($s['state'])" -ne '0'
+                $store = $s['from_webstore'] -eq $true -or "$($man['update_url'])" -match $b.Stores
+                $perms = @($man['permissions']) + @($man['host_permissions']) + @(foreach ($cs in @($man['content_scripts'])) { if ($cs) { @($cs['matches']) } }) | Where-Object { $_ -is [string] }
+                $readsAll = [bool]($perms | Where-Object { $_ -match $allSites })
+                $strong = @($perms | Where-Object { $_ -in 'proxy', 'debugger', 'management', 'nativeMessaging', 'privacy', 'declarativeNetRequestWithHostAccess' })
+                $ov = $man['chrome_settings_overrides']; $nt = & $get $man @('chrome_url_overrides', 'newtab')
+                $changes = @($(if ($ov -and $ov['search_provider']) { 'your search engine' }), $(if ($ov -and $ov['homepage']) { 'your home page' }),
+                             $(if ($ov -and $ov['startup_pages']) { 'your start-up pages' }), $(if ($nt) { 'the new-tab page' }) | Where-Object { $_ })
+                $policy = [int]$loc -in 7, 9
+                $notes = @()
+                if ($changes) { $notes += "changes $($changes -join ', ')" }
+                if ($readsAll) { $notes += 'can read and change every website you visit' }
+                if ($strong) { $notes += "extra powers: $($strong -join ', ')" }
+                if ($policy) { $notes += 'installed by a policy' } elseif (-not $store) { $notes += 'not from a store (added by a program or by hand)' }
+                if (-not $on) { $notes += 'switched off' }
+                $level = if ((-not $store -and -not $policy -and ($changes -or $readsAll)) -or ($policy -and -not $cfg.Managed -and -not $store)) { 'Risky' }
+                         elseif ($changes -or (-not $store) -or $strong) { 'Review' } else { 'OK' }
+                if (-not $on -and $level -eq 'Review') { $level = 'Info' }
+                $todo = switch ($level) { 'Risky' { $todoRisky } 'Review' { $todoReview } 'Info' { 'Switched off. Remove it if you don''t need it any more.' } default { $todoOk } }
+                Add-B $name $label 'Extension' $level $(if ($notes) { ($notes -join '; ') } else { 'from the store' }) $todo @{ Browser = $b.Name; Id = $id }
+            }
+            # Search engine, home page and start-up pages
+            $se = & $get $prefs @('default_search_provider_data', 'template_url_data', 'url')
+            if ($se) { $h = & $hostOf ($se -replace '\{[^}]+\}', 'x'); $ok = $h -match $knownSearch
+                Add-B "Search engine: $h" $label 'Search' $(if ($ok) { 'OK' } else { 'Review' }) $(if ($ok) { 'a well-known search engine' } else { 'not a well-known search engine - adware often swaps it' }) `
+                    $(if ($ok) { $todoOk } else { 'Change it back in the browser: Settings > Search engine. If it changes again, use "Reset browser settings".' }) $null }
+            $home = & $get $prefs @('homepage')
+            if ($home -and (& $get $prefs @('homepage_is_newtabpage')) -ne $true -and (& $get $prefs @('browser', 'show_home_button')) -eq $true) {
+                Add-B "Home page: $(& $hostOf $home)" $label 'Home page' 'Info' "$home" 'Fine if you chose it.' $null
+            }
+            if ((& $get $prefs @('session', 'restore_on_startup')) -eq 4) {
+                $urls = @(& $get $prefs @('session', 'startup_urls'))
+                $odd = @($urls | Where-Object { (& $hostOf $_) -notmatch $knownSearch -and $_ -notmatch '^(chrome|edge|brave|vivaldi)://' })
+                if ($urls) { Add-B "Start-up pages: $(($urls | ForEach-Object { & $hostOf $_ }) -join ', ')" $label 'Start-up' $(if ($odd) { 'Review' } else { 'OK' }) ($urls -join '  ') $(if ($odd) { 'Fine if you chose them; otherwise change them in Settings > On start-up.' } else { $todoOk }) $null }
+            }
+        }
+        # Policies: on a home PC, settings forced here are a classic adware trick (the browser says "managed by your organisation")
+        if ($b.Pol) {
+            foreach ($hive in 'HKLM', 'HKCU') {
+                $key = "${hive}:\SOFTWARE\Policies\$($b.Pol)"
+                if (-not (Test-Path $key)) { continue }
+                $k = Get-Item $key
+                foreach ($vn in $k.GetValueNames() | Where-Object { $_ -match '^(DefaultSearchProvider(SearchURL|Name|Enabled)|HomepageLocation|NewTabPageLocation|HomepageIsNewTabPage|RestoreOnStartup)$' }) {
+                    $val = "$($k.GetValue($vn))"
+                    Add-B "Policy: $vn = $val" $b.Name 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Risky' }) "forced through $key" `
+                        $(if ($cfg.Managed) { 'Set by your organisation (this PC is managed) - leave it.' } else { 'Nobody manages this home PC, so a program forced this. Check it and click "Remove checked policies" (needs administrator).' }) @{ Path = $key; Name = $vn }
+                }
+                foreach ($sub in 'ExtensionInstallForcelist', 'RestoreOnStartupURLs') {
+                    $sk = Get-Item "$key\$sub" -ErrorAction SilentlyContinue
+                    if (-not $sk) { continue }
+                    foreach ($vn in $sk.GetValueNames()) {
+                        $val = "$($sk.GetValue($vn))"
+                        $what = if ($sub -eq 'ExtensionInstallForcelist') { "Forced extension: $(($val -split ';')[0])" } else { "Forced start-up page: $val" }
+                        Add-B "Policy: $what" $b.Name 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Risky' }) "forced through $key\$sub" `
+                            $(if ($cfg.Managed) { 'Set by your organisation (this PC is managed) - leave it.' } else { 'Nobody manages this home PC, so a program forced this. Check it and click "Remove checked policies" (needs administrator).' }) @{ Path = "$key\$sub"; Name = $vn }
+                    }
+                }
+            }
+        }
+    }
+    # Firefox
+    $ff = "$env:APPDATA\Mozilla\Firefox\Profiles"
+    foreach ($p in @(Get-ChildItem -LiteralPath $ff -Directory -ErrorAction SilentlyContinue | Where-Object { Test-Path (Join-Path $_.FullName 'extensions.json') })) {
+        $j = & $read (Join-Path $p.FullName 'extensions.json')
+        foreach ($a in @($j['addons'])) {
+            if (-not $a -or $a['type'] -ne 'extension' -or "$($a['location'])" -match '^app-(builtin|system-defaults|system-addons|temporary)$') { continue }
+            $name = & $get $a @('defaultLocale', 'name'); if (-not $name) { $name = $a['id'] }
+            $perms = @(& $get $a @('userPermissions', 'origins')) + @(& $get $a @('userPermissions', 'permissions')) | Where-Object { $_ -is [string] }
+            $readsAll = [bool]($perms | Where-Object { $_ -match $allSites })
+            $byProgram = "$($a['location'])" -ne 'app-profile'
+            $on = $a['active'] -eq $true
+            $notes = @($(if ($readsAll) { 'can read and change every website you visit' }), $(if ($byProgram) { 'added by a program, not from the add-ons site' }), $(if (-not $on) { 'switched off' }) | Where-Object { $_ })
+            $level = if ($byProgram -and $readsAll) { 'Risky' } elseif ($byProgram) { 'Review' } else { 'OK' }
+            Add-B $name "Firefox$(if (@($j['addons']).Count -and $p.Name -notmatch 'default') { " ($($p.Name -replace '^[^.]+\.', ''))" })" 'Extension' $level $(if ($notes) { $notes -join '; ' } else { 'from the add-ons site' }) `
+                $(switch ($level) { 'Risky' { $todoRisky } 'Review' { $todoReview } default { $todoOk } }) @{ Browser = 'Firefox'; Id = $a['id'] }
+        }
+    }
+    $ffPol = "$env:ProgramFiles\Mozilla Firefox\distribution\policies.json"
+    if (Test-Path $ffPol) { Add-B 'Policy file: policies.json' 'Firefox' 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) "forced settings in $ffPol" 'Open about:policies in Firefox to see what it forces. On a home PC you can delete the file (needs administrator).' $null }
+    if (Test-Path 'HKLM:\SOFTWARE\Policies\Mozilla\Firefox') { Add-B 'Policy: settings forced in the registry' 'Firefox' 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) 'HKLM\SOFTWARE\Policies\Mozilla\Firefox' 'Open about:policies in Firefox to see what it forces.' $null }
+    $rows
+}
+$BrwLevels = @{ Risky = 0; Review = 1; Info = 2; OK = 3 }
+function Update-Browsers {
+    $btnBrwReload.Enabled = $false
+    $txtBrw.Text = 'Reading browser settings...'
+    $managed = [bool]$env:USERDNSDOMAIN -or [bool](Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\Enrollments' -ErrorAction SilentlyContinue | Where-Object { $_.GetValue('UPN') })
+    Start-Bg -Label 'Checking browsers' $BrowserWork @{ Managed = $managed } {
+        param($rows)
+        $btnBrwReload.Enabled = $true
+        $lvBrw.BeginUpdate(); $lvBrw.Items.Clear()
+        foreach ($r in $rows | Sort-Object { $BrwLevels[$_.Level] }, Browser, Item) {
+            $it = Add-Row $lvBrw @($r.Item, $r.Browser, $r.Kind, $r.Level, $r.Detail) $r ($r.Kind -eq 'Policy' -and $r.Level -eq 'Risky' -and $r.Extra)
+            $it.ForeColor = switch ($r.Level) { 'Risky' { $Theme.Bad } 'Review' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } }
+        }
+        $lvBrw.EndUpdate()
+        $script:BrowserRisky = @($rows | Where-Object Level -eq 'Risky').Count
+        if ($script:BrowserRisky) { $script:ExtraAdvice['Browsers'] = "Browsers: $($script:BrowserRisky) thing(s) look like adware - see the Browsers page." } else { $script:ExtraAdvice.Remove('Browsers') }
+        if ($lvBrw.Items.Count) { $lvBrw.Items[0].Selected = $true } else { $txtBrw.Text = 'No supported browsers found.' }
+        Update-Health -Quick
+    }
+}
+$lvBrw.Add_SelectedIndexChanged({
+    if (-not $lvBrw.SelectedItems.Count) { return }
+    $r = $lvBrw.SelectedItems[0].Tag
+    $txtBrw.Text = "$($r.Item) ($($r.Browser)): $($r.Detail)`r`n`r`nWhat to do: $($r.Todo)"
+})
+$BrowserExe = @{ Chrome = 'chrome.exe'; Edge = 'msedge.exe'; Brave = 'brave.exe'; Vivaldi = 'vivaldi.exe'; Firefox = 'firefox.exe' }
+function Open-Browser([string]$Browser, [string]$Url) {
+    $exe = $BrowserExe[$Browser]
+    $path = foreach ($h in 'HKCU', 'HKLM') { (Get-ItemProperty "${h}:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\$exe" -ErrorAction SilentlyContinue).'(default)' }
+    $path = @($path | Where-Object { $_ })[0]
+    try { Start-Process $(if ($path) { $path.Trim('"') } else { $exe }) $Url } catch { Show-Msg "Couldn't start $Browser." 'OK' 'Warning' | Out-Null }
+}
+function Get-SelectedBrowser {
+    $r = if ($lvBrw.SelectedItems.Count) { $lvBrw.SelectedItems[0].Tag }
+    if ($r) { ($r.Browser -split ' ')[0] } else { $null }
+}
+$btnBrwExt.Add_Click({
+    $b = Get-SelectedBrowser; if (-not $b) { Show-Msg 'Select a row first.' | Out-Null; return }
+    Open-Browser $b $(switch ($b) { 'Firefox' { 'about:addons' } default { "$($b.ToLower() -replace 'edge', 'edge')://extensions" } })
+})
+$btnBrwReset.Add_Click({
+    $b = Get-SelectedBrowser; if (-not $b) { Show-Msg 'Select a row of the browser to reset first.' | Out-Null; return }
+    if ((Show-Msg "Open $b's reset page?`n`nResetting puts the search engine, home page, start-up pages and pinned tabs back to normal and switches extensions off. Bookmarks, history and saved passwords stay." 'YesNo' 'Question') -ne 'Yes') { return }
+    Open-Browser $b $(switch ($b) { 'Edge' { 'edge://settings/resetProfileSettings' } 'Firefox' { 'about:support' } default { "$($b.ToLower())://settings/reset" } })
+})
+$btnBrwPol.Add_Click({
+    $picked = @($lvBrw.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { $_.Kind -eq 'Policy' -and $_.Extra })
+    if (-not $picked) { Show-Msg 'Check one or more policy rows first (extensions are removed in the browser itself - use "Open extensions page").' | Out-Null; return }
+    if (-not $IsAdmin) { Show-Msg 'Removing browser policies needs administrator rights - click "Restart as admin" first.' 'OK' 'Warning' | Out-Null; return }
+    if ((Show-Msg "Remove these forced browser settings?`n`n$(($picked | ForEach-Object { " - $($_.Browser): $($_.Item -replace '^Policy: ', '')" }) -join "`n")`n`nRestart the browser afterwards. You can undo this from the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+    $done = 0
+    foreach ($p in $picked) {
+        try {
+            $k = Get-Item -LiteralPath $p.Extra.Path
+            $old = $k.GetValue($p.Extra.Name); $kind = "$($k.GetValueKind($p.Extra.Name))"
+            Remove-ItemProperty -LiteralPath $p.Extra.Path -Name $p.Extra.Name -ErrorAction Stop
+            Add-History 'Browser' "$($p.Browser): $($p.Item -replace '^Policy: ', '')" 'forced setting removed' @{ Type = 'Reg'; Values = @(@{ P = $p.Extra.Path; N = $p.Extra.Name; Old = $old; T = $kind }) }
+            $done++
+        } catch { }
+    }
+    Update-History; Update-Browsers
+    Show-Msg "$done forced setting(s) removed. Restart the browser to see the change." | Out-Null
+})
+$btnBrwReload.Add_Click({ Update-Browsers })
+
+# ===========================================================================
+# Programs: everything installed, its size, and when it was last used
+# ===========================================================================
+$pgProg = New-Page 'Programs' 'Every installed program with its size and when you last opened it (from Windows'' own record of what you start). Check the ones you don''t need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.'
+$btnProgUn = New-Button 'Uninstall checked'
+$btnProgSort = New-Button 'Sort: size'
+$btnProgSet = New-Button 'Open Installed apps'
+$btnProgReload = New-Button 'Reload'
+$lvProg = New-ListView $true @('Program', 300, 'Publisher', 170, 'Size', 85, 'Installed', 95, 'Last used', 130, 'Note', 330)
+$lblProg = New-Status
+Set-PageLayout $pgProg $lvProg @((New-ButtonBar @($btnProgUn, $btnProgSort, $btnProgSet, $btnProgReload))) $lblProg
+$ProgramsWork = {
+    param($cfg)
+    # Windows' record of programs started from Start, the taskbar, the desktop or Explorer (UserAssist, names in ROT13).
+    $rot = { param($s) $c = $s.ToCharArray(); for ($i = 0; $i -lt $c.Length; $i++) { $n = [int]$c[$i]
+        if ($n -ge 65 -and $n -le 90) { $c[$i] = [char](65 + ($n - 52) % 26) } elseif ($n -ge 97 -and $n -le 122) { $c[$i] = [char](97 + ($n - 84) % 26) } }; -join $c }
+    $folders = @{
+        '{6D809377-6AF0-444B-8957-A3773F02200E}' = $env:ProgramFiles; '{905E63B6-C1BF-494E-B29C-65B732D3D21A}' = $env:ProgramFiles
+        '{7C5A40EF-A0FB-4BFC-874A-C0F2E0B9FA8E}' = ${env:ProgramFiles(x86)}; '{F38BF404-1D43-42F2-9305-67DE0B28FC23}' = $env:windir
+        '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}' = "$env:windir\System32"; '{D65231B0-B2F1-4857-A4CE-A8E7C6EA7D27}' = "$env:windir\SysWOW64"
+        '{F1B32785-6FBA-4FCF-9D55-7B8E7F157091}' = $env:LOCALAPPDATA; '{3EB685DB-65F9-4CF6-A03A-E3EF65729F3D}' = $env:APPDATA
+        '{62AB5D82-FDC1-4DC3-A9DD-070D1D495D97}' = $env:ProgramData; '{5E6C858F-0E22-4760-9AFE-EA3317B67173}' = $env:USERPROFILE
+        '{374DE290-123F-4565-9164-39C4925E467B}' = "$env:USERPROFILE\Downloads"; '{B4BFCC3A-DB2C-424C-B029-7FE99A87C641}' = [Environment]::GetFolderPath('Desktop')
+    }
+    $exeRuns = @(); $lnkRuns = @(); $since = $null
+    foreach ($k in Get-ChildItem 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\UserAssist' -ErrorAction SilentlyContinue) {
+        $c = Get-Item "$($k.PSPath)\Count" -ErrorAction SilentlyContinue; if (-not $c) { continue }
+        foreach ($n in $c.GetValueNames()) {
+            $d = $c.GetValue($n); if ($d -isnot [byte[]] -or $d.Length -lt 68) { continue }
+            $ft = [BitConverter]::ToInt64($d, 60); if ($ft -le 0) { continue }
+            $when = [DateTime]::FromFileTime($ft); if ($when.Year -lt 2005) { continue }
+            if (-not $since -or $when -lt $since) { $since = $when }
+            $name = & $rot $n
+            if ($name -match '^(\{[0-9A-Fa-f-]{36}\})\\(.*)$' -and $folders[$Matches[1].ToUpper()]) { $name = Join-Path $folders[$Matches[1].ToUpper()] $Matches[2] }
+            if ($name -match '\.lnk$') { $lnkRuns += [pscustomobject]@{ Key = (([IO.Path]::GetFileNameWithoutExtension($name)).ToLower() -replace '\(.*?\)', '' -replace '[^a-z0-9]', ''); When = $when } }
+            elseif ($name -match '\.exe$') { $exeRuns += [pscustomobject]@{ Path = $name.ToLower(); When = $when } }
+        }
+    }
+    $running = @(Get-Process -ErrorAction SilentlyContinue | ForEach-Object { try { "$($_.Path)".ToLower() } catch { } } | Where-Object { $_ })
+    $support = 'Redistributable|Runtime|\.NET|Driver|SDK|Framework|Visual C\+\+|WebView2|Java\b|Update Health|Add-in|Plug-?in|Codec|Bonjour|Help Viewer|Language Pack|Microsoft (Edge|OneDrive|Teams Meeting)'
+    $seen = @{}; $rows = New-Object System.Collections.ArrayList
+    $keys = @(@{ P = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'; Scope = 'all users' }, @{ P = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'; Scope = 'all users' },
+              @{ P = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall'; Scope = 'you' })
+    foreach ($kk in $keys) {
+        foreach ($e in Get-ChildItem $kk.P -ErrorAction SilentlyContinue) {
+            $v = Get-ItemProperty $e.PSPath -ErrorAction SilentlyContinue
+            $name = "$($v.DisplayName)".Trim()
+            if (-not $name -or $v.SystemComponent -eq 1 -or $v.ParentKeyName -or "$($v.ReleaseType)" -match 'Update|Hotfix' -or $name -match '^(Update for|Security Update|Hotfix)' -or -not ($v.UninstallString -or $v.QuietUninstallString)) { continue }
+            if ($seen[$name]) { continue }; $seen[$name] = 1
+            $loc = "$($v.InstallLocation)".Trim().Trim('"').TrimEnd('\')
+            if (-not $loc -and $v.DisplayIcon) { $ic = ("$($v.DisplayIcon)" -replace ',\s*-?\d+$', '').Trim('"'); if ($ic -match '\.exe$' -and $ic -notmatch '\\(System32|SysWOW64|Installer)\\') { $loc = Split-Path $ic -Parent } }
+            if ($loc -and ($loc.Length -le 3 -or $loc -match '^[A-Za-z]:\\(Windows|Program Files( \(x86\))?|ProgramData|Users)$')) { $loc = '' }   # never a whole system folder
+            $bytes = if ($v.EstimatedSize) { [int64]$v.EstimatedSize * 1KB } else { $null }
+            $installed = $null; if ("$($v.InstallDate)" -match '^(\d{4})(\d{2})(\d{2})$') { try { $installed = Get-Date -Year $Matches[1] -Month $Matches[2] -Day $Matches[3] -Hour 0 -Minute 0 -Second 0 } catch { } }
+            $last = $null; $now = $false
+            if ($loc) {
+                $pre = $loc.ToLower() + '\'
+                foreach ($x in $exeRuns) { if ($x.Path.StartsWith($pre) -and (-not $last -or $x.When -gt $last)) { $last = $x.When } }
+                if ($running | Where-Object { $_.StartsWith($pre) }) { $now = $true }
+            }
+            $key = $name.ToLower() -replace '\(.*?\)', '' -replace '[^a-z0-9]', ''
+            foreach ($l in $lnkRuns) { if ($l.Key.Length -ge 4 -and ($key.StartsWith($l.Key) -or $l.Key.StartsWith($key)) -and (-not $last -or $l.When -gt $last)) { $last = $l.When } }
+            [void]$rows.Add([pscustomobject]@{ Name = $name; Publisher = "$($v.Publisher)".Trim(); Version = "$($v.DisplayVersion)"; Bytes = $bytes; Installed = $installed; Last = $last; Now = $now
+                Location = $loc; Uninstall = "$($v.UninstallString)"; Quiet = "$($v.QuietUninstallString)"; Key = $e.PSPath; Scope = $kk.Scope
+                Support = ($name -match $support); Keep = (("$name $($v.Publisher)" -match $cfg.Keep) -or ($cfg.UserKeep -and "$name $($v.Publisher)" -match $cfg.UserKeep)) })
+        }
+    }
+    # Folder size for programs that don't report one (capped, so a huge folder can't stall the list)
+    $budget = [Diagnostics.Stopwatch]::StartNew()
+    foreach ($r in $rows | Where-Object { -not $_.Bytes -and $_.Location }) {
+        if ($budget.Elapsed.TotalSeconds -gt 25 -or (Test-Cancelled)) { break }
+        Set-JobProgress "measuring $($r.Name)"
+        $sum = 0; $sw = [Diagnostics.Stopwatch]::StartNew()
+        foreach ($f in Get-FilesSafe $r.Location) { $sum += $f.Length; if ($sw.Elapsed.TotalSeconds -gt 2) { break } }
+        if ($sum) { $r.Bytes = $sum }
+    }
+    [pscustomobject]@{ Rows = $rows; Since = $since; Tracking = ((Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -ErrorAction SilentlyContinue).Start_TrackProgs -ne 0) }
+}
+$script:ProgSort = 'size'
+function Show-Programs {
+    $p = $script:ProgData; if (-not $p) { return }
+    $old = (Get-Date).AddDays(-180)
+    $perLoc = @{}; foreach ($x in $p.Rows) { if ($x.Location) { $perLoc[$x.Location] = 1 + [int]$perLoc[$x.Location] } }
+    $isPack = { param($r) $r.Location -and $perLoc[$r.Location] -gt 1 -and $r.Name -match ' - [a-z]{2}-[a-z]{2}$' }
+    $sorted = switch ($script:ProgSort) {
+        'size' { $p.Rows | Sort-Object { if ($_.Bytes -and -not (& $isPack $_)) { $_.Bytes } else { 0 } } -Descending }
+        'used' { $p.Rows | Sort-Object { if ($_.Now) { [datetime]::MaxValue } elseif ($_.Last) { $_.Last } else { [datetime]::MinValue } }, Name }
+        default { $p.Rows | Sort-Object Name }
+    }
+    $lvProg.BeginUpdate(); $lvProg.Items.Clear()
+    $unused = 0
+    foreach ($r in $sorted) {
+        $usedTxt = if ($r.Now) { 'now (running)' } elseif ($r.Last) { $r.Last.ToString('d') } else { 'no record' }
+        $pack = & $isPack $r
+        $note = if ($r.Keep) { 'on the keep list' } elseif ($pack) { 'language pack - shares its files (and size) with the main program' } elseif ($r.Support) { 'used by other programs - keep' }
+                elseif ($r.Last -and $r.Last -lt $old -and -not $r.Now) { $unused++; "not opened for $([int]((Get-Date) - $r.Last).TotalDays) days" }
+                elseif (-not $r.Last -and -not $r.Now -and $r.Installed -and $r.Installed -lt $old -and $p.Since -and $p.Since -lt $old) { 'never opened from Start or the desktop (may run in the background)' }
+                else { '' }
+        $it = Add-Row $lvProg @($r.Name, $r.Publisher, $(if ($pack) { 'shared' } elseif ($r.Bytes) { Format-Size $r.Bytes } else { '' }), $(if ($r.Installed) { $r.Installed.ToString('d') } else { '' }), $usedTxt, $note) $r
+        $it.ForeColor = if ($note -like 'not opened*') { $Theme.Warn } elseif ($r.Keep -or $r.Support -or $pack) { $Theme.Muted } else { $Theme.Text }
+    }
+    $lvProg.EndUpdate()
+    # Count each folder once: language packs share one folder, and games sit inside their launcher's folder (Steam).
+    $sized = @($p.Rows | Where-Object Bytes | Group-Object { "$($_.Location)|$($_.Bytes)" } | ForEach-Object { $_.Group[0] })
+    $locs = @($sized | Where-Object Location | ForEach-Object { $_.Location.ToLower() + '\' })
+    $total = (@($sized | Where-Object { $l = "$($_.Location)".ToLower(); -not $l -or -not ($locs | Where-Object { $l.StartsWith($_) -and $l + '\' -ne $_ }) }) | Measure-Object Bytes -Sum).Sum
+    $lblProg.Text = "$(@($p.Rows).Count) programs, $(Format-Size $total) in total. $unused not opened for 6 months or more." +
+        $(if (-not $p.Tracking) { '  (Windows is set not to record program use: Settings > Privacy > General.)' } elseif ($p.Since) { "  Use is recorded since $($p.Since.ToString('d'))." })
+}
+function Update-Programs {
+    $btnProgReload.Enabled = $false
+    $lblProg.Text = 'Reading installed programs...'
+    Start-Bg -Label 'Reading installed programs' -Cancellable $ProgramsWork @{ Keep = $KeepBuiltIn; UserKeep = (Get-UserKeep) } {
+        param($r)
+        $btnProgReload.Enabled = $true
+        $script:ProgData = @($r)[0]
+        Show-Programs
+    }
+}
+$btnProgSort.Add_Click({
+    $script:ProgSort = switch ($script:ProgSort) { 'size' { 'used' } 'used' { 'name' } default { 'size' } }
+    $btnProgSort.Text = switch ($script:ProgSort) { 'size' { 'Sort: size' } 'used' { 'Sort: last used' } default { 'Sort: name' } }
+    Show-Programs
+})
+$btnProgSet.Add_Click({ Start-Process 'ms-settings:appsfeatures' })
+$btnProgReload.Add_Click({ Update-Programs })
+# Uninstallers run one after another (each may show its own window); then leftovers go to the Recycle Bin.
+$UninstallWork = {
+    param($list)
+    $i = 0
+    foreach ($p in $list) {
+        $i++; if (Test-Cancelled) { break }
+        Set-JobProgress "uninstalling $($p.Name)" $i $list.Count
+        $cmd = if ($p.Quiet) { $p.Quiet } else { $p.Uninstall }
+        if ($cmd -match '(?i)msiexec(\.exe)?\s+/[IX]\s*(\{[0-9A-F-]{36}\})') { $cmd = "MsiExec.exe /X$($Matches[2])" }   # /I would "repair" instead
+        $code = $null
+        try { $code = (Start-Process cmd.exe -ArgumentList "/c `"$cmd`"" -Wait -PassThru -WindowStyle Hidden).ExitCode } catch { }
+        $gone = -not (Test-Path -LiteralPath $p.Key)
+        $left = @()
+        if ($gone) {
+            Start-Sleep -Seconds 2
+            $cands = @($p.Location) + @(foreach ($base in $env:LOCALAPPDATA, $env:APPDATA, $env:ProgramData) {
+                Join-Path $base $p.Name; if ($p.Publisher) { Join-Path (Join-Path $base $p.Publisher) $p.Name } })
+            $left = @($cands | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) } | Select-Object -Unique)
+        }
+        [pscustomobject]@{ Name = $p.Name; Gone = $gone; Code = $code; Left = $left }
+    }
+}
+$btnProgUn.Add_Click({
+    $picked = @($lvProg.CheckedItems | ForEach-Object { $_.Tag })
+    if (-not $picked) { Show-Msg 'Check one or more programs first.' | Out-Null; return }
+    $warn = @($picked | Where-Object { $_.Keep -or $_.Support })
+    $msg = "Uninstall these programs?`n`n$(($picked | ForEach-Object { " - $($_.Name)" }) -join "`n")"
+    if ($warn) { $msg += "`n`nCareful - other programs may need: $(($warn | ForEach-Object Name) -join ', ')" }
+    $msg += "`n`nEach program's own uninstaller runs, one after another; some show a window or ask for administrator rights."
+    if ((Show-Msg $msg 'YesNo' 'Question') -ne 'Yes') { return }
+    $btnProgUn.Enabled = $false
+    $script:ProgPicked = $picked
+    Start-WithRestorePoint 'uninstalling programs' { Start-Bg -Label 'Uninstalling programs' -Cancellable $UninstallWork $script:ProgPicked {
+        param($res)
+        $btnProgUn.Enabled = $true
+        $ok = @($res | Where-Object Gone); $failed = @($res | Where-Object { -not $_.Gone })
+        foreach ($r in $ok) { Add-History 'Uninstall' $r.Name 'uninstalled' }
+        $left = @($ok | ForEach-Object { $_.Left } | Where-Object { $_ })
+        $msg = "$($ok.Count) program(s) uninstalled."
+        if ($failed) { $msg += "`n`nStill installed (cancelled, or the uninstaller failed): $(($failed | ForEach-Object Name) -join ', ')" }
+        Show-Msg $msg | Out-Null
+        if ($left -and (Show-Msg "These leftover folders are still there:`n`n$($left -join "`n")`n`nMove them to the Recycle Bin?" 'YesNo' 'Question') -eq 'Yes') {
+            Add-Type -AssemblyName Microsoft.VisualBasic
+            $n = 0; $bad = @()
+            foreach ($d in $left) {
+                try { [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($d, 'OnlyErrorDialogs', 'SendToRecycleBin'); $n++; Add-History 'Clean' $d 'leftover folder moved to the Recycle Bin' } catch { $bad += $d }
+            }
+            if ($bad) { Show-Msg "$n folder(s) moved to the Recycle Bin. Couldn't move (in use, or needs administrator): $($bad -join ', ')" | Out-Null }
+        }
+        Update-History; Update-Programs
+        if ($script:Loaded['Bloatware']) { Start-BloatScan }
+    } }
+})
+
+# ===========================================================================
+# Network: Wi-Fi signal, delays, DNS speed, dropped connections, and a reset
+# ===========================================================================
+$pgNet = New-Page 'Network' 'Wi-Fi signal and speed, delays to the router and the internet, how fast names are looked up (DNS), and how often the connection dropped in the last 30 days.'
+$btnNetScan = New-Button 'Check again'
+$btnNetDns = New-Button 'Flush DNS cache'
+$btnNetReset = New-Button 'Reset network'
+$btnNetWifi = New-Button 'Wi-Fi settings'
+$btnNetTrouble = New-Button 'Network troubleshooter'
+$lvNet = New-ListView $false @('Check', 200, 'Status', 80, 'Result', 380, 'What to do', 520)
+$txtNet = New-DetailBox 104
+Set-PageLayout $pgNet $lvNet @((New-ButtonBar @($btnNetScan, $btnNetDns, $btnNetReset, $btnNetWifi, $btnNetTrouble))) $txtNet
+$NetworkWork = {
+    $rows = New-Object System.Collections.ArrayList
+    function Add-N($Check, $Level, $Result, $Todo) { [void]$rows.Add([pscustomobject]@{ Check = $Check; Level = $Level; Result = $Result; Todo = $Todo }) }
+    # Pings without the one-second pause of Test-Connection
+    $ping = { param($ip, $n, $gapMs = 0)
+        $p = New-Object Net.NetworkInformation.Ping; $ok = @()
+        for ($i = 0; $i -lt $n; $i++) { try { $r = $p.Send($ip, 1000); if ($r.Status -eq 'Success') { $ok += [int]$r.RoundtripTime } } catch { }; if ($gapMs) { Start-Sleep -Milliseconds $gapMs } }
+        $p.Dispose()
+        [pscustomobject]@{ Loss = [int](100 * ($n - $ok.Count) / $n); Avg = $(if ($ok) { [int]($ok | Measure-Object -Average).Average }); Max = $(if ($ok) { ($ok | Measure-Object -Maximum).Maximum }) }
+    }
+    Set-JobProgress 'connection'
+    $up = @(Get-NetAdapter -Physical -ErrorAction SilentlyContinue | Where-Object Status -eq 'Up')
+    $vpn = @(Get-NetAdapter -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Up' -and "$($_.InterfaceDescription) $($_.Name)" -match 'VPN|WireGuard|TAP-|OpenVPN|NordLynx|Tunnel|Fortinet|Cisco AnyConnect|GlobalProtect|Zscaler|Tailscale' })
+    if (-not $up) { Add-N 'Connection' 'Problem' 'Not connected' 'Plug in the network cable or connect to Wi-Fi (the network icon at the bottom right).' }
+    foreach ($a in $up) {
+        $wifi = $a.MediaType -match '802\.11|Wireless' -or $a.InterfaceDescription -match 'Wi-?Fi|Wireless|WLAN'
+        Add-N 'Connection' 'OK' "$(if ($wifi) { 'Wi-Fi' } else { 'Cable (Ethernet)' }): $($a.InterfaceDescription), $($a.LinkSpeed)" 'Nothing to do.'
+    }
+    if ($vpn) { Add-N 'VPN' 'Info' "On: $(($vpn | ForEach-Object InterfaceDescription) -join ', ')" 'Everything below goes through the VPN, so delays are higher than without it. That is normal.' }
+    # Wi-Fi details (netsh prints English or Dutch labels)
+    $w = @{}
+    foreach ($l in (& "$env:windir\System32\netsh.exe" wlan show interfaces 2>$null)) {
+        if ($l -match '^\s+(.+?)\s+:\s(.*)$') {
+            $k = $Matches[1].Trim(); $v = $Matches[2].Trim()
+            switch -Regex ($k) {
+                '^SSID$' { $w.Ssid = $v } '^(Signal|Signaal)$' { $w.Signal = [int]($v -replace '\D', '') } '^Band$' { $w.Band = $v }
+                '^(Channel|Kanaal)$' { $w.Channel = $v } '^(Receive rate|Ontvangstsnelheid)' { $w.Rx = $v } '^(Radio type|Radiotype)$' { $w.Radio = $v }
+                '^(Description|Beschrijving)$' { $w.Card = $v }
+            }
+        }
+    }
+    if ($w.Ssid -and $null -ne $w.Signal) {
+        $lvl = if ($w.Signal -ge 60) { 'OK' } elseif ($w.Signal -ge 40) { 'Warning' } else { 'Problem' }
+        Add-N 'Wi-Fi signal' $lvl "$($w.Signal)% on ""$($w.Ssid)""$(if ($w.Rx) { ", $($w.Rx) Mbps" })$(if ($w.Radio) { ", $($w.Radio)" })" `
+            $(if ($lvl -eq 'OK') { 'Nothing to do.' } else { 'Weak signal: move closer to the router, put the router higher and out in the open, or add a mesh point or repeater. Walls and floors weaken Wi-Fi a lot.' })
+        if ($w.Band -match '^2\.4' -and "$($w.Card)" -match 'AX|AC|6E|Wi-?Fi 6|Wi-?Fi 7|BE\d|Dual') {
+            Add-N 'Wi-Fi band' 'Info' "2.4 GHz (channel $($w.Channel))" 'This Wi-Fi card can use 5 GHz (faster, less crowded). If the router offers a separate 5 GHz network, connect to that one - or turn on "band steering" in the router.'
+        }
+    }
+    # Delays: router, then the internet
+    $gw = (Get-NetRoute -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue | Sort-Object { $_.RouteMetric + $_.InterfaceMetric } | Select-Object -First 1).NextHop
+    $g = $null
+    if ($gw -and $gw -ne '0.0.0.0') { Set-JobProgress 'router'; $g = & $ping $gw 20 150 }
+    Set-JobProgress 'internet'
+    $i = & $ping '1.1.1.1' 20 150
+    if ($g) {
+        # Many routers answer only some pings on purpose; lost router pings only matter if the internet loses packets too.
+        $loss = if ($i.Loss -eq 0) { 0 } else { $g.Loss }
+        $lvl = if ($null -eq $g.Avg) { 'Info' } elseif ($loss -ge 10 -or $g.Avg -gt 30) { 'Problem' } elseif ($loss -gt 0 -or $g.Max -gt 100) { 'Warning' } else { 'OK' }
+        Add-N 'Router' $lvl "$(if ($null -ne $g.Avg) { "$($g.Avg) ms on average, worst $($g.Max) ms" } else { 'does not answer pings' })$(if ($loss) { ", $loss% lost" })" `
+            $(switch ($lvl) { 'OK' { 'Nothing to do.' } 'Info' { 'Some routers never answer pings - fine if the internet line is OK.' } default { 'The problem is between this PC and the router: usually weak or crowded Wi-Fi. Move closer, use 5 GHz or a cable, and restart the router.' } })
+    }
+    $lvl = if ($i.Loss -ge 10 -or $null -eq $i.Avg) { 'Problem' } elseif ($i.Loss -gt 0 -or $i.Avg -gt 80) { 'Warning' } else { 'OK' }
+    Add-N 'Internet' $lvl "$(if ($null -ne $i.Avg) { "$($i.Avg) ms on average, worst $($i.Max) ms" } else { 'no answer' }), $($i.Loss)% lost" `
+        $(switch ($lvl) { 'OK' { 'Nothing to do.' } default { 'If the router line above is fine, the delay comes from the internet connection itself: restart the modem/router; if it keeps happening, contact your internet provider.' } })
+    # DNS: how fast names are looked up by the current server, compared with two public ones
+    Set-JobProgress 'DNS'
+    $names = 'wikipedia.org', 'github.com', 'microsoft.com', 'cloudflare.com', 'apple.com'
+    $dnsTime = { param($server) $t = @()
+        foreach ($n in $names) { $sw = [Diagnostics.Stopwatch]::StartNew(); try { [void](Resolve-DnsName $n -Server $server -DnsOnly -QuickTimeout -ErrorAction Stop); $t += $sw.ElapsedMilliseconds } catch { } }
+        if ($t) { [int]($t | Sort-Object | Select-Object -First ([Math]::Max(1, $t.Count - 1)) | Measure-Object -Average).Average } }   # drop the slowest
+    $idx = @($up | ForEach-Object ifIndex)
+    $mine = @(Get-DnsClientServerAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | Where-Object { $_.InterfaceIndex -in $idx } | ForEach-Object ServerAddresses | Select-Object -Unique)
+    if ($mine) {
+        $cur = & $dnsTime $mine[0]; $cf = & $dnsTime '1.1.1.1'; $gg = & $dnsTime '8.8.8.8'
+        $best = @(@{ N = 'Cloudflare (1.1.1.1)'; T = $cf }, @{ N = 'Google (8.8.8.8)'; T = $gg } | Where-Object { $_.T } | Sort-Object { $_.T })[0]
+        if ($null -eq $cur) { Add-N 'DNS' 'Problem' "$($mine[0]) doesn't answer" 'Names can''t be looked up, so websites won''t open. Restart the router, or set DNS to 1.1.1.1 in Settings > Network & internet > (your connection) > DNS server assignment.' }
+        else {
+            $slow = $best -and $cur -gt 60 -and $cur -gt 2 * $best.T
+            Add-N 'DNS' $(if ($slow) { 'Warning' } else { 'OK' }) "$($mine[0]): $cur ms per look-up$(if ($best) { " ($($best.N): $($best.T) ms)" })" `
+                $(if ($slow) { "Your DNS server is slow - every new website waits for it. Switching to $($best.N) helps: Settings > Network & internet > (your connection) > DNS server assignment > Edit." } else { 'Nothing to do.' })
+        }
+    }
+    # Dropped Wi-Fi connections in the last 30 days
+    $ev = @(Get-WinEvent -FilterHashtable @{ LogName = 'Microsoft-Windows-WLAN-AutoConfig/Operational'; Id = 8003, 8002; StartTime = (Get-Date).AddDays(-30) } -ErrorAction SilentlyContinue)
+    $drops = @($ev | Where-Object Id -eq 8003).Count; $fails = @($ev | Where-Object Id -eq 8002).Count
+    if ($w.Ssid -or $ev) {
+        $lvl = if ($drops -ge 30 -or $fails -ge 10) { 'Warning' } else { 'OK' }
+        Add-N 'Wi-Fi drops (30 days)' $lvl "$drops disconnect(s), $fails failed connection(s)" `
+            $(if ($lvl -eq 'OK') { 'Normal - disconnects also happen at sleep, shutdown and when you move between networks.' } else { 'More than normal. Update the Wi-Fi driver (Drivers page), turn off "Allow the computer to turn off this device to save power" for the Wi-Fi card in Device Manager, and restart the router.' })
+    }
+    # Errors on the network card itself
+    foreach ($s in Get-NetAdapterStatistics -ErrorAction SilentlyContinue | Where-Object { $_.Name -in ($up | ForEach-Object Name) }) {
+        $pk = [double]$s.ReceivedUnicastPackets + $s.SentUnicastPackets; $er = [double]$s.ReceivedPacketErrors + $s.OutboundPacketErrors
+        if ($pk -gt 10000 -and $er / $pk -gt 0.001) { Add-N "Errors on $($s.Name)" 'Warning' ('{0:N0} damaged packets ({1:P2})' -f $er, ($er / $pk)) 'Usually a bad cable or a failing port. Try another cable or port; for Wi-Fi, update the driver.' }
+    }
+    $rows
+}
+function Update-Network {
+    $btnNetScan.Enabled = $false
+    $txtNet.Text = 'Checking the network (about 15 seconds)...'
+    Start-Bg -Label 'Checking the network' $NetworkWork $null {
+        param($rows)
+        $btnNetScan.Enabled = $true
+        $lvNet.BeginUpdate(); $lvNet.Items.Clear()
+        foreach ($r in $rows | Sort-Object { $SecLevels[$_.Level] }) {
+            $it = Add-Row $lvNet @($r.Check, $r.Level, $r.Result, $r.Todo) $r
+            $it.ForeColor = switch ($r.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.Muted } }
+        }
+        $lvNet.EndUpdate()
+        $script:NetProblems = @($rows | Where-Object Level -eq 'Problem').Count
+        $bad = @($rows | Where-Object { $_.Level -in 'Problem', 'Warning' })
+        if ($bad) { $script:ExtraAdvice['Network'] = "Network: $(($bad | ForEach-Object Check) -join ', ') - see the Network page." } else { $script:ExtraAdvice.Remove('Network') }
+        if ($lvNet.Items.Count) { $lvNet.Items[0].Selected = $true }
+        Update-Health -Quick
+    }
+}
+$lvNet.Add_SelectedIndexChanged({
+    if (-not $lvNet.SelectedItems.Count) { return }
+    $r = $lvNet.SelectedItems[0].Tag
+    $txtNet.Text = "$($r.Check): $($r.Result)`r`n`r`nWhat to do: $($r.Todo)"
+})
+$btnNetScan.Add_Click({ Update-Network })
+$btnNetDns.Add_Click({
+    try { Clear-DnsClientCache -ErrorAction Stop } catch { [void](& "$env:windir\System32\ipconfig.exe" /flushdns) }
+    Add-History 'Network' 'DNS cache' 'flushed'; Update-History
+    Show-Msg 'DNS cache flushed. Websites that wouldn''t open because of an old address should work now.' | Out-Null
+})
+$btnNetReset.Add_Click({
+    if (-not $IsAdmin) { Show-Msg 'Resetting the network needs administrator rights - click "Restart as admin" first. (Or: Settings > Network & internet > Advanced network settings > Network reset.)' 'OK' 'Warning' | Out-Null; return }
+    if ((Show-Msg "Reset the network?`n`nThis resets Windows' network settings (Winsock and TCP/IP) to factory state and clears the DNS cache - the standard fix when nothing connects although the router works. Wi-Fi passwords and VPN apps stay, but a manually set IP address or DNS server is cleared.`n`nThe PC needs a restart afterwards." 'YesNo' 'Question') -ne 'Yes') { return }
+    Start-WithRestorePoint 'resetting the network' {
+        Start-Bg -Label 'Resetting the network' {
+            $out = @()
+            foreach ($a in 'winsock reset', 'int ip reset', 'int ipv6 reset') { $r = Invoke-Native "$env:windir\System32\netsh.exe" $a 120; $out += "netsh $a`: exit $($r.Code)" }
+            [void](Invoke-Native "$env:windir\System32\ipconfig.exe" '/flushdns' 60)
+            $out -join '; '
+        } $null {
+            param($r)
+            Add-History 'Network' 'Winsock and TCP/IP' "reset ($(@($r)[0]))"; Update-History
+            if ((Show-Msg 'The network has been reset. Restart the PC now to finish?' 'YesNo' 'Question') -eq 'Yes') { Restart-Computer -Force }
+        }
+    }
+})
+$btnNetWifi.Add_Click({ Start-Process 'ms-settings:network-wifi' })
+$btnNetTrouble.Add_Click({ Start-Process 'ms-settings:troubleshoot' })
+
+# ===========================================================================
+# Right-click: entries that programs add to Explorer's right-click menu
+# ===========================================================================
+$pgCtx = New-Page 'Right-click' 'Entries other programs add to Explorer''s right-click menu (under "Show more options" on Windows 11). Leftovers of removed programs are pre-checked. Hiding an entry can be undone from History or with "Show checked".'
+$btnCtxHide = New-Button 'Hide checked'
+$btnCtxShow = New-Button 'Show checked'
+$btnCtxReload = New-Button 'Reload'
+$lvCtx = New-ListView $true @('Entry', 260, 'Shown on', 170, 'Made by', 170, 'State', 80, 'Details', 460)
+$lblCtx = New-Status
+Set-PageLayout $pgCtx $lvCtx @((New-ButtonBar @($btnCtxHide, $btnCtxShow, $btnCtxReload))) $lblCtx
+$ContextWork = {
+    $where = [ordered]@{ '*' = 'files'; 'AllFilesystemObjects' = 'files and folders'; 'Directory' = 'folders'; 'Directory\Background' = 'folder background'
+                         'Folder' = 'folders'; 'Drive' = 'drives'; 'DesktopBackground' = 'desktop' }
+    $builtin = '^(open|opennewwindow|opennewtab|opennewprocess|find|explore|print|printto|runas|runasuser|edit|properties|openas|pintohome|cmd|powershell|wsl|Windows\.\w+|UpdateEncryptionSettings\w*|AnyCode|Play|Enqueue|Shuffle)$'
+    $blocked = @{}
+    foreach ($h in 'HKLM', 'HKCU') { $k = Get-Item "${h}:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked" -ErrorAction SilentlyContinue; if ($k) { foreach ($n in $k.GetValueNames()) { $blocked[$n.ToUpper()] = $h } } }
+    $fileOf = { param($cmd) $c = [Environment]::ExpandEnvironmentVariables("$cmd").Trim()
+        if ($c -match '^"([^"]+)"') { $Matches[1] } elseif ($c -match '^(.+?\.(exe|dll|cmd|bat))\b') { $Matches[1] } else { ($c -split '\s')[0] } }
+    $maker = { param($f) if ($f -and (Test-Path -LiteralPath $f -ErrorAction SilentlyContinue)) { try { "$([Diagnostics.FileVersionInfo]::GetVersionInfo($f).CompanyName)".Trim() } catch { '' } } }
+    $dllOf = { param($clsid) foreach ($h in 'HKCU:\Software\Classes', 'HKLM:\SOFTWARE\Classes') { $d = (Get-ItemProperty "$h\CLSID\$clsid\InprocServer32" -ErrorAction SilentlyContinue).'(default)'; if ($d) { return [Environment]::ExpandEnvironmentVariables($d) } } }
+    $nameOf = { param($clsid) foreach ($h in 'HKCU:\Software\Classes', 'HKLM:\SOFTWARE\Classes') { $n = (Get-ItemProperty "$h\CLSID\$clsid" -ErrorAction SilentlyContinue).'(default)'; if ($n) { return $n } } }
+    $rows = @{}
+    foreach ($root in 'HKCU:\Software\Classes', 'HKLM:\SOFTWARE\Classes') {
+        $hive = if ($root -like 'HKCU*') { 'HKCU' } else { 'HKLM' }
+        foreach ($loc in $where.Keys) {
+            # Plain menu entries (verbs): hidden with a LegacyDisable value, which works per user too.
+            foreach ($v in Get-ChildItem -LiteralPath "$root\$loc\shell" -ErrorAction SilentlyContinue) {
+                $verb = $v.PSChildName
+                if ($verb -match $builtin) { continue }
+                $cmd = (Get-ItemProperty -LiteralPath "$($v.PSPath)\command" -ErrorAction SilentlyContinue).'(default)'
+                $file = if ($cmd) { & $fileOf $cmd } else { $clsid = (Get-ItemProperty -LiteralPath $v.PSPath -ErrorAction SilentlyContinue).ExplorerCommandHandler; if ($clsid) { & $dllOf $clsid } }
+                if (-not $file) { continue }
+                $co = & $maker $file
+                if ($co -match '^Microsoft' -and $file -match '\\Windows\\') { continue }
+                $label = "$((Get-ItemProperty -LiteralPath $v.PSPath -ErrorAction SilentlyContinue).MUIVerb)"; if (-not $label -or $label -match '^@') { $label = "$((Get-ItemProperty -LiteralPath $v.PSPath -ErrorAction SilentlyContinue).'(default)')" }
+                if (-not $label -or $label -match '^@') { $label = $verb }
+                $id = "verb|$loc|$verb"
+                $missing = -not (Test-Path -LiteralPath $file -ErrorAction SilentlyContinue)
+                $hidden = $null -ne (Get-ItemProperty -LiteralPath $v.PSPath -ErrorAction SilentlyContinue).LegacyDisable -or (Get-ItemProperty -LiteralPath "HKCU:\Software\Classes\$loc\shell\$verb" -ErrorAction SilentlyContinue).LegacyDisable -ne $null
+                if (-not $rows[$id]) {
+                    $rows[$id] = [pscustomobject]@{ Name = ($label -replace '&', ''); Where = @($where[$loc]); Maker = $co; Missing = $missing; Hidden = $hidden; File = $file
+                                                    Kind = 'verb'; Loc = $loc; Verb = $verb; Clsid = $null; Hive = $hive }
+                }
+            }
+            # Shell extensions (DLLs): hidden by putting their ID on Windows' "Blocked" list for this user.
+            foreach ($h in Get-ChildItem -LiteralPath "$root\$loc\shellex\ContextMenuHandlers" -ErrorAction SilentlyContinue) {
+                $clsid = "$((Get-ItemProperty -LiteralPath $h.PSPath -ErrorAction SilentlyContinue).'(default)')"
+                if ($clsid -notmatch '^\{[0-9A-Fa-f-]{36}\}$') { $clsid = $h.PSChildName }
+                if ($clsid -notmatch '^\{[0-9A-Fa-f-]{36}\}$') { continue }
+                $id = "ext|$($clsid.ToUpper())"
+                if ($rows[$id]) { if ($rows[$id].Where -notcontains $where[$loc]) { $rows[$id].Where += $where[$loc] }; continue }
+                $dll = & $dllOf $clsid
+                $co = & $maker $dll
+                if ($dll -and $co -match '^Microsoft' -and $dll -match '\\Windows\\') { continue }
+                $name = $h.PSChildName -replace '^\s+', ''
+                if ($name -match '^\{') { $n2 = & $nameOf $clsid; if ($n2) { $name = $n2 } }
+                if ($name -match '^\{' -and $dll -and (Test-Path -LiteralPath $dll)) { $n3 = try { [Diagnostics.FileVersionInfo]::GetVersionInfo($dll).FileDescription } catch { }; if ($n3) { $name = $n3 } elseif ($co) { $name = $co } }
+                $rows[$id] = [pscustomobject]@{ Name = $name; Where = @($where[$loc]); Maker = $co; Missing = (-not $dll -or -not (Test-Path -LiteralPath $dll -ErrorAction SilentlyContinue))
+                                                Hidden = [bool]$blocked[$clsid.ToUpper()]; File = $dll; Kind = 'ext'; Loc = $loc; Verb = $null; Clsid = $clsid.ToUpper(); Hive = $hive }
+            }
+        }
+    }
+    $rows.Values
+}
+function Update-Context {
+    $btnCtxReload.Enabled = $false
+    $lblCtx.Text = 'Reading the right-click menu...'
+    Start-Bg -Label 'Reading the right-click menu' $ContextWork $null {
+        param($rows)
+        $btnCtxReload.Enabled = $true
+        $lvCtx.BeginUpdate(); $lvCtx.Items.Clear()
+        foreach ($r in $rows | Sort-Object { -not $_.Missing }, { $_.Hidden }, Name) {
+            $state = if ($r.Hidden) { 'Hidden' } else { 'Shown' }
+            $detail = if ($r.Missing) { "leftover: the program is gone$(if ($r.File) { " ($($r.File))" })" } else { "$($r.File)" }
+            $it = Add-Row $lvCtx @($r.Name, (($r.Where | Select-Object -Unique | ForEach-Object { T $_ }) -join ', '), $(if ($r.Maker) { $r.Maker } else { '?' }), $state, $detail) $r ($r.Missing -and -not $r.Hidden)
+            $it.ForeColor = if ($r.Hidden) { $Theme.Muted } elseif ($r.Missing) { $Theme.Bad } else { $Theme.Text }
+        }
+        $lvCtx.EndUpdate()
+        $script:CtxLeftovers = @($rows | Where-Object { $_.Missing -and -not $_.Hidden }).Count
+        $lblCtx.Text = "$(@($rows).Count) entries from other programs; $($script:CtxLeftovers) leftover(s) of removed programs (pre-checked)."
+        if ($script:NavButtons) { Update-NavBadges }
+    }
+}
+function Set-ContextEntries([bool]$Hide) {
+    $picked = @($lvCtx.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { $_.Hidden -ne $Hide })
+    if (-not $picked) { Show-Msg $(if ($Hide) { 'Check one or more entries that are shown first.' } else { 'Check one or more hidden entries first.' }) | Out-Null; return }
+    $done = 0; $failed = @()
+    foreach ($r in $picked) {
+        try {
+            if ($r.Kind -eq 'verb') {
+                # A LegacyDisable value in the user's own copy of the key hides the entry, even when it is installed for all users.
+                $key = "HKCU:\Software\Classes\$($r.Loc)\shell\$($r.Verb)"
+                $created = -not (Test-Path -LiteralPath $key)
+                if ($Hide) { Set-RegValue $key 'LegacyDisable' '' 'String' } else {
+                    Remove-ItemProperty -LiteralPath $key -Name LegacyDisable -ErrorAction SilentlyContinue
+                    if ($r.Hive -eq 'HKLM') { Remove-ItemProperty -LiteralPath "HKLM:\SOFTWARE\Classes\$($r.Loc)\shell\$($r.Verb)" -Name LegacyDisable -ErrorAction SilentlyContinue }
+                }
+                Add-History 'Right-click' $r.Name $(if ($Hide) { 'hidden from the menu' } else { 'shown in the menu again' }) @{ Type = 'Reg'; Values = @(@{ P = $key; N = 'LegacyDisable'; Old = $(if ($Hide) { $null } else { '' }); T = 'String'; Created = ($Hide -and $created) }) }
+            } else {
+                $key = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked'
+                if ($Hide) { Set-RegValue $key $r.Clsid $r.Name 'String' } else {
+                    Remove-ItemProperty -LiteralPath $key -Name $r.Clsid -ErrorAction SilentlyContinue
+                    if ($IsAdmin) { Remove-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked' -Name $r.Clsid -ErrorAction SilentlyContinue }
+                }
+                Add-History 'Right-click' $r.Name $(if ($Hide) { 'hidden from the menu' } else { 'shown in the menu again' }) @{ Type = 'Reg'; Values = @(@{ P = $key; N = $r.Clsid; Old = $(if ($Hide) { $null } else { $r.Name }); T = 'String' }) }
+            }
+            $done++
+        } catch { $failed += "$($r.Name): $($_.Exception.Message)" }
+    }
+    Update-History; Update-Context
+    $msg = "$done entr(y/ies) $(if ($Hide) { 'hidden' } else { 'shown again' }). Undo from the History page."
+    if ($failed) { $msg += "`n`nCouldn't change: $($failed -join '; ')" }
+    Show-Msg $msg | Out-Null
+    if ((Show-Msg "Restart Explorer now so the menu updates?`n`nOpen File Explorer windows close; nothing else is affected." 'YesNo' 'Question') -eq 'Yes') {
+        Get-Process -Name explorer -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    }
+}
+$btnCtxHide.Add_Click({ Set-ContextEntries $true })
+$btnCtxShow.Add_Click({ Set-ContextEntries $false })
+$btnCtxReload.Add_Click({ Update-Context })
+
+# ===========================================================================
 # 7. Upgrades: what could be added or replaced, and the exact spec to buy
 # ===========================================================================
 $pgUpg = New-Page 'Upgrades' 'What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.'
@@ -3781,7 +5047,11 @@ $btnHistUndo.Add_Click({
                     $logs += , @('Undo', $e.Item, $(if ($u.Enable) { 'scheduled task switched back on' } else { 'scheduled task switched off again' }))
                 }
                 'Reg' {
-                    foreach ($v in @($u.Values)) { Set-RegValue $v.P $v.N $v.Old $v.T }
+                    foreach ($v in @($u.Values)) {
+                        Set-RegValue $v.P $v.N $v.Old $v.T
+                        $k = Get-Item -LiteralPath $v.P -ErrorAction SilentlyContinue
+                        if ($v.Created -and $k -and -not $k.GetValueNames().Count -and -not $k.SubKeyCount) { Remove-Item -LiteralPath $v.P -ErrorAction SilentlyContinue }
+                    }
                     $logs += , @('Undo', $e.Item, 'setting put back as it was')
                 }
                 'Store' {
@@ -4049,6 +5319,11 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T "Apps that start with Windows ($($startOn.Count) on)")</h2>$(ConvertTo-HtmlRows @('App', 'For', 'Advice') $startOn @(0, 1, 2))
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
+<h2>$(T 'Browsers')</h2>$(ConvertTo-HtmlRows @('Item', 'Browser', 'Kind', 'Status', 'Details') $lvBrw.Items @(0, 1, 2, 3, 4))
+<h2>$(T 'Network')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvNet.Items @(0, 1, 2, 3))
+$(if ($HasBattery) { "<h2>$(T 'Battery')</h2>$(ConvertTo-HtmlRows @('Reading', 'Value', 'What it means') $lvBatt.Items @(0, 1, 2))" })
+<h2>$(T 'Programs')</h2>$(ConvertTo-HtmlRows @('Program', 'Publisher', 'Size', 'Installed', 'Last used', 'Note') $lvProg.Items @(0, 1, 2, 3, 4, 5))
+<h2>$(T 'Right-click menu')</h2>$(ConvertTo-HtmlRows @('Entry', 'Shown on', 'Made by', 'State', 'Details') $lvCtx.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Drivers')</h2>$(ConvertTo-HtmlRows @('Device', 'Kind', 'Status', 'Driver', 'What to do') ($lvDrv.Items | Where-Object { $_.Tag.Level -ne 'OK' }) @(0, 1, 2, 3, 4))
 <h2>$(T 'Privacy')</h2>$(ConvertTo-HtmlRows @('Setting', 'State', 'What it does') $lvPriv.Items @(0, 1, 2))
 <h2>$(T 'Backup')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvBackup.Items @(0, 1, 2, 3))
@@ -4232,9 +5507,9 @@ $OldExeCleanupWork = {
 # ===========================================================================
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health') }
-    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Services', 'Tasks', 'Privacy', 'Disk') }
-    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Stability', 'Backup', 'Upgrades') }
-    @{ Title = 'MORE';     Pages = @('History', 'Settings') }
+    @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
+    @{ Title = $null;      Pages = @('History', 'Settings'); Bottom = $true }   # pinned under the list, side by side, so they never scroll away
 )
 $script:NavButtons = @{}
 function Show-Page($Page) {
@@ -4261,6 +5536,10 @@ function Update-NavBadges {
     Set-NavBadge 'Backup' $script:BackupProblems
     Set-NavBadge 'Drivers' $script:DriverIssues
     Set-NavBadge 'Privacy' $script:PrivacyOn
+    Set-NavBadge 'Browsers' $script:BrowserRisky
+    Set-NavBadge 'Network' $script:NetProblems
+    Set-NavBadge 'Right-click' $script:CtxLeftovers
+    Set-NavBadge 'Battery' $script:BatteryWorn
 }
 
 $nav = New-Object Windows.Forms.FlowLayoutPanel
@@ -4273,31 +5552,34 @@ $appVer = New-Object Windows.Forms.Label
 $appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.AutoSize = $true
 $appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 2)
 $nav.Controls.AddRange(@($appName, $appVer))
+$navBottom = New-Object Windows.Forms.FlowLayoutPanel
+$navBottom.Dock = 'Bottom'; $navBottom.AutoSize = $true; $navBottom.WrapContents = $false; $navBottom.Padding = New-Object Windows.Forms.Padding(12, 6, 12, 2)
 foreach ($g in $NavGroups) {
     if ($g.Title) {
         $cap = New-Object Windows.Forms.Label
         $cap.Text = $g.Title; $cap.Font = $FontSmall; $cap.ForeColor = $Theme.Dim; $cap.AutoSize = $true
-        $cap.Margin = New-Object Windows.Forms.Padding(10, 9, 0, 2)
+        $cap.Margin = New-Object Windows.Forms.Padding(10, 6, 0, 1)
         $nav.Controls.Add($cap)
     }
     foreach ($name in $g.Pages) {
         $page = $script:Pages | Where-Object Name -eq $name | Select-Object -First 1
         if (-not $page) { continue }
         $b = New-Object Windows.Forms.Button
-        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 30; $b.TextAlign = 'MiddleLeft'
+        $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 25; $b.TextAlign = 'MiddleLeft'
         $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
         $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
         $b.Cursor = [Windows.Forms.Cursors]::Hand
         $b.Add_Click({ Show-Page $this.Tag })
         $script:NavButtons[$name] = $b
-        $nav.Controls.Add($b)
+        if ($g.Bottom) { $b.Width = 89; $b.Padding = New-Object Windows.Forms.Padding(6, 0, 0, 0); $navBottom.Controls.Add($b) } else { $nav.Controls.Add($b) }
     }
 }
 $sidebar.Controls.Add($nav)
+$sidebar.Controls.Add($navBottom)
 if (-not $IsAdmin) {
     $adm = New-Object Windows.Forms.Panel
-    # Kept small: with 16 pages the sidebar needs the room.
-    $adm.Dock = 'Bottom'; $adm.Height = 82; $adm.Padding = New-Object Windows.Forms.Padding(16, 6, 14, 12)
+    # Kept small: with 20+ pages the sidebar needs the room.
+    $adm.Dock = 'Bottom'; $adm.Height = 74; $adm.Padding = New-Object Windows.Forms.Padding(16, 4, 14, 10)
     $admT = New-Object Windows.Forms.Label
     $admT.Text = 'Limited mode - some fixes need administrator rights.'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 30; $admT.Font = $FontSmall
     $admB = New-Button 'Restart as admin'
@@ -4313,7 +5595,7 @@ if (-not $IsAdmin) {
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -4353,7 +5635,8 @@ function Update-ActivityBar {
 # ---------------------------------------------------------------------------
 $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-Stability }; Bloatware = { Start-BloatScan }; Services = { Update-Services }
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
-                         Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy } }
+                         Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy }
+                         Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -4363,8 +5646,10 @@ function Invoke-PageLoader([string]$Name) {
 }
 function Start-Everything {
     Update-Health; Update-Startup; Update-History
+    $script:EverythingStarted = $true
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Updates', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Privacy', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Clean'))
+    if ($HasBattery) { [void]$script:LoadQueue.Insert(5, 'Battery') }
 }
 Enable-Translation $form
 Show-Page $pgHealth

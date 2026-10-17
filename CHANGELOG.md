@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0
+
+- New **Battery** page (laptops): how much charge the battery still holds, a graph of its wear since it was new, wear over the last year, time on a full charge, and where your PC maker hides the "stop charging at 80%" setting (Dell, Lenovo, HP, ASUS, Acer, MSI, Samsung, Surface, Razer, Framework). Links to battery use per app, the full battery report and a replacement search.
+- New **Browsers** page: extensions in Chrome, Edge, Brave, Vivaldi and Firefox with what they can do (read every website, change the search engine, proxy, ...) and whether they came from a store; the search engine, home page and start-up pages; and settings forced through browser "policies" on a home PC - a classic adware trick - which can be removed (with undo). Opens each browser's extensions or reset page.
+- New **Programs** page: every installed program with its size, install date and when you last opened it (from Windows' own record), sorted by size or last use; uninstall several in one go, and leftover folders go to the Recycle Bin.
+- New **Network** page: Wi-Fi signal and band (tips when a 5 GHz-capable card sits on 2.4 GHz), delays and lost packets to the router and the internet, DNS speed compared with Cloudflare and Google, Wi-Fi drops in the last 30 days and network-card errors; Flush DNS cache and Reset network.
+- New **Right-click** page: entries other programs add to Explorer's right-click menu, with leftovers of removed programs pre-checked; hide or show them again (with undo, no administrator needed).
+- **Disk** page: find large files (100 MB+) and duplicate files (compared by content) and move them to the Recycle Bin; one copy of each duplicate is always kept, and cloud-only OneDrive files are never opened.
+- **Health over time**: a score out of 100 saved every day (also by automatic maintenance), shown in a graph next to Windows' own stability rating.
+- History and Settings stay at the bottom of the sidebar, so every page fits.
+- How the exe could be code-signed: see `docs/SIGNING.md`.
 ## 1.8.0
 
 - **Automatic maintenance** (Settings): every week or every 4 weeks, PC Tune-Up cleans junk files and checks the PC by itself - only when the PC is idle, and catching up if it was off - then shows a notification ("Cleaned 1.2 GB. 2 things worth a look"); click it to open the app. It never changes startup apps, services or programs by itself. Uses a normal scheduled task for your account (no administrator needed); uninstalling removes it. Also available as `PC-TuneUp.exe /auto`.

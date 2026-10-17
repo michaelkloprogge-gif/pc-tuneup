@@ -25,7 +25,7 @@ $form.StartPosition = 'Manual'; $form.Location = New-Object Drawing.Point(-4000,
 foreach ($step in 'Update-Health', 'Update-Startup', 'Update-History') {
     $sw = [Diagnostics.Stopwatch]::StartNew(); & $step; Mark "ui  $step" $sw.ElapsedMilliseconds
 }
-Start-Everything; $script:LoadQueue.Clear(); [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Updates', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Privacy', 'Clean'))
+Start-Everything; $script:LoadQueue.Clear(); [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Clean'))
 # Longest freeze: the biggest gap between two passes through the message loop
 $gap = 0; $last = $script:Clock.ElapsedMilliseconds
 $deadline = (Get-Date).AddSeconds(__TIMEOUT__)

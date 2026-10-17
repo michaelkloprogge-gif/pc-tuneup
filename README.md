@@ -14,18 +14,23 @@ you can undo.
 
 | Page | |
 |---|---|
-| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once |
+| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once - plus a health score over time |
 | **Clean** | temp files, crash dumps, browser caches (Chrome, Edge, Brave, Firefox), Windows Update leftovers, old drivers, Windows.old |
 | **Startup** | stop apps from launching with Windows |
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |
+| **Programs** | every installed program with its size and when you last opened it; uninstall several in one go, leftover folders to the Recycle Bin |
 | **Services** | trim background services from PC makers, updaters and telemetry, with one-click restore |
 | **Tasks** | scheduled tasks from other companies (updaters, telemetry, promo helpers from Adobe, Google, Zoom, PC makers...) - switch them off with undo |
+| **Right-click** | entries other programs add to Explorer's right-click menu - leftovers of removed programs pre-checked; hide with undo |
 | **Privacy** | switch off Windows ads, tips and tracking (advertising ID, Start-menu ads, web results in search, lock-screen promos, optional diagnostic data...) with undo |
-| **Disk** | see which folders fill the drive |
+| **Disk** | see which folders fill the drive, and find large and duplicate files (they only go to the Recycle Bin when you say so; cloud-only OneDrive files are never touched) |
 | **Updates** | update outdated programs through winget; safe updates are pre-selected |
 | **Drivers** | devices with a problem (Device Manager error codes, explained) and the age of the drivers that matter most: graphics, network, audio, storage, BIOS |
 | **Security** | is Windows still supported, can it run Windows 11, are antivirus, firewall, encryption, Secure Boot and TPM on |
+| **Browsers** | extensions in Chrome, Edge, Brave, Vivaldi and Firefox, search engine, home page and settings forced by "policies" - the usual places adware hides |
 | **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with one-click fixes (turn off NVIDIA nView, repair Visual C++, reset Windows Update, repair system files, check the drive...) |
+| **Network** | Wi-Fi signal and band, delays to the router and the internet, DNS speed, dropped connections, flush DNS and network reset |
+| **Battery** | (laptops) how much charge the battery still holds, a graph of its wear over the years, runtime, and where your PC maker hides the 80% charge limit |
 | **Backup** | are Desktop, Documents and Pictures in OneDrive/Dropbox/iCloud, File History, backup programs and restore points - warns when nothing backs up your files |
 | **Upgrades** | which memory, drive and battery upgrades fit, the exact specification to buy, and whether it is worth it |
 | **History** | every change, with Undo |
@@ -47,7 +52,7 @@ install itself for you (Start menu, Settings > Apps; no administrator rights nee
 itself up to date. Without installing, the exe runs as-is from anywhere.
 
 Windows SmartScreen may warn the first time because the exe is not code-signed yet: click
-**More info > Run anyway**.
+**More info > Run anyway**. (How signing could be added: [docs/SIGNING.md](docs/SIGNING.md).)
 
 Some fixes (Windows' own files, services, restore points) need administrator rights: use
 **Restart as admin** in the app.

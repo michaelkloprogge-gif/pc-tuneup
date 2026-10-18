@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.3
+
+- **Turn off checked** (Tasks and Privacy) and **Apply checked fixes** (Gaming) now ask first and list what they will change, like the other pages do. Everything stays undoable from the History page.
+
 ## 1.16.2
 
 - Fixed: some buttons did nothing when clicked - **Keep list** and **Change log** in Settings, **Change log** on the History page, and **Fix this** for program updates in the simple view. They handed the click on to a button on another (hidden) page, which Windows ignores.

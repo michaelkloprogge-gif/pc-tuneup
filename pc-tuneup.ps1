@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.16.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.16.3'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,11 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+...and {0} more	...en nog {0}
+Switch off these {0} scheduled task(s)?	Deze {0} geplande ta(a)k(en) uitzetten?
+Turn off these {0} Windows setting(s)?	Deze {0} Windows-instelling(en) uitzetten?
+Apply these {0} fix(es)?	Deze {0} oplossing(en) toepassen?
+You can undo this on the History page.	Terugdraaien kan op de pagina Geschiedenis.
 Select a row in the list first, then click the button again.	Selecteer eerst een rij in de lijst en klik dan nog een keer op de knop.
 There is no setting to open for this row - see "What to do" below the list.	Voor deze rij is er geen instelling om te openen - zie "Wat te doen" onder de lijst.
 Advanced view	Geavanceerde weergave
@@ -4098,9 +4103,18 @@ function Update-Tasks {
         if ($script:NavButtons) { Update-NavBadges }
     }
 }
-function Set-Tasks([bool]$Enable) {
+# "Do this to these N things?" with the names listed (at most 12), for buttons that act on the checked rows.
+function Confirm-Checked([string]$Question, [string[]]$Names, [string]$After) {
+    $list = @($Names | Select-Object -First 12 | ForEach-Object { " - $_" })
+    if ($Names.Count -gt 12) { $list += (T '...and {0} more').Replace('{0}', "$($Names.Count - 12)") }
+    $q = (T $Question).Replace('{0}', "$($Names.Count)")
+    (Show-Msg ("$q`n`n" + ($list -join "`n") + "`n`n" + (T $After)) 'YesNo' 'Question') -eq 'Yes'
+}
+# -Ask: the button asks first (the simple view asks its own, plainer question before calling this).
+function Set-Tasks([bool]$Enable, [switch]$Ask) {
     $picked = @($lvTasks.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { ($_.State -eq 'Disabled') -eq $Enable })
     if (-not $picked) { Show-Msg $(if ($Enable) { 'Check one or more tasks that are off first.' } else { 'Check one or more tasks that are on first.' }) | Out-Null; return }
+    if ($Ask -and -not (Confirm-Checked 'Switch off these {0} scheduled task(s)?' @($picked | ForEach-Object { $_.Name }) 'The programs themselves keep working. You can undo this on the History page.')) { return }
     $done = 0; $denied = @()
     foreach ($t in $picked) {
         try {
@@ -4115,7 +4129,7 @@ function Set-Tasks([bool]$Enable) {
     if ($denied) { $msg += "`n`nThese need administrator rights (click ""Restart as admin""): $($denied -join ', ')" }
     Show-Msg $msg | Out-Null
 }
-$btnTaskOff.Add_Click({ Set-Tasks $false })
+$btnTaskOff.Add_Click({ Set-Tasks $false -Ask })
 $btnTaskOn.Add_Click({ Set-Tasks $true })
 $btnTaskScan.Add_Click({ Update-Tasks })
 $btnTaskOpen.Add_Click({ Start-Process taskschd.msc })
@@ -4320,9 +4334,10 @@ function Update-Privacy {
     $lblPriv.Text = if ($on) { "$on recommended setting(s) are still on. Grey rows are already off." } else { 'All recommended settings are off.' }
     if ($script:NavButtons) { Update-NavBadges }
 }
-function Set-Privacy([bool]$Off) {
+function Set-Privacy([bool]$Off, [switch]$Ask) {
     $picked = @($lvPriv.CheckedItems | ForEach-Object { $_.Tag })
     if (-not $picked) { Show-Msg 'Check one or more settings first.' | Out-Null; return }
+    if ($Ask -and -not (Confirm-Checked 'Turn off these {0} Windows setting(s)?' @($picked | ForEach-Object { T $_.Name }) 'Your files and programs are not touched. You can undo this on the History page.')) { return }
     $locked = @($picked | Where-Object { $_.Admin -and -not $IsAdmin })
     $picked = @($picked | Where-Object { -not ($_.Admin -and -not $IsAdmin) })
     $done = 0; $failed = @(); $explorer = $false
@@ -4351,7 +4366,7 @@ function Set-Privacy([bool]$Off) {
         Get-Process -Name explorer -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue   # Windows starts it again by itself
     }
 }
-$btnPrivOff.Add_Click({ Set-Privacy $true })
+$btnPrivOff.Add_Click({ Set-Privacy $true -Ask })
 $btnPrivOn.Add_Click({ Set-Privacy $false })
 $btnPrivReload.Add_Click({ Update-Privacy })
 $btnPrivOpen.Add_Click({ Start-Process 'ms-settings:privacy' })
@@ -5556,6 +5571,7 @@ $btnGameFix.Add_Click({
     $picked = @($lvGame.CheckedItems | ForEach-Object { $_.Tag } | Where-Object Fix)
     if (-not $picked) { Show-Msg 'Check one or more rows that have a fix first.' | Out-Null; return }
     if ((@($picked | Where-Object Fix -eq 'hags')) -and -not $IsAdmin) { Show-Msg 'Hardware-accelerated GPU scheduling needs administrator rights - click "Restart as admin" first, or uncheck it.' 'OK' 'Warning' | Out-Null; return }
+    if (-not (Confirm-Checked 'Apply these {0} fix(es)?' @($picked | ForEach-Object { T $_.Check }) 'You can undo this on the History page.')) { return }
     $done = @(); $restart = $false
     foreach ($g in $picked) {
         try {

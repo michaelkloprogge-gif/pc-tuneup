@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.15.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.16.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,12 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Advanced view	Geavanceerde weergave
+Show every page and tool. You can come back to this simple view at any time.	Toon elke pagina en elk hulpmiddel. Je kunt altijd terug naar deze eenvoudige weergave.
+Most can be fixed with one click - see the list below.	De meeste los je op met één klik - zie de lijst hieronder.
+Checking your PC - the list appears here in a moment.	Je pc wordt gecontroleerd - de lijst verschijnt hier zo.
+Back to the simple view	Terug naar de eenvoudige weergave
+Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. Advanced view shows every page.	De eenvoudige weergave toont één rustig scherm met drie grote knoppen en alleen veilige oplossingen - het beste voor de meeste mensen. De geavanceerde weergave toont elke pagina.
 Checking your PC...	Je pc wordt gecontroleerd...
 This takes about half a minute.	Dit duurt ongeveer een halve minuut.
 Make my PC faster	Maak mijn pc sneller
@@ -6059,8 +6065,8 @@ function Restart-App {
     $form.Close()
 }
 
-Add-SetSection 'View' 'Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. All tools shows every page.'
-$cmbView = New-Choice @('Simple view', 'All tools') @('simple', 'full') $Settings.View
+Add-SetSection 'View' 'Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. Advanced view shows every page.'
+$cmbView = New-Choice @('Simple view', 'Advanced view') @('simple', 'full') $Settings.View
 Add-SetRow @($cmbView)
 $cmbView.Add_SelectedIndexChanged({ $v = $this.Tag[$this.SelectedIndex]; if ($v -ne $Settings.View) { Set-ViewMode $v } })
 
@@ -6682,7 +6688,23 @@ $nav.Dock = 'Fill'; $nav.FlowDirection = 'TopDown'; $nav.WrapContents = $false; 
 $nav.Padding = New-Object Windows.Forms.Padding(12, 8, 12, 2)
 $appName = New-Object Windows.Forms.Label
 $appName.Text = 'PC Tune-Up'; $appName.Font = New-Object Drawing.Font('Segoe UI Semibold', 13); $appName.AutoSize = $true
-$appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0)
+$appName.Margin = New-Object Windows.Forms.Padding(6, 0, 0, 0); $appName.AutoSize = $false; $appName.Padding = New-Object Windows.Forms.Padding(4, 0, 0, 0); $appName.Dock = 'Fill'; $appName.TextAlign = 'MiddleLeft'
+# Next to the name: back to the simple view (an icon button, so it fits in every language).
+$appHead = New-Object Windows.Forms.Panel; $appHead.Width = 178; $appHead.Height = 26; $appHead.Margin = New-Object Windows.Forms.Padding(0)
+$btnToSimple = New-Object Windows.Forms.Button
+$btnToSimple.Dock = 'Right'; $btnToSimple.Width = 28; $btnToSimple.FlatStyle = 'Flat'; $btnToSimple.FlatAppearance.BorderSize = 0; $btnToSimple.UseVisualStyleBackColor = $false
+$btnToSimple.BackColor = $Theme.Side; $btnToSimple.Cursor = [Windows.Forms.Cursors]::Hand; $btnToSimple.AccessibleName = 'Simple view'
+$btnToSimple.Add_Paint({ param($s, $e)
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'; $g.Clear($Theme.Side)
+    if ($script:HotButton -eq $s) { $p = New-RoundRect 0.5 0.5 ($s.Width - 1.5) ($s.Height - 1.5) (Px 5); $br = New-Object Drawing.SolidBrush($Theme.Hover); $g.FillPath($br, $p); $br.Dispose(); $p.Dispose() }
+    [Windows.Forms.TextRenderer]::DrawText($g, [string][char]0xE80F, $IconFont, $s.ClientRectangle, $(if ($script:HotButton -eq $s) { $Theme.AccentText } else { $Theme.Dim }), 'VerticalCenter, HorizontalCenter, NoPrefix')
+    if ($s.Focused -and $s.ShowFocusCues) { $fp = New-RoundRect 1.5 1.5 ($s.Width - 3.5) ($s.Height - 3.5) (Px 4); $pen = New-Object Drawing.Pen($Theme.Accent); $pen.DashStyle = 'Dot'; $g.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose() }
+})
+$btnToSimple.Add_MouseEnter({ $script:HotButton = $this; $this.Invalidate(); $toSimpleTip.SetToolTip($this, (T 'Back to the simple view')) })
+$btnToSimple.Add_MouseLeave({ if ($script:HotButton -eq $this) { $script:HotButton = $null }; $this.Invalidate() })
+$btnToSimple.Add_Click({ Set-ViewMode 'simple' })
+$toSimpleTip = New-Object Windows.Forms.ToolTip
+$appHead.Controls.AddRange(@($appName, $btnToSimple))
 $appVer = New-Object Windows.Forms.Label
 $appVer.Text = "Version $AppVersion"; $appVer.ForeColor = $Theme.Dim; $appVer.AutoSize = $true
 $appVer.Margin = New-Object Windows.Forms.Padding(8, 0, 0, 2)
@@ -6702,7 +6724,7 @@ $txtSearch.Add_KeyDown({
     elseif ($_.KeyCode -eq 'Down' -and $lvFind.Items.Count) { [void]$lvFind.Focus(); $_.SuppressKeyPress = $true }
     elseif ($_.KeyCode -eq 'Escape') { $txtSearch.Clear(); Show-Page $pgHealth; $_.SuppressKeyPress = $true }
 })
-$nav.Controls.AddRange(@($appName, $txtSearch))
+$nav.Controls.AddRange(@($appHead, $txtSearch))
 # Keyboard: Ctrl+F searches, F5 reloads the page you are on.
 $form.KeyPreview = $true
 $form.Add_KeyDown({
@@ -6878,7 +6900,7 @@ function Start-Everything {
 }
 # ===========================================================================
 # Simple mode: one calm screen for people who don't want 23 pages - a status in plain words, three big buttons,
-# and only safe fixes that can be undone. "Show all tools" switches to the full app (Settings > View switches back).
+# and only safe fixes that can be undone. "Advanced view" switches to the full app (the house icon next to the name switches back).
 # ===========================================================================
 # Everything worth doing, most urgent first, for both "Start here" (full view) and simple mode.
 # Plain = one everyday sentence; Fix = a safe change with undo that simple mode may offer as "Fix this".
@@ -6911,101 +6933,259 @@ function Get-NextSteps {
 
 $SimpleFont = New-Object Drawing.Font('Segoe UI', 11)
 $SimpleBig = New-Object Drawing.Font('Segoe UI Semibold', 20)
+$SimpleTileFont = New-Object Drawing.Font('Segoe UI Semibold', 12)
+$SimpleIcon = New-Object Drawing.Font($IconFontName, 14)
+$SimpleIconBig = New-Object Drawing.Font($IconFontName, 24)
+# Panels that paint themselves (cards) would flicker while the window is resized without this.
+function Set-DoubleBuffered($Control) { try { $Control.GetType().GetProperty('DoubleBuffered', [Reflection.BindingFlags]'NonPublic, Instance').SetValue($Control, $true, $null) } catch { } }
+# A card: rounded, in its own BackColor, with a faint edge. Its children use the same BackColor.
+function Draw-Card($C, $G) {
+    $G.SmoothingMode = 'AntiAlias'; $G.Clear($C.Parent.BackColor)
+    $p = New-RoundRect 0.5 0.5 ($C.Width - 1.5) ($C.Height - 1.5) (Px 10)
+    $br = New-Object Drawing.SolidBrush($C.BackColor); $G.FillPath($br, $p); $br.Dispose()
+    $pen = New-Object Drawing.Pen($Theme.Hover); $G.DrawPath($pen, $p); $pen.Dispose(); $p.Dispose()
+}
+# An icon in a tinted circle, as used by the status card, the tiles and the rows.
+function Draw-IconDisc($G, [single]$X, [single]$Y, [single]$D, [int]$Glyph, $Color, $Font, [int]$Alpha = 38) {
+    $G.SmoothingMode = 'AntiAlias'
+    $br = New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb($Alpha, $Color)); $G.FillEllipse($br, $X, $Y, $D, $D); $br.Dispose()
+    $r = New-Object Drawing.Rectangle([int]$X, [int]$Y, [int]$D, [int]$D)
+    [Windows.Forms.TextRenderer]::DrawText($G, [string][char]$Glyph, $Font, $r, $Color, 'VerticalCenter, HorizontalCenter, NoPrefix')
+}
 $simple = New-Object Windows.Forms.Panel
 $simple.Dock = 'Fill'; $simple.BackColor = $Theme.Bg; $simple.Visible = $false; $simple.Font = $SimpleFont
 $sCol = New-Object Windows.Forms.Panel   # the centred column
-$sCol.Width = 820; $sCol.Height = 700; $sCol.Font = $SimpleFont
+$sCol.Width = 860; $sCol.Height = 700; $sCol.Font = $SimpleFont
 $simple.Controls.Add($sCol)
 $simple.Add_Resize({
     $w = [Math]::Min($sCol.Width, $simple.ClientSize.Width - 32)
     $sCol.Width = [Math]::Max(300, $w); $sCol.Left = [Math]::Max(16, ($simple.ClientSize.Width - $sCol.Width) / 2)
     $sCol.Top = 12; $sCol.Height = [Math]::Max(300, $simple.ClientSize.Height - 24)
 })
-# Top: name and "Show all tools"
-$sTop = New-Object Windows.Forms.Panel; $sTop.Dock = 'Top'; $sTop.Height = 44
-$sName = New-Object Windows.Forms.Label; $sName.Text = 'PC Tune-Up'; $sName.Font = $FontTitle; $sName.AutoSize = $true; $sName.Location = New-Object Drawing.Point(0, 4)
-$sAll = New-Object Windows.Forms.LinkLabel; $sAll.Text = 'Show all tools'; $sAll.AutoSize = $true; $sAll.Dock = 'Right'; $sAll.Padding = New-Object Windows.Forms.Padding(0, 12, 0, 0)
-$sAll.LinkColor = $Theme.AccentText; $sAll.ActiveLinkColor = $Theme.AccentText
-$sAll.Add_LinkClicked({ Set-ViewMode 'full' })
-$sTop.Controls.AddRange(@($sName, $sAll))
-# Status: a coloured circle and one sentence
-$sStatus = New-Object Windows.Forms.Panel; $sStatus.Dock = 'Top'; $sStatus.Height = 112; $sStatus.BackColor = $Theme.Soft; $sStatus.Padding = New-Object Windows.Forms.Padding(18, 14, 14, 14)
-$sDot = New-Object Windows.Forms.PictureBox; $sDot.Dock = 'Left'; $sDot.Width = 84; $sDot.BackColor = $Theme.Soft
-$script:SimpleColor = $Theme.Muted
-$sDot.Add_Paint({ param($s, $e) $e.Graphics.SmoothingMode = 'AntiAlias'; $d = [Math]::Min($s.Width, $s.Height) - 8
-    $br = New-Object Drawing.SolidBrush($script:SimpleColor); $e.Graphics.FillEllipse($br, 2, [int](($s.Height - $d) / 2), $d, $d); $br.Dispose() })
-$sText = New-Object Windows.Forms.Panel; $sText.Dock = 'Fill'; $sText.Padding = New-Object Windows.Forms.Padding(12, 6, 0, 0); $sText.BackColor = $Theme.Soft
-$sHead = New-Object Windows.Forms.Label; $sHead.Dock = 'Top'; $sHead.Height = 42; $sHead.Font = $SimpleBig; $sHead.Text = 'Checking your PC...'
+# Top: logo, name and the way to the advanced view
+$sTop = New-Object Windows.Forms.Panel; $sTop.Dock = 'Top'; $sTop.Height = 58
+$sLogo = New-Object Windows.Forms.PictureBox; $sLogo.Dock = 'Left'; $sLogo.Width = 40
+$sLogo.Add_Paint({ param($s, $e)
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'; $d = [single](Px 34); $y = [single](($s.Height - $d) / 2)
+    $p = New-RoundRect 0 $y $d $d (Px 9); $br = New-Object Drawing.SolidBrush($Theme.Accent); $g.FillPath($br, $p); $br.Dispose(); $p.Dispose()
+    $r = New-Object Drawing.Rectangle(0, [int]$y, [int]$d, [int]$d)
+    [Windows.Forms.TextRenderer]::DrawText($g, [string][char]0xE95E, $SimpleIcon, $r, [Drawing.Color]::White, 'VerticalCenter, HorizontalCenter, NoPrefix')
+})
+$sName = New-Object Windows.Forms.Label; $sName.Text = 'PC Tune-Up'; $sName.Font = $FontTitle; $sName.TextAlign = 'MiddleLeft'; $sName.Padding = New-Object Windows.Forms.Padding(6, 0, 0, 2); $sName.AutoEllipsis = $true
+$sAll = New-Button 'Advanced view'
+$sAll.Font = $FontBold; $sAll.MinimumSize = New-Object Drawing.Size(0, 38); $sAll.Padding = New-Object Windows.Forms.Padding(34, 0, 14, 0); $sAll.Margin = New-Object Windows.Forms.Padding(0)
+$sAll.BackColor = $Theme.AccentSoft; $sAll.ForeColor = $Theme.AccentText; $sAll.FlatAppearance.MouseOverBackColor = $Theme.Hover
+$sAll.Add_Paint({ param($s, $e)   # (after Draw-Button) the icon in front of the text
+    $r = New-Object Drawing.Rectangle([int]($s.Padding.Left - (Px 26)), 0, [int](Px 20), $s.Height)
+    [Windows.Forms.TextRenderer]::DrawText($e.Graphics, [string][char]0xE8A9, $IconFont, $r, $s.ForeColor, 'VerticalCenter, HorizontalCenter, NoPrefix')
+})
+$sAll.Add_Click({ Set-ViewMode 'full' })
+$sAllTip = New-Object Windows.Forms.ToolTip
+$sAll.Add_MouseEnter({ $sAllTip.SetToolTip($this, (T 'Show every page and tool. You can come back to this simple view at any time.')) })
+$sTop.Controls.AddRange(@($sName, $sLogo, $sAll))
+$sTop.Add_Layout({
+    $sAll.Left = $sTop.ClientSize.Width - $sAll.Width - 1; $sAll.Top = [int](($sTop.ClientSize.Height - $sAll.Height) / 2)
+    $sName.SetBounds($sLogo.Width, 0, [Math]::Max(10, $sAll.Left - $sLogo.Width - 8), $sTop.ClientSize.Height)
+})
+$sAll.Add_SizeChanged({ $sTop.PerformLayout() })
+# Status: a ring in the status colour with an icon, a headline and one sentence
+$sStatus = New-Object Windows.Forms.Panel; $sStatus.Dock = 'Top'; $sStatus.Height = 136; $sStatus.BackColor = $Theme.Soft; $sStatus.Padding = New-Object Windows.Forms.Padding(22, 16, 18, 16)
+Set-DoubleBuffered $sStatus
+$sStatus.Add_Paint({ param($s, $e) Draw-Card $s $e.Graphics })
+$sDot = New-Object Windows.Forms.PictureBox; $sDot.Dock = 'Left'; $sDot.Width = 104; $sDot.BackColor = $Theme.Soft
+$script:SimpleColor = $Theme.Muted; $script:SimpleGlyph = 0xE721; $script:SimpleBusy = $true; $script:SimpleSpin = 0.0
+$sDot.Add_Paint({ param($s, $e)
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'
+    $pw = [single](Px 7); $d = [single]([Math]::Min($s.Width, $s.Height) - $pw - (Px 4)); $x = [single](($s.Width - $d) / 2); $y = [single](($s.Height - $d) / 2)
+    $c = $script:SimpleColor
+    $br = New-Object Drawing.SolidBrush([Drawing.Color]::FromArgb(22, $c)); $g.FillEllipse($br, $x, $y, $d, $d); $br.Dispose()
+    $pen = New-Object Drawing.Pen([Drawing.Color]::FromArgb(50, $c), $pw); $g.DrawEllipse($pen, $x, $y, $d, $d); $pen.Dispose()
+    $pen = New-Object Drawing.Pen($c, $pw); $pen.StartCap = 'Round'; $pen.EndCap = 'Round'
+    if ($script:SimpleBusy) { $g.DrawArc($pen, $x, $y, $d, $d, [single]$script:SimpleSpin, [single]100) } else { $g.DrawEllipse($pen, $x, $y, $d, $d) }
+    $pen.Dispose()
+    $r = New-Object Drawing.Rectangle(0, 0, $s.Width, $s.Height)
+    [Windows.Forms.TextRenderer]::DrawText($g, [string][char]$script:SimpleGlyph, $SimpleIconBig, $r, $c, 'VerticalCenter, HorizontalCenter, NoPrefix')
+})
+$sText = New-Object Windows.Forms.Panel; $sText.Dock = 'Fill'; $sText.Padding = New-Object Windows.Forms.Padding(18, 10, 0, 0); $sText.BackColor = $Theme.Soft
+$sHead = New-Object Windows.Forms.Label; $sHead.Dock = 'Top'; $sHead.Height = 46; $sHead.Font = $SimpleBig; $sHead.Text = 'Checking your PC...'; $sHead.AutoEllipsis = $true
 $sSub = New-Object Windows.Forms.Label; $sSub.Dock = 'Fill'; $sSub.ForeColor = $Theme.Dim; $sSub.Text = 'This takes about half a minute.'
 $sText.Controls.AddRange(@($sSub, $sHead)); $sStatus.Controls.AddRange(@($sText, $sDot))
-# Three big buttons
-$sTiles = New-Object Windows.Forms.TableLayoutPanel; $sTiles.Dock = 'Top'; $sTiles.Height = 118; $sTiles.ColumnCount = 3; $sTiles.Padding = New-Object Windows.Forms.Padding(0, 14, 0, 6)
+# While checking, the ring turns; when the last check is done the status updates by itself.
+$sSpin = New-Object Windows.Forms.Timer; $sSpin.Interval = 40
+$sSpin.Add_Tick({
+    if ($Settings.View -ne 'simple') { return }
+    $y = -$sList.AutoScrollPosition.Y; if ($y -ne $script:SimpleScrollY) { $script:SimpleScrollY = $y; $sBar.Invalidate() }   # follow the mouse wheel
+    if (-not $script:SimpleBusy) { return }
+    $script:SimpleSpin = ($script:SimpleSpin + 8) % 360; $sDot.Invalidate()
+    if (-not ($script:Jobs.Count -or $script:LoadQueue.Count -or -not $script:EverythingStarted)) { Update-SimpleView }
+})
+$sSpin.Start()
+# Three big tiles: an icon, a title and one line about what it does
+$sTiles = New-Object Windows.Forms.TableLayoutPanel; $sTiles.Dock = 'Top'; $sTiles.Height = 176; $sTiles.ColumnCount = 3; $sTiles.Padding = New-Object Windows.Forms.Padding(0, 16, 0, 4)
 foreach ($k in 1..3) { [void]$sTiles.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 33.3))) }
-function New-Tile([string]$Text) {
-    $b = New-Button $Text; $b.AutoSize = $false; $b.Dock = 'Fill'; $b.Margin = New-Object Windows.Forms.Padding(0, 0, 10, 0); $b.Font = $SimpleFont
-    $b.TextAlign = 'MiddleLeft'; $b.Padding = New-Object Windows.Forms.Padding(14, 0, 8, 0); $b
+$script:SimpleTab = 'check'
+function Draw-SimpleTile($B, $G) {
+    $G.SmoothingMode = 'AntiAlias'; $G.Clear($B.Parent.BackColor)
+    $primary = $B.Name -eq 'fast'; $hot = $script:HotButton -eq $B; $sel = $script:SimpleTab -eq $B.Name
+    $fill = if ($primary) { if ($hot) { $Theme.AccentDark } else { $Theme.Accent } } elseif ($sel) { $Theme.AccentSoft } elseif ($hot) { $Theme.Hover } else { $Theme.Soft }
+    $p = New-RoundRect 0.5 0.5 ($B.Width - 1.5) ($B.Height - 1.5) (Px 12)
+    $br = New-Object Drawing.SolidBrush($fill); $G.FillPath($br, $p); $br.Dispose()
+    if (-not $primary) { $pen = New-Object Drawing.Pen($(if ($sel) { $Theme.Accent } else { $Theme.Hover }), [single]$(if ($sel) { Px 2 } else { 1 })); $G.DrawPath($pen, $p); $pen.Dispose() }
+    $p.Dispose()
+    $fore = if ($primary) { [Drawing.Color]::White } else { $Theme.Text }
+    $iconC = if ($primary) { [Drawing.Color]::White } else { $Theme.AccentText }
+    $pad = [int](Px 18); $d = [single](Px 42)
+    Draw-IconDisc $G $pad $pad $d ([int]$B.Tag) $iconC $SimpleIcon $(if ($primary) { 60 } else { 34 })
+    $lines = @("$($B.Text)" -split "\r?\n", 2 | ForEach-Object { $_.Trim() })
+    $w = $B.Width - 2 * $pad
+    $ty = $pad + [int]$d + [int](Px 12)
+    $th = [Windows.Forms.TextRenderer]::MeasureText($G, $lines[0], $SimpleTileFont, (New-Object Drawing.Size($w, 999)), 'WordBreak, NoPrefix').Height
+    [Windows.Forms.TextRenderer]::DrawText($G, $lines[0], $SimpleTileFont, (New-Object Drawing.Rectangle($pad, $ty, $w, $th)), $fore, 'WordBreak, NoPrefix')
+    if ($lines.Count -gt 1) {
+        $dc = if ($primary) { [Drawing.Color]::FromArgb(225, 255, 255, 255) } else { $Theme.Dim }
+        [Windows.Forms.TextRenderer]::DrawText($G, $lines[1], $Font, (New-Object Drawing.Rectangle($pad, ($ty + $th + [int](Px 2)), $w, ($B.Height - $ty - $th - $pad / 2))), $dc, 'WordBreak, EndEllipsis, NoPrefix')
+    }
+    if ($B.Focused -and $B.ShowFocusCues) {
+        $fp = New-RoundRect 3.5 3.5 ($B.Width - 7.5) ($B.Height - 7.5) (Px 9)
+        $pen = New-Object Drawing.Pen($(if ($primary) { [Drawing.Color]::White } else { $Theme.Accent })); $pen.DashStyle = 'Dot'; $G.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose()
+    }
 }
-$sFast = New-Tile "Make my PC faster`nRemoves leftover files and stops apps you don't need"
-$sCheck = New-Tile "Check for problems`nShows what could be better, in plain words"
-$sHelp = New-Tile "Get help`nSend a report to someone who helps you"
-Set-Primary $sFast
+function New-Tile([string]$Text, [int]$Icon, [string]$Key) {
+    $b = New-Object Windows.Forms.Button
+    $b.Text = $Text; $b.Name = $Key; $b.Tag = $Icon; $b.Dock = 'Fill'; $b.Margin = New-Object Windows.Forms.Padding(0, 0, 14, 0)
+    $b.FlatStyle = 'Flat'; $b.FlatAppearance.BorderSize = 0; $b.UseVisualStyleBackColor = $false; $b.BackColor = $Theme.Bg; $b.Cursor = [Windows.Forms.Cursors]::Hand
+    $b.Add_Paint({ param($sender, $e) Draw-SimpleTile $sender $e.Graphics })
+    $b.Add_MouseEnter({ $script:HotButton = $this; $this.Invalidate() })
+    $b.Add_MouseLeave({ if ($script:HotButton -eq $this) { $script:HotButton = $null }; $this.Invalidate() })
+    $b.Add_GotFocus({ $this.Invalidate() }); $b.Add_LostFocus({ $this.Invalidate() })
+    $b
+}
+$sFast = New-Tile "Make my PC faster`nRemoves leftover files and stops apps you don't need" 0xE945 'fast'
+$sCheck = New-Tile "Check for problems`nShows what could be better, in plain words" 0xE9D9 'check'
+$sHelp = New-Tile "Get help`nSend a report to someone who helps you" 0xE897 'help'
+$sHelp.Margin = New-Object Windows.Forms.Padding(0)
 $sTiles.Controls.Add($sFast, 0, 0); $sTiles.Controls.Add($sCheck, 1, 0); $sTiles.Controls.Add($sHelp, 2, 0)
-# Below: what the last button showed
-$sArea = New-Object Windows.Forms.Panel; $sArea.Dock = 'Fill'; $sArea.Padding = New-Object Windows.Forms.Padding(0, 10, 0, 0)
-$sAreaHead = New-Object Windows.Forms.Label; $sAreaHead.Dock = 'Top'; $sAreaHead.Height = 34; $sAreaHead.Font = $FontBold
-$sList = New-Object Windows.Forms.FlowLayoutPanel; $sList.Dock = 'Fill'; $sList.FlowDirection = 'TopDown'; $sList.WrapContents = $false; $sList.AutoScroll = $true
-$sArea.Controls.AddRange(@($sList, $sAreaHead))
+# Below: what the last tile showed
+$sArea = New-Object Windows.Forms.Panel; $sArea.Dock = 'Fill'; $sArea.Padding = New-Object Windows.Forms.Padding(0, 14, 0, 0)
+$sAreaHead = New-Object Windows.Forms.Label; $sAreaHead.Dock = 'Top'; $sAreaHead.Height = 38; $sAreaHead.Font = $SimpleTileFont
+$sList = New-Object Windows.Forms.FlowLayoutPanel; $sList.FlowDirection = 'TopDown'; $sList.WrapContents = $false; $sList.AutoScroll = $true
+# Windows' own scroll bar can't be made dark on a panel like this, so it is pushed just outside the visible area
+# and a slim one in the theme's colours is drawn instead (the mouse wheel and dragging work as usual).
+$sClip = New-Object Windows.Forms.Panel; $sClip.Dock = 'Fill'
+$sBar = New-Object Windows.Forms.PictureBox; $sBar.BackColor = $Theme.Bg; $sBar.Cursor = [Windows.Forms.Cursors]::Hand
+$sClip.Controls.AddRange(@($sBar, $sList))
+function Get-SimpleScroll {
+    $view = $sList.ClientSize.Height; $total = $sList.DisplayRectangle.Height
+    if ($total -le $view + 1) { return $null }
+    $h = $sBar.Height; $thumb = [Math]::Max([double](Px 36), [double]$h * $view / $total)
+    @{ View = $view; Total = $total; Thumb = $thumb; Track = [double]($h - $thumb); Pos = [double](-$sList.AutoScrollPosition.Y) }
+}
+$sBar.Add_Paint({ param($s, $e)
+    $k = Get-SimpleScroll; if (-not $k) { return }
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'
+    $y = $k.Track * $k.Pos / [Math]::Max(1.0, [double]($k.Total - $k.View)); $w = [single](Px 6); $x = [single](($s.Width - $w) / 2)
+    $p = New-RoundRect $x ([single]$y) $w ([single]$k.Thumb) ($w / 2)
+    $br = New-Object Drawing.SolidBrush($(if ($script:SimpleBarHot) { $Theme.Dim } else { $Theme.Border })); $g.FillPath($br, $p); $br.Dispose(); $p.Dispose()
+})
+$sBar.Add_MouseEnter({ $script:SimpleBarHot = $true; $sBar.Invalidate() })
+$sBar.Add_MouseLeave({ $script:SimpleBarHot = $false; $sBar.Invalidate() })
+$sBar.Add_MouseDown({ Move-SimpleScroll $_.Y }); $sBar.Add_MouseMove({ if ($_.Button -eq 'Left') { Move-SimpleScroll $_.Y } })
+function Move-SimpleScroll([int]$Y) {
+    $k = Get-SimpleScroll; if (-not $k) { return }
+    $f = [Math]::Min(1.0, [Math]::Max(0.0, ($Y - $k.Thumb / 2) / [Math]::Max(1.0, $k.Track)))
+    $sList.AutoScrollPosition = New-Object Drawing.Point(0, [int]($f * ($k.Total - $k.View))); $sBar.Invalidate()
+}
+function Resize-SimpleList {
+    $w = $sClip.ClientSize.Width; $h = $sClip.ClientSize.Height
+    $sList.SetBounds(0, 0, $w + [Windows.Forms.SystemInformation]::VerticalScrollBarWidth, $h)
+    $sBar.SetBounds($w - (Px 10), 0, (Px 10), $h)
+    foreach ($r in $sList.Controls) { $r.Width = $w - (Px 18) }
+    $sBar.Invalidate()
+}
+$sClip.Add_Resize({ Resize-SimpleList })
+$sList.Add_Layout({ $sBar.Invalidate() })
+$sArea.Controls.AddRange(@($sClip, $sAreaHead))
 $sCol.Controls.AddRange(@($sArea, $sTiles, $sStatus, $sTop))
 $form.Controls.Add($simple); $simple.BringToFront()
 
-# One row in the list: a sentence and (maybe) a button. Made at run time, so texts are translated here.
-function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $Tag) {
+# One row in the list: an icon, a sentence and (maybe) a button. Made at run time, so texts are translated here.
+# Tone picks the icon's colour: Accent (can be fixed), Bad (needs attention), Good, or Muted.
+function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $Tag, [int]$Icon = 0xE946, [string]$Tone = 'Accent') {
     $row = New-Object Windows.Forms.Panel
-    $row.Width = $sList.ClientSize.Width - (Px 24); $row.Height = (Px 62); $row.Margin = New-Object Windows.Forms.Padding(0, 0, 0, (Px 6)); $row.BackColor = $Theme.Soft
-    $row.Padding = New-Object Windows.Forms.Padding((Px 14), (Px 8), (Px 10), (Px 8))
+    $row.Width = $sClip.ClientSize.Width - (Px 18); $row.Height = (Px 70); $row.Margin = New-Object Windows.Forms.Padding(0, 0, 0, (Px 8)); $row.BackColor = $Theme.Soft
+    $row.Padding = New-Object Windows.Forms.Padding((Px 14), (Px 13), (Px 14), (Px 13))
+    Set-DoubleBuffered $row
+    $row.Add_Paint({ param($s, $e) Draw-Card $s $e.Graphics })
+    $ic = New-Object Windows.Forms.PictureBox; $ic.Dock = 'Left'; $ic.Width = (Px 44); $ic.BackColor = $Theme.Soft
+    $ic.Tag = @{ Glyph = $Icon; Color = $(if ($Tone -eq 'Accent') { $Theme.AccentText } else { $Theme[$Tone] }) }
+    $ic.Add_Paint({ param($s, $e) $d = [single](Px 40); Draw-IconDisc $e.Graphics 0 (($s.Height - $d) / 2) $d $s.Tag.Glyph $s.Tag.Color $IconFont })
     $l = New-Object Windows.Forms.Label; $l.Dock = 'Fill'; $l.Text = T $Text; $l.TextAlign = 'MiddleLeft'; $l.AutoEllipsis = $true; $l.BackColor = $Theme.Soft
+    $l.Padding = New-Object Windows.Forms.Padding((Px 10), 0, (Px 10), 0)
     if ($Button) {
-        $b = New-Button (T $Button); $b.Dock = 'Right'; $b.AutoSize = $false; $b.Width = (Px 150); $b.Margin = New-Object Windows.Forms.Padding(0); $b.Tag = $Tag
+        $b = New-Button (T $Button); $b.Dock = 'Right'; $b.AutoSize = $false; $b.Margin = New-Object Windows.Forms.Padding(0); $b.Tag = $Tag
+        # As wide as the (translated) text needs, at least 150 - measured in bold, as "Fix this" is a primary button.
+        $b.Width = [Math]::Max((Px 150), [Windows.Forms.TextRenderer]::MeasureText($b.Text, $FontBold).Width + (Px 36))
         $b.Add_Click($OnClick); $row.Controls.Add($b)
         if ($Button -eq 'Fix this') { Set-Primary $b }
     }
-    $row.Controls.Add($l); $l.BringToFront()
+    $row.Controls.Add($ic); $row.Controls.Add($l); $l.BringToFront()
     $sList.Controls.Add($row)
 }
-$sList.Add_Resize({ foreach ($r in $sList.Controls) { $r.Width = $sList.ClientSize.Width - (Px 24) } })
+# All buttons in the list as wide as the widest, so they line up.
+function Set-SimpleButtonWidths {
+    $btns = @($sList.Controls | ForEach-Object { $_.Controls } | Where-Object { $_ -is [Windows.Forms.Button] })
+    if ($btns) { $w = ($btns | Measure-Object Width -Maximum).Maximum; foreach ($b in $btns) { $b.Width = $w } }
+}
+function Set-SimpleTab([string]$Tab) {
+    if ($script:SimpleTab -eq $Tab) { return }
+    $script:SimpleTab = $Tab; $script:SimpleSig = $null; foreach ($t in @($sFast, $sCheck, $sHelp)) { $t.Invalidate() }
+}
 function Show-SimpleProblems {
-    $sList.SuspendLayout(); $sList.Controls.Clear()
+    Set-SimpleTab 'check'
     $steps = @(Get-NextSteps)
-    $sAreaHead.Text = if ($steps) { T 'What could be better' } else { T 'Nothing to do' }
-    if (-not $steps) { Add-SimpleRow 'Everything looks fine. PC Tune-Up checks again next time you open it.' $null $null $null }
-    foreach ($s in $steps) {
-        if ($s.Fix) { Add-SimpleRow $s.Plain 'Fix this' { Invoke-SimpleFix $this.Tag } $s }
-        else { Add-SimpleRow $s.Plain 'Show me' { Set-ViewMode 'full'; Show-Page $this.Tag.Page } $s }
+    $busy = $script:Jobs.Count -or $script:LoadQueue.Count -or -not $script:EverythingStarted
+    # Rebuild only when something changed, so the list doesn't flicker each time a check finishes.
+    $sig = "$busy|" + (($steps | ForEach-Object { "$($_.Plain)|$($_.Fix)" }) -join '||')
+    if ($sig -eq $script:SimpleSig -and $sList.Controls.Count) { return }
+    $sList.SuspendLayout(); $sList.Controls.Clear()
+    $sAreaHead.Text = if ($steps) { T 'What could be better' } elseif ($busy) { T 'Checking your PC...' } else { T 'Nothing to do' }
+    if (-not $steps) {
+        if ($busy) { Add-SimpleRow 'Checking your PC - the list appears here in a moment.' $null $null $null 0xE721 'Muted' }
+        else { Add-SimpleRow 'Everything looks fine. PC Tune-Up checks again next time you open it.' $null $null $null 0xE73E 'Good' }
     }
-    $sList.ResumeLayout()
+    foreach ($s in $steps) {
+        $glyph = if ($s.Page -and $NavIcons[$s.Page.Name]) { $NavIcons[$s.Page.Name] } else { 0xE946 }
+        $tone = if ($s.P -le 35) { 'Bad' } else { 'Accent' }
+        if ($s.Fix) { Add-SimpleRow $s.Plain 'Fix this' { Invoke-SimpleFix $this.Tag } $s $glyph $tone }
+        else { Add-SimpleRow $s.Plain 'Show me' { Set-ViewMode 'full'; Show-Page $this.Tag.Page } $s $glyph $tone }
+    }
+    Set-SimpleButtonWidths; $sList.ResumeLayout()
+    $script:SimpleSig = $sig
 }
 function Show-SimpleHelp {
+    Set-SimpleTab 'help'
     $sList.SuspendLayout(); $sList.Controls.Clear()
     $sAreaHead.Text = T 'Get help'
-    Add-SimpleRow 'Send a report about this PC to a family member or friend who helps you - by email, with the report attached.' 'Send by email' { Send-HelperReport } $null
-    Add-SimpleRow 'Copy a short summary to paste into WhatsApp, a text message or a chat.' 'Copy summary' { Copy-PlainSummary } $null
-    Add-SimpleRow 'Something in PC Tune-Up itself not working? Tell the people who make it.' 'Report a problem' { Open-ProblemReport 'bug' } $null
-    Add-SimpleRow 'See the short introduction again.' 'Show the tour' { Show-Tour } $null
-    $sList.ResumeLayout()
+    Add-SimpleRow 'Send a report about this PC to a family member or friend who helps you - by email, with the report attached.' 'Send by email' { Send-HelperReport } $null 0xE715
+    Add-SimpleRow 'Copy a short summary to paste into WhatsApp, a text message or a chat.' 'Copy summary' { Copy-PlainSummary } $null 0xE8C8
+    Add-SimpleRow 'Something in PC Tune-Up itself not working? Tell the people who make it.' 'Report a problem' { Open-ProblemReport 'bug' } $null 0xED15
+    Add-SimpleRow 'See the short introduction again.' 'Show the tour' { Show-Tour } $null 0xE7BE
+    Set-SimpleButtonWidths; $sList.ResumeLayout()
 }
 # The big status: red when something needs attention, orange when things could be better, green when all is well.
 function Update-SimpleView {
     if ($Settings.View -ne 'simple') { return }   # (not .Visible: that is false while the window itself is hidden)
     $steps = @(Get-NextSteps)
-    $busy = $script:Jobs.Count -or $script:LoadQueue.Count -or -not $script:EverythingStarted
+    $busy = [bool]($script:Jobs.Count -or $script:LoadQueue.Count -or -not $script:EverythingStarted)
     $urgent = @($steps | Where-Object { $_.P -le 35 })
-    if ($urgent) { $script:SimpleColor = $Theme.Bad; $sHead.Text = T 'Something needs attention'; $sSub.Text = T $urgent[0].Plain }
-    elseif ($steps) { $script:SimpleColor = $Theme.Warn; $sHead.Text = (T '{0} thing(s) could be better').Replace('{0}', "$($steps.Count)"); $sSub.Text = T 'Click "Check for problems" to see them - most can be fixed with one click.' }
-    elseif ($busy) { $script:SimpleColor = $Theme.Muted; $sHead.Text = T 'Checking your PC...'; $sSub.Text = T 'This takes about half a minute.' }
-    else { $script:SimpleColor = $Theme.Good; $sHead.Text = T 'Your PC is in good shape'; $sSub.Text = T 'Nothing needs doing right now.' }
+    if ($urgent) { $script:SimpleColor = $Theme.Bad; $script:SimpleGlyph = 0xE7BA; $sHead.Text = T 'Something needs attention'; $sSub.Text = T $urgent[0].Plain }
+    elseif ($steps) { $script:SimpleColor = $Theme.Warn; $script:SimpleGlyph = 0xE82F; $sHead.Text = (T '{0} thing(s) could be better').Replace('{0}', "$($steps.Count)"); $sSub.Text = T 'Most can be fixed with one click - see the list below.' }
+    elseif ($busy) { $script:SimpleColor = $Theme.Accent; $script:SimpleGlyph = 0xE721; $sHead.Text = T 'Checking your PC...'; $sSub.Text = T 'This takes about half a minute.' }
+    else { $script:SimpleColor = $Theme.Good; $script:SimpleGlyph = 0xE73E; $sHead.Text = T 'Your PC is in good shape'; $sSub.Text = T 'Nothing needs doing right now.' }
     if ($busy -and ($steps -or $urgent)) { $sSub.Text += '  ' + (T '(Still checking...)') }
+    $script:SimpleBusy = $busy
     $sDot.Invalidate()
-    if ($sAreaHead.Text -eq (T 'What could be better') -or $sAreaHead.Text -eq (T 'Nothing to do')) { Show-SimpleProblems }   # keep the open list current
+    if ($script:SimpleTab -eq 'check') { Show-SimpleProblems }   # keep the open list current
 }
 # Safe fixes, each with a plain question first. All of them can be undone from History.
 function Invoke-SimpleFix($Step) {

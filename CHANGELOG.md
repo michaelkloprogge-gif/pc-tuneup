@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.0
+
+- **A fresh look for the simple view**: a status ring with an icon (it turns while the PC is being checked), three tiles with an icon each, and rounded cards for every item with an icon that shows what it is about. The list of things that could be better now shows straight away, and it no longer flickers while checks finish.
+- **Advanced view button**: the simple view has a clear "Advanced view" button at the top right. In the advanced view, the house icon next to the name goes back to the simple view. (Settings calls the two views "Simple view" and "Advanced view".)
+- A slim scroll bar in the app's colours in the simple view, also in dark mode. Buttons are as wide as their text, so longer translations are no longer cut off.
+
 ## 1.15.1
 
 - Dark mode: the empty end of every list header (above the scroll bar) is dark now too, instead of a light grey strip.

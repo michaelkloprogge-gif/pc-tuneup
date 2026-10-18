@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.1
+
+- Fixed: in a maximized window the simple view was squeezed into a narrow strip in the middle. It now uses the width of the window (up to a comfortable reading width).
+- In a normal-sized window the simple view is more compact (a lower status card, tiles with the icon beside the text), so more of the list fits.
+- French: the advanced view is called "Affichage avancé", to match "Affichage simple".
+
 ## 1.16.0
 
 - **A fresh look for the simple view**: a status ring with an icon (it turns while the PC is being checked), three tiles with an icon each, and rounded cards for every item with an icon that shows what it is about. The list of things that could be better now shows straight away, and it no longer flickers while checks finish.

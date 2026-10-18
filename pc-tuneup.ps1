@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.16.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.16.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -6957,11 +6957,27 @@ $simple.Dock = 'Fill'; $simple.BackColor = $Theme.Bg; $simple.Visible = $false; 
 $sCol = New-Object Windows.Forms.Panel   # the centred column
 $sCol.Width = 860; $sCol.Height = 700; $sCol.Font = $SimpleFont
 $simple.Controls.Add($sCol)
-$simple.Add_Resize({
-    $w = [Math]::Min($sCol.Width, $simple.ClientSize.Width - 32)
-    $sCol.Width = [Math]::Max(300, $w); $sCol.Left = [Math]::Max(16, ($simple.ClientSize.Width - $sCol.Width) / 2)
-    $sCol.Top = 12; $sCol.Height = [Math]::Max(300, $simple.ClientSize.Height - 24)
-})
+# The column takes the window's width up to a comfortable reading width, and is worked out again from the window
+# every time (not from its own last width: the window is tiny for a moment while it opens, and a maximized window
+# then kept a narrow column).
+function Resize-SimpleColumn {
+    $cw = $simple.ClientSize.Width; $ch = $simple.ClientSize.Height
+    if ($cw -le 0 -or $ch -le 0) { return }
+    $sCol.Width = [int][Math]::Max([double](Px 360), [Math]::Min([double](Px 960), [double]($cw - (Px 48))))
+    $sCol.Left = [int][Math]::Max([double](Px 16), ($cw - $sCol.Width) / 2)
+    $sCol.Top = Px 12; $sCol.Height = [int][Math]::Max([double](Px 300), [double]($ch - (Px 24)))
+    # Compact when the tall layout would leave room for fewer than four items in the list (the default window size).
+    $compact = ($ch / $DpiScale) - 446 -lt 4 * 78
+    # (Set every time: the first resize comes before the window is scaled for the screen, which would scale these twice.)
+    if ($sStatus) {
+        $sStatus.Height = Px $(if ($compact) { 108 } else { 136 }); $sDot.Width = Px $(if ($compact) { 86 } else { 104 })
+        $sTiles.Height = Px $(if ($compact) { 118 } else { 176 })
+    }
+    if ($compact -ne $script:SimpleCompact) { $script:SimpleCompact = $compact; foreach ($t in @($sFast, $sCheck, $sHelp)) { if ($t) { $t.Invalidate() } } }
+}
+$simple.Add_Resize({ Resize-SimpleColumn })
+$simple.Add_VisibleChanged({ Resize-SimpleColumn })
+$form.Add_Shown({ Resize-SimpleColumn })
 # Top: logo, name and the way to the advanced view
 $sTop = New-Object Windows.Forms.Panel; $sTop.Dock = 'Top'; $sTop.Height = 58
 $sLogo = New-Object Windows.Forms.PictureBox; $sLogo.Dock = 'Left'; $sLogo.Width = 40
@@ -7023,6 +7039,7 @@ $sSpin.Start()
 # Three big tiles: an icon, a title and one line about what it does
 $sTiles = New-Object Windows.Forms.TableLayoutPanel; $sTiles.Dock = 'Top'; $sTiles.Height = 176; $sTiles.ColumnCount = 3; $sTiles.Padding = New-Object Windows.Forms.Padding(0, 16, 0, 4)
 foreach ($k in 1..3) { [void]$sTiles.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 33.3))) }
+$sTiles.RowCount = 1; [void]$sTiles.RowStyles.Add((New-Object Windows.Forms.RowStyle('Percent', 100)))   # the tiles follow the height (compact or tall)
 $script:SimpleTab = 'check'
 function Draw-SimpleTile($B, $G) {
     $G.SmoothingMode = 'AntiAlias'; $G.Clear($B.Parent.BackColor)
@@ -7035,15 +7052,26 @@ function Draw-SimpleTile($B, $G) {
     $fore = if ($primary) { [Drawing.Color]::White } else { $Theme.Text }
     $iconC = if ($primary) { [Drawing.Color]::White } else { $Theme.AccentText }
     $pad = [int](Px 18); $d = [single](Px 42)
-    Draw-IconDisc $G $pad $pad $d ([int]$B.Tag) $iconC $SimpleIcon $(if ($primary) { 60 } else { 34 })
     $lines = @("$($B.Text)" -split "\r?\n", 2 | ForEach-Object { $_.Trim() })
-    $w = $B.Width - 2 * $pad
-    $ty = $pad + [int]$d + [int](Px 12)
+    $dc = if ($primary) { [Drawing.Color]::FromArgb(225, 255, 255, 255) } else { $Theme.Dim }
+    # Low tiles (small window): the icon beside the text; tall tiles: the icon above it.
+    $compact = $B.Height -lt (Px 140)
+    if ($compact) { $pad = [int](Px 14); $d = [single](Px 38) }
+    $tx = if ($compact) { $pad + [int]$d + [int](Px 12) } else { $pad }
+    $w = $B.Width - $tx - $pad
     $th = [Windows.Forms.TextRenderer]::MeasureText($G, $lines[0], $SimpleTileFont, (New-Object Drawing.Size($w, 999)), 'WordBreak, NoPrefix').Height
-    [Windows.Forms.TextRenderer]::DrawText($G, $lines[0], $SimpleTileFont, (New-Object Drawing.Rectangle($pad, $ty, $w, $th)), $fore, 'WordBreak, NoPrefix')
+    $dh = if ($lines.Count -gt 1) { [Windows.Forms.TextRenderer]::MeasureText($G, $lines[1], $Font, (New-Object Drawing.Size($w, 999)), 'WordBreak, NoPrefix').Height } else { 0 }
+    if ($compact) {
+        Draw-IconDisc $G $pad (($B.Height - $d) / 2) $d ([int]$B.Tag) $iconC $SimpleIcon $(if ($primary) { 60 } else { 34 })
+        $ty = [int][Math]::Max([double]$pad / 2, ($B.Height - $th - $dh - (Px 2)) / 2)
+    } else {
+        Draw-IconDisc $G $pad $pad $d ([int]$B.Tag) $iconC $SimpleIcon $(if ($primary) { 60 } else { 34 })
+        $ty = $pad + [int]$d + [int](Px 12)
+    }
+    [Windows.Forms.TextRenderer]::DrawText($G, $lines[0], $SimpleTileFont, (New-Object Drawing.Rectangle($tx, $ty, $w, $th)), $fore, 'WordBreak, NoPrefix')
     if ($lines.Count -gt 1) {
-        $dc = if ($primary) { [Drawing.Color]::FromArgb(225, 255, 255, 255) } else { $Theme.Dim }
-        [Windows.Forms.TextRenderer]::DrawText($G, $lines[1], $Font, (New-Object Drawing.Rectangle($pad, ($ty + $th + [int](Px 2)), $w, ($B.Height - $ty - $th - $pad / 2))), $dc, 'WordBreak, EndEllipsis, NoPrefix')
+        $dy = $ty + $th + [int](Px 2)
+        [Windows.Forms.TextRenderer]::DrawText($G, $lines[1], $Font, (New-Object Drawing.Rectangle($tx, $dy, $w, [int][Math]::Max(1.0, [double]($B.Height - $dy - $pad / 2)))), $dc, 'WordBreak, EndEllipsis, NoPrefix')
     }
     if ($B.Focused -and $B.ShowFocusCues) {
         $fp = New-RoundRect 3.5 3.5 ($B.Width - 7.5) ($B.Height - 7.5) (Px 9)

@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PC Tune-Up</title>
-<link rel="alternate" hreflang="en" href="../">
+<link rel="alternate" hreflang="en" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
+<link rel="alternate" hreflang="nl" href="https://michaelkloprogge-gif.github.io/pc-tuneup/nl/">
+<link rel="alternate" hreflang="de" href="https://michaelkloprogge-gif.github.io/pc-tuneup/de/">
+<link rel="alternate" hreflang="fr" href="https://michaelkloprogge-gif.github.io/pc-tuneup/fr/">
+<link rel="alternate" hreflang="x-default" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
 <meta name="description" content="Gratis, open-source programma dat elke Windows-pc controleert, opruimt en versnelt - en elke wijziging kan terugdraaien.">
 <style>
   :root {
@@ -24,8 +28,13 @@
   header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--text); text-decoration: none; }
   .brand svg { width: 30px; height: 30px; flex: none; }
+  .right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   nav a { margin-left: 18px; color: var(--dim); text-decoration: none; font-size: 15px; }
   nav a:hover { color: var(--accent); }
+  .langs { display: flex; gap: 2px; }
+  .langs a { padding: 4px 8px; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--dim); text-decoration: none; }
+  .langs a:hover { color: var(--accent); }
+  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
   .hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
   h1 { font-size: 42px; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.5px; }
   .lead { font-size: 19px; color: var(--dim); margin: 0 0 26px; }
@@ -64,6 +73,8 @@
     nav { display: none; }
   }
   @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { h1 { font-size: 28px; } h2 { font-size: 24px; } .lead { font-size: 17px; } }
+  h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
 </style>
 </head>
 <body>
@@ -73,7 +84,10 @@
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0067c0"/><path d="M8.5 21.5a8.5 8.5 0 1 1 15 0" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M16 17l4.6-4.1" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><circle cx="16" cy="17" r="2.3" fill="#fff"/></svg>
       PC Tune-Up
     </a>
-    <nav><a href="#functies">Functies</a><a href="#schermen">Schermafbeeldingen</a><a href="#installeren">Installeren</a><a href="#privacy">Privacy</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a><a href="../" hreflang="en" lang="en">English</a></nav>
+    <div class="right">
+      <nav><a href="#functies">Functies</a><a href="#schermen">Schermafbeeldingen</a><a href="#installeren">Installeren</a><a href="#privacy">Privacy</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a></nav>
+      <div class="langs" aria-label="Taal"><a href="../" lang="en" hreflang="en" title="English">EN</a><a href="./" lang="nl" hreflang="nl" aria-current="page" title="Nederlands">NL</a><a href="../de/" lang="de" hreflang="de" title="Deutsch">DE</a><a href="../fr/" lang="fr" hreflang="fr" title="Français">FR</a></div>
+    </div>
   </div>
 </header>
 
@@ -86,7 +100,7 @@
         <a class="btn primary" href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Downloaden voor Windows</a>
         <a class="btn" href="https://github.com/michaelkloprogge-gif/pc-tuneup">Bekijk de broncode</a>
       </div>
-      <p class="small">Gratis en open source (MIT). Windows 10 en 11. Nederlands, English, Deutsch en Français. Geen account, geen reclame. &middot; <a href="../" lang="en">English</a></p>
+      <p class="small">Gratis en open source (MIT). Windows 10 en 11. In het Nederlands, Engels, Duits en Frans. Geen account, geen reclame.</p>
     </div>
     <img src="../screenshots/nl/health.png" alt="De pagina Gezondheid van PC Tune-Up: metingen, een score door de tijd en de drie nuttigste volgende stappen" width="1440" height="972">
   </div>
@@ -116,11 +130,11 @@
       <ul class="plain">
         <li><span class="check">&#10003;</span>Elke wijziging staat op de pagina Geschiedenis, en bijna alles kun je met één klik terugdraaien.</li>
         <li><span class="check">&#10003;</span>Het vraagt het eerst en laat precies zien wat het gaat doen. Niets groots is vooraf aangevinkt.</li>
-        <li><span class="check">&#10003;</span>Een eenvoudige weergave voor wie de details niet hoeft te zien: één rustig scherm, een status in gewone woorden en drie grote knoppen - en een knop om een rapport te sturen naar het familielid dat meestal helpt.</li>
+        <li><span class="check">&#10003;</span>Een eenvoudige weergave voor wie de details niet hoeft te zien: één rustig scherm, een status in gewone woorden, drie grote knoppen en alleen veilige oplossingen - en een knop om een rapport te sturen naar het familielid dat meestal helpt. Eén klik op <strong>Geavanceerde weergave</strong> toont alle hulpmiddelen.</li>
         <li><span class="check">&#10003;</span>Beveiligingssoftware, VPN's, stuurprogramma's en databases worden nooit aangeraakt, en je kunt je eigen programma's op een bewaarlijst zetten.</li>
         <li><span class="check">&#10003;</span>Als beheerder maakt het eerst een Windows-herstelpunt voor grotere wijzigingen.</li>
         <li><span class="check">&#10003;</span>Optioneel wekelijks onderhoud ruimt zelf rommel op en meldt alleen iets als er iets nieuws is.</li>
-        <li><span class="check">&#10003;</span>Elke nieuwe versie wordt automatisch getest op een schone Windows-pc, in vier talen.</li>
+        <li><span class="check">&#10003;</span>Elke nieuwe versie wordt automatisch getest op een schone Windows-pc, in alle vier de talen.</li>
       </ul>
     </div>
   </section>
@@ -130,10 +144,12 @@
       <h2>Schermafbeeldingen</h2>
       <p class="sub">Licht en donker, net als je Windows-instelling.</p>
       <div class="shots">
+        <figure><img src="../screenshots/nl/simple.png" alt="De eenvoudige weergave: een status, drie grote knoppen en een lijst met wat beter kan" loading="lazy" width="1440" height="972"><figcaption>Eenvoudige weergave: wat beter kan, in gewone woorden, en meestal met één klik opgelost.</figcaption></figure>
+        <figure><img src="../screenshots/nl/simple-dark.png" alt="De eenvoudige weergave in het donkere thema" loading="lazy" width="1440" height="972"><figcaption>De eenvoudige weergave in het donkere thema.</figcaption></figure>
         <figure><img src="../screenshots/nl/space-savers.png" alt="Pagina Ruimtebesparingen" loading="lazy" width="1440" height="972"><figcaption>Ruimtebesparingen: grote stukken schijfruimte, elk met wat je ervoor inlevert.</figcaption></figure>
         <figure><img src="../screenshots/nl/privacy.png" alt="Pagina Privacy" loading="lazy" width="1440" height="972"><figcaption>Privacy: advertenties, tips en tracking van Windows - de aanbevolen instellingen zijn al aangevinkt.</figcaption></figure>
         <figure><img src="../screenshots/nl/battery.png" alt="Pagina Accu met een grafiek van de slijtage" loading="lazy" width="1440" height="972"><figcaption>Accu: hoeveel lading hij nog vasthoudt, en hoe snel hij slijt.</figcaption></figure>
-        <figure><img src="../screenshots/nl/health-dark.png" alt="Pagina Gezondheid in het donkere thema" loading="lazy" width="1440" height="972"><figcaption>Donker thema.</figcaption></figure>
+        <figure><img src="../screenshots/nl/health-dark.png" alt="Pagina Gezondheid in het donkere thema" loading="lazy" width="1440" height="972"><figcaption>De pagina Gezondheid in het donkere thema.</figcaption></figure>
       </div>
     </div>
   </section>
@@ -144,7 +160,7 @@
       <ol class="steps">
         <li><a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Download PC-TuneUp.exe</a> en start het. Het biedt aan zichzelf voor je te installeren - zonder beheerdersrechten - en houdt zichzelf up-to-date.</li>
         <li>Windows zegt de eerste keer misschien <em>"Windows heeft uw pc beveiligd"</em>, omdat het programma nog niet digitaal ondertekend is. Klik op <strong>Meer informatie &gt; Toch uitvoeren</strong>.</li>
-        <li>Begin met <strong>Pc repareren</strong> op de pagina Gezondheid, of volg de suggesties bij "Begin hier". Gebruik <strong>Opnieuw als beheerder</strong> om ook de eigen bestanden en instellingen van Windows mee te nemen.</li>
+        <li>Het opent in de eenvoudige weergave: klik op <strong>Maak mijn pc sneller</strong>, of los de punten in de lijst één voor één op. Voor alle hulpmiddelen klik je op <strong>Geavanceerde weergave</strong> en begin je met <strong>Pc repareren</strong> op de pagina Gezondheid. Gebruik <strong>Opnieuw als beheerder</strong> om ook de eigen bestanden en instellingen van Windows mee te nemen.</li>
       </ol>
       <p class="note">Binnenkort ook via winget: <code>winget install MichaelKloprogge.PCTuneUp</code></p>
       <h3 style="margin-top:30px">Voor IT en scripts</h3>

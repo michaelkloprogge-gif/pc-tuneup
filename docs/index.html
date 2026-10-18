@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PC Tune-Up</title>
-<link rel="alternate" hreflang="nl" href="nl/">
+<link rel="alternate" hreflang="en" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
+<link rel="alternate" hreflang="nl" href="https://michaelkloprogge-gif.github.io/pc-tuneup/nl/">
+<link rel="alternate" hreflang="de" href="https://michaelkloprogge-gif.github.io/pc-tuneup/de/">
+<link rel="alternate" hreflang="fr" href="https://michaelkloprogge-gif.github.io/pc-tuneup/fr/">
+<link rel="alternate" hreflang="x-default" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
 <meta name="description" content="Free, open-source tool that checks, cleans and speeds up any Windows PC - and can undo every change.">
 <style>
   :root {
@@ -24,8 +28,13 @@
   header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--text); text-decoration: none; }
   .brand svg { width: 30px; height: 30px; flex: none; }
+  .right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   nav a { margin-left: 18px; color: var(--dim); text-decoration: none; font-size: 15px; }
   nav a:hover { color: var(--accent); }
+  .langs { display: flex; gap: 2px; }
+  .langs a { padding: 4px 8px; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--dim); text-decoration: none; }
+  .langs a:hover { color: var(--accent); }
+  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
   .hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
   h1 { font-size: 42px; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.5px; }
   .lead { font-size: 19px; color: var(--dim); margin: 0 0 26px; }
@@ -64,6 +73,8 @@
     nav { display: none; }
   }
   @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { h1 { font-size: 28px; } h2 { font-size: 24px; } .lead { font-size: 17px; } }
+  h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
 </style>
 </head>
 <body>
@@ -73,7 +84,10 @@
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0067c0"/><path d="M8.5 21.5a8.5 8.5 0 1 1 15 0" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M16 17l4.6-4.1" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><circle cx="16" cy="17" r="2.3" fill="#fff"/></svg>
       PC Tune-Up
     </a>
-    <nav><a href="#features">Features</a><a href="#screens">Screenshots</a><a href="#install">Install</a><a href="#privacy">Privacy</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a><a href="nl/" hreflang="nl" lang="nl">Nederlands</a></nav>
+    <div class="right">
+      <nav><a href="#features">Features</a><a href="#screens">Screenshots</a><a href="#install">Install</a><a href="#privacy">Privacy</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a></nav>
+      <div class="langs" aria-label="Language"><a href="./" lang="en" hreflang="en" aria-current="page" title="English">EN</a><a href="nl/" lang="nl" hreflang="nl" title="Nederlands">NL</a><a href="de/" lang="de" hreflang="de" title="Deutsch">DE</a><a href="fr/" lang="fr" hreflang="fr" title="Français">FR</a></div>
+    </div>
   </div>
 </header>
 
@@ -86,7 +100,7 @@
         <a class="btn primary" href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Download for Windows</a>
         <a class="btn" href="https://github.com/michaelkloprogge-gif/pc-tuneup">View the source</a>
       </div>
-      <p class="small">Free and open source (MIT). Windows 10 and 11. English, Nederlands, Deutsch and Français. No account, no ads. &middot; <a href="nl/" lang="nl">Nederlands</a></p>
+      <p class="small">Free and open source (MIT). Windows 10 and 11. In English, Dutch, German and French. No account, no ads.</p>
     </div>
     <img src="screenshots/health.png" alt="The Health page of PC Tune-Up: readings, a score over time and the three most useful next steps" width="1440" height="972">
   </div>
@@ -116,11 +130,11 @@
       <ul class="plain">
         <li><span class="check">&#10003;</span>Every change is listed on the History page, and almost all of them can be undone with one click.</li>
         <li><span class="check">&#10003;</span>It asks first and shows exactly what it will do. Nothing big is pre-checked.</li>
-        <li><span class="check">&#10003;</span>A simple view for people who don't want the details: one calm screen, a status in plain words and three big buttons - and a button to send a report to the family member who usually helps.</li>
+        <li><span class="check">&#10003;</span>A simple view for people who don't want the details: one calm screen, a status in plain words, three big buttons and only safe fixes - and a button to send a report to the family member who usually helps. One click on <strong>Advanced view</strong> shows every tool.</li>
         <li><span class="check">&#10003;</span>Security software, VPNs, drivers and databases are never touched, and you can add your own programs to a keep list.</li>
         <li><span class="check">&#10003;</span>As administrator it creates a Windows restore point before larger changes.</li>
         <li><span class="check">&#10003;</span>Optional weekly maintenance cleans junk by itself and only notifies you when something new turns up.</li>
-        <li><span class="check">&#10003;</span>Every release is tested automatically on a clean Windows machine, in English and Dutch.</li>
+        <li><span class="check">&#10003;</span>Every release is tested automatically on a clean Windows machine, in all four languages.</li>
       </ul>
     </div>
   </section>
@@ -130,10 +144,12 @@
       <h2>Screenshots</h2>
       <p class="sub">Light and dark, following your Windows setting.</p>
       <div class="shots">
+        <figure><img src="screenshots/simple.png" alt="The simple view: a status, three big buttons and a list of what could be better" loading="lazy" width="1440" height="972"><figcaption>Simple view: what could be better, in plain words, most of it fixed with one click.</figcaption></figure>
+        <figure><img src="screenshots/simple-dark.png" alt="The simple view in the dark theme" loading="lazy" width="1440" height="972"><figcaption>The simple view in the dark theme.</figcaption></figure>
         <figure><img src="screenshots/space-savers.png" alt="Space savers page" loading="lazy" width="1440" height="972"><figcaption>Space savers: big chunks of disk space, each with what you give up.</figcaption></figure>
         <figure><img src="screenshots/privacy.png" alt="Privacy page" loading="lazy" width="1440" height="972"><figcaption>Privacy: Windows ads, tips and tracking - recommended ones pre-checked.</figcaption></figure>
         <figure><img src="screenshots/battery.png" alt="Battery page with a wear graph" loading="lazy" width="1440" height="972"><figcaption>Battery: how much charge it still holds, and how fast it wears.</figcaption></figure>
-        <figure><img src="screenshots/health-dark.png" alt="Health page in the dark theme" loading="lazy" width="1440" height="972"><figcaption>Dark theme.</figcaption></figure>
+        <figure><img src="screenshots/health-dark.png" alt="Health page in the dark theme" loading="lazy" width="1440" height="972"><figcaption>The Health page in the dark theme.</figcaption></figure>
       </div>
     </div>
   </section>
@@ -144,7 +160,7 @@
       <ol class="steps">
         <li><a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Download PC-TuneUp.exe</a> and run it. It offers to install itself for you - no administrator rights needed - and keeps itself up to date.</li>
         <li>Windows may say <em>"Windows protected your PC"</em> the first time, because the app is not code-signed yet. Click <strong>More info &gt; Run anyway</strong>.</li>
-        <li>Start with <strong>Fix my PC</strong> on the Health page, or follow the "Start here" suggestions. Use <strong>Restart as admin</strong> to include Windows' own files and settings.</li>
+        <li>It opens in the simple view: click <strong>Make my PC faster</strong>, or fix the items in the list one by one. For every tool, click <strong>Advanced view</strong> and start with <strong>Fix my PC</strong> on the Health page. Use <strong>Restart as admin</strong> to include Windows' own files and settings.</li>
       </ol>
       <p class="note">Coming soon to winget: <code>winget install MichaelKloprogge.PCTuneUp</code></p>
       <h3 style="margin-top:30px">For IT and scripts</h3>

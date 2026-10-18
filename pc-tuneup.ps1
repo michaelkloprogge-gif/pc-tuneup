@@ -40,6 +40,41 @@ if (-not ('PcTuneUp.Native' -as [type])) { Add-Type -Namespace PcTuneUp -Name Na
 [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)] public static extern int SetWindowTheme(System.IntPtr h, string app, string idList);
 [DllImport("user32.dll")] public static extern System.IntPtr SendMessage(System.IntPtr h, int msg, System.IntPtr w, System.IntPtr l);
 '@ }
+# Paints the empty end of a dark list header (Windows draws it light). The exe has it too; keep both copies in step.
+function Get-HeaderFillType {
+    if (-not ('PcTuneUp.HeaderFill' -as [type])) {
+        Add-Type -ReferencedAssemblies System.Windows.Forms, System.Drawing -ErrorAction SilentlyContinue -TypeDefinition @'
+using System;
+using System.Windows.Forms;
+namespace PcTuneUp
+{
+    public class HeaderFill : NativeWindow
+    {
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)] struct RECT { public int Left, Top, Right, Bottom; }
+        [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, ref RECT r);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool GetClientRect(IntPtr h, out RECT r);
+        public System.Drawing.Color Color;
+        public HeaderFill(IntPtr header, System.Drawing.Color color) { Color = color; AssignHandle(header); }
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg != 0x000F) return;   // WM_PAINT
+            var item = new RECT();
+            int n = (int)SendMessage(Handle, 0x1200, IntPtr.Zero, ref item);   // HDM_GETITEMCOUNT
+            if (n > 0) SendMessage(Handle, 0x1207, (IntPtr)(n - 1), ref item);   // HDM_GETITEMRECT
+            RECT c; GetClientRect(Handle, out c);
+            if (item.Right >= c.Right) return;
+            using (var g = System.Drawing.Graphics.FromHwnd(Handle))
+            using (var b = new System.Drawing.SolidBrush(Color))
+                g.FillRectangle(b, item.Right, 0, c.Right - item.Right, c.Bottom);
+        }
+    }
+}
+'@
+    }
+    'PcTuneUp.HeaderFill' -as [type]
+}
+$script:HeaderFills = New-Object Collections.ArrayList   # keeps the hooks alive
 try { [void][PcTuneUp.Native]::SetProcessDPIAware() } catch { }
 [Windows.Forms.Application]::EnableVisualStyles()
 $DpiScale = try { [Drawing.Graphics]::FromHwnd([IntPtr]::Zero).DpiX / 96 } catch { 1 }
@@ -60,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.15.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.15.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -2073,7 +2108,10 @@ function New-ListView([bool]$Checks, [object[]]$Columns) {
         $lv.OwnerDraw = $true
         $lv.Add_DrawColumnHeader({
             param($sender, $e)
-            $brush = New-Object Drawing.SolidBrush($Theme.Side); $e.Graphics.FillRectangle($brush, $e.Bounds); $brush.Dispose()
+            $fillR = $e.Bounds
+            # The last column also paints the strip to its right (above the scroll bar), which Windows would leave light grey.
+            if ($e.ColumnIndex -eq $sender.Columns.Count - 1) { $fillR = New-Object Drawing.Rectangle($e.Bounds.X, $e.Bounds.Y, [Math]::Max($e.Bounds.Width, $sender.Width - $e.Bounds.X), $e.Bounds.Height) }
+            $brush = New-Object Drawing.SolidBrush($Theme.Side); $e.Graphics.FillRectangle($brush, $fillR); $brush.Dispose()
             $r = $e.Bounds; $r.X += (Px 5); $r.Width -= (Px 5)
             [Windows.Forms.TextRenderer]::DrawText($e.Graphics, $e.Header.Text, $sender.Font, $r, $Theme.Dim, 'VerticalCenter, Left, EndEllipsis')
         })
@@ -2083,7 +2121,10 @@ function New-ListView([bool]$Checks, [object[]]$Columns) {
     $lv.Add_HandleCreated({
         Set-DarkChrome $this
         $header = [PcTuneUp.Native]::SendMessage($this.Handle, 0x101F, [IntPtr]::Zero, [IntPtr]::Zero)   # LVM_GETHEADER
-        if ($Dark -and $header -ne [IntPtr]::Zero) { try { [void][PcTuneUp.Native]::SetWindowTheme($header, 'DarkMode_ItemsView', $null) } catch { } }
+        if ($Dark -and $header -ne [IntPtr]::Zero) {
+            try { [void][PcTuneUp.Native]::SetWindowTheme($header, 'DarkMode_ItemsView', $null) } catch { }
+            try { $t = Get-HeaderFillType; if ($t) { [void]$script:HeaderFills.Add($t::new($header, $Theme.Side)) } } catch { Write-AppError 'Header colour' $_ }
+        }
     })
     $lv.Tag = @($lv.Columns | ForEach-Object Width)   # designed widths
     $lv.Add_Resize({ Resize-LastColumn $this })

@@ -83,6 +83,28 @@ namespace PcTuneUp
         [System.Runtime.InteropServices.DllImport("uxtheme.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int SetWindowTheme(IntPtr h, string app, string idList);
         [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, IntPtr l);
     }
+    // Keep in step with the copy in pc-tuneup.ps1.
+    public class HeaderFill : NativeWindow
+    {
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)] struct RECT { public int Left, Top, Right, Bottom; }
+        [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr h, int msg, IntPtr w, ref RECT r);
+        [System.Runtime.InteropServices.DllImport("user32.dll")] static extern bool GetClientRect(IntPtr h, out RECT r);
+        public System.Drawing.Color Color;
+        public HeaderFill(IntPtr header, System.Drawing.Color color) { Color = color; AssignHandle(header); }
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg != 0x000F) return;   // WM_PAINT
+            var item = new RECT();
+            int n = (int)SendMessage(Handle, 0x1200, IntPtr.Zero, ref item);   // HDM_GETITEMCOUNT
+            if (n > 0) SendMessage(Handle, 0x1207, (IntPtr)(n - 1), ref item);   // HDM_GETITEMRECT
+            RECT c; GetClientRect(Handle, out c);
+            if (item.Right >= c.Right) return;
+            using (var g = System.Drawing.Graphics.FromHwnd(Handle))
+            using (var b = new System.Drawing.SolidBrush(Color))
+                g.FillRectangle(b, item.Right, 0, c.Right - item.Right, c.Bottom);
+        }
+    }
 }
 
 static class Program
@@ -163,7 +185,7 @@ Set-Content -Path $manifest -Encoding UTF8 -Value @'
 # Extra languages (lang\de.tsv, lang\fr.tsv) go into the exe as resources too.
 $langRes = @(Get-ChildItem (Join-Path $here 'lang') -Filter *.tsv -ErrorAction SilentlyContinue | ForEach-Object { "/resource:$($_.FullName),$($_.Name)" })
 & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$exe" "/win32icon:$ico" "/win32manifest:$manifest" `
-    "/reference:$sma" /reference:System.Windows.Forms.dll /reference:System.Core.dll `
+    "/reference:$sma" /reference:System.Windows.Forms.dll /reference:System.Drawing.dll /reference:System.Core.dll `
     "/resource:$script,pc-tuneup.ps1" @($langRes) $cs
 if ($LASTEXITCODE) { throw "Compile failed (exit $LASTEXITCODE)" }
 Remove-Item $work -Recurse -Force

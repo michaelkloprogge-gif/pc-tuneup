@@ -60,6 +60,9 @@ jobs:
         shell: powershell
         run: .\tests\Test-Pages.ps1 -Language fr -MaxFreezeMs 5000; exit $LASTEXITCODE
 
+      - name: Test every button
+        shell: powershell
+        run: .\tests\Test-Buttons.ps1 -Language en; exit $LASTEXITCODE
 
       - name: Build PC-TuneUp.exe
         shell: powershell

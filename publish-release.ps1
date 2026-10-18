@@ -26,6 +26,8 @@ if ($LASTEXITCODE) { throw 'Upgrade advice tests failed - run .\tests\Test-Upgra
 if ($LASTEXITCODE) { throw 'Translation tests failed - run .\tests\Test-Translation.ps1' }
 & powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Test-Pages.ps1 -Language en | Out-Null
 if ($LASTEXITCODE) { throw 'Page tests failed - run .\tests\Test-Pages.ps1' }
+& powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Test-Buttons.ps1 -Language en | Out-Null
+if ($LASTEXITCODE) { throw 'Button tests failed - run .\tests\Test-Buttons.ps1' }
 
 git add -A
 git diff --cached --quiet

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.2
+
+- Fixed: some buttons did nothing when clicked - **Keep list** and **Change log** in Settings, **Change log** on the History page, and **Fix this** for program updates in the simple view. They handed the click on to a button on another (hidden) page, which Windows ignores.
+- **Open setting** (Security, Backup) and **Search selected online** (Stability, Drivers) now say "Select a row in the list first" instead of silently doing nothing when no row is selected.
+- New test: every button in the app is clicked on every release (in a sandbox where nothing on the PC can change), and the build fails if one does nothing.
+
 ## 1.16.1
 
 - Fixed: in a maximized window the simple view was squeezed into a narrow strip in the middle. It now uses the width of the window (up to a comfortable reading width).

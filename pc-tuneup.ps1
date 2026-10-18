@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.16.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.16.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,8 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Select a row in the list first, then click the button again.	Selecteer eerst een rij in de lijst en klik dan nog een keer op de knop.
+There is no setting to open for this row - see "What to do" below the list.	Voor deze rij is er geen instelling om te openen - zie "Wat te doen" onder de lijst.
 Advanced view	Geavanceerde weergave
 Show every page and tool. You can come back to this simple view at any time.	Toon elke pagina en elk hulpmiddel. Je kunt altijd terug naar deze eenvoudige weergave.
 Most can be fixed with one click - see the list below.	De meeste los je op met één klik - zie de lijst hieronder.
@@ -2518,14 +2520,18 @@ $btnSpeed.Add_Click({
 })
 $btnWU.Add_Click({ Start-Process 'ms-settings:windowsupdate' })
 $btnReport.Add_Click({ Save-Report })
-$btnLog.Add_Click({
+# Functions, not handlers: buttons on other pages (Settings, History) call them too. (PerformClick on a button
+# whose page is hidden does nothing, which is why those buttons once did nothing.)
+function Open-ChangeLog {
     if (-not (Test-Path $LogFile)) { Write-Log 'Log started' }
     Start-Process notepad.exe $LogFile
-})
-$btnKeep.Add_Click({
+}
+function Open-KeepList {
     Start-Process notepad.exe $KeepFile -Wait
     Update-Startup; Start-BloatScan; Update-Services
-})
+}
+$btnLog.Add_Click({ Open-ChangeLog })
+$btnKeep.Add_Click({ Open-KeepList })
 
 # ===========================================================================
 # 2. Clean
@@ -3475,7 +3481,9 @@ function Start-UpdScan {
 }
 $btnUpdScan.Add_Click({ Start-UpdScan })
 $btnUpdStore.Add_Click({ Start-Process 'ms-windows-store://downloadsandupdates' })
-$btnUpdRun.Add_Click({
+$btnUpdRun.Add_Click({ Start-ProgramUpdates })
+# (A function so the simple view's "Fix this" can start it too.)
+function Start-ProgramUpdates {
     $picked = @($lvUpd.CheckedItems | ForEach-Object { $_.Tag })
     if (-not $picked) { Show-Msg 'Check at least one program first.' | Out-Null; return }
     $names = ($picked | ForEach-Object { " - $($_.Name) ($($_.Version) -> $($_.Available))" }) -join "`n"
@@ -3495,7 +3503,7 @@ $btnUpdRun.Add_Click({
         Show-Msg $msg | Out-Null
         Update-History; Start-UpdScan
     }
-})
+}
 
 # ===========================================================================
 # Security: is this PC protected?
@@ -3668,9 +3676,16 @@ function Update-Security {
         Update-Health -Quick
     }
 }
+# For buttons that act on "the selected row": the row's data, or a short note when no row is selected
+# (otherwise clicking the button seemed to do nothing).
+function Get-PickedRow($Lv) {
+    if ($Lv.SelectedItems.Count) { return $Lv.SelectedItems[0].Tag }
+    Show-Msg 'Select a row in the list first, then click the button again.' | Out-Null
+    $null
+}
 function Open-SecSetting {
-    if (-not $lvSec.SelectedItems.Count) { return }
-    $link = $lvSec.SelectedItems[0].Tag.Link
+    $row = Get-PickedRow $lvSec; if (-not $row) { return }
+    $link = $row.Link
     if ($link) { try { Start-Process $link } catch { Show-Msg "Couldn't open $link" | Out-Null } }
     else { Show-Msg 'This one is changed in the firmware (BIOS/UEFI) settings, not in Windows - see "What to do".' | Out-Null }
 }
@@ -4003,9 +4018,9 @@ function Invoke-StabilityFix {
 }
 $btnStabRel.Add_Click({ Start-Process perfmon.exe '/rel' })
 $btnStabWeb.Add_Click({
-    if (-not $lvStab.SelectedItems.Count) { return }
-    $q = $lvStab.SelectedItems[0].Tag.Search
-    if ($q) { Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString($q)) }
+    $row = Get-PickedRow $lvStab; if (-not $row) { return }
+    $q = if ($row.Search) { $row.Search } else { "Windows $($row.Problem) $($row.What)" }
+    Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString($q))
 })
 
 # ===========================================================================
@@ -4191,9 +4206,9 @@ function Update-Backup {
     }
 }
 function Open-BackupSetting {
-    if (-not $lvBackup.SelectedItems.Count) { return }
-    $link = $lvBackup.SelectedItems[0].Tag.Link
-    if (-not $link) { return }
+    $row = Get-PickedRow $lvBackup; if (-not $row) { return }
+    $link = $row.Link
+    if (-not $link) { Show-Msg 'There is no setting to open for this row - see "What to do" below the list.' | Out-Null; return }
     try {
         if ($link -eq 'start-onedrive') {
             $od = @("$env:LOCALAPPDATA\Microsoft\OneDrive\OneDrive.exe", "$env:ProgramFiles\Microsoft OneDrive\OneDrive.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
@@ -4451,8 +4466,8 @@ $btnDrvGet.Add_Click({
 $btnDrvWU.Add_Click({ Start-Process 'ms-settings:windowsupdate-optionalupdates' })
 $btnDrvDm.Add_Click({ Start-Process devmgmt.msc })
 $btnDrvWeb.Add_Click({
-    if (-not $lvDrv.SelectedItems.Count) { return }
-    Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString("$($lvDrv.SelectedItems[0].Tag.Search) $(if ($script:UpgInfo) { $script:UpgInfo.Name })"))
+    $row = Get-PickedRow $lvDrv; if (-not $row) { return }
+    Start-Process ('https://www.bing.com/search?q=' + [uri]::EscapeDataString("$($row.Search) $(if ($script:UpgInfo) { $script:UpgInfo.Name })"))
 })
 $btnDrvReload.Add_Click({ Update-Drivers })
 
@@ -5959,7 +5974,7 @@ function Update-History {
     $lblHist.Text = if ($entries.Count) { "$($entries.Count) change(s) recorded, $n can be undone." } else { 'No changes yet. (Changes from before this version are in the text log.)' }
 }
 $btnHistReload.Add_Click({ Update-History })
-$btnHistLog.Add_Click({ $btnLog.PerformClick() })
+$btnHistLog.Add_Click({ Open-ChangeLog })
 $btnHistUndo.Add_Click({
     $picked = @($lvHist.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { (Get-UndoStatus $_) -in 'can undo', 'reinstall from Store' })
     if (-not $picked) { Show-Msg 'Check one or more rows that say "can undo" first.' | Out-Null; return }
@@ -6158,8 +6173,8 @@ $btnSetErr.Add_Click({
     if (Test-Path $ErrorLogFile) { Start-Process notepad.exe "`"$ErrorLogFile`"" }
     else { Show-Msg 'No problems inside PC Tune-Up have been recorded.' | Out-Null }
 })
-$btnSetKeep.Add_Click({ $btnKeep.PerformClick() })
-$btnSetLog.Add_Click({ $btnLog.PerformClick() })
+$btnSetKeep.Add_Click({ Open-KeepList })
+$btnSetLog.Add_Click({ Open-ChangeLog })
 $btnSetData.Add_Click({ Start-Process explorer.exe "`"$DataDir`"" })
 $btnSetReport.Add_Click({ Save-Report })
 
@@ -7221,7 +7236,7 @@ function Invoke-SimpleFix($Step) {
     try {
         switch ($Step.Fix) {
             'clean' { Invoke-FixMyPc }
-            'updates' { $btnUpdRun.PerformClick() }
+            'updates' { Start-ProgramUpdates }
             'startup' {
                 $items = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' })
                 $names = ($items | ForEach-Object { $_.Tag.Name -replace '_[0-9A-F]{32}$', '' }) -join ', '

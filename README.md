@@ -31,7 +31,7 @@ you can undo.
 | **Updates** | update outdated programs through winget; safe updates are pre-selected |
 | **Drivers** | devices with a problem (Device Manager error codes, explained) and the age of the drivers that matter most: graphics, network, audio, storage, BIOS |
 | **Security** | is Windows still supported, can it run Windows 11, are antivirus, firewall, encryption, Secure Boot and TPM on |
-| **Browsers** | extensions in Chrome, Edge, Brave, Vivaldi and Firefox, search engine, home page and settings forced by "policies" - the usual places adware hides |
+| **Browsers** | extensions in Chrome, Edge, Brave, Vivaldi and Firefox, search engine, home page and settings forced by "policies", plus the hosts file, proxy settings and known adware root certificates - the usual places adware hides |
 | **Stability** | crashes, freezes, blue screens and errors from the last 30 days, grouped by what really caused them, with one-click fixes (turn off NVIDIA nView, repair Visual C++, reset Windows Update, repair system files, check the drive...) |
 | **Network** | Wi-Fi signal and band, delays to the router and the internet, DNS speed, dropped connections, flush DNS and network reset |
 | **Gaming** | which graphics card a running game really uses, what else is busy, power mode, Game Mode, background recording and GPU settings - with one-click fixes |

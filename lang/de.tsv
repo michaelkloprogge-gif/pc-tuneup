@@ -1016,7 +1016,7 @@ see button above	siehe Schaltfläche oben
 Which apps used the most battery in the last day or week (Windows Settings).	Welche Apps am letzten Tag oder in der letzten Woche am meisten Akku verbraucht haben (Windows-Einstellungen).
 Battery history since {0}.	Akkuverlauf seit {0}.
 Charge it holds (% of new)	Gespeicherte Ladung (% vom Neuzustand)
-Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren't installed from a store, and settings forced through browser "policies" on a home PC.	Erweiterungen in Chrome, Edge, Brave, Vivaldi und Firefox sowie Suchmaschine, Startseite und Seiten beim Start. Hier versteckt sich Adware: Erweiterungen, die nicht aus einem Store installiert wurden, und Einstellungen, die auf einem Heim-PC über Browser-"Richtlinien" erzwungen werden.
+Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, the search engine, home page and start-up pages, plus Windows' hosts file and proxy. Adware hides here: extensions that weren't installed from a store, and settings forced through "policies".	Erweiterungen in Chrome, Edge, Brave, Vivaldi und Firefox, Suchmaschine, Startseite und Start-Seiten, dazu die Hosts-Datei und der Proxy von Windows. Hier versteckt sich Adware: Erweiterungen, die nicht aus einem Store stammen, und per "Richtlinie" erzwungene Einstellungen.
 Open extensions page	Erweiterungsseite öffnen
 Remove checked policies	Angehakte Richtlinien entfernen
 Reset browser settings	Browsereinstellungen zurücksetzen
@@ -1693,3 +1693,43 @@ Best power efficiency	Beste Energieeffizienz
 Better performance	Bessere Leistung
 Best performance	Beste Leistung
 Fast startup	Schnellstart
+Remove checked	Markierte entfernen
+That row is about Windows itself (every browser). Select a row of a browser first.	Diese Zeile betrifft Windows selbst (alle Browser). Wählen Sie zuerst eine Zeile eines Browsers aus.
+Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").	Markieren Sie zuerst eine oder mehrere Zeilen mit Richtlinien, der Hosts-Datei oder einem Proxy (Erweiterungen entfernen Sie im Browser selbst - nutzen Sie "Erweiterungsseite öffnen").
+Removing browser policies and hosts file lines needs administrator rights - click "Restart as admin" first, or check only proxy rows.	Zum Entfernen von Browser-Richtlinien und Zeilen der Hosts-Datei sind Administratorrechte nötig - klicken Sie zuerst auf "Als Admin neu starten" oder markieren Sie nur Proxy-Zeilen.
+Remove these?	Diese entfernen?
+{0} line(s) removed	{0} Zeile(n) entfernt
+Windows: hosts file	Windows: Hosts-Datei
+Windows: {0}	Windows: {0}
+Couldn't change the hosts file: {0}	Die Hosts-Datei konnte nicht geändert werden: {0}
+{0} item(s) removed. Restart the browser to see the change.	{0} Eintrag/Einträge entfernt. Starten Sie den Browser neu, um die Änderung zu sehen.
+Some of these changes need administrator rights to undo - use "Restart as administrator" first.	Einige dieser Änderungen brauchen zum Rückgängigmachen Administratorrechte - nutzen Sie zuerst "Als Admin neu starten".
+Hosts file moved	Hosts-Datei verschoben
+Hosts file	Hosts-Datei
+Windows reads its hosts file from {0} instead of {1}	Windows liest seine Hosts-Datei aus {0} statt aus {1}
+Programs have no reason to move it - malware does this to hide its own hosts file. Have the PC scanned (Windows Security > Virus & threat protection > Scan options > Microsoft Defender Offline scan).	Programme haben keinen Grund, sie zu verschieben - Schadsoftware tut das, um ihre eigene Hosts-Datei zu verstecken. Lassen Sie den PC prüfen (Windows-Sicherheit > Viren- & Bedrohungsschutz > Scanoptionen > Microsoft Defender Offline-Überprüfung).
+Hosts file blocks {0}	Hosts-Datei blockiert {0}
+hosts file line: {0}	Zeile der Hosts-Datei: {0}
+Malware blocks security and update sites so it can't be removed. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator), then have the PC scanned.	Schadsoftware blockiert Sicherheits- und Update-Seiten, damit sie nicht entfernt werden kann. Wenn Sie das nicht selbst eingetragen haben, entfernen Sie die Zeile (markieren und auf "Markierte entfernen" klicken - Administrator nötig) und lassen Sie den PC danach prüfen.
+Hosts file: {0} -> {1}	Hosts-Datei: {0} -> {1}
+Points a name at a device in your own network (a NAS, printer or server). Fine if you set it up.	Verweist einen Namen auf ein Gerät in Ihrem eigenen Netzwerk (NAS, Drucker oder Server). In Ordnung, wenn Sie das eingerichtet haben.
+Sends a well-known website to a different server - the way hijackers show fake pages or ads. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator).	Leitet eine bekannte Website auf einen anderen Server um - so zeigen Entführer gefälschte Seiten oder Werbung. Wenn Sie das nicht selbst eingetragen haben, entfernen Sie die Zeile (markieren und auf "Markierte entfernen" klicken - Administrator nötig).
+Sends this name to a fixed address. Developers and some programs do this on purpose; if you don't know why it is there, remove the line (needs administrator).	Leitet diesen Namen auf eine feste Adresse. Entwickler und manche Programme tun das absichtlich; wenn Sie nicht wissen, warum er da steht, entfernen Sie die Zeile (Administrator nötig).
+Hosts file blocks {0} site(s)	Hosts-Datei blockiert {0} Seite(n)
+in the file {0}	in der Datei {0}
+Usually an ad or tracking blocker you installed. If websites or programs fail to connect, look here first.	Meist ein Werbe- oder Tracking-Blocker, den Sie installiert haben. Wenn Websites oder Programme keine Verbindung bekommen, schauen Sie zuerst hier.
+no redirects or blocks	keine Umleitungen oder Sperren
+Proxy: {0}	Proxy: {0}
+every website goes through a program on this PC first	jede Website läuft zuerst durch ein Programm auf diesem PC
+every website goes through this server first	jede Website läuft zuerst über diesen Server
+Fine for tools like Fiddler or some security programs. Otherwise it is often adware reading or changing your web pages: switch it off (check it and click "Remove checked").	In Ordnung für Werkzeuge wie Fiddler oder manche Sicherheitsprogramme. Sonst ist es oft Adware, die Ihre Webseiten liest oder ändert: schalten Sie es ab (markieren und auf "Markierte entfernen" klicken).
+Fine if your school, work or VPN set it up. Otherwise someone can see and change everything you browse: switch it off (check it and click "Remove checked").	In Ordnung, wenn Ihre Schule, Ihre Arbeit oder Ihr VPN das eingerichtet hat. Sonst kann jemand alles sehen und ändern, was Sie aufrufen: schalten Sie es ab (markieren und auf "Markierte entfernen" klicken).
+Proxy script: {0}	Proxy-Skript: {0}
+a script decides which server each website goes through	ein Skript entscheidet, über welchen Server jede Website läuft
+Normal at work or school. On a home PC adware uses this to send your browsing through its own server: remove it (check it and click "Remove checked").	Normal bei der Arbeit oder in der Schule. Auf einem Heim-PC nutzt Adware das, um Ihr Surfen über ihren eigenen Server zu leiten: entfernen Sie es (markieren und auf "Markierte entfernen" klicken).
+none - the PC connects directly	keiner - der PC verbindet sich direkt
+Proxy	Proxy
+Certificate: {0}	Zertifikat: {0}
+Certificate	Zertifikat
+a trusted root certificate known from adware (store {0})	ein vertrauenswürdiges Stammzertifikat, das von Adware bekannt ist (Speicher {0})
+It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.	Damit kann Adware sichere (https) Websites lesen und ändern. Deinstallieren Sie das Programm, das es mitgebracht hat (Seite Programme), und entfernen Sie dann das Zertifikat: Start > "Computerzertifikate verwalten" > Vertrauenswürdige Stammzertifizierungsstellen.

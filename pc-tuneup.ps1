@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.18.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.19.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1161,7 +1161,7 @@ see button above	zie de knop hierboven
 Which apps used the most battery in the last day or week (Windows Settings).	Welke apps de afgelopen dag of week de meeste accu gebruikten (Windows-instellingen).
 Battery history since {0}.	Accugeschiedenis sinds {0}.
 Charge it holds (% of new)	Lading die hij vasthoudt (% van nieuw)
-Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren't installed from a store, and settings forced through browser "policies" on a home PC.	Extensies in Chrome, Edge, Brave, Vivaldi en Firefox, plus de zoekmachine, startpagina en opstartpagina's. Hier verstopt adware zich: extensies die niet uit een store komen, en instellingen die op een thuis-pc via browser-"beleid" worden afgedwongen.
+Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, the search engine, home page and start-up pages, plus Windows' hosts file and proxy. Adware hides here: extensions that weren't installed from a store, and settings forced through "policies".	Extensies in Chrome, Edge, Brave, Vivaldi en Firefox, de zoekmachine, startpagina en opstartpagina's, plus het hosts-bestand en de proxy van Windows. Hier verstopt adware zich: extensies die niet uit een store komen, en via "beleid" afgedwongen instellingen.
 Open extensions page	Extensiepagina openen
 Remove checked policies	Aangevinkt beleid verwijderen
 Reset browser settings	Browserinstellingen herstellen
@@ -1618,6 +1618,46 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Remove checked	Aangevinkte verwijderen
+That row is about Windows itself (every browser). Select a row of a browser first.	Die rij gaat over Windows zelf (alle browsers). Selecteer eerst een rij van een browser.
+Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").	Vink eerst een of meer rijen met een beleid, het hosts-bestand of een proxy aan (extensies verwijder je in de browser zelf - gebruik "Extensiepagina openen").
+Removing browser policies and hosts file lines needs administrator rights - click "Restart as admin" first, or check only proxy rows.	Browserbeleid en regels in het hosts-bestand verwijderen vraagt beheerdersrechten - klik eerst op "Opnieuw als beheerder", of vink alleen proxy-rijen aan.
+Remove these?	Deze verwijderen?
+{0} line(s) removed	{0} regel(s) verwijderd
+Windows: hosts file	Windows: hosts-bestand
+Windows: {0}	Windows: {0}
+Couldn't change the hosts file: {0}	Kon het hosts-bestand niet wijzigen: {0}
+{0} item(s) removed. Restart the browser to see the change.	{0} item(s) verwijderd. Start de browser opnieuw om het verschil te zien.
+Some of these changes need administrator rights to undo - use "Restart as administrator" first.	Voor sommige van deze wijzigingen zijn beheerdersrechten nodig om ze ongedaan te maken - gebruik eerst "Opnieuw als beheerder".
+Hosts file moved	Hosts-bestand verplaatst
+Hosts file	Hosts-bestand
+Windows reads its hosts file from {0} instead of {1}	Windows leest zijn hosts-bestand uit {0} in plaats van {1}
+Programs have no reason to move it - malware does this to hide its own hosts file. Have the PC scanned (Windows Security > Virus & threat protection > Scan options > Microsoft Defender Offline scan).	Programma's hebben geen reden om het te verplaatsen - malware doet dit om zijn eigen hosts-bestand te verbergen. Laat de pc scannen (Windows-beveiliging > Virus- en bedreigingsbeveiliging > Scanopties > Microsoft Defender Offline-scan).
+Hosts file blocks {0}	Hosts-bestand blokkeert {0}
+hosts file line: {0}	regel in het hosts-bestand: {0}
+Malware blocks security and update sites so it can't be removed. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator), then have the PC scanned.	Malware blokkeert beveiligings- en updatesites zodat hij niet verwijderd kan worden. Heb je dit niet zelf toegevoegd, verwijder de regel dan (vink hem aan en klik op "Aangevinkte verwijderen" - beheerder nodig) en laat de pc daarna scannen.
+Hosts file: {0} -> {1}	Hosts-bestand: {0} -> {1}
+Points a name at a device in your own network (a NAS, printer or server). Fine if you set it up.	Wijst een naam naar een apparaat in je eigen netwerk (een NAS, printer of server). Prima als je dat zelf hebt ingesteld.
+Sends a well-known website to a different server - the way hijackers show fake pages or ads. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator).	Stuurt een bekende website naar een andere server - zo tonen kapers nepsites of advertenties. Heb je dit niet zelf toegevoegd, verwijder de regel dan (vink hem aan en klik op "Aangevinkte verwijderen" - beheerder nodig).
+Sends this name to a fixed address. Developers and some programs do this on purpose; if you don't know why it is there, remove the line (needs administrator).	Stuurt deze naam naar een vast adres. Ontwikkelaars en sommige programma's doen dat bewust; weet je niet waarom het er staat, verwijder de regel dan (beheerder nodig).
+Hosts file blocks {0} site(s)	Hosts-bestand blokkeert {0} site(s)
+in the file {0}	in het bestand {0}
+Usually an ad or tracking blocker you installed. If websites or programs fail to connect, look here first.	Meestal een advertentie- of trackerblokker die je hebt geïnstalleerd. Als websites of programma's geen verbinding krijgen, kijk dan eerst hier.
+no redirects or blocks	geen omleidingen of blokkades
+Proxy: {0}	Proxy: {0}
+every website goes through a program on this PC first	elke website gaat eerst door een programma op deze pc
+every website goes through this server first	elke website gaat eerst door deze server
+Fine for tools like Fiddler or some security programs. Otherwise it is often adware reading or changing your web pages: switch it off (check it and click "Remove checked").	Prima voor hulpmiddelen als Fiddler of sommige beveiligingsprogramma's. Anders is het vaak adware die je webpagina's leest of verandert: zet het uit (vink het aan en klik op "Aangevinkte verwijderen").
+Fine if your school, work or VPN set it up. Otherwise someone can see and change everything you browse: switch it off (check it and click "Remove checked").	Prima als je school, werk of vpn dit heeft ingesteld. Anders kan iemand alles zien en veranderen wat je bekijkt: zet het uit (vink het aan en klik op "Aangevinkte verwijderen").
+Proxy script: {0}	Proxyscript: {0}
+a script decides which server each website goes through	een script bepaalt via welke server elke website gaat
+Normal at work or school. On a home PC adware uses this to send your browsing through its own server: remove it (check it and click "Remove checked").	Normaal op het werk of op school. Op een thuis-pc gebruikt adware dit om je surfgedrag via zijn eigen server te sturen: verwijder het (vink het aan en klik op "Aangevinkte verwijderen").
+none - the PC connects directly	geen - de pc maakt direct verbinding
+Proxy	Proxy
+Certificate: {0}	Certificaat: {0}
+Certificate	Certificaat
+a trusted root certificate known from adware (store {0})	een vertrouwd basiscertificaat dat bekend is van adware (opslag {0})
+It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.	Hiermee kan adware beveiligde (https) websites lezen en veranderen. Verwijder het programma dat het meebracht (pagina Programma's) en daarna het certificaat: Start > "Computercertificaten beheren" > Vertrouwde basiscertificeringsinstanties.
 Plugged in	Aangesloten
 On battery	Op de accu
 Best power efficiency	Beste energie-efficiëntie
@@ -4902,9 +4942,9 @@ $btnPowerPlans.Add_Click({ Start-Process control.exe '/name Microsoft.PowerOptio
 # ===========================================================================
 # Browsers: extensions, search engine, home page, and settings forced by "policies"
 # ===========================================================================
-$pgBrw = New-Page 'Browsers' 'Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren''t installed from a store, and settings forced through browser "policies" on a home PC.'
+$pgBrw = New-Page 'Browsers' 'Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, the search engine, home page and start-up pages, plus Windows'' hosts file and proxy. Adware hides here: extensions that weren''t installed from a store, and settings forced through "policies".'
 $btnBrwExt = New-Button 'Open extensions page'
-$btnBrwPol = New-Button 'Remove checked policies'
+$btnBrwPol = New-Button 'Remove checked'
 $btnBrwReset = New-Button 'Reset browser settings'
 $btnBrwReload = New-Button 'Reload'
 $lvBrw = New-ListView $true @('Item', 290, 'Browser', 130, 'Kind', 110, 'Status', 80, 'Details', 560)
@@ -5044,7 +5084,63 @@ $BrowserWork = {
     $ffPol = "$env:ProgramFiles\Mozilla Firefox\distribution\policies.json"
     if (Test-Path $ffPol) { Add-B 'Policy file: policies.json' 'Firefox' 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) "forced settings in $ffPol" 'Open about:policies in Firefox to see what it forces. On a home PC you can delete the file (needs administrator).' $null }
     if (Test-Path 'HKLM:\SOFTWARE\Policies\Mozilla\Firefox') { Add-B 'Policy: settings forced in the registry' 'Firefox' 'Policy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) 'HKLM\SOFTWARE\Policies\Mozilla\Firefox' 'Open about:policies in Firefox to see what it forces.' $null }
+    # Windows itself, for every browser: the hosts file, the proxy, and fake root certificates (classic hijacker tricks)
+    Set-JobProgress 'hosts file and proxy'
+    $etc = "$env:windir\System32\drivers\etc"
+    $db = "$((Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' -ErrorAction SilentlyContinue).DataBasePath)".TrimEnd('\')
+    if ($db -and $db -ne $etc) {
+        Add-B 'Hosts file moved' 'Windows' 'Hosts file' 'Risky' "Windows reads its hosts file from $db instead of $etc" 'Programs have no reason to move it - malware does this to hide its own hosts file. Have the PC scanned (Windows Security > Virus & threat protection > Scan options > Microsoft Defender Offline scan).' $null
+        $etc = $db
+    }
+    $hostsFile = Join-Path $etc 'hosts'
+    $lines = @(try { [IO.File]::ReadAllLines($hostsFile) } catch { })
+    $popular = '(^|\.)(google|bing|microsoft|live|office|outlook|windowsupdate|apple|icloud|facebook|instagram|whatsapp|paypal|amazon|ebay|netflix|youtube|twitter|linkedin|yahoo|wikipedia|steampowered|steamcommunity|epicgames|discord|dropbox)\.[a-z.]+$|(^|\.)x\.com$|bank'
+    $security = '(^|\.)(windowsupdate\.(com|microsoft\.com)|update\.microsoft\.com|definitionupdates\.microsoft\.com|avast\.com|avg\.com|kaspersky\.[a-z]+|eset\.com|norton\.com|mcafee\.com|malwarebytes\.com|bitdefender\.[a-z]+|sophos\.com|trendmicro\.com|f-secure\.com|avira\.com|virustotal\.com|emsisoft\.com)$'
+    $blocked = 0
+    foreach ($line in $lines) {
+        $l = ($line -replace '#.*$', '').Trim()
+        if (-not $l) { continue }
+        $parts = @($l -split '\s+'); if ($parts.Count -lt 2) { continue }
+        $ip = $parts[0]; $names = @($parts[1..($parts.Count - 1)] | Where-Object { $_ -notmatch '^(localhost|localhost\.localdomain|local|broadcasthost|ip6-.*)$' -and $_ -notmatch '\.(docker|local|lan|home|internal|test|localhost)$' })
+        if (-not $names) { continue }
+        $block = $ip -in '0.0.0.0', '127.0.0.1', '::1', '::', '0:0:0:0:0:0:0:0', '0:0:0:0:0:0:0:1'
+        $private = $ip -match '^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|fe80:|fd)'
+        if ($block) {
+            $sec = @($names | Where-Object { $_ -match $security })
+            if ($sec) { Add-B "Hosts file blocks $($sec[0])" 'Windows' 'Hosts file' 'Risky' "hosts file line: $line" 'Malware blocks security and update sites so it can''t be removed. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator), then have the PC scanned.' @{ Line = $line } }
+            else { $blocked++ }
+        } elseif ($private) {
+            Add-B "Hosts file: $($names[0]) -> $ip" 'Windows' 'Hosts file' 'Info' "hosts file line: $line" 'Points a name at a device in your own network (a NAS, printer or server). Fine if you set it up.' @{ Line = $line }
+        } else {
+            $pop = @($names | Where-Object { $_ -match $popular })
+            Add-B "Hosts file: $(if ($pop) { $pop[0] } else { $names[0] }) -> $ip" 'Windows' 'Hosts file' $(if ($pop) { 'Risky' } else { 'Review' }) "hosts file line: $line" `
+                $(if ($pop) { 'Sends a well-known website to a different server - the way hijackers show fake pages or ads. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator).' } else { 'Sends this name to a fixed address. Developers and some programs do this on purpose; if you don''t know why it is there, remove the line (needs administrator).' }) @{ Line = $line }
+        }
+    }
+    if ($blocked) { Add-B "Hosts file blocks $blocked site(s)" 'Windows' 'Hosts file' 'Info' "in the file $hostsFile" 'Usually an ad or tracking blocker you installed. If websites or programs fail to connect, look here first.' $null }
+    elseif (-not @($rows | Where-Object Kind -eq 'Hosts file')) { Add-B 'Hosts file' 'Windows' 'Hosts file' 'OK' 'no redirects or blocks' $todoOk $null }
+    # Proxy: everything you browse goes through it
+    $isk = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
+    $is = Get-ItemProperty $isk -ErrorAction SilentlyContinue
+    $proxyTodo = if ($cfg.Managed) { 'Set by your organisation (this PC is managed) - leave it.' }
+    if ($is.ProxyEnable -eq 1 -and $is.ProxyServer) {
+        $local = "$($is.ProxyServer)" -match '(^|=)(127\.|localhost|\[?::1)'
+        Add-B "Proxy: $($is.ProxyServer)" 'Windows' 'Proxy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) $(if ($local) { 'every website goes through a program on this PC first' } else { 'every website goes through this server first' }) `
+            $(if ($proxyTodo) { $proxyTodo } elseif ($local) { 'Fine for tools like Fiddler or some security programs. Otherwise it is often adware reading or changing your web pages: switch it off (check it and click "Remove checked").' } else { 'Fine if your school, work or VPN set it up. Otherwise someone can see and change everything you browse: switch it off (check it and click "Remove checked").' }) `
+            @{ Path = $isk; Name = 'ProxyEnable'; Proxy = $true }
+    }
+    if ($is.AutoConfigURL) {
+        Add-B "Proxy script: $($is.AutoConfigURL)" 'Windows' 'Proxy' $(if ($cfg.Managed) { 'Info' } else { 'Review' }) 'a script decides which server each website goes through' `
+            $(if ($proxyTodo) { $proxyTodo } else { 'Normal at work or school. On a home PC adware uses this to send your browsing through its own server: remove it (check it and click "Remove checked").' }) @{ Path = $isk; Name = 'AutoConfigURL'; Proxy = $true }
+    }
+    if (-not ($is.ProxyEnable -eq 1 -and $is.ProxyServer) -and -not $is.AutoConfigURL) { Add-B 'Proxy' 'Windows' 'Proxy' 'OK' 'none - the PC connects directly' $todoOk $null }
+    # Root certificates that adware installed to read encrypted (https) pages
+    $badCa = 'Superfish|eDellRoot|DSDTestProvider|PrivDog|Komodia|Sendori|WebSafety|NetFilter|Lavasoft Ad-Aware Web Companion|Wajam|Bazooka'
+    foreach ($c in @(Get-ChildItem Cert:\LocalMachine\Root, Cert:\CurrentUser\Root -ErrorAction SilentlyContinue | Where-Object { "$($_.Subject)" -match $badCa })) {
+        Add-B "Certificate: $(($c.Subject -split ',')[0] -replace '^CN=', '')" 'Windows' 'Certificate' 'Risky' "a trusted root certificate known from adware (store $($c.PSParentPath -replace '^.*::', ''))" 'It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.' $null
+    }
     $rows
+
 }
 $BrwLevels = @{ Risky = 0; Review = 1; Info = 2; OK = 3 }
 function Update-Browsers {
@@ -5056,7 +5152,7 @@ function Update-Browsers {
         $btnBrwReload.Enabled = $true
         $lvBrw.BeginUpdate(); $lvBrw.Items.Clear()
         foreach ($r in $rows | Sort-Object { $BrwLevels[$_.Level] }, Browser, Item) {
-            $it = Add-Row $lvBrw @($r.Item, $r.Browser, $r.Kind, $r.Level, $r.Detail) $r ($r.Kind -eq 'Policy' -and $r.Level -eq 'Risky' -and $r.Extra)
+            $it = Add-Row $lvBrw @($r.Item, $r.Browser, $r.Kind, $r.Level, $r.Detail) $r ($r.Kind -in 'Policy', 'Hosts file' -and $r.Level -eq 'Risky' -and $r.Extra)
             Set-RowStatus $it 3 $(switch ($r.Level) { 'Risky' { $Theme.Bad } 'Review' { $Theme.Warn } 'OK' { $Theme.Text } default { $Theme.Muted } })
         }
         $lvBrw.EndUpdate()
@@ -5080,24 +5176,27 @@ function Open-Browser([string]$Browser, [string]$Url) {
 }
 function Get-SelectedBrowser {
     $r = if ($lvBrw.SelectedItems.Count) { $lvBrw.SelectedItems[0].Tag }
+    if ($r -and $r.Browser -eq 'Windows') { Show-Msg 'That row is about Windows itself (every browser). Select a row of a browser first.' | Out-Null; return $null }
     if ($r) { ($r.Browser -split ' ')[0] } else { $null }
 }
 $btnBrwExt.Add_Click({
+    if ($lvBrw.SelectedItems.Count -and $lvBrw.SelectedItems[0].Tag.Browser -eq 'Windows') { [void](Get-SelectedBrowser); return }
     $b = Get-SelectedBrowser; if (-not $b) { Show-Msg 'Select a row first.' | Out-Null; return }
     Open-Browser $b $(switch ($b) { 'Firefox' { 'about:addons' } default { "$($b.ToLower() -replace 'edge', 'edge')://extensions" } })
 })
 $btnBrwReset.Add_Click({
+    if ($lvBrw.SelectedItems.Count -and $lvBrw.SelectedItems[0].Tag.Browser -eq 'Windows') { [void](Get-SelectedBrowser); return }
     $b = Get-SelectedBrowser; if (-not $b) { Show-Msg 'Select a row of the browser to reset first.' | Out-Null; return }
     if ((Show-Msg "Open $b's reset page?`n`nResetting puts the search engine, home page, start-up pages and pinned tabs back to normal and switches extensions off. Bookmarks, history and saved passwords stay." 'YesNo' 'Question') -ne 'Yes') { return }
     Open-Browser $b $(switch ($b) { 'Edge' { 'edge://settings/resetProfileSettings' } 'Firefox' { 'about:support' } default { "$($b.ToLower())://settings/reset" } })
 })
 $btnBrwPol.Add_Click({
-    $picked = @($lvBrw.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { $_.Kind -eq 'Policy' -and $_.Extra })
-    if (-not $picked) { Show-Msg 'Check one or more policy rows first (extensions are removed in the browser itself - use "Open extensions page").' | Out-Null; return }
-    if (-not $IsAdmin) { Show-Msg 'Removing browser policies needs administrator rights - click "Restart as admin" first.' 'OK' 'Warning' | Out-Null; return }
-    if ((Show-Msg "Remove these forced browser settings?`n`n$(($picked | ForEach-Object { " - $($_.Browser): $($_.Item -replace '^Policy: ', '')" }) -join "`n")`n`nRestart the browser afterwards. You can undo this from the History page." 'YesNo' 'Question') -ne 'Yes') { return }
+    $picked = @($lvBrw.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { $_.Kind -in 'Policy', 'Hosts file', 'Proxy' -and $_.Extra })
+    if (-not $picked) { Show-Msg 'Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").' | Out-Null; return }
+    if (-not $IsAdmin -and ($picked | Where-Object Kind -in 'Policy', 'Hosts file')) { Show-Msg 'Removing browser policies and hosts file lines needs administrator rights - click "Restart as admin" first, or check only proxy rows.' 'OK' 'Warning' | Out-Null; return }
+    if ((Show-Msg "Remove these?`n`n$(($picked | ForEach-Object { " - $($_.Browser): $($_.Item -replace '^Policy: ', '')" }) -join "`n")`n`nRestart the browser afterwards. You can undo this from the History page." 'YesNo' 'Question') -ne 'Yes') { return }
     $done = 0
-    foreach ($p in $picked) {
+    foreach ($p in @($picked | Where-Object Kind -eq 'Policy')) {
         try {
             $k = Get-Item -LiteralPath $p.Extra.Path
             $old = $k.GetValue($p.Extra.Name); $kind = "$($k.GetValueKind($p.Extra.Name))"
@@ -5106,9 +5205,39 @@ $btnBrwPol.Add_Click({
             $done++
         } catch { }
     }
+    foreach ($p in @($picked | Where-Object Kind -eq 'Proxy')) {
+        try {
+            $old = Get-RegValue $p.Extra.Path $p.Extra.Name
+            if ($p.Extra.Name -eq 'ProxyEnable') { Set-RegValue $p.Extra.Path 'ProxyEnable' 0 } else { Remove-ItemProperty -LiteralPath $p.Extra.Path -Name $p.Extra.Name -ErrorAction Stop }
+            Add-History 'Browser' "Windows: $($p.Item)" 'switched off' @{ Type = 'Reg'; Values = @(@{ P = $p.Extra.Path; N = $p.Extra.Name; Old = $old; T = $(if ($p.Extra.Name -eq 'ProxyEnable') { 'DWord' } else { 'String' }) }) }
+            $done++
+        } catch { }
+    }
+    $hostLines = @($picked | Where-Object Kind -eq 'Hosts file' | ForEach-Object { $_.Extra.Line })
+    if ($hostLines) {
+        try { Remove-HostsLines $hostLines; Add-History 'Browser' 'Windows: hosts file' "$($hostLines.Count) line(s) removed" @{ Type = 'Hosts'; Lines = $hostLines }; $done += $hostLines.Count }
+        catch { Show-Msg "Couldn't change the hosts file: $($_.Exception.Message)" 'OK' 'Warning' | Out-Null }
+    }
     Update-History; Update-Browsers
-    Show-Msg "$done forced setting(s) removed. Restart the browser to see the change." | Out-Null
+    Show-Msg "$done item(s) removed. Restart the browser to see the change." | Out-Null
 })
+# The hosts file: lines are taken out (or put back) exactly as they were, and Windows forgets the old answers.
+function Get-HostsPath {
+    $db = "$((Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters' -ErrorAction SilentlyContinue).DataBasePath)".TrimEnd('\')
+    Join-Path $(if ($db) { $db } else { "$env:windir\System32\drivers\etc" }) 'hosts'
+}
+function Remove-HostsLines([string[]]$Lines) {
+    $f = Get-HostsPath
+    $keep = New-Object System.Collections.ArrayList
+    $left = New-Object System.Collections.ArrayList(, @($Lines))
+    foreach ($l in [IO.File]::ReadAllLines($f)) { if ($left.Contains($l)) { $left.Remove($l) } else { [void]$keep.Add($l) } }
+    Set-Content -LiteralPath $f -Value @($keep) -Encoding Default -ErrorAction Stop
+    Clear-DnsClientCache -ErrorAction SilentlyContinue
+}
+function Add-HostsLines([string[]]$Lines) {
+    Add-Content -LiteralPath (Get-HostsPath) -Value $Lines -Encoding Default -ErrorAction Stop
+    Clear-DnsClientCache -ErrorAction SilentlyContinue
+}
 $btnBrwReload.Add_Click({ Update-Browsers })
 
 # ===========================================================================
@@ -6530,8 +6659,8 @@ $btnHistLog.Add_Click({ Open-ChangeLog })
 $btnHistUndo.Add_Click({
     $picked = @($lvHist.CheckedItems | ForEach-Object { $_.Tag } | Where-Object { (Get-UndoStatus $_) -in 'can undo', 'reinstall from Store' })
     if (-not $picked) { Show-Msg 'Check one or more rows that say "can undo" first.' | Out-Null; return }
-    if ($IsAdmin -eq $false -and ($picked | Where-Object { $_.Undo.Type -eq 'Service' -or ($_.Undo.Type -eq 'Cmd' -and $_.Undo.Admin) })) {
-        Show-Msg 'Undoing service changes needs administrator rights - use "Restart as administrator" first.' 'OK' 'Warning' | Out-Null; return
+    if ($IsAdmin -eq $false -and ($picked | Where-Object { $_.Undo.Type -eq 'Service' -or ($_.Undo.Type -eq 'Cmd' -and $_.Undo.Admin) -or $_.Undo.Type -eq 'Hosts' })) {
+        Show-Msg 'Some of these changes need administrator rights to undo - use "Restart as administrator" first.' 'OK' 'Warning' | Out-Null; return
     }
     $names = ($picked | ForEach-Object { " - $($_.Item): $($_.Change)" }) -join "`n"
     if ((Show-Msg "Undo these changes?`n$names" 'YesNo' 'Question') -ne 'Yes') { return }
@@ -6559,6 +6688,10 @@ $btnHistUndo.Add_Click({
                 }
                 'Power' {
                     foreach ($a in @($u.Cmds)) { Invoke-PowerCfg $a }
+                    $logs += , @('Undo', $e.Item, 'put back as it was')
+                }
+                'Hosts' {
+                    Add-HostsLines @($u.Lines)
                     $logs += , @('Undo', $e.Item, 'put back as it was')
                 }
                 'PowerMode' {

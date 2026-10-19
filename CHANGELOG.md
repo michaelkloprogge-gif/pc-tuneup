@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.19.0
+
+- The **Browsers** page now also checks Windows itself, for every browser at once:
+  - **Hosts file:** lines that send well-known websites (Google, Microsoft, banks, PayPal...) to another server, lines that block security and update sites (a malware trick), and a hosts file that was moved. Ad and tracking blockers and names in your own network are recognised as normal.
+  - **Proxy:** a proxy server or proxy script that all your browsing goes through - normal at work, often adware on a home PC.
+  - **Fake root certificates** known from adware (Superfish, eDellRoot, PrivDog and others) that let it read secure websites.
+- **Remove checked** (was "Remove checked policies") also removes checked hosts file lines (as administrator) and switches off checked proxy settings (no administrator needed). Everything can be undone from History.
 ## 1.18.0
 
 - New page **Power** (under Check): the power mode, power plan, when the screen turns off and the PC goes to sleep, what closing the lid does, the highest processor speed allowed, USB power saving, hibernate and Fast startup - each for plugged in and on battery, with what to do. The aim: quick when plugged in, lasting on battery. Recommended fixes are pre-checked, and every change can be undone from History. The power mode for the power source the PC is on now can be changed without administrator rights.

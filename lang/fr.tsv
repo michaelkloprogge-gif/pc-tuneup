@@ -1016,7 +1016,7 @@ see button above	voir le bouton ci-dessus
 Which apps used the most battery in the last day or week (Windows Settings).	Quelles applications ont le plus utilisé la batterie au cours du dernier jour ou de la dernière semaine (Paramètres Windows).
 Battery history since {0}.	Historique de la batterie depuis le {0}.
 Charge it holds (% of new)	Charge conservée (% du neuf)
-Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren't installed from a store, and settings forced through browser "policies" on a home PC.	Extensions de Chrome, Edge, Brave, Vivaldi et Firefox, ainsi que le moteur de recherche, la page d'accueil et les pages de démarrage. C'est là que se cachent les adwares: extensions non installées depuis une boutique, et paramètres imposés par des "stratégies" de navigateur sur un PC familial.
+Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, the search engine, home page and start-up pages, plus Windows' hosts file and proxy. Adware hides here: extensions that weren't installed from a store, and settings forced through "policies".	Extensions de Chrome, Edge, Brave, Vivaldi et Firefox, moteur de recherche, page d'accueil et pages de démarrage, ainsi que le fichier hosts et le proxy de Windows. Les logiciels publicitaires se cachent ici : extensions hors boutique et paramètres imposés par des « stratégies ».
 Open extensions page	Ouvrir la page des extensions
 Remove checked policies	Supprimer les stratégies cochées
 Reset browser settings	Réinitialiser les paramètres du navigateur
@@ -1693,3 +1693,43 @@ Best power efficiency	Meilleure efficacité énergétique
 Better performance	Meilleures performances
 Best performance	Performances optimales
 Fast startup	Démarrage rapide
+Remove checked	Supprimer la sélection
+That row is about Windows itself (every browser). Select a row of a browser first.	Cette ligne concerne Windows lui-même (tous les navigateurs). Sélectionnez d'abord une ligne d'un navigateur.
+Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").	Cochez d'abord une ou plusieurs lignes de stratégie, de fichier hosts ou de proxy (les extensions se suppriment dans le navigateur lui-même - utilisez « Ouvrir la page des extensions »).
+Removing browser policies and hosts file lines needs administrator rights - click "Restart as admin" first, or check only proxy rows.	Supprimer des stratégies de navigateur et des lignes du fichier hosts nécessite des droits d'administrateur - cliquez d'abord sur « Relancer en admin », ou ne cochez que les lignes de proxy.
+Remove these?	Supprimer ceci ?
+{0} line(s) removed	{0} ligne(s) supprimée(s)
+Windows: hosts file	Windows : fichier hosts
+Windows: {0}	Windows : {0}
+Couldn't change the hosts file: {0}	Impossible de modifier le fichier hosts : {0}
+{0} item(s) removed. Restart the browser to see the change.	{0} élément(s) supprimé(s). Redémarrez le navigateur pour voir le changement.
+Some of these changes need administrator rights to undo - use "Restart as administrator" first.	Certaines de ces modifications nécessitent des droits d'administrateur pour être annulées - utilisez d'abord « Relancer en admin ».
+Hosts file moved	Fichier hosts déplacé
+Hosts file	Fichier hosts
+Windows reads its hosts file from {0} instead of {1}	Windows lit son fichier hosts dans {0} au lieu de {1}
+Programs have no reason to move it - malware does this to hide its own hosts file. Have the PC scanned (Windows Security > Virus & threat protection > Scan options > Microsoft Defender Offline scan).	Les programmes n'ont aucune raison de le déplacer - les logiciels malveillants le font pour cacher leur propre fichier hosts. Faites analyser le PC (Sécurité Windows > Protection contre les virus et menaces > Options d'analyse > Analyse Microsoft Defender hors ligne).
+Hosts file blocks {0}	Le fichier hosts bloque {0}
+hosts file line: {0}	ligne du fichier hosts : {0}
+Malware blocks security and update sites so it can't be removed. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator), then have the PC scanned.	Les logiciels malveillants bloquent les sites de sécurité et de mise à jour pour ne pas être supprimés. Si vous ne l'avez pas ajoutée vous-même, supprimez la ligne (cochez-la et cliquez sur « Supprimer la sélection » - administrateur nécessaire), puis faites analyser le PC.
+Hosts file: {0} -> {1}	Fichier hosts : {0} -> {1}
+Points a name at a device in your own network (a NAS, printer or server). Fine if you set it up.	Associe un nom à un appareil de votre propre réseau (NAS, imprimante ou serveur). Bien si vous l'avez configuré.
+Sends a well-known website to a different server - the way hijackers show fake pages or ads. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator).	Envoie un site connu vers un autre serveur - c'est ainsi que les pirates affichent de fausses pages ou des publicités. Si vous ne l'avez pas ajoutée vous-même, supprimez la ligne (cochez-la et cliquez sur « Supprimer la sélection » - administrateur nécessaire).
+Sends this name to a fixed address. Developers and some programs do this on purpose; if you don't know why it is there, remove the line (needs administrator).	Envoie ce nom vers une adresse fixe. Les développeurs et certains programmes le font exprès ; si vous ne savez pas pourquoi il est là, supprimez la ligne (administrateur nécessaire).
+Hosts file blocks {0} site(s)	Le fichier hosts bloque {0} site(s)
+in the file {0}	dans le fichier {0}
+Usually an ad or tracking blocker you installed. If websites or programs fail to connect, look here first.	Généralement un bloqueur de publicités ou de pistage que vous avez installé. Si des sites ou des programmes n'arrivent pas à se connecter, regardez ici en premier.
+no redirects or blocks	aucune redirection ni blocage
+Proxy: {0}	Proxy : {0}
+every website goes through a program on this PC first	chaque site passe d'abord par un programme sur ce PC
+every website goes through this server first	chaque site passe d'abord par ce serveur
+Fine for tools like Fiddler or some security programs. Otherwise it is often adware reading or changing your web pages: switch it off (check it and click "Remove checked").	Normal pour des outils comme Fiddler ou certains logiciels de sécurité. Sinon, c'est souvent un logiciel publicitaire qui lit ou modifie vos pages : désactivez-le (cochez-le et cliquez sur « Supprimer la sélection »).
+Fine if your school, work or VPN set it up. Otherwise someone can see and change everything you browse: switch it off (check it and click "Remove checked").	Normal si votre école, votre travail ou votre VPN l'a configuré. Sinon, quelqu'un peut voir et modifier tout ce que vous consultez : désactivez-le (cochez-le et cliquez sur « Supprimer la sélection »).
+Proxy script: {0}	Script de proxy : {0}
+a script decides which server each website goes through	un script décide par quel serveur passe chaque site
+Normal at work or school. On a home PC adware uses this to send your browsing through its own server: remove it (check it and click "Remove checked").	Normal au travail ou à l'école. Sur un PC personnel, les logiciels publicitaires s'en servent pour faire passer votre navigation par leur propre serveur : supprimez-le (cochez-le et cliquez sur « Supprimer la sélection »).
+none - the PC connects directly	aucun - le PC se connecte directement
+Proxy	Proxy
+Certificate: {0}	Certificat : {0}
+Certificate	Certificat
+a trusted root certificate known from adware (store {0})	un certificat racine de confiance connu pour venir d'un logiciel publicitaire (magasin {0})
+It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.	Il permet à un logiciel publicitaire de lire et de modifier les sites sécurisés (https). Désinstallez le programme qui l'a apporté (page Programmes), puis supprimez le certificat : Démarrer > « Gérer les certificats de l'ordinateur » > Autorités de certification racines de confiance.

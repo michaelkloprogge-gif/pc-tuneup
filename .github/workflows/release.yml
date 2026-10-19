@@ -48,7 +48,7 @@ jobs:
         shell: powershell
         run: .\tests\Test-Pages.ps1 -Language nl -MaxFreezeMs 5000; exit $LASTEXITCODE
 
-      - name: Check the German and French translation files
+      - name: Check the translation files (German, French, Spanish, Italian, Polish)
         shell: powershell
         run: .\tests\Test-Languages.ps1; exit $LASTEXITCODE
 
@@ -59,6 +59,12 @@ jobs:
       - name: Test every page (French)
         shell: powershell
         run: .\tests\Test-Pages.ps1 -Language fr -MaxFreezeMs 5000; exit $LASTEXITCODE
+
+      # Spanish, Italian and Polish: one step, so the build doesn't get much longer.
+      - name: Test every page (Spanish, Italian, Polish)
+        shell: powershell
+        run: |
+          foreach ($l in 'es', 'it', 'pl') { .\tests\Test-Pages.ps1 -Language $l -MaxFreezeMs 5000; if ($LASTEXITCODE) { exit $LASTEXITCODE } }
 
       - name: Test every button
         shell: powershell

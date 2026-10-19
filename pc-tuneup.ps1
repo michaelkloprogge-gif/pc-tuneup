@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.21.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.22.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -137,7 +137,7 @@ function Save-Settings { $Settings | ConvertTo-Json | Set-Content -Path $Setting
 # Language. Code and data stay English; T() translates text on its way to the screen.
 # Table: English <TAB> Dutch, one per line; {0}, {1}... stand for values filled in at run time.
 # ---------------------------------------------------------------------------
-$Lang = switch ($Settings.Language) { { $_ -in 'nl', 'en', 'de', 'fr' } { $_ } default { $w = (Get-UICulture).TwoLetterISOLanguageName; if ($w -in 'nl', 'de', 'fr') { $w } else { 'en' } } }
+$Lang = switch ($Settings.Language) { { $_ -in 'nl', 'en', 'de', 'fr', 'es', 'it', 'pl' } { $_ } default { $w = (Get-UICulture).TwoLetterISOLanguageName; if ($w -in 'nl', 'de', 'fr', 'es', 'it', 'pl') { $w } else { 'en' } } }
 $NLTable = @'
 Health	Gezondheid
 Clean	Opruimen
@@ -1618,6 +1618,19 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+It started right after a Windows update ({0}, installed {1}). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates.	Het begon direct na een Windows-update ({0}, geïnstalleerd op {1}). Blijft het gebeuren, verwijder die update dan: Instellingen > Windows Update > Updategeschiedenis > Updates verwijderen.
+Open the update history (to uninstall the update)	De updategeschiedenis openen (om de update te verwijderen)
+Also: {0}	Ook: {0}
+Slows start-up	Vertraagt opstarten
+Drive wear	Slijtage schijf
+{0}: {1}% used, about {2}% a year more	{0}: {1}% versleten, ongeveer {2}% per jaar erbij
+{0}: {1}% used, no change in {2} days	{0}: {1}% versleten, geen verandering in {2} dagen
+Drive {0} is wearing fast - at this rate it is worn out in about {1} year(s). Keep your backups up to date and plan a replacement.	Schijf {0} slijt snel - in dit tempo is hij over ongeveer {1} jaar versleten. Houd je back-ups bij en plan een vervanging.
+Drive {0} got hot ({1} C) in the last 30 days - heat shortens its life. Keep the vents free and the PC off soft surfaces.	Schijf {0} werd de afgelopen 30 dagen heet ({1} C) - warmte verkort zijn levensduur. Houd de ventilatieopeningen vrij en zet de pc niet op zachte ondergronden.
+Drive {0} reported new read or write errors - back up your files now and check the drive.	Schijf {0} meldde nieuwe lees- of schrijffouten - maak nu een back-up van je bestanden en laat de schijf controleren.
+Español	Español
+Italiano	Italiano
+Polski	Polski
 Earlier	Eerder
 On average	Gemiddeld
 At most	Hoogstens
@@ -1912,9 +1925,9 @@ $script:TExact = New-Object Collections.Hashtable([StringComparer]::Ordinal)
 $script:TCache = New-Object Collections.Hashtable([StringComparer]::Ordinal)
 $script:TPatterns = @()
 # Dates and numbers in the chosen language too (3,5 / okt 2028).
-$UiCulture = switch ($Lang) { 'nl' { [Globalization.CultureInfo]::GetCultureInfo('nl-NL') } 'de' { [Globalization.CultureInfo]::GetCultureInfo('de-DE') } 'fr' { [Globalization.CultureInfo]::GetCultureInfo('fr-FR') } default { [Globalization.CultureInfo]::CurrentCulture } }
+$UiCulture = switch ($Lang) { 'nl' { [Globalization.CultureInfo]::GetCultureInfo('nl-NL') } 'de' { [Globalization.CultureInfo]::GetCultureInfo('de-DE') } 'fr' { [Globalization.CultureInfo]::GetCultureInfo('fr-FR') } 'es' { [Globalization.CultureInfo]::GetCultureInfo('es-ES') } 'it' { [Globalization.CultureInfo]::GetCultureInfo('it-IT') } 'pl' { [Globalization.CultureInfo]::GetCultureInfo('pl-PL') } default { [Globalization.CultureInfo]::CurrentCulture } }
 [Threading.Thread]::CurrentThread.CurrentCulture = $UiCulture
-# German and French live in lang\de.tsv and lang\fr.tsv (same format), built into the exe as resources.
+# The other languages live in lang\<code>.tsv (German, French, Spanish, Italian, Polish; same format), built into the exe as resources.
 function Get-LangTable([string]$Code) {
     if ($Code -eq 'nl') { return $NLTable }
     try {
@@ -2551,13 +2564,15 @@ $script:ExtraAdvice = @{}    # one-line findings from the Updates / Security / S
 
 # Slower checks (a few seconds), run in the background: drive health, battery wear, Windows Update.
 $HealthDeepWork = {
-    $lines = @(); $advice = @()
+    $lines = @(); $advice = @(); $diskData = @()
     foreach ($d in Get-PhysicalDisk -ErrorAction SilentlyContinue) {
         $extra = ''
         try {   # wear and temperature need administrator rights
             $rc = $d | Get-StorageReliabilityCounter -ErrorAction Stop
             if ($null -ne $rc.Wear) { $extra += ", $($rc.Wear)% worn" }
             if ($rc.Temperature) { $extra += ", $($rc.Temperature) C" }
+            $diskData += [pscustomobject]@{ N = "$($d.FriendlyName)".Trim(); S = "$($d.SerialNumber)".Trim(); W = $rc.Wear; T = $rc.Temperature; TMax = $rc.TemperatureMax
+                                            E = [int64]$rc.ReadErrorsUncorrected + [int64]$rc.WriteErrorsUncorrected; H = $rc.PowerOnHours }
         } catch { }
         $lines += 'Drive:     {0} ({1} {2}) - {3}{4}' -f "$($d.FriendlyName)".Trim(), $d.BusType, $d.MediaType, $d.HealthStatus, $extra
         if ("$($d.HealthStatus)" -ne 'Healthy') { $advice += "Drive '$($d.FriendlyName)' reports '$($d.HealthStatus)' - back up your files now and have the drive checked." }
@@ -2594,7 +2609,7 @@ $HealthDeepWork = {
         $advice += 'Windows is waiting for a restart to finish installing updates - restart when you can.'
     }
     $lines += $upd
-    [pscustomobject]@{ Lines = $lines; Advice = $advice; WuDays = $wuDays }
+    [pscustomobject]@{ Lines = $lines; Advice = $advice; WuDays = $wuDays; Disks = $diskData }
 }
 
 # The everyday readings (CPU, memory, disks, power, top programs). Gathered in the background: reading
@@ -2626,6 +2641,43 @@ $HealthQuickWork = {
 }
 $script:HealthQuick = $null
 
+# Drive health over time: one note per drive per day (wear, temperature, uncorrected errors - administrator only), kept a year,
+# so the Health page can say how fast a drive wears and warn about heat or new errors.
+$DiskFile = Join-Path $DataDir 'disks.jsonl'
+$script:DiskTrend = $null
+function Save-DiskSample($Disks) {
+    $Disks = @($Disks | Where-Object { $null -ne $_.W -or $_.T })
+    if (-not $Disks) { return }
+    $today = (Get-Date).ToString('yyyy-MM-dd')
+    $old = @(if (Test-Path $DiskFile) { Get-Content $DiskFile -Encoding UTF8 | Where-Object { $_.Trim() } | ForEach-Object { try { $_ | ConvertFrom-Json } catch { } } })
+    $keep = @($old | Where-Object { $_.D -ne $today -and [datetime]$_.D -gt (Get-Date).AddDays(-400) })
+    $new = foreach ($d in $Disks) { [pscustomobject]@{ D = $today; N = $d.N; S = $d.S; W = $d.W; T = $d.T; TMax = $d.TMax; E = $d.E; H = $d.H } }
+    try { Set-Content -Path $DiskFile -Value @(@($keep) + @($new) | ForEach-Object { $_ | ConvertTo-Json -Compress }) -Encoding UTF8 } catch { }
+    $script:DiskTrend = $null
+}
+# Lines for the readings and advice, worked out once per new note.
+function Get-DiskTrend {
+    if ($script:DiskTrend) { return $script:DiskTrend }
+    $lines = @(); $advice = @()
+    $all = @(if (Test-Path $DiskFile) { Get-Content $DiskFile -Encoding UTF8 | Where-Object { $_.Trim() } | ForEach-Object { try { $_ | ConvertFrom-Json } catch { } } })
+    foreach ($g in $all | Group-Object { if ($_.S) { $_.S } else { $_.N } }) {
+        $s = @($g.Group | Sort-Object D); $first = $s[0]; $last = $s[-1]; $name = $last.N
+        $days = ([datetime]$last.D - [datetime]$first.D).TotalDays
+        if ($null -ne $last.W -and $null -ne $first.W -and $days -ge 30) {
+            $perYear = [Math]::Round(([double]$last.W - [double]$first.W) / $days * 365, 1)
+            if ($perYear -gt 0) {
+                $years = [Math]::Round((100 - [double]$last.W) / $perYear)
+                $lines += "Drive wear:  $((T '{0}: {1}% used, about {2}% a year more').Replace('{0}', $name).Replace('{1}', "$($last.W)").Replace('{2}', "$perYear"))"
+                if ($years -lt 2) { $advice += (T 'Drive {0} is wearing fast - at this rate it is worn out in about {1} year(s). Keep your backups up to date and plan a replacement.').Replace('{0}', $name).Replace('{1}', "$([Math]::Max(0, $years))") }
+            } else { $lines += "Drive wear:  $((T '{0}: {1}% used, no change in {2} days').Replace('{0}', $name).Replace('{1}', "$($last.W)").Replace('{2}', "$([int]$days)"))" }
+        }
+        $hot = @($s | Where-Object { [double]$_.T -ge 70 -and ([datetime]$_.D) -gt (Get-Date).AddDays(-30) })
+        if ($hot) { $advice += (T 'Drive {0} got hot ({1} C) in the last 30 days - heat shortens its life. Keep the vents free and the PC off soft surfaces.').Replace('{0}', $name).Replace('{1}', "$(($hot | Measure-Object T -Maximum).Maximum)") }
+        if ($s.Count -ge 2 -and [int64]$last.E -gt [int64]$s[-2].E) { $advice += (T 'Drive {0} reported new read or write errors - back up your files now and check the drive.').Replace('{0}', $name) }
+    }
+    $script:DiskTrend = [pscustomobject]@{ Lines = $lines; Advice = $advice }
+    $script:DiskTrend
+}
 # Draws the Health page from the latest readings. Cheap (no Windows queries), so every page can call it.
 function Render-Health {
     $q = $script:HealthQuick
@@ -2656,6 +2708,7 @@ function Render-Health {
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
     $lines += @(Get-FixLines)
+    $dt = Get-DiskTrend; $lines += @($dt.Lines); $advice += @($dt.Advice)
     foreach ($k in 'Browsers', 'Network', 'Drivers', 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $key = ($lines + $advice) -join '|'
     if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
@@ -2679,7 +2732,7 @@ function Update-Health([switch]$Quick) {
     Render-Health
     if ($Quick) { return }
     Start-Bg -Label 'Checking this PC' $HealthQuickWork $null { param($r) if ($r) { $script:HealthQuick = $r[0] }; Render-Health }
-    Start-Bg -Label 'Checking drive, battery and updates' $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0] }; Render-Health }
+    Start-Bg -Label 'Checking drive, battery and updates' $HealthDeepWork $null { param($r) if ($r) { $script:HealthDeep = $r[0]; Save-DiskSample $script:HealthDeep.Disks }; Render-Health }
 }
 
 $SpeedWork = {
@@ -2942,7 +2995,7 @@ $StartupSafeOff = @(
 $btnStartReload = New-Button 'Reload'
 $btnStartApply = New-Button 'Apply changes'
 $btnStartTM = New-Button 'Open Task Manager'
-$lvStart = New-ListView $true @('App', 260, 'For', 80, 'Advice', 170, 'Command', 420)
+$lvStart = New-ListView $true @('App', 260, 'For', 80, 'Advice', 170, 'Slows start-up', 110, 'Command', 320)
 $lblStart = New-Status
 $chartBoot = New-Chart 150
 $lblBoot = New-Object Windows.Forms.Label
@@ -2990,12 +3043,24 @@ function Update-Startup {
                 if ($text -match $StartupSafeOff) { $advice = 'safe to turn off'; break }
             }
             $display = $e.Name -replace '_[0-9A-F]{32}$', ''
-            $it = Add-Row $lvStart @($display, $s.Scope, $advice, $e.Cmd) @{ Src = $s; Name = $e.Name; On = $on; Advice = $advice } $on
+            $it = Add-Row $lvStart @($display, $s.Scope, $advice, '', $e.Cmd) @{ Src = $s; Name = $e.Name; On = $on; Advice = $advice; Cmd = $e.Cmd } $on
             if ($advice -like 'keep*') { $it.ForeColor = $Theme.Good }
         }
     }
     $lvStart.EndUpdate()
+    Set-StartupImpact
     $lblStart.Text = '{0} startup apps, {1} turned on.' -f $lvStart.Items.Count, $lvStart.CheckedItems.Count
+}
+# The "Slows start-up" column: how many seconds each app added to a start in the last 90 days (Windows' own measurement,
+# visible to administrators only). Empty when Windows recorded no delay for it.
+function Set-StartupImpact {
+    if ($null -eq $script:BootApps) { return }
+    foreach ($it in $lvStart.Items) {
+        $cmd = "$($it.Tag.Cmd)"
+        $a = @($script:BootApps | Where-Object { $_.File -and $cmd.IndexOf($_.File, [StringComparison]::OrdinalIgnoreCase) -ge 0 } | Sort-Object Sec -Descending)[0]
+        $it.SubItems[3].Text = if ($a) { '+{0:N1} s' -f $a.Sec } else { '' }
+        if ($a -and $a.Sec -ge 5) { $it.UseItemStyleForSubItems = $false; $it.SubItems[3].ForeColor = $Theme.Warn }
+    }
 }
 $btnStartReload.Add_Click({ Update-Startup })
 $btnStartTM.Add_Click({ Start-Process taskmgr.exe '/7 /startup' })
@@ -3018,7 +3083,10 @@ $BootWork = {
         if ($name) { [pscustomobject]@{ Name = "$name".Trim(); Kind = $kind[$_.Id]; Sec = [double]$h.DegradationTime / 1000 } } } |
         Group-Object Name | ForEach-Object { [pscustomobject]@{ Name = $_.Name; Kind = $_.Group[0].Kind; Sec = [Math]::Round(($_.Group | Measure-Object Sec -Maximum).Maximum, 1); Times = $_.Count } } |
         Sort-Object Sec -Descending | Select-Object -First 5)
-    [pscustomobject]@{ Denied = $false; Boots = $boots; Slow = $slow }
+    # Per start-up app (event 101): the longest it delayed a start, matched to the Startup list by its program file.
+    $apps = @($slowEv | Where-Object Id -eq 101 | ForEach-Object { $h = & $data $_; if ($h.Name) { [pscustomobject]@{ File = "$($h.Name)".Trim(); Sec = [double]$h.DegradationTime / 1000 } } } |
+        Group-Object File | ForEach-Object { [pscustomobject]@{ File = $_.Name; Sec = [Math]::Round(($_.Group | Measure-Object Sec -Maximum).Maximum, 1); Times = $_.Count } })
+    [pscustomobject]@{ Denied = $false; Boots = $boots; Slow = $slow; Apps = $apps }
 }
 function Update-Boot {
     $fast = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power' -ErrorAction SilentlyContinue).HiberbootEnabled -eq 1
@@ -3033,6 +3101,7 @@ function Update-Boot {
         }
         $b = @($r.Boots | Sort-Object X)
         $script:BootList = $b; Update-FixBoot
+        $script:BootApps = @($r.Apps); Set-StartupImpact
         if (-not $b) { Set-Chart $chartBoot @() 60 ' s' 'Start-up time' 'No start-up times recorded yet.'; $lblBoot.Text = $fastTxt; return }
         $max = [Math]::Max(30, [Math]::Ceiling((($b | Measure-Object Y -Maximum).Maximum) / 30) * 30)
         $recent = @($b | Where-Object { $_.X -gt (Get-Date).AddDays(-30) })
@@ -3918,7 +3987,8 @@ $StabScanWork = {
     # $Fix names the one-click fix for the row (see $StabilityFixes); set $nextFix just before calling.
     function Add-Stab($Problem, $Level, $What, $Events, $Todo, $Search, $Fix = $nextFix) {
         $last = ($Events | Measure-Object TimeCreated -Maximum).Maximum
-        [void]$rows.Add([pscustomobject]@{ Problem = $Problem; Level = $Level; What = $What; Count = @($Events).Count; Last = $last; Todo = $Todo; Search = $Search; Fix = $Fix })
+        $first = ($Events | Measure-Object TimeCreated -Minimum).Minimum
+        [void]$rows.Add([pscustomobject]@{ Problem = $Problem; Level = $Level; What = $What; Count = @($Events).Count; Last = $last; First = $first; Todo = $Todo; Search = $Search; Fix = $Fix; OrigTodo = $null })
     }
     $nextFix = $null
     $sev = { param($n, $warnAt, $probAt) if ($n -ge $probAt) { 'Problem' } elseif ($n -ge $warnAt) { 'Warning' } else { 'Info' } }
@@ -4045,6 +4115,20 @@ $StabScanWork = {
             "Restart and try Windows Update again. If it keeps failing: Settings > System > Troubleshoot > Other troubleshooters > Windows Update. (Error $code)" "$code windows update"
     }
 
+    # --- Did it start right after an update? Windows Update's own log says what was installed when (readable without administrator).
+    # A crash kind that began within 3 days of an update, after at least 10 quiet days, probably came with it. Rows whose cause is already known (an add-on, nView) are left alone.
+    $updates = @(Get-Events 'System' 19 'Microsoft-Windows-WindowsUpdateClient' | ForEach-Object { [pscustomobject]@{ Time = $_.TimeCreated; Title = "$($_.Properties[0].Value)" } } |
+                 Where-Object { $_.Title -notmatch 'KB2267602|KB4052623|KB890830|KB5007651|Security Intelligence|Defender Antivirus|^9[A-Z0-9]{11}-' })   # (virus definitions, the malware removal tool and Store apps don't break things)
+    foreach ($row in $rows) {
+        if ($row.Problem -notin 'App crashes', 'Blue screens', 'Graphics resets', 'Freezes', 'Hardware errors' -or $row.Count -lt 2 -or -not $row.First -or $row.What -match 'froze once' -or $row.Level -eq 'Info' -or $row.Fix -in 'nview', 'vcredist') { continue }
+        $u = $updates | Where-Object { $_.Time -le $row.First -and ($row.First - $_.Time).TotalDays -le 3 -and ($_.Time - $since).TotalDays -ge 10 } | Sort-Object Time -Descending | Select-Object -First 1
+        if (-not $u) { continue }
+        $name = if ($u.Title -match '(KB\d{6,8})') { $Matches[1] } else { $t = $u.Title -replace '\s*\(.*$', ''; if ($t.Length -gt 50) { $t.Substring(0, 47) + '...' } else { $t } }
+        $row.OrigTodo = $row.Todo
+        $row.Todo = "It started right after a Windows update ($name, installed $($u.Time.ToString('d'))). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates."
+        $row.Fix = 'wuhistory'
+    }
+
     $index = $null
     $hist = @()
     try {
@@ -4083,6 +4167,7 @@ $lvStab.Add_SelectedIndexChanged({
     $s = $lvStab.SelectedItems[0].Tag
     $fix = Get-StabilityFix $s
     $txtStab.Text = "$($s.Problem): $($s.What) - $($s.Count) time(s) in 30 days, last on $(if ($s.Last) { $s.Last.ToString('g') })`r`n`r`nWhat to do: $($s.Todo)" +
+                    $(if ($s.OrigTodo) { "`r`n`r`nAlso: $($s.OrigTodo)" }) +
                     $(if ($fix) { "`r`n`r`nOne-click fix: $($fix.Label)$(if ($fix.Admin -and -not $IsAdmin) { ' (needs administrator)' })" })
     $btnStabFix.Enabled = [bool]$fix
 })
@@ -4103,6 +4188,7 @@ $StabilityFixes = @{
     drivers   = @{ Label = 'Check the drivers on the Drivers page'; Admin = $false }
     store     = @{ Label = 'Open Store app updates'; Admin = $false }
     appupdate = @{ Label = 'Look for an update on the Updates page'; Admin = $false }
+    wuhistory = @{ Label = 'Open the update history (to uninstall the update)'; Admin = $false }
 }
 function Get-StabilityFix($Row) {
     if (-not $Row.Fix) { return $null }
@@ -4171,6 +4257,7 @@ function Invoke-StabilityFix {
         'drivers'   { Show-Page $pgDrv; return }
         'store'     { Start-Process 'ms-windows-store://downloadsandupdates'; return }
         'appupdate' { Show-Page $pgUpd; return }
+        'wuhistory' { Start-Process 'ms-settings:windowsupdate-history'; return }
         'memtest'   {
             if ((Show-Msg 'Windows Memory Diagnostic checks the memory while the PC restarts (about 10-20 minutes). It asks whether to restart now or next time.' 'OKCancel' 'Information') -eq 'OK') {
                 Start-Process mdsched.exe; Add-History 'Repair' 'Memory test' 'scheduled with Windows Memory Diagnostic'; Update-History
@@ -6270,10 +6357,15 @@ function Update-Now {
         Render-Now
     }
 }
-# Every 3 seconds while the page is on screen (not while it's hidden, minimised or paused).
+# Every 3 seconds while the page is on screen (not while it's hidden, minimised or paused); every 15 seconds while
+# another window is in front, so a forgotten open page costs next to nothing.
 $nowTimer = New-Object Windows.Forms.Timer; $nowTimer.Interval = 3000
+$script:NowLast = [datetime]::MinValue
 $nowTimer.Add_Tick({
-    if ($pgNow.Visible -and $form.Visible -and $form.WindowState -ne 'Minimized' -and -not $script:NowPaused -and -not ($simple -and $simple.Visible)) { Update-Now }
+    if (-not ($pgNow.Visible -and $form.Visible -and $form.WindowState -ne 'Minimized' -and -not $script:NowPaused -and -not ($simple -and $simple.Visible))) { return }
+    if ([Windows.Forms.Form]::ActiveForm -ne $form -and ((Get-Date) - $script:NowLast).TotalSeconds -lt 15) { return }
+    $script:NowLast = Get-Date
+    Update-Now
 })
 $nowTimer.Start()
 $lvNow.Add_SelectedIndexChanged({ Show-NowDetail })
@@ -6921,7 +7013,7 @@ Add-SetRow @($cmbView)
 $cmbView.Add_SelectedIndexChanged({ $v = $this.Tag[$this.SelectedIndex]; if ($v -ne $Settings.View) { Set-ViewMode $v } })
 
 Add-SetSection 'Language' 'Takes effect when PC Tune-Up restarts.'
-$cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands', 'Deutsch', 'Français') @('auto', 'en', 'nl', 'de', 'fr') $Settings.Language
+$cmbLang = New-Choice @('Automatic (Windows language)', 'English', 'Nederlands', 'Deutsch', 'Français', 'Español', 'Italiano', 'Polski') @('auto', 'en', 'nl', 'de', 'fr', 'es', 'it', 'pl') $Settings.Language
 $btnLangRestart = New-Button 'Restart now'
 Add-SetRow @($cmbLang, $btnLangRestart)
 $cmbLang.Add_SelectedIndexChanged({ $Settings.Language = $this.Tag[$this.SelectedIndex]; Save-Settings })

@@ -42,7 +42,7 @@ you can undo.
 | **History** | every change, with Undo |
 
 **Simple view** (the default for new users) shows one calm screen with a status in plain words and three big buttons - "Show all tools" opens everything below. Security software, VPNs, drivers and databases are never touched, and you can add your own programs
-to a keep list. Search everything with Ctrl+F. English, Nederlands, Deutsch and Français, light and dark theme. Settings and choices can be moved to another PC, and Settings > Help and feedback reports a problem with the details already filled in.
+to a keep list. Search everything with Ctrl+F. English, Nederlands, Deutsch, Français, Español, Italiano and Polski, light and dark theme. Settings and choices can be moved to another PC, and Settings > Help and feedback reports a problem with the details already filled in.
 
 **Automatic maintenance** (Settings): every week or every 4 weeks PC Tune-Up cleans junk files and checks the PC
 by itself when the PC is idle, and shows a notification when it finds something new. It never changes startup apps, services or programs on its own.

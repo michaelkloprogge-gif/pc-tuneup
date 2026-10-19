@@ -1761,3 +1761,16 @@ Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}
 Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	In den letzten {0} Tag(en) war der Arbeitsspeicher {1}% der Zeit fast voll - mehr Arbeitsspeicher würde spürbar helfen.
 Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	In den letzten {0} Tag(en) war der Arbeitsspeicher selten fast voll ({1}% der Zeit) - mehr Arbeitsspeicher würde man kaum merken.
 Over the last {0} day(s) memory was nearly full {1}% of the time.	In den letzten {0} Tag(en) war der Arbeitsspeicher {1}% der Zeit fast voll.
+It started right after a Windows update ({0}, installed {1}). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates.	Es begann direkt nach einem Windows-Update ({0}, installiert am {1}). Wenn es weiter passiert, deinstallieren Sie dieses Update: Einstellungen > Windows Update > Updateverlauf > Updates deinstallieren.
+Open the update history (to uninstall the update)	Den Updateverlauf öffnen (um das Update zu deinstallieren)
+Also: {0}	Außerdem: {0}
+Slows start-up	Bremst den Start
+Drive wear	Abnutzung
+{0}: {1}% used, about {2}% a year more	{0}: {1}% abgenutzt, etwa {2}% mehr pro Jahr
+{0}: {1}% used, no change in {2} days	{0}: {1}% abgenutzt, keine Änderung in {2} Tagen
+Drive {0} is wearing fast - at this rate it is worn out in about {1} year(s). Keep your backups up to date and plan a replacement.	Der Datenträger {0} nutzt sich schnell ab - in diesem Tempo ist er in etwa {1} Jahr(en) verschlissen. Halten Sie Ihre Sicherungen aktuell und planen Sie einen Austausch.
+Drive {0} got hot ({1} C) in the last 30 days - heat shortens its life. Keep the vents free and the PC off soft surfaces.	Der Datenträger {0} wurde in den letzten 30 Tagen heiß ({1} C) - Hitze verkürzt seine Lebensdauer. Halten Sie die Lüftungsöffnungen frei und stellen Sie den PC nicht auf weiche Unterlagen.
+Drive {0} reported new read or write errors - back up your files now and check the drive.	Der Datenträger {0} hat neue Lese- oder Schreibfehler gemeldet - sichern Sie jetzt Ihre Dateien und lassen Sie den Datenträger prüfen.
+Español	Español
+Italiano	Italiano
+Polski	Polski

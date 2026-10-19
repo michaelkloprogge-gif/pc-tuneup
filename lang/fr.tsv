@@ -1761,3 +1761,16 @@ Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}
 Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	Au cours des {0} dernier(s) jour(s), la mémoire était presque pleine {1} % du temps - plus de mémoire ferait une vraie différence.
 Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	Au cours des {0} dernier(s) jour(s), la mémoire était rarement presque pleine ({1} % du temps) - plus de mémoire se remarquerait à peine.
 Over the last {0} day(s) memory was nearly full {1}% of the time.	Au cours des {0} dernier(s) jour(s), la mémoire était presque pleine {1} % du temps.
+It started right after a Windows update ({0}, installed {1}). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates.	C'est apparu juste après une mise à jour Windows ({0}, installée le {1}). Si cela continue, désinstallez cette mise à jour : Paramètres > Windows Update > Historique des mises à jour > Désinstaller des mises à jour.
+Open the update history (to uninstall the update)	Ouvrir l'historique des mises à jour (pour désinstaller la mise à jour)
+Also: {0}	Aussi : {0}
+Slows start-up	Ralentit le démarrage
+Drive wear	Usure du disque
+{0}: {1}% used, about {2}% a year more	{0} : {1} % d'usure, environ {2} % de plus par an
+{0}: {1}% used, no change in {2} days	{0} : {1} % d'usure, aucun changement en {2} jours
+Drive {0} is wearing fast - at this rate it is worn out in about {1} year(s). Keep your backups up to date and plan a replacement.	Le disque {0} s'use vite - à ce rythme il sera usé dans environ {1} an(s). Gardez vos sauvegardes à jour et prévoyez un remplacement.
+Drive {0} got hot ({1} C) in the last 30 days - heat shortens its life. Keep the vents free and the PC off soft surfaces.	Le disque {0} a chauffé ({1} C) ces 30 derniers jours - la chaleur réduit sa durée de vie. Dégagez les aérations et ne posez pas le PC sur une surface molle.
+Drive {0} reported new read or write errors - back up your files now and check the drive.	Le disque {0} a signalé de nouvelles erreurs de lecture ou d'écriture - sauvegardez vos fichiers maintenant et faites vérifier le disque.
+Español	Español
+Italiano	Italiano
+Polski	Polski

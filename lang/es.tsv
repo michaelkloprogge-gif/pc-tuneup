@@ -1,0 +1,1776 @@
+Health	Estado
+Clean	Limpiar
+Startup	Inicio
+Bloatware	Bloatware
+Services	Servicios
+Disk	Disco
+Updates	Actualizaciones
+Security	Seguridad
+Stability	Estabilidad
+Upgrades	Mejoras
+History	Historial
+Settings	Opciones
+CLEAN UP	LIMPIEZA
+CHECK	REVISIÓN
+MORE	MÁS
+{0}  ({1})	{0}  ({1})
+Version {0}	Versión {0}
+Limited mode	Modo limitado
+Limited mode - some fixes need administrator rights.	Modo limitado: algunas correcciones necesitan permisos de administrador.
+Some fixes need administrator rights.	Algunas correcciones necesitan permisos de administrador.
+Restart as admin	Reiniciar como admin
+Restart as administrator	Reiniciar como administrador
+Cancel	Cancelar
+Stopping...	Deteniendo...
+{0}      ({1} more waiting)	{0}      ({1} más en espera)
+{0}: {1}	{0}: {1}
+How the PC is doing right now. "Fix my PC" runs all the safe fixes in one go - it shows you the list first.	Cómo está el PC ahora mismo. "Arreglar mi PC" aplica todas las correcciones seguras de una vez; antes te muestra la lista.
+Fix my PC	Arreglar mi PC
+Fixing...	Arreglando...
+Refresh	Actualizar
+Speed test	Test de velocidad
+Windows Update	Windows Update
+Save report	Guardar informe
+Change log	Registro de cambios
+Keep list	Lista de conservar
+This PC	Este equipo
+CPU load	Uso de CPU
+Memory	Memoria
+Uptime	Tiempo activo
+Power	Energía
+Drive	Unidad
+Battery	Batería
+Disk {0}	Disco {0}
+{0} GB free of {1} GB ({2}% used)	{0} GB libres de {1} GB ({2}% usado)
+{0} free of {1} ({2}% free)	{0} libres de {1} ({2}% libre)
+{0}d {1}h {2}m	{0}d {1}h {2}m
+holds {0}% of its original charge	conserva el {0}% de su carga original
+last Windows update {0} day(s) ago	última actualización de Windows hace {0} día(s)
+last Windows update {0} day(s) ago - restart needed to finish	última actualización de Windows hace {0} día(s); hay que reiniciar para terminar
+could not read update history	no se pudo leer el historial de actualizaciones
+{0} plan	plan {0}
+{0} plan, {1} mode	plan {0}, modo {1}
+{0} plan, plugged in	plan {0}, enchufado
+{0} plan, on battery	plan {0}, con batería
+{0} plan, {1} mode, plugged in	plan {0}, modo {1}, enchufado
+{0} plan, {1} mode, on battery	plan {0}, modo {1}, con batería
+Balanced	Equilibrado
+Power saver	Economizador
+High performance	Alto rendimiento
+best power efficiency	mejor eficiencia energética
+better performance	más rendimiento
+best performance	mejor rendimiento
+{0} ({1} {2}) - Healthy	{0} ({1} {2}) - En buen estado
+{0} ({1} {2}) - Healthy, {3}% worn	{0} ({1} {2}) - En buen estado, {3}% de desgaste
+Checking drive, battery and updates...	Comprobando unidad, batería y actualizaciones...
+Internet:  not tested yet - click Speed test	Internet:  aún sin probar; haz clic en Test de velocidad
+Internet:  testing... (about 10 seconds)	Internet:  probando... (unos 10 segundos)
+Internet:  {0} Mbps download	Internet:  {0} Mbps de descarga
+Internet:  {0} Mbps download, {1} ms ping	Internet:  {0} Mbps de descarga, {1} ms de ping
+Internet:  {0} Mbps download, {1} ms ping   (a VPN is running - it can lower this)	Internet:  {0} Mbps de descarga, {1} ms de ping   (hay una VPN activa, puede reducirlo)
+Internet:  download failed - {0}	Internet:  la descarga falló - {0}
+Programs using the most memory	Programas que más memoria usan
+Program	Programa
+Memory (MB)	Memoria (MB)
+Processes	Procesos
+Drive '{0}' reports '{1}' - back up your files now and have the drive checked.	La unidad '{0}' indica '{1}': haz ya una copia de tus archivos y lleva la unidad a revisar.
+The battery only holds {0}% of its original charge - short battery life is the battery wearing out, not the PC. A new battery fixes it.	La batería solo conserva el {0}% de su carga original: la poca autonomía se debe al desgaste de la batería, no al PC. Una batería nueva lo soluciona.
+Windows hasn't installed an update in {0} days - click Windows Update and check for updates.	Windows no ha instalado ninguna actualización en {0} días: haz clic en Windows Update y busca actualizaciones.
+Windows is waiting for a restart to finish installing updates - restart when you can.	Windows espera un reinicio para terminar de instalar actualizaciones: reinicia cuando puedas.
+Memory is {0}% full, which slows everything down - closing {1} ({2} MB) would help most.	La memoria está al {0}%, lo que ralentiza todo; cerrar {1} ({2} MB) es lo que más ayudaría.
+Drive {0} is getting full ({1}% free) - use Fix my PC, then the Clean and Disk tabs.	La unidad {0} se está llenando ({1}% libre): usa Arreglar mi PC y después las pestañas Limpiar y Disco.
+The PC is plugged in but set to save energy - set Power mode to Balanced in Settings > System > Power for more speed.	El PC está enchufado pero configurado para ahorrar energía: pon el modo de energía en Equilibrado en Configuración > Sistema > Energía para ganar velocidad.
+The PC hasn't restarted in {0} days - a restart clears out a lot of slowness.	El PC no se ha reiniciado en {0} días: un reinicio elimina mucha lentitud.
+Stability: {0} ({1}x) - see the Stability tab.	Estabilidad: {0} ({1}x) - mira la pestaña Estabilidad.
+Security: {0} problem(s) - see the Security tab.	Seguridad: {0} problema(s) - mira la pestaña Seguridad.
+{0} program update(s) available - see the Updates tab.	{0} actualización(es) de programas disponibles - mira la pestaña Actualizaciones.
+Deletes junk Windows and apps re-create on their own. Files changed in the last 24 hours and files in use are skipped. Browser caches are only cleaned while that browser is closed.	Elimina la basura que Windows y las aplicaciones vuelven a crear solos. Se omiten los archivos modificados en las últimas 24 horas y los que están en uso. La caché de un navegador solo se limpia si ese navegador está cerrado.
+Scan	Analizar
+Clean checked items	Limpiar lo marcado
+Open Windows Disk Cleanup	Abrir Liberador de espacio en disco
+What	Qué
+Size	Tamaño
+Files	Archivos
+Note	Nota
+Your temp files	Tus archivos temporales
+Windows temp files	Archivos temporales de Windows
+Windows Update download cache	Caché de descargas de Windows Update
+App crash dumps	Volcados de bloqueos de aplicaciones
+Windows error reports	Informes de errores de Windows
+Chrome cache	Caché de Chrome
+Edge cache	Caché de Edge
+Brave cache	Caché de Brave
+Firefox cache	Caché de Firefox
+Previous Windows installation (Windows.old)	Instalación anterior de Windows (Windows.old)
+Old Windows update files	Archivos antiguos de actualizaciones de Windows
+Old driver packages	Paquetes de controladores antiguos
+Delivery Optimization cache	Caché de Optimización de distribución
+Windows upgrade leftovers	Restos de actualizaciones de Windows
+Thumbnail cache	Caché de miniaturas
+Recycle Bin	Papelera de reciclaje
+needs administrator	requiere administrador
+permanently empties it	la vacía de forma permanente
+removes the option to go back to your old Windows version	elimina la opción de volver a tu versión anterior de Windows
+Windows works out the size	Windows calcula el tamaño
+keeps the drivers in use now	conserva los controladores en uso
+update pieces shared with other PCs	partes de actualizaciones compartidas con otros PC
+{0} is open - close it to clean this	{0} está abierto: ciérralo para limpiar esto
+Chrome is open - close it to clean this	Chrome está abierto: ciérralo para limpiar esto
+Edge is open - close it to clean this	Edge está abierto: ciérralo para limpiar esto
+Firefox is open - close it to clean this	Firefox está abierto: ciérralo para limpiar esto
+Checked items add up to about {0}.	Lo marcado suma unos {0}.
+Scanning...	Analizando...
+Cleaning...	Limpiando...
+Skipped because the browser is open: {0}	Omitido porque el navegador está abierto: {0}
+Nothing to clean - check at least one item (admin-only items need "Restart as administrator").	Nada que limpiar: marca al menos un elemento (los que requieren administrador necesitan "Reiniciar como administrador").
+Windows Disk Cleanup will run for the Windows items - this can take several minutes.	El Liberador de espacio en disco de Windows se ejecutará para los elementos de Windows; puede tardar varios minutos.
+Delete the junk in:	Eliminar la basura de:
+This can't be undone (it's all re-creatable).	No se puede deshacer (todo se puede volver a crear).
+freed {0}, {1} in-use files skipped	liberado {0}, {1} archivos en uso omitidos
+Freed {0}. {1} files were in use and left alone.	Liberado {0}. {1} archivos estaban en uso y no se tocaron.
+freed {0} (Fix my PC)	liberado {0} (Arreglar mi PC)
+Checked apps start when you sign in. Uncheck to stop them auto-starting (the app itself stays installed) and click Apply. Same switch as Task Manager > Startup.	Las aplicaciones marcadas se inician al iniciar sesión. Desmárcalas para que no se inicien solas (la aplicación sigue instalada) y haz clic en Aplicar. Es el mismo interruptor que Administrador de tareas > Inicio.
+Reload	Recargar
+Apply changes	Aplicar cambios
+Open Task Manager	Abrir Administrador de tareas
+App	Aplicación
+For	Para
+Advice	Consejo
+Command	Comando
+You	Tú
+All users	Todos los usuarios
+keep (your keep list)	conservar (tu lista)
+keep (security/VPN/drivers)	conservar (seguridad/VPN/controladores)
+safe to turn off	se puede desactivar
+{0} startup apps, {1} turned on.	{0} aplicaciones de inicio, {1} activadas.
+{0} starting with Windows ({1})	{0} se inician con Windows ({1})
+allowed starting with Windows ({0})	se permite iniciar con Windows ({0})
+stopped starting with Windows ({0})	ya no se inicia con Windows ({0})
+{0} change(s) saved. They take effect next time you sign in.	{0} cambio(s) guardado(s). Surten efecto la próxima vez que inicies sesión.
+Couldn't change (needs administrator): {0}	No se pudo cambiar (requiere administrador): {0}
+Pre-installed extras found on this PC. Junk is pre-checked; Optional means fine to remove if you never use it. Uninstalling is permanent (reinstall from the Store or maker's site).	Extras preinstalados encontrados en este PC. La basura viene marcada; Opcional significa que puedes quitarlo si nunca lo usas. Desinstalar es permanente (se reinstala desde la Store o la web del fabricante).
+Rescan	Volver a analizar
+Uninstall checked	Desinstalar lo marcado
+Create restore point	Crear punto de restauración
+Open Settings > Apps	Abrir Configuración > Aplicaciones
+Name	Nombre
+Type	Tipo
+Category	Categoría
+Why	Por qué
+Publisher	Editor
+Store app	App de la Store
+Junk	Basura
+Optional	Opcional
+Trial AV	Antivirus de prueba
+cleaner / driver-updater / adware - Windows does this itself	limpiador / actualizador de controladores / adware: Windows ya lo hace
+pre-installed promo / trial	promoción / prueba preinstalada
+antivirus - remove if you did not pay for it; Windows Security takes over	antivirus: quítalo si no has pagado por él; Seguridad de Windows toma el relevo
+pre-installed game / ad	juego / anuncio preinstalado
+pre-installed promo app	aplicación promocional preinstalada
+pre-installed app - remove if you do not use it	aplicación preinstalada: quítala si no la usas
+Windows extra - reinstall from the Store any time	extra de Windows: se puede reinstalar desde la Store cuando quieras
+PC maker promo / registration / telemetry	promoción / registro / telemetría del fabricante
+Dell utility - get drivers from dell.com/support when needed	utilidad de Dell: descarga los controladores de dell.com/support cuando los necesites
+HP utility - get drivers from support.hp.com when needed	utilidad de HP: descarga los controladores de support.hp.com cuando los necesites
+Lenovo utility (Vantage also sets battery charge limits - keep it if you use that)	utilidad de Lenovo (Vantage también fija límites de carga de la batería; consérvala si lo usas)
+ASUS utility (Armoury Crate controls fans/RGB on gaming models)	utilidad de ASUS (Armoury Crate controla ventiladores/RGB en modelos gaming)
+Acer utility	utilidad de Acer
+MSI utility (controls fans/RGB on gaming models)	utilidad de MSI (controla ventiladores/RGB en modelos gaming)
+driver updater / network tweaker - Windows Update covers drivers	actualizador de controladores / optimizador de red: Windows Update ya cubre los controladores
+pre-installed media software	software multimedia preinstalado
+removed	eliminado
+exit code {0}	código de salida {0}
+uninstaller closed (exit code {0})	desinstalador cerrado (código de salida {0})
+Looking for bloatware...	Buscando bloatware...
+Found {0} item(s). Check what you want gone and click Uninstall.	Se encontraron {0} elemento(s). Marca lo que quieras quitar y haz clic en Desinstalar.
+No known bloatware found - nice and clean.	No se encontró bloatware conocido: todo limpio.
+Creating a restore point (can take a minute)...	Creando un punto de restauración (puede tardar un minuto)...
+Restore point created (Windows skips it if one was made in the last 24 hours).	Punto de restauración creado (Windows lo omite si ya se creó uno en las últimas 24 horas).
+Restore point failed: {0} - System Protection may be off for C:.	Error al crear el punto de restauración: {0} - puede que Protección del sistema esté desactivada para C:.
+Check at least one item first.	Primero marca al menos un elemento.
+Uninstall these {0} item(s)?	¿Desinstalar estos {0} elemento(s)?
+Some uninstallers open their own window or ask for permission - follow along. This can't be undone here; you'd reinstall from the Store or the maker's website.	Algunos desinstaladores abren su propia ventana o piden permiso; síguelos. Esto no se puede deshacer aquí; tendrías que reinstalar desde la Store o la web del fabricante.
+Uninstalling... (watch for uninstaller windows)	Desinstalando... (atento a las ventanas de los desinstaladores)
+Done. {0} of {1} uninstalled.	Listo. {0} de {1} desinstalados.
+Problems:	Problemas:
+Non-Microsoft background services. Known bloat is listed first; "review" rows are other third-party services that start with Windows - only change those if you know what they are.	Servicios en segundo plano que no son de Microsoft. El bloat conocido aparece primero; las filas "revisar" son otros servicios de terceros que se inician con Windows: cámbialos solo si sabes qué son.
+Apply suggestion to checked	Aplicar sugerencia a lo marcado
+Set checked to Manual	Poner lo marcado en Manual
+Restore checked	Restaurar lo marcado
+Service	Servicio
+What it is	Qué es
+Company	Empresa
+Starts	Inicio
+Running	En ejecución
+Stopped	Detenido
+Suggested	Sugerido
+Original	Original
+Automatic	Automático
+Manual	Manual
+Disabled	Deshabilitado
+Looking at services...	Revisando servicios...
+{0}  (review: {1})	{0}  (revisar: {1})
+third-party, starts with Windows	de terceros, se inicia con Windows
+on your keep list	en tu lista de conservar
+changed by PC Tune-Up	cambiado por PC Tune-Up
+looks important (security/driver/VPN)	parece importante (seguridad/controlador/VPN)
+looks like an updater or telemetry	parece un actualizador o telemetría
+View only - restart as administrator to change services. {0} could be trimmed.	Solo lectura: reinicia como administrador para cambiar servicios. Se podrían recortar {0}.
+{0} service(s) could be trimmed. Grey rows are already done.	Se podrían recortar {0} servicio(s). Las filas grises ya están hechas.
+Nothing left to trim. Review rows are shown for information.	No queda nada que recortar. Las filas "revisar" son solo informativas.
+{0} service(s) updated.	{0} servicio(s) actualizado(s).
+{0} service(s) updated. {1} were already set that way or had no suggestion (use 'Set checked to Manual').	{0} servicio(s) actualizado(s). {1} ya estaban así o no tenían sugerencia (usa 'Poner lo marcado en Manual').
+Failed:	Fallaron:
+Dell SupportAssist	Dell SupportAssist
+Dell app installer	Instalador de aplicaciones de Dell
+Dell telemetry	Telemetría de Dell
+HP telemetry	Telemetría de HP
+HP support helper	Asistente de soporte de HP
+HP promo	Promoción de HP
+Lenovo Vantage (starts when opened)	Lenovo Vantage (se inicia al abrirlo)
+Lenovo telemetry	Telemetría de Lenovo
+ASUS phone link	Vínculo con el teléfono de ASUS
+ASUS updater	Actualizador de ASUS
+ASUS diagnostics	Diagnóstico de ASUS
+MyASUS helper	Asistente de MyASUS
+MSI utility	Utilidad de MSI
+Intel telemetry	Telemetría de Intel
+Intel driver updater	Actualizador de controladores de Intel
+NVIDIA telemetry	Telemetría de NVIDIA
+Razer game scanner	Escáner de juegos de Razer
+Adobe updater	Actualizador de Adobe
+Adobe licence checker	Comprobador de licencia de Adobe
+Google updater (Chrome still updates when open)	Actualizador de Google (Chrome se sigue actualizando al abrirlo)
+Edge updater (Edge still updates when open)	Actualizador de Edge (Edge se sigue actualizando al abrirlo)
+Brave updater	Actualizador de Brave
+Dropbox updater	Actualizador de Dropbox
+EA Origin helper	Asistente de EA Origin
+Wondershare helper	Asistente de Wondershare
+McAfee promo	Promoción de McAfee
+{0} - {1}	{0} - {1}
+Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. This only looks - it never deletes.	Descubre qué está llenando la unidad. Elige un lugar y pulsa Analizar; haz doble clic en una fila para ver su contenido. Esto solo mira, nunca elimina nada.
+Browse...	Examinar...
+Up	Subir
+Open in Explorer	Abrir en el Explorador
+Folder	Carpeta
+Share	Proporción
+Quick pick...	Selección rápida...
+Your user folder	Tu carpeta de usuario
+Downloads	Descargas
+Steam games	Juegos de Steam
+Epic games	Juegos de Epic
+Program Files	Program Files
+Program Files (x86)	Program Files (x86)
+Whole C: drive (slow)	Toda la unidad C: (lento)
+(files directly in this folder)	(archivos directamente en esta carpeta)
+Folder not found:	Carpeta no encontrada:
+Scanning... big folders like C:\ can take a few minutes.	Analizando... las carpetas grandes como C:\ pueden tardar unos minutos.
+Total: {0}.	Total: {0}.
+Total: {0}.  Uninstall games/programs from their launcher or Settings > Apps, not by deleting folders.	Total: {0}.  Desinstala juegos/programas desde su launcher o desde Configuración > Aplicaciones, no borrando carpetas.
+Programs with a newer version available, via winget (built into Windows). Small updates are pre-checked; big version jumps, self-updating apps, very large updates and keep-list programs are not. Close a program before updating it.	Programas con una versión más nueva disponible, mediante winget (integrado en Windows). Las actualizaciones pequeñas vienen marcadas; los saltos de versión grandes, las apps que se actualizan solas, las actualizaciones muy grandes y los programas de la lista de conservar no. Cierra un programa antes de actualizarlo.
+Check for updates	Buscar actualizaciones
+Update checked	Actualizar lo marcado
+Store app updates	Actualizaciones de la Store
+Installed	Instalada
+Available	Disponible
+winget took too long - try again later	winget tardó demasiado; inténtalo más tarde
+stopped - you pressed Cancel	detenido: pulsaste Cancelar
+took longer than 30 minutes - stopped	tardó más de 30 minutos; detenido
+Asking winget which programs have updates (20-60 seconds)...	Preguntando a winget qué programas tienen actualizaciones (20-60 segundos)...
+winget is missing on this PC - install "App Installer" from the Microsoft Store, then check again.	Falta winget en este PC: instala "Instalador de aplicación" desde Microsoft Store y vuelve a comprobar.
+on the keep list - update it yourself if you want	en la lista de conservar: actualízalo tú si quieres
+updates itself - just restart it	se actualiza solo: basta con reiniciarlo
+very large update - run it when you have time	actualización muy grande: hazla cuando tengas tiempo
+name cut off by winget - update it from the program itself	winget recortó el nombre: actualízalo desde el propio programa
+major new version - check it still suits you	nueva versión principal: comprueba que te sigue conviniendo
+small update	actualización pequeña
+{0} program(s) can be updated, {1} pre-checked.	Se pueden actualizar {0} programa(s), {1} marcados.
+Everything winget knows about is up to date.	Todo lo que conoce winget está al día.
+Check at least one program first.	Primero marca al menos un programa.
+Update these {0} program(s)?	¿Actualizar estos {0} programa(s)?
+Close them first. Some show a permission prompt - click Yes. This can take a few minutes.	Ciérralos antes. Algunos muestran una solicitud de permiso: haz clic en Sí. Puede tardar unos minutos.
+Updating {0} program(s)... watch for permission prompts.	Actualizando {0} programa(s)... atento a las solicitudes de permiso.
+{0} -> {1}: updated	{0} -> {1}: actualizado
+{0} -> {1}: failed - {2}	{0} -> {1}: error - {2}
+{0} of {1} program(s) updated.	{0} de {1} programa(s) actualizados.
+Not updated (often because the program was open - close it and try again):	No actualizados (a menudo porque el programa estaba abierto; ciérralo y vuelve a intentarlo):
+Is this PC protected? Green is fine, orange is worth a look, red needs fixing. Double-click a row (or select it and click Open setting) to go to the right Windows setting.	¿Está protegido este PC? Verde está bien, naranja merece un vistazo, rojo hay que arreglarlo. Haz doble clic en una fila (o selecciónala y haz clic en Abrir ajuste) para ir al ajuste de Windows correspondiente.
+Check again	Comprobar de nuevo
+Open setting	Abrir ajuste
+Open Windows Security	Abrir Seguridad de Windows
+Check	Comprobación
+Status	Estado
+Result	Resultado
+What to do	Qué hacer
+Problem	Problema
+Warning	Aviso
+Info	Info
+OK	OK
+Windows version	Versión de Windows
+{0} (long-term edition)	{0} (edición de largo plazo)
+Long-term editions get security updates for years. Nothing to do.	Las ediciones de largo plazo reciben actualizaciones de seguridad durante años. No hay nada que hacer.
+Not a version this check knows. Open Windows Update to see if a newer one is offered.	Esta comprobación no conoce esta versión. Abre Windows Update para ver si se ofrece una más nueva.
+{0} - no longer supported	{0} - ya no tiene soporte
+This Windows 10 version gets no security updates any more. See the Windows 11 check below for your options.	Esta versión de Windows 10 ya no recibe actualizaciones de seguridad. Mira la comprobación de Windows 11 más abajo para ver tus opciones.
+This version gets no more security updates. Open Windows Update and install the newest Windows 11 version (free).	Esta versión ya no recibe actualizaciones de seguridad. Abre Windows Update e instala la versión más reciente de Windows 11 (gratis).
+Windows 10 stopped getting security updates. Upgrade to Windows 11 for free if the PC qualifies (see below), sign up for Extended Security Updates, or plan a replacement.	Windows 10 ya no recibe actualizaciones de seguridad. Actualiza gratis a Windows 11 si el PC cumple los requisitos (ver abajo), suscríbete a las Actualizaciones de seguridad extendidas o planea sustituirlo.
+{0} - security updates ended {1}	{0} - las actualizaciones de seguridad terminaron el {1}
+{0} - security updates end {1}	{0} - las actualizaciones de seguridad terminan el {1}
+Install the newest Windows version from Windows Update before then (free).	Instala antes la versión más reciente de Windows desde Windows Update (gratis).
+{0} - supported until about {1}	{0} - con soporte hasta aproximadamente {1}
+{0} - supported until {1}	{0} - con soporte hasta {1}
+Nothing to do - Windows Update keeps it patched.	No hay nada que hacer: Windows Update lo mantiene actualizado.
+Nothing to do.	No hay nada que hacer.
+Secure Boot	Arranque seguro
+PC starts in old "legacy BIOS" mode	El PC arranca en el antiguo modo "BIOS heredado"
+Modern UEFI mode with Secure Boot blocks malware that loads before Windows. Switching needs care (the disk must be converted with MBR2GPT) - get help if unsure.	El modo UEFI moderno con Arranque seguro bloquea el malware que se carga antes de Windows. Cambiarlo requiere cuidado (hay que convertir el disco con MBR2GPT); pide ayuda si no estás seguro.
+On	Activado
+Off	Desactivado
+Switch Secure Boot on in the firmware (BIOS/UEFI) settings - usually F2, F10 or Del while the PC starts.	Activa el Arranque seguro en la configuración del firmware (BIOS/UEFI); normalmente con F2, F10 o Supr mientras arranca el PC.
+TPM security chip	Chip de seguridad TPM
+TPM {0} present	TPM {0} presente
+Old TPM {0}	TPM {0} antiguo
+Windows 11 needs TPM 2.0. Some PCs can switch to 2.0 with a firmware update from the maker.	Windows 11 necesita TPM 2.0. Algunos PC pueden pasar a 2.0 con una actualización de firmware del fabricante.
+None found	No se encontró
+Many PCs have one that is switched off - look for TPM, PTT (Intel) or fTPM (AMD) in the firmware settings.	Muchos PC tienen uno desactivado: busca TPM, PTT (Intel) o fTPM (AMD) en la configuración del firmware.
+Could not check	No se pudo comprobar
+Run "tpm.msc" to see the TPM status.	Ejecuta "tpm.msc" para ver el estado del TPM.
+Windows 11 ready?	¿Listo para Windows 11?
+No - missing: {0}	No - falta: {0}
+If only TPM or Secure Boot is missing, switch them on in the firmware settings and check again. Otherwise: Extended Security Updates for Windows 10, or a new or refurbished PC.	Si solo falta TPM o Arranque seguro, actívalos en la configuración del firmware y vuelve a comprobar. Si no: Actualizaciones de seguridad extendidas para Windows 10, o un PC nuevo o reacondicionado.
+Probably - processor not recognised ({0}); confirm with Microsoft's PC Health Check	Probablemente - procesador no reconocido ({0}); confírmalo con Comprobación de estado del PC de Microsoft
+Yes - this PC can run Windows 11	Sí - este PC puede ejecutar Windows 11
+Upgrade for free: Settings > Windows Update > Upgrade to Windows 11. Back up your files first.	Actualiza gratis: Configuración > Windows Update > Actualizar a Windows 11. Haz antes una copia de tus archivos.
+Antivirus	Antivirus
+{0} - on and up to date	{0} - activado y al día
+{0} - on but out of date	{0} - activado pero desactualizado
+Open it and update it. If that fails, check the internet connection or whether its subscription ran out.	Ábrelo y actualízalo. Si falla, revisa la conexión a internet o si ha caducado la suscripción.
+{0} - switched off	{0} - desactivado
+Switch it on. If a paid antivirus expired, uninstall it - Microsoft Defender then takes over for free.	Actívalo. Si caducó un antivirus de pago, desinstálalo: Microsoft Defender toma el relevo gratis.
+No antivirus found	No se encontró antivirus
+Open Windows Security and switch on Microsoft Defender.	Abre Seguridad de Windows y activa Microsoft Defender.
+Firewall	Firewall
+Windows Firewall is on	El Firewall de Windows está activado
+{0} firewall is on	El firewall de {0} está activado
+Windows Firewall is off ({0})	El Firewall de Windows está desactivado ({0})
+Switch it on in Windows Security > Firewall & network protection.	Actívalo en Seguridad de Windows > Firewall y protección de red.
+Open Windows Security > Firewall & network protection.	Abre Seguridad de Windows > Firewall y protección de red.
+Drive encryption	Cifrado de unidad
+C: is encrypted (BitLocker / Device encryption)	C: está cifrada (BitLocker / Cifrado de dispositivo)
+Know where the recovery key is: account.microsoft.com/devices/recoverykey - you need it if the PC ever asks for it.	Ten localizada la clave de recuperación: account.microsoft.com/devices/recoverykey; la necesitarás si el PC te la pide alguna vez.
+Encryption is paused	El cifrado está en pausa
+It is usually paused during an update and resumes after a restart. If it stays paused, resume it in BitLocker settings.	Suele pausarse durante una actualización y se reanuda tras reiniciar. Si sigue en pausa, reanúdalo en la configuración de BitLocker.
+C: is not encrypted	C: no está cifrada
+Anyone who steals the laptop can read its files. Turn on Device encryption (Settings > Privacy & security > Device encryption) or BitLocker on Pro. Know where the recovery key is: account.microsoft.com/devices/recoverykey - you need it if the PC ever asks for it.	Cualquiera que robe el portátil puede leer sus archivos. Activa el Cifrado de dispositivo (Configuración > Privacidad y seguridad > Cifrado de dispositivo) o BitLocker en Pro. Ten localizada la clave de recuperación: account.microsoft.com/devices/recoverykey; la necesitarás si el PC te la pide alguna vez.
+Less important for a desktop that stays at home; worth it for business PCs.	Menos importante en un PC de sobremesa que no sale de casa; recomendable en PC de empresa.
+See Settings > Privacy & security > Device encryption.	Mira Configuración > Privacidad y seguridad > Cifrado de dispositivo.
+Memory integrity	Integridad de memoria
+Optional extra protection: Windows Security > Device security > Core isolation. Very old drivers can block it.	Protección adicional opcional: Seguridad de Windows > Seguridad del dispositivo > Aislamiento del núcleo. Los controladores muy antiguos pueden impedirla.
+User Account Control	Control de cuentas de usuario
+Off - every program runs with full rights	Desactivado: todos los programas se ejecutan con todos los permisos
+Search "UAC" in Start, set the slider back to the default level and restart.	Busca "UAC" en Inicio, devuelve el control deslizante al nivel predeterminado y reinicia.
+Old file sharing (SMB 1.0)	Uso compartido de archivos antiguo (SMB 1.0)
+SMB 1.0 is what the WannaCry worm used. Remove it unless a very old NAS or printer needs it: Windows Features > untick "SMB 1.0/CIFS File Sharing Support".	SMB 1.0 es lo que usó el gusano WannaCry. Quítalo salvo que lo necesite un NAS o una impresora muy antiguos: Características de Windows > desmarca "Compatibilidad con el protocolo para compartir archivos SMB 1.0/CIFS".
+Remote Desktop	Escritorio remoto
+On - this PC accepts remote connections	Activado: este PC acepta conexiones remotas
+Fine if you use it. Otherwise switch it off: Settings > System > Remote Desktop.	Bien si lo usas. Si no, desactívalo: Configuración > Sistema > Escritorio remoto.
+Out-of-support software	Software sin soporte
+{0} found: {1}	{0} encontrado(s): {1}
+These no longer get security fixes. Uninstall them in Settings > Apps; old .NET runtimes can go too - a program that still needs one will ask for it.	Ya no reciben correcciones de seguridad. Desinstálalos en Configuración > Aplicaciones; los .NET antiguos también pueden irse: un programa que aún necesite uno lo pedirá.
+None of the usual suspects (Flash, Java 6/7, QuickTime, Silverlight, old .NET)	Ninguno de los sospechosos habituales (Flash, Java 6/7, QuickTime, Silverlight, .NET antiguo)
+Checking security settings...	Comprobando la configuración de seguridad...
+{0} of {1} checks fine.	{0} de {1} comprobaciones correctas.
+{0} of {1} checks fine, {2} worth a look.	{0} de {1} comprobaciones correctas, {2} merecen un vistazo.
+{0} of {1} checks fine, {2} problem(s).	{0} de {1} comprobaciones correctas, {2} problema(s).
+{0} of {1} checks fine, {2} problem(s), {3} worth a look.	{0} de {1} comprobaciones correctas, {2} problema(s), {3} merecen un vistazo.
+Couldn't open {0}	No se pudo abrir {0}
+This one is changed in the firmware (BIOS/UEFI) settings, not in Windows - see "What to do".	Esto se cambia en la configuración del firmware (BIOS/UEFI), no en Windows; mira "Qué hacer".
+What to do: {0}	Qué hacer: {0}
+What went wrong in the last 30 days according to Windows' own logs - crashes, freezes, blue screens, errors - and what usually fixes it. Click a row for details.	Qué ha fallado en los últimos 30 días según los propios registros de Windows (bloqueos, cuelgues, pantallas azules, errores) y qué suele arreglarlo. Haz clic en una fila para ver detalles.
+Open Reliability Monitor	Abrir Monitor de confiabilidad
+Search selected online	Buscar lo seleccionado en internet
+Times	Veces
+Last	Última
+App crashes	Bloqueos de aplicaciones
+Freezes	Cuelgues
+Blue screens	Pantallas azules
+Sudden shutdowns	Apagados repentinos
+Graphics resets	Reinicios de gráficos
+Drive errors	Errores de unidad
+Hardware errors	Errores de hardware
+NVIDIA nView	NVIDIA nView
+{0} crashed {1}	{0} se bloqueó {1}
+{0} crashed	{0} se bloqueó
+NVIDIA nView (an old desktop-manager add-on) loads itself into other programs and crashes them. Turn it off: NVIDIA Control Panel > Desktop Management > Disable, or uninstall "NVIDIA nView" in Settings > Apps.	NVIDIA nView (un antiguo complemento de gestión de escritorio) se carga en otros programas y los bloquea. Desactívalo: Panel de control de NVIDIA > Desktop Management > Disable, o desinstala "NVIDIA nView" en Configuración > Aplicaciones.
+NVIDIA graphics driver	Controlador gráfico de NVIDIA
+Update the NVIDIA driver from nvidia.com or the PC maker's support page (choose a clean install).	Actualiza el controlador de NVIDIA desde nvidia.com o la página de soporte del fabricante del PC (elige instalación limpia).
+AMD graphics driver	Controlador gráfico de AMD
+Update the AMD graphics driver from amd.com or the PC maker's support page.	Actualiza el controlador gráfico de AMD desde amd.com o la página de soporte del fabricante del PC.
+Intel graphics driver	Controlador gráfico de Intel
+Update the Intel graphics driver (Windows Update > Advanced > Optional updates, or the PC maker's support page).	Actualiza el controlador gráfico de Intel (Windows Update > Opciones avanzadas > Actualizaciones opcionales, o la página de soporte del fabricante del PC).
+Visual C++ runtime	Runtime de Visual C++
+Repair "Microsoft Visual C++ Redistributable" in Settings > Apps (Modify > Repair), then update the crashing programs.	Repara "Microsoft Visual C++ Redistributable" en Configuración > Aplicaciones (Modificar > Reparar) y luego actualiza los programas que se bloquean.
+an overlay or audio add-on	un overlay o complemento de audio
+An overlay (Steam, Discord, RivaTuner) or audio enhancer (Nahimic, Sonic Studio) loads into other programs. Update it or switch its overlay off.	Un overlay (Steam, Discord, RivaTuner) o un potenciador de audio (Nahimic, Sonic Studio) se carga en otros programas. Actualízalo o desactiva su overlay.
+Update or reinstall {0}. If it keeps crashing, check the maker's support site (crash point: {1}).	Actualiza o reinstala {0}. Si sigue bloqueándose, consulta la web de soporte del fabricante (punto del fallo: {1}).
+{0} stopped responding	{0} dejó de responder
+If {0} freezes often, update it. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab.	Si {0} se cuelga a menudo, actualízalo. Si se cuelgan muchos programas distintos, suele ser por memoria llena o una unidad lenta o defectuosa; mira la pestaña Estado.
+{0} program(s) froze once ({1})	{0} programa(s) se colgaron una vez ({1})
+A one-off freeze is normal. Many different programs freezing points to full memory or a slow or failing drive - see the Health tab.	Un cuelgue aislado es normal. Si se cuelgan muchos programas distintos, suele ser por memoria llena o una unidad lenta o defectuosa; mira la pestaña Estado.
+Windows crashed: {0}	Windows se bloqueó: {0}
+Usually caused by {0}. Install driver updates (Windows Update > Advanced options > Optional updates, or the PC maker's support page). If it keeps happening, test the memory: run mdsched.exe.	Suele deberse a {0}. Instala las actualizaciones de controladores (Windows Update > Opciones avanzadas > Actualizaciones opcionales, o la página de soporte del fabricante del PC). Si sigue pasando, prueba la memoria: ejecuta mdsched.exe.
+a driver	un controlador
+memory (RAM) or a driver	la memoria (RAM) o un controlador
+memory or a driver	la memoria o un controlador
+the drive or its connection	la unidad o su conexión
+a driver during sleep or wake-up	un controlador al suspender o reanudar
+a driver (often network or Wi-Fi)	un controlador (a menudo de red o Wi-Fi)
+damaged Windows files or the drive	archivos de Windows dañados o la unidad
+the drive	la unidad
+the graphics driver	el controlador gráfico
+hardware (processor, memory or overheating)	el hardware (procesador, memoria o sobrecalentamiento)
+memory (RAM)	la memoria (RAM)
+a storage or other driver	un controlador de almacenamiento u otro
+a driver or memory	un controlador o la memoria
+a driver or hardware	un controlador o el hardware
+The PC switched off without shutting down properly	El PC se apagó sin cerrarse correctamente
+A power cut, the battery running flat, the power button held down, or overheating. If it happens on its own, check the charger or power supply and clean the fans.	Un corte de luz, la batería agotada, el botón de encendido mantenido pulsado o un sobrecalentamiento. Si pasa por sí solo, revisa el cargador o la fuente de alimentación y limpia los ventiladores.
+The graphics driver stopped responding and recovered	El controlador gráfico dejó de responder y se recuperó
+Update the graphics driver. If it happens in games, check the GPU temperature and stop any overclocking.	Actualiza el controlador gráfico. Si pasa en juegos, revisa la temperatura de la GPU y quita cualquier overclock.
+Storage errors ({0})	Errores de almacenamiento ({0})
+Back up important files now. Then check drive health on the Health tab and run the drive maker's tool; frequent errors mean the drive or its cable is failing.	Haz ya una copia de los archivos importantes. Después revisa el estado de la unidad en la pestaña Estado y ejecuta la herramienta del fabricante de la unidad; los errores frecuentes indican que la unidad o su cable están fallando.
+The processor, memory or a PCIe device reported errors	El procesador, la memoria o un dispositivo PCIe informaron de errores
+Make sure the PC isn't overheating (clean the fans). If blue screens happen too, test the memory: run mdsched.exe.	Asegúrate de que el PC no se sobrecalienta (limpia los ventiladores). Si también hay pantallas azules, prueba la memoria: ejecuta mdsched.exe.
+{0} Store app update(s) kept waiting ({1}...)	{0} actualización(es) de la Store quedaron en espera ({1}...)
+Usually because the app was open at the time - they install by themselves later. To force it: Microsoft Store > Library > Get updates.	Normalmente porque la aplicación estaba abierta en ese momento; se instalan solas más tarde. Para forzarlo: Microsoft Store > Biblioteca > Obtener actualizaciones.
+Couldn't install: {0}	No se pudo instalar: {0}
+Restart and try Windows Update again. If it keeps failing: Settings > System > Troubleshoot > Other troubleshooters > Windows Update. (Error {0})	Reinicia y vuelve a probar Windows Update. Si sigue fallando: Configuración > Sistema > Solucionar problemas > Otros solucionadores de problemas > Windows Update. (Error {0})
+Reading Windows' logs...	Leyendo los registros de Windows...
+Windows rates stability {0} out of 10. {1} kind(s) of trouble in the last 30 days.	Windows valora la estabilidad con un {0} de 10. {1} tipo(s) de problema en los últimos 30 días.
+Windows rates stability {0} out of 10. {1} kind(s) of trouble in the last 30 days, {2} worth fixing.	Windows valora la estabilidad con un {0} de 10. {1} tipo(s) de problema en los últimos 30 días, {2} que conviene arreglar.
+Windows rates stability {0} out of 10. Nothing went wrong in the last 30 days.	Windows valora la estabilidad con un {0} de 10. No ha fallado nada en los últimos 30 días.
+{0} kind(s) of trouble in the last 30 days.	{0} tipo(s) de problema en los últimos 30 días.
+{0} kind(s) of trouble in the last 30 days, {1} worth fixing.	{0} tipo(s) de problema en los últimos 30 días, {1} que conviene arreglar.
+Nothing went wrong in the last 30 days.	No ha fallado nada en los últimos 30 días.
+No crashes, freezes or errors found.	No se encontraron bloqueos, cuelgues ni errores.
+{0}: {1} - {2} time(s) in 30 days, last on {3}	{0}: {1} - {2} vez/veces en 30 días, la última el {3}
+What you could add or replace in this PC, with the specification to buy. Click a row for the full details. Always confirm with the service manual before buying.	Qué podrías añadir o cambiar en este PC, con la especificación que debes comprar. Haz clic en una fila para ver todos los detalles. Confírmalo siempre con el manual de servicio antes de comprar.
+Open support page	Abrir página de soporte
+Find service manual	Buscar manual de servicio
+Find motherboard manual	Buscar manual de la placa base
+Copy shopping list	Copiar lista de la compra
+Part	Componente
+You have now	Lo que tienes
+Upgrade option	Opción de mejora
+Worth it?	¿Merece la pena?
+What to buy	Qué comprar
+Memory / disk	Memoria / disco
+{0} GB memory - this is a virtual machine	{0} GB de memoria - es una máquina virtual
+Change the VM settings	Cambia la configuración de la VM
+Nothing to buy - give the virtual machine more memory or disk space in VMware / VirtualBox / Hyper-V settings.	Nada que comprar: da más memoria o espacio en disco a la máquina virtual en la configuración de VMware / VirtualBox / Hyper-V.
+Physical upgrades belong to the computer that runs the VM.	Las mejoras físicas corresponden al equipo que ejecuta la VM.
+Not upgradeable	No ampliable
+Nothing to buy - this memory is soldered to the motherboard.	Nada que comprar: esta memoria está soldada a la placa base.
+Already at the maximum	Ya está al máximo
+Not needed	No hace falta
+Nothing to buy - {0} GB is the most this PC supports.	Nada que comprar: {0} GB es lo máximo que admite este PC.
+The firmware reports a maximum of {0} GB.	El firmware indica un máximo de {0} GB.
+Add {0} x {1} GB (total {2} GB)	Añadir {0} x {1} GB (total {2} GB)
+Replace with {0} x {1} GB (total {2} GB)	Cambiar por {0} x {1} GB (total {2} GB)
+Recommended - one module means single-channel; a matching second module roughly doubles memory speed	Recomendado: un solo módulo implica canal único; un segundo módulo igual duplica aproximadamente la velocidad de la memoria
+Strongly recommended	Muy recomendado
+Recommended	Recomendado
+Recommended - memory is {0}% full right now	Recomendado: la memoria está al {0}% ahora mismo
+Optional - worth it for virtual machines, big spreadsheets, photo/video/CAD work or many browser tabs	Opcional: merece la pena para máquinas virtuales, hojas de cálculo grandes, fotografía/vídeo/CAD o muchas pestañas del navegador
+Replace with an SSD	Cambiar por un SSD
+Strongly recommended - the biggest speed-up an older PC can get	Muy recomendado: la mayor mejora de velocidad que puede tener un PC antiguo
+Optional - only matters for files on this disk	Opcional: solo afecta a los archivos de este disco
+Hard disks are 20-50x slower than SSDs at the small reads Windows does all the time.	Los discos duros son 20-50 veces más lentos que los SSD en las pequeñas lecturas que Windows hace constantemente.
+Recommended - C: is only {0}% free	Recomendado: C: solo tiene un {0}% libre
+Recommended - small drive	Recomendado: unidad pequeña
+Bigger or second SSD	SSD más grande o un segundo SSD
+Windows cannot see empty slots, so check the manual for a free one. Gen4 drives fall back to the slot's speed, so they are always a safe pick.	Windows no ve las ranuras vacías, así que busca una libre en el manual. Las unidades Gen4 funcionan a la velocidad de la ranura, así que siempre son una opción segura.
+External drive	Unidad externa
+This PC has a USB4/Thunderbolt port	Este PC tiene un puerto USB4/Thunderbolt
+USB ports	Puertos USB
+External SSD	SSD externo
+Optional - no screwdriver needed, good for games, photos and backups	Opcional: no hace falta destornillador, ideal para juegos, fotos y copias de seguridad
+External NVMe SSD (or an NVMe enclosure) for USB4/Thunderbolt, 1-2 TB: up to ~3,000 MB/s on this PC.	SSD NVMe externo (o una carcasa NVMe) para USB4/Thunderbolt, 1-2 TB: hasta ~3.000 MB/s en este PC.
+USB 3.2 Gen 2 external SSD, 1-2 TB (about 1,000 MB/s) - use a blue or "SS 10" USB port.	SSD externo USB 3.2 Gen 2, 1-2 TB (unos 1.000 MB/s); usa un puerto USB azul o "SS 10".
+Use the fastest port: USB4/Thunderbolt (lightning symbol) > USB-C 10 Gbps > blue USB-A.	Usa el puerto más rápido: USB4/Thunderbolt (símbolo de rayo) > USB-C 10 Gbps > USB-A azul.
+Recommended - battery life is roughly halved	Recomendado: la autonomía se ha reducido más o menos a la mitad
+{0} Wh {1} battery ({2}), now holds {3}% of its original charge	Batería {1} de {0} Wh ({2}), ahora conserva el {3}% de su carga original
+Replacement battery	Batería de repuesto
+Batteries wear with age and charge cycles. A worn battery doesn't slow the PC down, it just runs out sooner.	Las baterías se desgastan con la edad y los ciclos de carga. Una batería gastada no ralentiza el PC, solo se agota antes.
+Recommended - Wi-Fi 4 is slow and crowded	Recomendado: Wi-Fi 4 es lento y está saturado
+Optional - faster and steadier on a Wi-Fi 6 router	Opcional: más rápido y estable con un router Wi-Fi 6
+Optional - check which Wi-Fi standard this card supports	Opcional: comprueba qué estándar Wi-Fi admite esta tarjeta
+Nothing to buy - this Wi-Fi is already current.	Nada que comprar: esta Wi-Fi ya es actual.
+Already modern	Ya es moderno
+Wi-Fi 6E card	Tarjeta Wi-Fi 6E
+Faster Wi-Fi only helps if your router supports it too.	Una Wi-Fi más rápida solo ayuda si tu router también la admite.
+No Wi-Fi adapter	Sin adaptador Wi-Fi
+Add Wi-Fi	Añadir Wi-Fi
+Optional - only if you can't use a cable	Opcional: solo si no puedes usar cable
+A network cable is still the fastest and steadiest connection.	Un cable de red sigue siendo la conexión más rápida y estable.
+Not read - Windows didn't answer in time (busy with a game?). Click Refresh later.	No leído: Windows no respondió a tiempo (¿ocupado con un juego?). Haz clic en Actualizar más tarde.
+Processor	Procesador
+Nothing to buy - laptop processors are soldered to the motherboard.	Nada que comprar: los procesadores de portátil están soldados a la placa base.
+If the processor is too slow, the upgrade path is a new laptop.	Si el procesador es demasiado lento, la solución es un portátil nuevo.
+Graphics	Gráficos
+Nothing to buy - laptop graphics are soldered.	Nada que comprar: los gráficos de portátil están soldados.
+An external graphics box over USB4/Thunderbolt is possible but costly.	Una caja de gráficos externa por USB4/Thunderbolt es posible, pero cara.
+Depends on the motherboard	Depende de la placa base
+Rarely worth it	Rara vez merece la pena
+A new processor only fits the same socket and often needs a BIOS update first.	Un procesador nuevo solo encaja en el mismo socket y a menudo necesita antes una actualización de BIOS.
+Add a graphics card	Añadir una tarjeta gráfica
+Faster graphics card	Tarjeta gráfica más rápida
+Optional - for gaming, video editing or 3D	Opcional: para juegos, edición de vídeo o 3D
+Depends on use	Depende del uso
+Needs a free PCIe x16 slot, enough power-supply wattage and connectors, and room in the case - check all three first.	Necesita una ranura PCIe x16 libre, suficiente potencia y conectores en la fuente de alimentación, y espacio en la caja; comprueba las tres cosas antes.
+Office PCs from HP, Dell and Lenovo often have small power supplies; a low-profile card that needs no power cable is the safe choice there.	Los PC de oficina de HP, Dell y Lenovo suelen tener fuentes de alimentación pequeñas; ahí la opción segura es una tarjeta de perfil bajo que no necesite cable de alimentación.
+Looking at this PC's hardware...	Revisando el hardware de este PC...
+Could not read the hardware details.	No se pudieron leer los detalles del hardware.
+Nothing worth upgrading was found.	No se encontró nada que merezca la pena mejorar.
+Shopping list copied - paste it into an email, a note or a shop's chat.	Lista de la compra copiada: pégala en un correo, una nota o el chat de una tienda.
+The serial number ({0}) is copied - paste it into the support page's search box to see this exact PC's parts.	El número de serie ({0}) se ha copiado: pégalo en el buscador de la página de soporte para ver los componentes de este PC exacto.
+Worth it? {0}	¿Merece la pena? {0}
+You have now: {0}	Lo que tienes: {0}
+What to buy: {0}	Qué comprar: {0}
+Good to know: {0}	Conviene saber: {0}
+Every change PC Tune-Up made on this PC, newest first. Check rows and click Undo to put them back. Cleaned files and uninstalled programs can't be undone; removed Store apps can be reinstalled.	Todos los cambios que PC Tune-Up ha hecho en este PC, los más recientes primero. Marca filas y haz clic en Deshacer para revertirlos. Los archivos limpiados y los programas desinstalados no se pueden deshacer; las apps de la Store eliminadas se pueden reinstalar.
+Undo checked	Deshacer lo marcado
+Open text log	Abrir registro de texto
+When	Cuándo
+Item	Elemento
+Change	Cambio
+Undo	Deshacer
+undone	deshecho
+reinstall from Store	reinstalar desde la Store
+can undo	se puede deshacer
+Update	Actualización
+Uninstall	Desinstalación
+Restore point	Punto de restauración
+created	creado
+created before {0}	creado antes de {0}
+{0} change(s) recorded, {1} can be undone.	{0} cambio(s) registrados, {1} se pueden deshacer.
+No changes yet. (Changes from before this version are in the text log.)	Aún no hay cambios. (Los cambios anteriores a esta versión están en el registro de texto.)
+Check one or more rows that say "can undo" first.	Primero marca una o más filas que digan "se puede deshacer".
+Undoing service changes needs administrator rights - use "Restart as administrator" first.	Deshacer cambios de servicios requiere permisos de administrador: usa antes "Reiniciar como administrador".
+Undo these changes?	¿Deshacer estos cambios?
+allowed to start with Windows again	se vuelve a permitir que se inicie con Windows
+stopped starting with Windows again	vuelve a no iniciarse con Windows
+service back to {0}	servicio devuelto a {0}
+{0} change(s) undone.	{0} cambio(s) deshechos.
+{0} change(s) undone. Startup changes take effect next time you sign in.	{0} cambio(s) deshechos. Los cambios de inicio surten efecto la próxima vez que inicies sesión.
+How PC Tune-Up looks and behaves, where its files are, and what it is. Changes are saved straight away.	Cómo se ve y se comporta PC Tune-Up, dónde están sus archivos y qué es. Los cambios se guardan al momento.
+Language	Idioma
+Takes effect when PC Tune-Up restarts.	Se aplica cuando PC Tune-Up se reinicia.
+Automatic (Windows language)	Automático (idioma de Windows)
+Restart now	Reiniciar ahora
+Theme	Tema
+Light, dark, or the same as Windows. Takes effect when PC Tune-Up restarts.	Claro, oscuro o igual que Windows. Se aplica cuando PC Tune-Up se reinicia.
+Same as Windows	Igual que Windows
+Light	Claro
+Dark	Oscuro
+You have version {0}. New versions come from github.com/{1} and are checked against GitHub's checksum before they are installed.	Tienes la versión {0}. Las versiones nuevas vienen de github.com/{1} y se verifican con la suma de comprobación de GitHub antes de instalarse.
+Check for updates when PC Tune-Up starts	Buscar actualizaciones al iniciar PC Tune-Up
+Check for updates now	Buscar actualizaciones ahora
+Safety	Seguridad
+A restore point lets Windows roll the whole PC back to before a change (Settings > System > Recovery, or search "restore point"). Windows makes at most one per day.	Un punto de restauración permite a Windows devolver todo el PC al estado anterior a un cambio (Configuración > Sistema > Recuperación, o busca "punto de restauración"). Windows crea como máximo uno al día.
+Create a restore point before Fix my PC, uninstalling and service changes (needs administrator)	Crear un punto de restauración antes de Arreglar mi PC, desinstalaciones y cambios de servicios (requiere administrador)
+Installation	Instalación
+Installed for you in {0} - it appears in the Start menu and in Settings > Apps.	Instalado para ti en {0}: aparece en el menú Inicio y en Configuración > Aplicaciones.
+Running from {0} without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed).	Ejecutándose desde {0} sin instalar. Instálalo para tener una entrada en el menú Inicio y poder desinstalarlo como cualquier otra aplicación (no requiere administrador).
+Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.	Ejecutándose como script de PowerShell (modo desarrollador); instálalo desde PC-TuneUp.exe.
+Uninstall PC Tune-Up	Desinstalar PC Tune-Up
+Install on this PC	Instalar en este PC
+Settings, history, the keep list and the change log are kept in {0}.	Las opciones, el historial, la lista de conservar y el registro de cambios se guardan en {0}.
+Open data folder	Abrir carpeta de datos
+Command line	Línea de comandos
+For scripts and IT use (use "start /wait" so the window waits for it):	Para scripts y uso de TI (usa "start /wait" para que la ventana espere):
+About	Acerca de
+PC Tune-Up {0} - free and open source (MIT licence). Privacy: everything runs on this PC. The only internet use is the update check (GitHub), the speed test (Cloudflare) and winget's program list; nothing about this PC is sent anywhere.	PC Tune-Up {0} - gratuito y de código abierto (licencia MIT). Privacidad: todo se ejecuta en este PC. Solo usa internet para buscar actualizaciones (GitHub), el test de velocidad (Cloudflare) y la lista de programas de winget; no se envía nada sobre este PC a ningún sitio.
+Install from PC-TuneUp.exe, not from the script.	Instálalo desde PC-TuneUp.exe, no desde el script.
+Installing failed: {0}	Error al instalar: {0}
+PC Tune-Up is installed. It is in the Start menu and on the desktop, and you can uninstall it in Settings > Apps.	PC Tune-Up está instalado. Está en el menú Inicio y en el escritorio, y puedes desinstalarlo en Configuración > Aplicaciones.
+The installed copy opens now; you can delete the file you started this from.	Ahora se abre la copia instalada; puedes borrar el archivo desde el que lo iniciaste.
+Remove PC Tune-Up from this PC?	¿Quitar PC Tune-Up de este PC?
+Also delete its settings, keep list and change history?	¿Borrar también sus opciones, la lista de conservar y el historial de cambios?
+PC Tune-Up has been removed.	PC Tune-Up se ha quitado.
+Install PC Tune-Up on this PC?	¿Instalar PC Tune-Up en este PC?
+It adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.	Añade PC Tune-Up al menú Inicio y a Configuración > Aplicaciones (para poder desinstalarlo como cualquier aplicación) y se mantiene actualizado solo. No requiere permisos de administrador.
+You can also do this later in Settings.	También puedes hacerlo más tarde en Opciones.
+Still checking services - try again in a few seconds.	Todavía se están revisando los servicios; inténtalo de nuevo en unos segundos.
+PC Tune-Up will:	PC Tune-Up va a:
+Clean junk files: {0}	Limpiar archivos basura: {0}
+(skipping {0} - close the browser first to include it)	(se omite {0}; cierra antes el navegador para incluirlo)
+Stop {0} app(s) starting with Windows: {1}	Impedir que {0} aplicación(es) se inicien con Windows: {1}
+Set {0} background service(s) to their suggested setting: {1}	Poner {0} servicio(s) en segundo plano en su configuración sugerida: {1}
+Create a restore point first	Crear antes un punto de restauración
+Tip: "Restart as admin" first to also clean Windows files and trim background services.	Consejo: usa antes "Reiniciar como admin" para limpiar también archivos de Windows y recortar servicios en segundo plano.
+Nothing gets uninstalled. Startup and service changes can be undone from the History page.	No se desinstala nada. Los cambios de inicio y de servicios se pueden deshacer desde la página Historial.
+Done!	¡Listo!
+Stopped early.	Se detuvo antes de tiempo.
+Freed {0} of junk files	Se liberaron {0} de archivos basura
+{0} app(s) no longer start with Windows	{0} aplicación(es) ya no se inician con Windows
+{0} background service(s) trimmed	{0} servicio(s) en segundo plano recortado(s)
+{0} junk app(s) found - see the Bloatware page if you want them gone	{0} aplicación(es) basura encontradas: mira la página Bloatware si quieres quitarlas
+Startup changes take effect next time you sign in. Undo anything from the History page.	Los cambios de inicio surten efecto la próxima vez que inicies sesión. Puedes deshacer cualquier cosa desde la página Historial.
+Updates are not set up in this build.	Las actualizaciones no están configuradas en esta versión.
+Couldn't check for updates:	No se pudo buscar actualizaciones:
+You have the latest version ({0}).	Tienes la última versión ({0}).
+PC Tune-Up {0} is available (you have {1}).	PC Tune-Up {0} está disponible (tienes la {1}).
+Open the download page?	¿Abrir la página de descarga?
+Update now? The app restarts by itself.	¿Actualizar ahora? La aplicación se reinicia sola.
+Update failed: {0}	Error al actualizar: {0}
+Couldn't replace the app file ({0}). Download it yourself from:	No se pudo reemplazar el archivo de la aplicación ({0}). Descárgalo tú desde:
+Something went wrong:	Algo ha salido mal:
+Checking drive, battery and updates	Comprobando unidad, batería y actualizaciones
+Testing internet speed	Probando la velocidad de internet
+Measuring junk files	Midiendo archivos basura
+Cleaning	Limpiando
+Looking for bloatware	Buscando bloatware
+Creating a restore point	Creando un punto de restauración
+Creating a restore point first	Creando antes un punto de restauración
+Uninstalling	Desinstalando
+Reading services	Leyendo servicios
+Measuring folders	Midiendo carpetas
+Checking for program updates	Buscando actualizaciones de programas
+Updating programs	Actualizando programas
+Checking security	Comprobando la seguridad
+Reading Windows logs	Leyendo los registros de Windows
+Reading the hardware	Leyendo el hardware
+Fix my PC: cleaning	Arreglar mi PC: limpiando
+Downloading the update	Descargando la actualización
+PC Tune-Up report	Informe de PC Tune-Up
+Junk files that can be cleaned	Archivos basura que se pueden limpiar
+Apps that start with Windows ({0} on)	Aplicaciones que se inician con Windows ({0} activadas)
+Bloatware found	Bloatware encontrado
+Background services	Servicios en segundo plano
+Stability (last 30 days)	Estabilidad (últimos 30 días)
+Program updates available	Actualizaciones de programas disponibles
+Upgrade options	Opciones de mejora
+Changes made by PC Tune-Up	Cambios hechos por PC Tune-Up
+Nothing found.	No se encontró nada.
+No problems spotted.	No se detectaron problemas.
+Worth a look:	Merece un vistazo:
+A matched kit of {0} x {1} GB {2}. The current modules come out (keep or sell them). Faster-rated {3} modules also work and simply run at {4} MT/s. Most supported: {5} GB.	Un kit a juego de {0} x {1} GB {2}. Los módulos actuales se retiran (guárdalos o véndelos). Los módulos {3} más rápidos también funcionan y simplemente van a {4} MT/s. Máximo admitido: {5} GB.
+A matched kit of {0} x {1} GB {2}. The current modules come out (keep or sell them). Faster-rated {3} modules also work and simply run at {4} MT/s.	Un kit a juego de {0} x {1} GB {2}. Los módulos actuales se retiran (guárdalos o véndelos). Los módulos {3} más rápidos también funcionan y simplemente van a {4} MT/s.
+{0} x {1} GB {2} - match the module already fitted. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s. Most supported: {6} GB.	{0} x {1} GB {2}: igual que el módulo ya instalado. Total después: {3} GB. Los módulos {4} más rápidos también funcionan y simplemente van a {5} MT/s. Máximo admitido: {6} GB.
+{0} x {1} GB {2} - match the module already fitted. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s.	{0} x {1} GB {2}: igual que el módulo ya instalado. Total después: {3} GB. Los módulos {4} más rápidos también funcionan y simplemente van a {5} MT/s.
+{0} x {1} GB {2} - same speed as the built-in memory. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s. Most supported: {6} GB.	{0} x {1} GB {2}: misma velocidad que la memoria integrada. Total después: {3} GB. Los módulos {4} más rápidos también funcionan y simplemente van a {5} MT/s. Máximo admitido: {6} GB.
+{0} x {1} GB {2} - same speed as the built-in memory. Total afterwards: {3} GB. Faster-rated {4} modules also work and simply run at {5} MT/s.	{0} x {1} GB {2}: misma velocidad que la memoria integrada. Total después: {3} GB. Los módulos {4} más rápidos también funcionan y simplemente van a {5} MT/s.
+{0} SO-DIMM (laptop size), {1}-pin, {2}, {3}	{0} SO-DIMM (tamaño portátil), {1} pines, {2}, {3}
+{0} DIMM (desktop size), {1}-pin, {2}, {3}	{0} DIMM (tamaño sobremesa), {1} pines, {2}, {3}
+non-ECC	sin ECC
+registered ECC (RDIMM)	ECC registrada (RDIMM)
+unbuffered ECC	ECC sin búfer
+{0} GB: {1} ({2}), {3}	{0} GB: {1} ({2}), {3}
+all {0} slot(s) used	las {0} ranura(s) ocupadas
+{0} of {1} slot(s) free	{0} de {1} ranura(s) libres
+{0} GB soldered, {1} of {2} slot(s) free	{0} GB soldados, {1} de {2} ranura(s) libres
+{0} GB soldered, all {1} slot(s) used	{0} GB soldados, las {1} ranura(s) ocupadas
+soldered to the motherboard	soldada a la placa base
+Memory is {0}% used right now. Modules must match the type ({1}) and size ({2}). Crucial's free System Scanner (crucial.com) or the service manual lists the exact modules this PC accepts.	La memoria está al {0}% de uso ahora mismo. Los módulos deben coincidir en tipo ({1}) y tamaño ({2}). El System Scanner gratuito de Crucial (crucial.com) o el manual de servicio indican los módulos exactos que acepta este PC.
+SO-DIMM (laptop size)	SO-DIMM (tamaño portátil)
+DIMM (desktop size)	DIMM (tamaño sobremesa)
+{0}: {1} GB {2} {3}, holds Windows (C: {4}% free)	{0}: {1} GB {2} {3}, contiene Windows (C: {4}% libre)
+{0}, 1 TB or 2 TB. If the laptop has a free M.2 slot, add it as a second drive; if not, replace this drive with the bigger one and clone it.	{0}, 1 TB o 2 TB. Si el portátil tiene una ranura M.2 libre, añádelo como segunda unidad; si no, cambia esta unidad por la más grande y clónala.
+{0}, 1 TB or 2 TB. Desktops usually have spare M.2 slots or 2.5/3.5-inch bays - add it as a second drive.	{0}, 1 TB o 2 TB. Los PC de sobremesa suelen tener ranuras M.2 o bahías de 2,5/3,5 pulgadas libres: añádelo como segunda unidad.
+M.2 2280 NVMe SSD, PCIe Gen4 x4 (also works in Gen3 slots)	SSD NVMe M.2 2280, PCIe Gen4 x4 (también funciona en ranuras Gen3)
+2.5-inch SATA SSD, or M.2 NVMe if the motherboard has an M.2 slot	SSD SATA de 2,5 pulgadas, o M.2 NVMe si la placa base tiene ranura M.2
+2.5-inch SATA SSD, or M.2 if the laptop has an M.2 slot (check whether it takes SATA or NVMe M.2)	SSD SATA de 2,5 pulgadas, o M.2 si el portátil tiene ranura M.2 (comprueba si admite M.2 SATA o NVMe)
+SSD of the same type as the current one	SSD del mismo tipo que el actual
+1 TB 2.5-inch SATA SSD (7 mm) in place of this hard disk, or an M.2 SSD if the laptop has an M.2 slot. Copy ("clone") the old drive with the SSD maker's free tool.	SSD SATA de 2,5 pulgadas (7 mm) de 1 TB en lugar de este disco duro, o un SSD M.2 si el portátil tiene ranura M.2. Copia ("clona") la unidad antigua con la herramienta gratuita del fabricante del SSD.
+1 TB SSD: M.2 NVMe if the motherboard has an M.2 slot (fastest), otherwise a 2.5-inch SATA SSD. Put Windows on it and keep the hard disk for files.	SSD de 1 TB: M.2 NVMe si la placa base tiene ranura M.2 (lo más rápido); si no, un SSD SATA de 2,5 pulgadas. Pon Windows en él y deja el disco duro para archivos.
+Replacement battery for the {0}: {1} Wh {2}. It reports itself as '{3}' - search that, or the serial number, to find the exact part. Prefer the maker's original.	Batería de repuesto para el {0}: {1} Wh {2}. Se identifica como '{3}': busca eso, o el número de serie, para encontrar la pieza exacta. Mejor la original del fabricante.
+{0} - {1} cores / {2} threads	{0} - {1} núcleos / {2} hilos
+M.2 2230 Wi-Fi 6E card with Bluetooth (e.g. Intel AX210). Most laptops let you swap it; a few have it soldered or only accept approved cards - check the manual.	Tarjeta Wi-Fi 6E M.2 2230 con Bluetooth (p. ej. Intel AX210). La mayoría de portátiles permiten cambiarla; algunos la llevan soldada o solo aceptan tarjetas aprobadas: consulta el manual.
+PCIe Wi-Fi 6E card with Bluetooth (e.g. Intel AX210 based), or a USB Wi-Fi 6 adapter if you'd rather not open the case.	Tarjeta Wi-Fi 6E PCIe con Bluetooth (p. ej. basada en Intel AX210), o un adaptador USB Wi-Fi 6 si prefieres no abrir la caja.
+PCIe Wi-Fi 6E card with Bluetooth, or a USB Wi-Fi 6 adapter.	Tarjeta Wi-Fi 6E PCIe con Bluetooth, o un adaptador USB Wi-Fi 6.
+Check the CPU support list of the motherboard ({0}) on its maker's website.	Consulta la lista de CPU compatibles de la placa base ({0}) en la web de su fabricante.
+1 x {0} GB {1} in place of the current module.	1 x {0} GB {1} en lugar del módulo actual.
+1 x {0} GB {1} in place of the current module (the {2} GB soldered memory stays).	1 x {0} GB {1} en lugar del módulo actual (los {2} GB de memoria soldada se quedan).
+Upgrade shopping list for {0}	Lista de la compra de mejoras para {0}
+Upgrade shopping list for {0} (serial {1})	Lista de la compra de mejoras para {0} (n.º de serie {1})
+{0} ({1}):	{0} ({1}):
+Tasks	Tareas
+Backup	Copia de seguridad
+Scheduled tasks	Tareas programadas
+Scheduled tasks from other companies: updaters, telemetry and helpers that Windows runs on a timer or at sign-in - the last place bloatware hides. Known junk is listed first and pre-checked. Switching a task off can be undone from History.	Tareas programadas de otras empresas: actualizadores, telemetría y asistentes que Windows ejecuta con un temporizador o al iniciar sesión; el último escondite del bloatware. La basura conocida aparece primero y viene marcada. Desactivar una tarea se puede deshacer desde Historial.
+Turn off checked	Desactivar lo marcado
+Turn on checked	Activar lo marcado
+Open Task Scheduler	Abrir Programador de tareas
+Task	Tarea
+Made by	Creada por
+Runs	Se ejecuta
+State	Estado
+Reading scheduled tasks	Leyendo tareas programadas
+Reading scheduled tasks...	Leyendo tareas programadas...
+at sign-in	al iniciar sesión
+at start-up	al arrancar
+daily	a diario
+weekly	semanalmente
+when idle	en inactividad
+on unlock	al desbloquear
+on a Windows event	ante un evento de Windows
+when installed	al instalarse
+repeatedly	repetidamente
+once	una vez
+on a schedule	según programación
+only when started	solo al iniciarla
+NVIDIA nView launcher - crashes other programs	Iniciador de NVIDIA nView: bloquea otros programas
+NVIDIA telemetry / updater	Telemetría / actualizador de NVIDIA
+Adobe updater (Acrobat still updates when opened)	Actualizador de Adobe (Acrobat se sigue actualizando al abrirlo)
+Adobe Creative Cloud helper - only needed if you use Creative Cloud	Asistente de Adobe Creative Cloud: solo hace falta si usas Creative Cloud
+Google promotions helper	Asistente de promociones de Google
+browser updater (updates when the browser is open)	actualizador del navegador (se actualiza con el navegador abierto)
+Firefox usage reporting	Informes de uso de Firefox
+Zoom updater (Zoom updates itself when opened)	Actualizador de Zoom (Zoom se actualiza solo al abrirlo)
+Dell support / telemetry tool	Herramienta de soporte / telemetría de Dell
+HP support / telemetry tool	Herramienta de soporte / telemetría de HP
+Lenovo helper / telemetry	Asistente / telemetría de Lenovo
+Acer promo / registration	Promoción / registro de Acer
+cleaner / trial / adware helper	asistente de limpiador / prueba / adware
+Windows tips and promotional notifications	Consejos de Windows y notificaciones promocionales
+looks like an updater or telemetry - usually safe to turn off	parece un actualizador o telemetría: normalmente se puede desactivar
+review: only turn off if you know what it is	revisar: desactívala solo si sabes qué es
+{0} known junk task(s) are switched on and pre-checked. Grey rows are already off.	{0} tarea(s) basura conocida(s) están activadas y marcadas. Las filas grises ya están desactivadas.
+No known junk tasks are running. Grey rows are already off.	No hay tareas basura conocidas activas. Las filas grises ya están desactivadas.
+Check one or more tasks that are off first.	Primero marca una o más tareas desactivadas.
+Check one or more tasks that are on first.	Primero marca una o más tareas activadas.
+{0} task(s) switched off. Undo from the History page.	{0} tarea(s) desactivada(s). Se puede deshacer desde la página Historial.
+{0} task(s) switched on. Undo from the History page.	{0} tarea(s) activada(s). Se puede deshacer desde la página Historial.
+These need administrator rights (click "Restart as admin"): {0}	Estas requieren permisos de administrador (haz clic en "Reiniciar como admin"): {0}
+switched off	desactivada
+switched on	activada
+scheduled task switched back on	tarea programada activada de nuevo
+scheduled task switched off again	tarea programada desactivada de nuevo
+disabled (stops NVIDIA nView crashing other programs)	desactivada (evita que NVIDIA nView bloquee otros programas)
+Would your files survive a broken, lost or stolen PC? Checks your cloud folders, File History, backup programs and restore points. Double-click a row (or select it and click Open setting) to change it.	¿Sobrevivirían tus archivos a un PC averiado, perdido o robado? Comprueba tus carpetas en la nube, Historial de archivos, programas de copia de seguridad y puntos de restauración. Haz doble clic en una fila (o selecciónala y haz clic en Abrir ajuste) para cambiarla.
+Create restore point now	Crear punto de restauración ahora
+Checking backups	Comprobando copias de seguridad
+Checking backups...	Comprobando copias de seguridad...
+Desktop, Documents and Pictures	Escritorio, Documentos e Imágenes
+Backed up to {0}	Copia en {0}
+Nothing to do - every change is copied to the cloud.	No hay nada que hacer: cada cambio se copia a la nube.
+{0} backed up to {1}; not: {2}	{0} con copia en {1}; sin copia: {2}
+Add the missing folders: OneDrive settings > Sync and back up > Manage back up (or Settings > Accounts > Windows backup).	Añade las carpetas que faltan: Configuración de OneDrive > Sincronizar y hacer copia de seguridad > Administrar copia de seguridad (o Configuración > Cuentas > Copia de seguridad de Windows).
+Not in any cloud folder	No están en ninguna carpeta en la nube
+If the PC breaks or is stolen, these files are gone. Turn on folder backup: Settings > Accounts > Windows backup (OneDrive), or use File History with an external drive.	Si el PC se avería o te lo roban, estos archivos se pierden. Activa la copia de carpetas: Configuración > Cuentas > Copia de seguridad de Windows (OneDrive), o usa Historial de archivos con una unidad externa.
+OneDrive running	OneDrive en ejecución
+Yes - changes are uploaded	Sí: los cambios se suben
+No - changes are not being uploaded	No: los cambios no se están subiendo
+Start OneDrive (it is in the Start menu) and let it sign in; check that it starts with Windows on the Startup page.	Inicia OneDrive (está en el menú Inicio) y deja que inicie sesión; comprueba en la página Inicio que se inicia con Windows.
+File History	Historial de archivos
+Keep the backup drive connected now and then.	Conecta la unidad de copia de vez en cuando.
+Optional extra copy (also of older versions) on an external drive: Control Panel > File History.	Copia adicional opcional (también de versiones anteriores) en una unidad externa: Panel de control > Historial de archivos.
+Backup program	Programa de copia de seguridad
+Found: {0}	Encontrado: {0}
+Check now and then that it still runs and that you can restore a file.	Comprueba de vez en cuando que sigue funcionando y que puedes restaurar un archivo.
+Optional: a backup program (Macrium Reflect and Veeam Agent have free versions) makes a full copy of the PC, including programs and settings.	Opcional: un programa de copia de seguridad (Macrium Reflect y Veeam Agent tienen versiones gratuitas) hace una copia completa del PC, incluidos programas y configuración.
+Restore points	Puntos de restauración
+{0} restore point(s), the latest {1} day(s) ago	{0} punto(s) de restauración, el último hace {1} día(s)
+Create one now (button above) - they let you undo a bad driver or update.	Crea uno ahora (botón de arriba): te permiten deshacer un controlador o una actualización que dé problemas.
+None found - System Protection may be off	No se encontró ninguno: puede que Protección del sistema esté desactivada
+Switch on System Protection for C: (System Properties > System Protection > Configure), then create one.	Activa Protección del sistema para C: (Propiedades del sistema > Protección del sistema > Configurar) y luego crea uno.
+Only visible as administrator	Solo visible como administrador
+Click "Restart as admin" to check them.	Haz clic en "Reiniciar como admin" para comprobarlos.
+Nothing is backing up your files.	Nada está haciendo copia de tus archivos.
+Your files are backed up to {0}.	Tus archivos tienen copia en {0}.
+Some backup is in place - see the rows above.	Hay alguna copia de seguridad: mira las filas de arriba.
+Backup: nothing backs up your files - see the Backup page.	Copia de seguridad: nada hace copia de tus archivos; mira la página Copia de seguridad.
+OneDrive was not found.	No se encontró OneDrive.
+Restore point created.	Punto de restauración creado.
+No restore point made: {0}	No se creó el punto de restauración: {0}
+Fix selected problem	Arreglar problema seleccionado
+One-click fix: {0} (needs administrator)	Arreglo con un clic: {0} (requiere administrador)
+One-click fix: {0}	Arreglo con un clic: {0}
+Turn off NVIDIA nView	Desactivar NVIDIA nView
+Uninstall NVIDIA nView completely (the graphics driver stays)	Desinstalar NVIDIA nView por completo (el controlador gráfico se queda)
+Repair the Visual C++ runtimes	Reparar los runtimes de Visual C++
+Reset Windows Update	Restablecer Windows Update
+Repair Windows system files	Reparar archivos del sistema de Windows
+Check drive C: for errors	Comprobar errores en la unidad C:
+Test the memory at the next restart	Probar la memoria en el próximo reinicio
+Check the drivers on the Drivers page	Revisar los controladores en la página Controladores
+Open Store app updates	Abrir actualizaciones de la Store
+Look for an update on the Updates page	Buscar una actualización en la página Actualizaciones
+{0} needs administrator rights - click "Restart as admin" first.	{0} requiere permisos de administrador: haz clic antes en "Reiniciar como admin".
+Switched off: {0}	Desactivado: {0}
+Fixed: nView's start-up task is switched off and there have been no crashes since {0}. To remove it completely, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	Arreglado: la tarea de inicio de nView está desactivada y no ha habido bloqueos desde {0}. Para quitarlo por completo, desinstala "NVIDIA RTX Desktop Manager" en Configuración > Aplicaciones.
+Windows Memory Diagnostic checks the memory while the PC restarts (about 10-20 minutes). It asks whether to restart now or next time.	El Diagnóstico de memoria de Windows comprueba la memoria mientras el PC se reinicia (unos 10-20 minutos). Te pregunta si reiniciar ahora o la próxima vez.
+Memory test	Prueba de memoria
+scheduled with Windows Memory Diagnostic	programada con el Diagnóstico de memoria de Windows
+Turn off NVIDIA nView?	¿Desactivar NVIDIA nView?
+It stops its start-up task and closes it. The graphics driver and NVIDIA Control Panel keep working. You can undo this from the History page.	Detiene su tarea de inicio y lo cierra. El controlador gráfico y el Panel de control de NVIDIA siguen funcionando. Puedes deshacerlo desde la página Historial.
+NVIDIA nView is switched off. If programs still crash in it, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	NVIDIA nView está desactivado. Si los programas siguen bloqueándose por él, desinstala "NVIDIA RTX Desktop Manager" en Configuración > Aplicaciones.
+NVIDIA nView is switched off (its start-up task was already off; running parts were closed). If programs still crash in it, uninstall "NVIDIA RTX Desktop Manager" in Settings > Apps.	NVIDIA nView está desactivado (su tarea de inicio ya estaba desactivada; se cerraron las partes en ejecución). Si los programas siguen bloqueándose por él, desinstala "NVIDIA RTX Desktop Manager" en Configuración > Aplicaciones.
+Uninstall NVIDIA RTX Desktop Manager (nView)?	¿Desinstalar NVIDIA RTX Desktop Manager (nView)?
+The graphics driver stays. NVIDIA's uninstaller may show its own window.	El controlador gráfico se queda. El desinstalador de NVIDIA puede mostrar su propia ventana.
+Repair the Microsoft Visual C++ runtimes (64- and 32-bit)?	¿Reparar los runtimes de Microsoft Visual C++ (64 y 32 bits)?
+They are reinstalled through winget; programs that use them keep working. Takes a minute or two.	Se reinstalan mediante winget; los programas que los usan siguen funcionando. Tarda un minuto o dos.
+Reset Windows Update?	¿Restablecer Windows Update?
+Its services are stopped, its download caches are set aside (renamed, not deleted) and it starts fresh. Afterwards, open Windows Update and check for updates again.	Se detienen sus servicios, sus cachés de descarga se apartan (se renombran, no se borran) y empieza de cero. Después, abre Windows Update y vuelve a buscar actualizaciones.
+Repair Windows system files?	¿Reparar los archivos del sistema de Windows?
+Runs sfc /scannow and then DISM, which can take 15-30 minutes. You can keep using the PC (and press Cancel).	Ejecuta sfc /scannow y luego DISM, lo que puede tardar 15-30 minutos. Puedes seguir usando el PC (y pulsar Cancelar).
+Check drive C: for errors?	¿Comprobar errores en la unidad C:?
+An online check (chkdsk /scan) - you can keep working. If it finds a problem that needs fixing, Windows repairs it at the next restart.	Una comprobación en línea (chkdsk /scan): puedes seguir trabajando. Si encuentra un problema que hay que arreglar, Windows lo repara en el próximo reinicio.
+{0}: done - {1}	{0}: hecho - {1}
+{0}: problem - {1}	{0}: problema - {1}
+{0}: stopped	{0}: detenido
+done - {0}	hecho - {0}
+problem - {0}	problema - {0}
+stopped	detenido
+checking system files (sfc)	comprobando archivos del sistema (sfc)
+repairing the Windows image (DISM)	reparando la imagen de Windows (DISM)
+winget is missing	falta winget
+nView is not installed any more	nView ya no está instalado
+Privacy	Privacidad
+Drivers	Controladores
+Ads, tips and tracking that Windows switches on by default. Recommended ones are pre-checked. Turning a setting off only changes your own Windows settings (nothing is uninstalled) and can be undone from History or with "Turn back on".	Anuncios, consejos y seguimiento que Windows activa por defecto. Los recomendados vienen marcados. Desactivar un ajuste solo cambia tu propia configuración de Windows (no se desinstala nada) y se puede deshacer desde Historial o con "Volver a activar".
+Turn back on checked	Volver a activar lo marcado
+Open privacy settings	Abrir configuración de privacidad
+Setting	Ajuste
+What it does	Qué hace
+restarts Explorer	reinicia el Explorador
+Advertising ID	Id. de publicidad
+Lets apps show ads based on what you do.	Permite que las aplicaciones muestren anuncios según lo que haces.
+Tailored experiences	Experiencias personalizadas
+Microsoft uses your diagnostic data for personal tips, ads and recommendations.	Microsoft usa tus datos de diagnóstico para consejos, anuncios y recomendaciones personalizados.
+Tips and suggestions notifications	Notificaciones de consejos y sugerencias
+Pop-ups with tips and offers while you use Windows.	Ventanas emergentes con consejos y ofertas mientras usas Windows.
+Suggested content in Settings	Contenido sugerido en Configuración
+Suggestions and offers inside the Settings app.	Sugerencias y ofertas dentro de la aplicación Configuración.
+"Finish setting up" and welcome screens	"Terminar de configurar" y pantallas de bienvenida
+Full-screen pages after updates that push Microsoft 365, OneDrive and Game Pass.	Páginas a pantalla completa tras las actualizaciones que promocionan Microsoft 365, OneDrive y Game Pass.
+Promoted apps installed without asking	Apps promocionadas instaladas sin preguntar
+Windows quietly installs suggested apps and games on the Start menu.	Windows instala sin avisar aplicaciones y juegos sugeridos en el menú Inicio.
+Recommendations and ads in Start	Recomendaciones y anuncios en Inicio
+Suggested apps, tips and promotions in the Start menu.	Aplicaciones sugeridas, consejos y promociones en el menú Inicio.
+Account notifications in Start	Notificaciones de cuenta en Inicio
+Microsoft account and backup reminders on your picture in the Start menu.	Recordatorios de la cuenta Microsoft y de copia de seguridad en tu imagen del menú Inicio.
+Fun facts and tips on the lock screen	Datos curiosos y consejos en la pantalla de bloqueo
+Text and promotions on top of the lock-screen picture.	Texto y promociones sobre la imagen de la pantalla de bloqueo.
+Search highlights	Destacados de la búsqueda
+Trending news and pictures in the search box and search window.	Noticias e imágenes populares en el cuadro y la ventana de búsqueda.
+Web results in Start search	Resultados web en la búsqueda de Inicio
+What you type in Start search is also sent to Bing. As administrator the Windows policy is set too, which newer Windows versions need.	Lo que escribes en la búsqueda de Inicio también se envía a Bing. Como administrador también se establece la directiva de Windows, que necesitan las versiones más nuevas de Windows.
+Feedback requests	Solicitudes de comentarios
+Windows asks now and then what you think of it.	Windows te pregunta de vez en cuando qué te parece.
+Inking and typing personalisation	Personalización de entrada manuscrita y escritura
+What you type and write by hand is collected into a personal dictionary.	Lo que escribes con el teclado y a mano se recopila en un diccionario personal.
+Optional diagnostic data	Datos de diagnóstico opcionales
+Extra data about the websites you visit and how you use apps, sent to Microsoft. The required basic data stays on.	Datos adicionales sobre los sitios web que visitas y cómo usas las aplicaciones, enviados a Microsoft. Los datos básicos obligatorios siguen activados.
+Activity history	Historial de actividad
+Windows keeps a history of the apps, files and websites you used.	Windows guarda un historial de las aplicaciones, archivos y sitios web que has usado.
+Recall snapshots	Instantáneas de Recall
+Recall saves pictures of everything on your screen every few seconds, to search later.	Recall guarda imágenes de todo lo que hay en tu pantalla cada pocos segundos, para buscar después.
+Location for apps	Ubicación para aplicaciones
+Apps such as Maps and Weather can see where you are. Only turn off if you don't need that.	Aplicaciones como Mapas y El Tiempo pueden ver dónde estás. Desactívalo solo si no lo necesitas.
+Partly on	Activado en parte
+{0} recommended setting(s) are still on. Grey rows are already off.	{0} ajuste(s) recomendado(s) siguen activados. Las filas grises ya están desactivadas.
+All recommended settings are off.	Todos los ajustes recomendados están desactivados.
+Check one or more settings first.	Primero marca uno o más ajustes.
+{0} setting(s) turned off. Undo from the History page.	{0} ajuste(s) desactivado(s). Se puede deshacer desde la página Historial.
+{0} setting(s) turned back on. Undo from the History page.	{0} ajuste(s) activado(s) de nuevo. Se puede deshacer desde la página Historial.
+Couldn't change: {0}	No se pudo cambiar: {0}
+Restart Explorer now so the Start menu, search and taskbar pick up the change?	¿Reiniciar el Explorador ahora para que el menú Inicio, la búsqueda y la barra de tareas apliquen el cambio?
+Open File Explorer windows close; nothing else is affected.	Las ventanas abiertas del Explorador de archivos se cierran; no afecta a nada más.
+turned off	desactivado
+turned back on	activado de nuevo
+setting put back as it was	ajuste devuelto a como estaba
+Devices Windows reports a problem with, and the drivers that matter most (graphics, network, audio, storage, BIOS) with their age. Old drivers are a common cause of crashes, blue screens and battery drain.	Dispositivos con los que Windows indica un problema y los controladores más importantes (gráficos, red, audio, almacenamiento, BIOS) con su antigüedad. Los controladores antiguos son una causa habitual de bloqueos, pantallas azules y consumo de batería.
+Get driver updates	Obtener actualizaciones de controladores
+Optional updates in Windows Update	Actualizaciones opcionales en Windows Update
+Open Device Manager	Abrir Administrador de dispositivos
+Device	Dispositivo
+Kind	Clase
+Driver	Controlador
+Reading drivers	Leyendo controladores
+Reading devices and drivers...	Leyendo dispositivos y controladores...
+No devices found.	No se encontraron dispositivos.
+Network	Red
+Storage	Almacenamiento
+Camera	Cámara
+Sign-in	Inicio de sesión
+BIOS	BIOS
+USB	USB
+Chipset	Chipset
+Input	Entrada
+Touchpad/mouse	Touchpad/ratón
+Keyboard	Teclado
+Printer	Impresora
+Other	Otros
+Driver is recent enough	El controlador es suficientemente reciente
+Driver is {0} years old	El controlador tiene {0} años
+No proper graphics driver installed	No hay un controlador gráfico adecuado instalado
+Device {0} (code {1})	Dispositivo {0} (código {1})
+Problem code {0}	Código de problema {0}
+Switched off in Device Manager (code 22)	Deshabilitado en el Administrador de dispositivos (código 22)
+is not set up correctly	no está configurado correctamente
+has a damaged driver	tiene un controlador dañado
+cannot start	no se puede iniciar
+lacks free resources	no tiene recursos libres
+needs a restart	necesita un reinicio
+needs its driver reinstalled	necesita reinstalar su controlador
+has damaged settings	tiene la configuración dañada
+has no driver installed	no tiene controlador instalado
+is not working properly	no funciona correctamente
+has its driver switched off	tiene el controlador deshabilitado
+driver failed to load	no se pudo cargar el controlador
+driver is missing or damaged	el controlador falta o está dañado
+was stopped by Windows because it reported problems	Windows lo detuvo porque informó de problemas
+driver is blocked	el controlador está bloqueado
+driver is not signed	el controlador no está firmado
+Driver: {0}	Controlador: {0}
+Update or reinstall the driver: Device Manager > right-click the device > Update driver. If that doesn't help: Uninstall device, then Action > Scan for hardware changes.	Actualiza o reinstala el controlador: Administrador de dispositivos > clic derecho en el dispositivo > Actualizar controlador. Si no ayuda: Desinstalar el dispositivo y luego Acción > Buscar cambios de hardware.
+Switched off on purpose? Then nothing to do. Otherwise: Device Manager > right-click > Enable device.	¿Lo desactivaste a propósito? Entonces no hay nada que hacer. Si no: Administrador de dispositivos > clic derecho > Habilitar dispositivo.
+Install its driver: Windows Update > Advanced options > Optional updates, or the PC maker's support page (button above).	Instala su controlador: Windows Update > Opciones avanzadas > Actualizaciones opcionales, o la página de soporte del fabricante del PC (botón de arriba).
+Restart the PC.	Reinicia el PC.
+Unplug the USB device and plug it into a different port (not a hub), or try another cable. If nothing is plugged in, update the chipset and USB drivers from the PC maker.	Desconecta el dispositivo USB y conéctalo a otro puerto (no a un hub), o prueba otro cable. Si no hay nada conectado, actualiza los controladores de chipset y USB desde el fabricante del PC.
+Install the graphics driver from the PC maker's support page or nvidia.com / amd.com / intel.com. Until then the screen is slow and games won't run.	Instala el controlador gráfico desde la página de soporte del fabricante del PC o desde nvidia.com / amd.com / intel.com. Hasta entonces la pantalla irá lenta y los juegos no funcionarán.
+Update the graphics driver - from the PC maker's support page for a laptop, otherwise from nvidia.com, amd.com or intel.com.	Actualiza el controlador gráfico: desde la página de soporte del fabricante del PC si es un portátil; si no, desde nvidia.com, amd.com o intel.com.
+A BIOS update may be available. Get it only from the PC maker's support page (button above), and keep the PC plugged in while it installs.	Puede haber una actualización de BIOS. Descárgala solo de la página de soporte del fabricante del PC (botón de arriba) y deja el PC enchufado mientras se instala.
+A newer driver may be available from the PC maker's support page or in Windows Update > Optional updates. Only needed if this device gives trouble.	Puede haber un controlador más nuevo en la página de soporte del fabricante del PC o en Windows Update > Actualizaciones opcionales. Solo hace falta si este dispositivo da problemas.
+Drivers: {0} device(s) have a problem - see the Drivers page.	Controladores: {0} dispositivo(s) tienen un problema; mira la página Controladores.
+Automatic maintenance	Mantenimiento automático
+PC Tune-Up cleans junk files and checks the PC by itself on Sunday around noon (or as soon as the PC is on and not in use), then shows a notification. Startup apps, services and programs are never changed without you.	PC Tune-Up limpia archivos basura y revisa el PC por sí solo los domingos hacia mediodía (o en cuanto el PC esté encendido y sin usar), y luego muestra una notificación. Las aplicaciones de inicio, los servicios y los programas nunca se cambian sin ti.
+Every week	Cada semana
+Every 4 weeks	Cada 4 semanas
+Run now	Ejecutar ahora
+Not run yet.	Aún no se ha ejecutado.
+Last run: {0}	Última ejecución: {0}
+Install PC Tune-Up first (Settings > Installation): the automatic run needs it in a fixed place.	Instala antes PC Tune-Up (Opciones > Instalación): la ejecución automática necesita que esté en una ubicación fija.
+Couldn't set up automatic maintenance: {0}	No se pudo configurar el mantenimiento automático: {0}
+every week	cada semana
+every 4 weeks	cada 4 semanas
+The maintenance run has started in the background. A notification appears when it is done (in a minute or two).	El mantenimiento se ha iniciado en segundo plano. Aparecerá una notificación cuando termine (en un minuto o dos).
+PC Tune-Up maintenance	Mantenimiento de PC Tune-Up
+Cleaned {0}. {1} thing(s) worth a look - click to see.	Limpiados {0}. {1} cosa(s) merecen un vistazo: haz clic para verlas.
+Cleaned {0}. Everything looks fine.	Limpiados {0}. Todo parece estar bien.
+freed {0}, {1} thing(s) worth a look	liberado {0}, {1} cosa(s) merecen un vistazo
+freed {0} (automatic)	liberado {0} (automático)
+Maintenance	Mantenimiento
+Browsers	Navegadores
+Programs	Programas
+Right-click	Clic derecho
+Right-click menu	Menú contextual
+How much charge the battery still holds, how fast it is wearing, and how to make it last longer. From Windows' own battery report.	Cuánta carga conserva aún la batería, lo rápido que se desgasta y cómo hacer que dure más. Según el propio informe de batería de Windows.
+Battery usage per app	Uso de batería por aplicación
+Power & battery settings	Configuración de energía y batería
+Full battery report	Informe completo de batería
+Find a replacement	Buscar repuesto
+Reading	Lectura
+Value	Valor
+What it means	Qué significa
+Reading the battery report	Leyendo el informe de batería
+Reading the battery report...	Leyendo el informe de batería...
+Making the battery report	Creando el informe de batería
+Windows could not make a battery report.	Windows no pudo crear un informe de batería.
+Could not read the battery.	No se pudo leer la batería.
+Battery health	Estado de la batería
+Good - normal for its age.	Bueno: normal para su edad.
+Worn: you get noticeably less time on battery than when it was new.	Desgastada: te dura bastante menos con batería que cuando era nueva.
+Worn out: it holds less than two thirds of its charge. A new battery brings back the original battery life - see "Replacement" below.	Agotada: conserva menos de dos tercios de su carga. Una batería nueva recupera la autonomía original; mira "Repuesto" más abajo.
+Capacity	Capacidad
+{0} Wh now, {1} Wh when new	{0} Wh ahora, {1} Wh cuando era nueva
+Wh (watt-hours) is how much energy the battery can store.	Wh (vatios-hora) es la cantidad de energía que puede almacenar la batería.
+Wear over the last year	Desgaste en el último año
+no loss	sin pérdida
+loses about {0}% a year	pierde aproximadamente un {0}% al año
+Faster than normal (about 5-10% a year). Usually heat, or the battery being kept at 100% while plugged in all day - a charge limit helps (below).	Más rápido de lo normal (aprox. 5-10% al año). Suele deberse al calor o a tener la batería al 100% enchufada todo el día; un límite de carga ayuda (abajo).
+Normal.	Normal.
+Time on a full charge	Autonomía con carga completa
+about {0} ({1} when new)	aprox. {0} ({1} cuando era nueva)
+about {0}	aprox. {0}
+Windows' estimate for the way you normally use the PC.	Estimación de Windows según cómo usas normalmente el PC.
+Charge cycles	Ciclos de carga
+One cycle = 100% used in total. Most laptop batteries are made for 300-1000 cycles.	Un ciclo = 100% usado en total. La mayoría de baterías de portátil están hechas para 300-1000 ciclos.
+lithium polymer	polímero de litio
+lithium-ion	iones de litio
+{0}, made by {1} ({2})	{0}, fabricada por {1} ({2})
+{0}, made by {1}	{0}, fabricada por {1}
+Needed when you look for a replacement.	Necesario para buscar un repuesto.
+Charge limit	Límite de carga
+plugged in now	enchufado ahora
+on battery now	con batería ahora
+If the PC is plugged in most of the time, stopping charging at about 80% slows wear a lot. {0}	Si el PC está enchufado casi siempre, dejar de cargar hacia el 80% reduce mucho el desgaste. {0}
+Look in the PC maker's app or in the BIOS for "charge limit", "battery care" or "conservation mode" (usually 80%).	Busca en la aplicación del fabricante del PC o en la BIOS "límite de carga", "cuidado de la batería" o "modo de conservación" (normalmente 80%).
+Dell Optimizer or Dell Power Manager > Battery > "Primarily AC use" (or Custom, e.g. 50-80%). Also in the BIOS (F2 at start-up) > Power > Battery Charge Configuration.	Dell Optimizer o Dell Power Manager > Battery > "Primarily AC use" (o Custom, p. ej. 50-80%). También en la BIOS (F2 al arrancar) > Power > Battery Charge Configuration.
+Lenovo Vantage > Device > Power > Battery Charge Threshold, or "Conservation mode".	Lenovo Vantage > Dispositivo > Energía > Umbral de carga de la batería, o "Modo de conservación".
+In the BIOS (F10 at start-up) > Advanced > Power Management Options > Battery Health Manager: "Maximize my battery health".	En la BIOS (F10 al arrancar) > Advanced > Power Management Options > Battery Health Manager: "Maximize my battery health".
+MyASUS > Customization > Battery Health Charging: "Balanced" (80%) or "Maximum lifespan" (60%).	MyASUS > Personalización > Carga de estado de la batería: "Equilibrado" (80%) o "Máxima vida útil" (60%).
+Acer Care Center or Acer Quick Access > Battery charge limit (80%).	Acer Care Center o Acer Quick Access > Límite de carga de la batería (80%).
+MSI Center > Features > Battery Master: "Best for Battery".	MSI Center > Features > Battery Master: "Best for Battery".
+Samsung Settings > Battery > "Protect battery" (charges to 85%).	Samsung Settings > Batería > "Proteger batería" (carga hasta el 85%).
+Surface app > Battery > Smart Charging, or the UEFI "Enable Battery Limit" mode.	Aplicación Surface > Batería > Carga inteligente, o el modo UEFI "Enable Battery Limit".
+Razer Synapse > System > Battery Health Optimizer.	Razer Synapse > System > Battery Health Optimizer.
+In the BIOS > Advanced > Battery Charge Limit.	En la BIOS > Advanced > Battery Charge Limit.
+Replacement	Repuesto
+worth it	merece la pena
+Search for "{0} battery"{1} - preferably the PC maker's own part. On many laptops it is a 10-20 minute job with a screwdriver; the Upgrades page has the service manual.	Busca "batería {0}"{1}, preferiblemente la pieza original del fabricante del PC. En muchos portátiles es un trabajo de 10-20 minutos con un destornillador; la página Mejoras tiene el manual de servicio.
+ (battery {0})	 (batería {0})
+see button above	mira el botón de arriba
+Which apps used the most battery in the last day or week (Windows Settings).	Qué aplicaciones gastaron más batería en el último día o semana (Configuración de Windows).
+Battery history since {0}.	Historial de la batería desde {0}.
+Charge it holds (% of new)	Carga que conserva (% de nueva)
+Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, the search engine, home page and start-up pages, plus Windows' hosts file and proxy. Adware hides here: extensions that weren't installed from a store, and settings forced through "policies".	Extensiones de Chrome, Edge, Brave, Vivaldi y Firefox, el motor de búsqueda, la página principal y las páginas de inicio, además del archivo hosts y el proxy de Windows. El adware se esconde aquí: extensiones que no se instalaron desde una tienda y ajustes forzados mediante "directivas".
+Open extensions page	Abrir página de extensiones
+Remove checked policies	Quitar directivas marcadas
+Reset browser settings	Restablecer navegador
+Browser	Navegador
+Details	Detalles
+Extension	Extensión
+Search	Búsqueda
+Home page	Página principal
+Start-up	Inicio
+Policy	Directiva
+Risky	Peligroso
+Review	Revisar
+Checking browsers	Comprobando navegadores
+Reading browser settings...	Leyendo la configuración de los navegadores...
+No supported browsers found.	No se encontraron navegadores compatibles.
+from the store	de la tienda
+from the add-ons site	del sitio de complementos
+changes {0}	cambia {0}
+your search engine	tu motor de búsqueda
+your home page	tu página principal
+your start-up pages	tus páginas de inicio
+the new-tab page	la página de nueva pestaña
+can read and change every website you visit	puede leer y cambiar todos los sitios web que visitas
+extra powers: {0}	permisos adicionales: {0}
+installed by a policy	instalada por una directiva
+not from a store (added by a program or by hand)	no viene de una tienda (añadida por un programa o a mano)
+added by a program, not from the add-ons site	añadida por un programa, no desde el sitio de complementos
+Remove it unless you installed it yourself on purpose: open the extensions page (button above) > Remove. If it comes back, a program keeps adding it - look on the Programs and Bloatware pages.	Quítala salvo que la hayas instalado tú a propósito: abre la página de extensiones (botón de arriba) > Quitar. Si vuelve a aparecer, un programa la sigue añadiendo; mira las páginas Programas y Bloatware.
+Keep it if you know it and use it; otherwise remove it from the extensions page (button above).	Consérvala si la conoces y la usas; si no, quítala desde la página de extensiones (botón de arriba).
+Switched off. Remove it if you don't need it any more.	Desactivada. Quítala si ya no la necesitas.
+Search engine: {0}	Motor de búsqueda: {0}
+a well-known search engine	un motor de búsqueda conocido
+not a well-known search engine - adware often swaps it	no es un motor de búsqueda conocido; el adware suele cambiarlo
+Change it back in the browser: Settings > Search engine. If it changes again, use "Reset browser settings".	Vuelve a cambiarlo en el navegador: Configuración > Motor de búsqueda. Si cambia otra vez, usa "Restablecer navegador".
+Home page: {0}	Página principal: {0}
+Fine if you chose it.	Bien si la elegiste tú.
+Start-up pages: {0}	Páginas de inicio: {0}
+Fine if you chose them; otherwise change them in Settings > On start-up.	Bien si las elegiste tú; si no, cámbialas en Configuración > Al iniciar.
+Policy: {0}	Directiva: {0}
+Forced extension: {0}	Extensión forzada: {0}
+Forced start-up page: {0}	Página de inicio forzada: {0}
+forced through {0}	forzado mediante {0}
+Set by your organisation (this PC is managed) - leave it.	Lo ha establecido tu organización (este PC está administrado): déjalo.
+Nobody manages this home PC, so a program forced this. Check it and click "Remove checked policies" (needs administrator).	Nadie administra este PC doméstico, así que lo forzó un programa. Revísalo y haz clic en "Quitar directivas marcadas" (requiere administrador).
+Policy file: policies.json	Archivo de directivas: policies.json
+forced settings in {0}	ajustes forzados en {0}
+Open about:policies in Firefox to see what it forces. On a home PC you can delete the file (needs administrator).	Abre about:policies en Firefox para ver qué fuerza. En un PC doméstico puedes borrar el archivo (requiere administrador).
+Policy: settings forced in the registry	Directiva: ajustes forzados en el registro
+Open about:policies in Firefox to see what it forces.	Abre about:policies en Firefox para ver qué fuerza.
+Browsers: {0} thing(s) look like adware - see the Browsers page.	Navegadores: {0} cosa(s) parecen adware; mira la página Navegadores.
+Select a row first.	Primero selecciona una fila.
+Select a row of the browser to reset first.	Primero selecciona una fila del navegador que quieres restablecer.
+Couldn't start {0}.	No se pudo iniciar {0}.
+Open {0}'s reset page?	¿Abrir la página de restablecimiento de {0}?
+Resetting puts the search engine, home page, start-up pages and pinned tabs back to normal and switches extensions off. Bookmarks, history and saved passwords stay.	Restablecer devuelve a la normalidad el motor de búsqueda, la página principal, las páginas de inicio y las pestañas ancladas, y desactiva las extensiones. Los marcadores, el historial y las contraseñas guardadas se conservan.
+Check one or more policy rows first (extensions are removed in the browser itself - use "Open extensions page").	Primero marca una o más filas de directivas (las extensiones se quitan en el propio navegador: usa "Abrir página de extensiones").
+Removing browser policies needs administrator rights - click "Restart as admin" first.	Quitar directivas del navegador requiere permisos de administrador: haz clic antes en "Reiniciar como admin".
+Remove these forced browser settings?	¿Quitar estos ajustes forzados del navegador?
+Restart the browser afterwards. You can undo this from the History page.	Reinicia el navegador después. Puedes deshacerlo desde la página Historial.
+forced setting removed	ajuste forzado quitado
+{0} forced setting(s) removed. Restart the browser to see the change.	{0} ajuste(s) forzado(s) quitado(s). Reinicia el navegador para ver el cambio.
+Every installed program with its size and when you last used it (from Windows' own record of what you start, and when the program last wrote its own files). Check the ones you don't need and uninstall them in one go; leftover folders are cleaned up afterwards. Store apps are on the Bloatware page.	Todos los programas instalados con su tamaño y la última vez que los usaste (según el propio registro de Windows de lo que inicias y cuándo escribió el programa sus propios archivos por última vez). Marca los que no necesites y desinstálalos de una vez; las carpetas sobrantes se limpian después. Las apps de la Store están en la página Bloatware.
+Sort: size	Ordenar: tamaño
+Sort: last used	Ordenar: último uso
+Sort: name	Ordenar: nombre
+Open Installed apps	Abrir Aplicaciones instaladas
+Last used	Último uso
+Reading installed programs	Leyendo programas instalados
+Reading installed programs...	Leyendo programas instalados...
+now (running)	ahora (en ejecución)
+no record	sin registro
+on the keep list	en la lista de conservar
+used by other programs - keep	lo usan otros programas: conservar
+no sign of use for {0} days	sin señales de uso en {0} días
+never opened from Start or the desktop (may run in the background)	nunca abierto desde Inicio ni el escritorio (puede ejecutarse en segundo plano)
+language pack - shares its files (and size) with the main program	paquete de idioma: comparte sus archivos (y tamaño) con el programa principal
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.	{0} programas, {1} en total. {2} sin señales de uso en 6 meses o más.
+  Use is recorded since {0}.	  El uso se registra desde {0}.
+  (Windows is set not to record program use: Settings > Privacy > General.)	  (Windows está configurado para no registrar el uso de programas: Configuración > Privacidad > General.)
+Check one or more programs first.	Primero marca uno o más programas.
+Uninstall these programs?	¿Desinstalar estos programas?
+Careful - other programs may need: {0}	Cuidado: otros programas pueden necesitar: {0}
+Each program's own uninstaller runs, one after another; some show a window or ask for administrator rights.	Se ejecuta el desinstalador de cada programa, uno tras otro; algunos muestran una ventana o piden permisos de administrador.
+Uninstalling programs	Desinstalando programas
+uninstalling {0}	desinstalando {0}
+{0} program(s) uninstalled.	{0} programa(s) desinstalado(s).
+Still installed (cancelled, or the uninstaller failed): {0}	Siguen instalados (cancelado o falló el desinstalador): {0}
+These leftover folders are still there:	Estas carpetas sobrantes siguen ahí:
+Move them to the Recycle Bin?	¿Moverlas a la Papelera de reciclaje?
+{0} folder(s) moved to the Recycle Bin. Couldn't move (in use, or needs administrator): {1}	{0} carpeta(s) movida(s) a la Papelera de reciclaje. No se pudieron mover (en uso o requieren administrador): {1}
+leftover folder moved to the Recycle Bin	carpeta sobrante movida a la Papelera de reciclaje
+uninstalled	desinstalado
+measuring {0}	midiendo {0}
+Wi-Fi signal and speed, delays to the router and the internet, how fast names are looked up (DNS), and how often the connection dropped in the last 30 days.	Señal y velocidad Wi-Fi, retrasos hasta el router e internet, rapidez de resolución de nombres (DNS) y cuántas veces se cortó la conexión en los últimos 30 días.
+Flush DNS cache	Vaciar caché DNS
+Reset network	Restablecer red
+Wi-Fi settings	Configuración Wi-Fi
+Network troubleshooter	Solucionador de red
+Checking the network	Comprobando la red
+Checking the network (about 15 seconds)...	Comprobando la red (unos 15 segundos)...
+Checking the network: {0}	Comprobando la red: {0}
+connection	conexión
+router	router
+internet	internet
+Connection	Conexión
+Not connected	Sin conexión
+Plug in the network cable or connect to Wi-Fi (the network icon at the bottom right).	Conecta el cable de red o conéctate a una Wi-Fi (el icono de red abajo a la derecha).
+Wi-Fi	Wi-Fi
+Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).	Instalado con winget: actualízalo o quítalo con winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).
+It was installed with winget, so winget updates it. Update now? (A window opens; start PC Tune-Up again afterwards.)	Se instaló con winget, así que winget lo actualiza. ¿Actualizar ahora? (Se abre una ventana; vuelve a iniciar PC Tune-Up después.)
+shared	compartido
+Cable (Ethernet)	Cable (Ethernet)
+VPN	VPN
+On: {0}	Activada: {0}
+Everything below goes through the VPN, so delays are higher than without it. That is normal.	Todo lo que hay abajo pasa por la VPN, así que los retrasos son mayores que sin ella. Es normal.
+Wi-Fi signal	Señal Wi-Fi
+{0}% on "{1}"{2}	{0}% en "{1}"{2}
+Weak signal: move closer to the router, put the router higher and out in the open, or add a mesh point or repeater. Walls and floors weaken Wi-Fi a lot.	Señal débil: acércate al router, ponlo más alto y despejado, o añade un punto mesh o un repetidor. Las paredes y los suelos debilitan mucho la Wi-Fi.
+Wi-Fi band	Banda Wi-Fi
+2.4 GHz (channel {0})	2,4 GHz (canal {0})
+This Wi-Fi card can use 5 GHz (faster, less crowded). If the router offers a separate 5 GHz network, connect to that one - or turn on "band steering" in the router.	Esta tarjeta Wi-Fi puede usar 5 GHz (más rápida, menos saturada). Si el router ofrece una red de 5 GHz aparte, conéctate a ella, o activa "band steering" en el router.
+Router	Router
+{0} ms on average, worst {1} ms	{0} ms de media, peor {1} ms
+{0} ms on average, worst {1} ms, {2}% lost	{0} ms de media, peor {1} ms, {2}% perdido
+does not answer pings	no responde a pings
+no answer, {0}% lost	sin respuesta, {0}% perdido
+Some routers never answer pings - fine if the internet line is OK.	Algunos routers nunca responden a pings; no pasa nada si la línea de internet va bien.
+The problem is between this PC and the router: usually weak or crowded Wi-Fi. Move closer, use 5 GHz or a cable, and restart the router.	El problema está entre este PC y el router: normalmente una Wi-Fi débil o saturada. Acércate, usa 5 GHz o un cable, y reinicia el router.
+Internet	Internet
+If the router line above is fine, the delay comes from the internet connection itself: restart the modem/router; if it keeps happening, contact your internet provider.	Si la línea del router de arriba está bien, el retraso viene de la propia conexión a internet: reinicia el módem/router; si sigue pasando, contacta con tu proveedor de internet.
+DNS	DNS
+{0}: {1} ms per look-up ({2}: {3} ms)	{0}: {1} ms por consulta ({2}: {3} ms)
+{0}: {1} ms per look-up	{0}: {1} ms por consulta
+{0} doesn't answer	{0} no responde
+Names can't be looked up, so websites won't open. Restart the router, or set DNS to 1.1.1.1 in Settings > Network & internet > (your connection) > DNS server assignment.	No se pueden resolver nombres, así que las webs no abren. Reinicia el router o pon el DNS en 1.1.1.1 en Configuración > Red e Internet > (tu conexión) > Asignación de servidor DNS.
+Your DNS server is slow - every new website waits for it. Switching to {0} helps: Settings > Network & internet > (your connection) > DNS server assignment > Edit.	Tu servidor DNS es lento: cada web nueva tiene que esperarlo. Cambiar a {0} ayuda: Configuración > Red e Internet > (tu conexión) > Asignación de servidor DNS > Editar.
+Wi-Fi drops (30 days)	Cortes de Wi-Fi (30 días)
+{0} disconnect(s), {1} failed connection(s)	{0} desconexión(es), {1} conexión(es) fallida(s)
+Normal - disconnects also happen at sleep, shutdown and when you move between networks.	Normal: también hay desconexiones al suspender, al apagar y al cambiar de red.
+More than normal. Update the Wi-Fi driver (Drivers page), turn off "Allow the computer to turn off this device to save power" for the Wi-Fi card in Device Manager, and restart the router.	Más de lo normal. Actualiza el controlador Wi-Fi (página Controladores), desactiva "Permitir que el equipo apague este dispositivo para ahorrar energía" para la tarjeta Wi-Fi en el Administrador de dispositivos, y reinicia el router.
+Errors on {0}	Errores en {0}
+{0} damaged packets ({1})	{0} paquetes dañados ({1})
+Usually a bad cable or a failing port. Try another cable or port; for Wi-Fi, update the driver.	Suele ser un cable defectuoso o un puerto que falla. Prueba otro cable o puerto; en Wi-Fi, actualiza el controlador.
+Network: {0} - see the Network page.	Red: {0}; mira la página Red.
+DNS cache	Caché DNS
+flushed	vaciada
+DNS cache flushed. Websites that wouldn't open because of an old address should work now.	Caché DNS vaciada. Las webs que no abrían por una dirección antigua deberían funcionar ya.
+Resetting the network needs administrator rights - click "Restart as admin" first. (Or: Settings > Network & internet > Advanced network settings > Network reset.)	Restablecer la red requiere permisos de administrador: haz clic antes en "Reiniciar como admin". (O bien: Configuración > Red e Internet > Configuración de red avanzada > Restablecimiento de red.)
+Reset the network?	¿Restablecer la red?
+This resets Windows' network settings (Winsock and TCP/IP) to factory state and clears the DNS cache - the standard fix when nothing connects although the router works. Wi-Fi passwords and VPN apps stay, but a manually set IP address or DNS server is cleared.	Esto devuelve la configuración de red de Windows (Winsock y TCP/IP) al estado de fábrica y vacía la caché DNS: la solución habitual cuando nada se conecta aunque el router funcione. Las contraseñas Wi-Fi y las apps de VPN se conservan, pero se borra una dirección IP o un servidor DNS configurados a mano.
+The PC needs a restart afterwards.	Después hay que reiniciar el PC.
+Resetting the network	Restableciendo la red
+Winsock and TCP/IP	Winsock y TCP/IP
+reset ({0})	restablecido ({0})
+The network has been reset. Restart the PC now to finish?	La red se ha restablecido. ¿Reiniciar el PC ahora para terminar?
+Entries other programs add to Explorer's right-click menu (under "Show more options" on Windows 11). Leftovers of removed programs are pre-checked. Hiding an entry can be undone from History or with "Show checked".	Entradas que otros programas añaden al menú contextual del Explorador (en "Mostrar más opciones" en Windows 11). Los restos de programas eliminados vienen marcados. Ocultar una entrada se puede deshacer desde Historial o con "Mostrar lo marcado".
+Hide checked	Ocultar lo marcado
+Show checked	Mostrar lo marcado
+Entry	Entrada
+Shown on	Se muestra en
+Hidden	Oculta
+Shown	Visible
+files	archivos
+folders	carpetas
+files and folders	archivos y carpetas
+folder background	fondo de carpeta
+drives	unidades
+desktop	escritorio
+leftover: the program is gone{0}	resto: el programa ya no está{0}
+Reading the right-click menu	Leyendo el menú contextual
+Reading the right-click menu...	Leyendo el menú contextual...
+{0} entries from other programs; {1} leftover(s) of removed programs (pre-checked).	{0} entradas de otros programas; {1} resto(s) de programas eliminados (marcados).
+Check one or more entries that are shown first.	Primero marca una o más entradas visibles.
+Check one or more hidden entries first.	Primero marca una o más entradas ocultas.
+hidden from the menu	oculta del menú
+shown in the menu again	visible de nuevo en el menú
+{0} entr(y/ies) hidden. Undo from the History page.	{0} entrada(s) oculta(s). Se puede deshacer desde la página Historial.
+{0} entr(y/ies) shown again. Undo from the History page.	{0} entrada(s) visible(s) de nuevo. Se puede deshacer desde la página Historial.
+Restart Explorer now so the menu updates?	¿Reiniciar el Explorador ahora para actualizar el menú?
+Large files	Archivos grandes
+Duplicate files	Archivos duplicados
+Recycle checked	Reciclar lo marcado
+File	Archivo
+Modified	Modificado
+Find what is filling the drive. Pick a place and Scan; double-click a row to look inside it. "Large files" and "Duplicate files" look for files you may not need - they only go to the Recycle Bin when you say so.	Descubre qué está llenando la unidad. Elige un lugar y pulsa Analizar; haz doble clic en una fila para ver su contenido. "Archivos grandes" y "Archivos duplicados" buscan archivos que quizá no necesites; solo van a la Papelera de reciclaje cuando tú lo dices.
+That is a very big or system folder - this can take a long time. Program and Windows files are never pre-checked. Continue?	Es una carpeta muy grande o del sistema; puede tardar mucho. Los archivos de programas y de Windows nunca vienen marcados. ¿Continuar?
+Looking for files of 100 MB or more in {0}...	Buscando archivos de 100 MB o más en {0}...
+Looking for identical files of 1 MB or more in {0} (it compares contents, so this can take a while)...	Buscando archivos idénticos de 1 MB o más en {0} (compara el contenido, así que puede tardar)...
+Finding large files	Buscando archivos grandes
+Finding duplicate files	Buscando archivos duplicados
+comparing files ({0} of {1})	comparando archivos ({0} de {1})
+in Downloads - often safe to remove	en Descargas: a menudo se puede quitar
+installer or archive - often not needed any more	instalador o archivo comprimido: a menudo ya no hace falta
+{0} large file(s), {1} together. Check what you don't need and click Recycle checked (they go to the Recycle Bin).	{0} archivo(s) grande(s), {1} en total. Marca lo que no necesites y haz clic en Reciclar lo marcado (van a la Papelera de reciclaje).
+kept (1 of {0} identical copies)	se conserva (1 de {0} copias idénticas)
+identical copy of {0}	copia idéntica de {0}
+{0} set(s) of identical files; the extra copies take {1}. One copy of each is kept (grey); the others are pre-checked.	{0} grupo(s) de archivos idénticos; las copias sobrantes ocupan {1}. Se conserva una copia de cada uno (gris); las demás vienen marcadas.
+Stopped. {0}	Detenido. {0}
+Check one or more files first.	Primero marca uno o más archivos.
+All copies of {0} are checked - leave at least one unchecked.	Todas las copias de {0} están marcadas: deja al menos una sin marcar.
+Move {0} file(s) ({1}) to the Recycle Bin?	¿Mover {0} archivo(s) ({1}) a la Papelera de reciclaje?
+You can get them back from the Recycle Bin until you empty it.	Puedes recuperarlos de la Papelera de reciclaje hasta que la vacíes.
+{0} file(s)	{0} archivo(s)
+moved to the Recycle Bin ({0})	movido a la Papelera de reciclaje ({0})
+{0} file(s) moved to the Recycle Bin ({1}). Empty the Recycle Bin to free the space.	{0} archivo(s) movido(s) a la Papelera de reciclaje ({1}). Vacía la Papelera de reciclaje para liberar el espacio.
+Couldn't move: {0}	No se pudo mover: {0}
+PC Tune-Up score	Puntuación de PC Tune-Up
+Windows stability x10	Estabilidad de Windows x10
+Score {0}/100 (was {1})	Puntuación {0}/100 (antes {1})
+Score {0}/100	Puntuación {0}/100
+Health over time	Estado a lo largo del tiempo
+The score appears once all checks have run.	La puntuación aparece cuando terminan todas las comprobaciones.
+No history yet.	Aún no hay historial.
+PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)	PC-TuneUp.exe /auto                 el mantenimiento automático (limpiar, comprobar, notificar)
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.  Use is recorded since {3}.	{0} programas, {1} en total. {2} sin señales de uso en 6 meses o más.  El uso se registra desde {3}.
+{0} programs, {1} in total. {2} with no sign of use for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programas, {1} en total. {2} sin señales de uso en 6 meses o más.  (Windows está configurado para no registrar el uso de programas: Configuración > Privacidad > General.)
+{0}; {1}	{0}; {1}
+Start here	Empieza aquí
+1.  {0}	1.  {0}
+2.  {0}	2.  {0}
+3.  {0}	3.  {0}
+Open	Abrir
+Nothing urgent - this PC looks good.	Nada urgente: este PC tiene buena pinta.
+Security: {0} problem(s) to fix	Seguridad: {0} problema(s) que arreglar
+Fix	Arreglar
+Nothing backs up your files yet	Nada hace aún copia de tus archivos
+Set up backup	Configurar copia
+{0} browser item(s) look like adware	{0} elemento(s) del navegador parecen adware
+{0} device(s) have a driver problem	{0} dispositivo(s) tienen un problema de controlador
+{0} kind(s) of crashes or errors keep happening	{0} tipo(s) de bloqueos o errores se siguen repitiendo
+See fixes	Ver soluciones
+Drive C: is almost full ({0} free)	La unidad C: está casi llena ({0} libre)
+Free up space	Liberar espacio
+The network has a problem	La red tiene un problema
+Clean up {0} of junk files	Limpiar {0} de archivos basura
+Free up to {0} with space savers	Liberar hasta {0} con Ahorro de espacio
+Stop {0} app(s) starting with Windows	Impedir que {0} aplicación(es) se inicien con Windows
+{0} program update(s) available	{0} actualización(es) de programas disponible(s)
+Turn off {0} Windows ads, tips and tracking settings	Desactivar {0} ajustes de anuncios, consejos y seguimiento de Windows
+Turn off	Desactivar
+Switch off {0} junk scheduled task(s)	Desactivar {0} tarea(s) programada(s) basura
+The battery is worn out - see how to replace it	La batería está agotada: mira cómo cambiarla
+See	Ver
+Hide {0} leftover right-click menu entr(y/ies)	Ocultar {0} entrada(s) sobrante(s) del menú contextual
+Start-up time	Tiempo de arranque
+Start-up time: {0} s	Tiempo de arranque: {0} s
+Reading start-up times	Leyendo los tiempos de arranque
+Seconds until the desktop is ready	Segundos hasta que el escritorio está listo
+Windows only shows start-up times to administrators - click "Restart as admin" to see them.	Windows solo muestra los tiempos de arranque a los administradores: haz clic en "Reiniciar como admin" para verlos.
+No start-up times recorded yet.	Aún no hay tiempos de arranque registrados.
+Fast startup is on, so Shut down and then starting again is quicker than Restart (only Restart does a full start).	El inicio rápido está activado, así que Apagar y volver a encender es más rápido que Reiniciar (solo Reiniciar hace un arranque completo).
+Fast startup is off.	El inicio rápido está desactivado.
+Last full start: {0} s ({1} s for Windows, then {2} s for start-up apps); {3} s on average over 30 days.	Último arranque completo: {0} s ({1} s para Windows y luego {2} s para las aplicaciones de inicio); {3} s de media en 30 días.
+Last full start: {0} s ({1} s for Windows, then {2} s for start-up apps).	Último arranque completo: {0} s ({1} s para Windows y luego {2} s para las aplicaciones de inicio).
+That is slow - turning off start-up apps below helps most.	Es lento: desactivar aplicaciones de inicio (abajo) es lo que más ayuda.
+Fine; fewer start-up apps would make it quicker.	Bien; con menos aplicaciones de inicio sería más rápido.
+Quick.	Rápido.
+app	aplicación
+driver	controlador
+service	servicio
+background task	tarea en segundo plano
+device	dispositivo
+Slowing it down: {0}.	Lo ralentiza: {0}.
+Space savers	Ahorro de espacio
+Big chunks of disk space that Windows keeps by default - each with what you give up. Nothing is checked except Storage Sense; most need administrator rights, and every change except freeing OneDrive copies can be undone from History.	Grandes bloques de espacio en disco que Windows reserva por defecto, cada uno con lo que pierdes. No hay nada marcado salvo Sensor de almacenamiento; la mayoría requieren permisos de administrador, y todos los cambios salvo liberar las copias de OneDrive se pueden deshacer desde Historial.
+Apply checked	Aplicar lo marcado
+Storage settings	Configuración de almacenamiento
+Saver	Ahorro
+Can free	Puede liberar
+Now	Ahora
+What it does - and what you give up	Qué hace y qué pierdes
+Looking for space savers	Buscando formas de ahorrar espacio
+Checking...	Comprobando...
+ongoing	continuo
+Hibernation file	Archivo de hibernación
+{0} GB (full size)	{0} GB (tamaño completo)
+{0} GB (already reduced)	{0} GB (ya reducido)
+Shrinks C:\hiberfil.sys to half. Fast startup keeps working; the PC can no longer hibernate (sleep still works, but if the battery runs flat while asleep, unsaved work is lost).	Reduce C:\hiberfil.sys a la mitad. El inicio rápido sigue funcionando; el PC ya no puede hibernar (la suspensión sigue funcionando, pero si la batería se agota mientras está suspendido, se pierde el trabajo sin guardar).
+Removes C:\hiberfil.sys. A desktop rarely hibernates; Fast startup is switched off too, so starting takes a few seconds longer.	Elimina C:\hiberfil.sys. Un PC de sobremesa rara vez hiberna; también se desactiva el inicio rápido, así que arrancar tarda unos segundos más.
+Already as small as it can be while keeping Fast startup.	Ya es lo más pequeño posible manteniendo el inicio rápido.
+Reserved storage	Almacenamiento reservado
+on (about 7 GB)	activado (unos 7 GB)
+only visible as administrator	solo visible como administrador
+Windows keeps about 7 GB free for updates. Switching it off gives you that space; on a nearly full drive an update may then fail until you free space.	Windows mantiene unos 7 GB libres para actualizaciones. Desactivarlo te da ese espacio; con la unidad casi llena, una actualización podría fallar hasta que liberes espacio.
+Windows keeps about 7 GB free for updates. Click "Restart as admin" to check and change it.	Windows mantiene unos 7 GB libres para actualizaciones. Haz clic en "Reiniciar como admin" para comprobarlo y cambiarlo.
+Nothing to free.	Nada que liberar.
+Compress Windows files	Comprimir archivos de Windows
+Windows says this isn't worth it on this PC (see "Now"), so it is not counted in the total. Compresses Windows' own files (Compact OS), about 2-4 GB; on a fast PC the slowdown is barely noticeable. Takes 10-20 minutes.	Windows dice que no merece la pena en este PC (mira "Ahora"), así que no se cuenta en el total. Comprime los propios archivos de Windows (Compact OS), unos 2-4 GB; en un PC rápido la ralentización apenas se nota. Tarda 10-20 minutos.
+Compresses Windows' own files (Compact OS), about 2-4 GB; on a fast PC the slowdown is barely noticeable. Takes 10-20 minutes.	Comprime los propios archivos de Windows (Compact OS), unos 2-4 GB; en un PC rápido la ralentización apenas se nota. Tarda 10-20 minutos.
+OneDrive copies ({0})	Copias de OneDrive ({0})
+{0} file(s) kept on this PC	{0} archivo(s) guardado(s) en este PC
+Removes the copies on this PC; the files stay in OneDrive with a cloud icon and download again when you open them (you need internet for that). Files set to "Always keep on this device" stay.	Quita las copias de este PC; los archivos siguen en OneDrive con un icono de nube y se vuelven a descargar al abrirlos (para eso necesitas internet). Los archivos marcados como "Mantener siempre en este dispositivo" se quedan.
+Storage Sense	Sensor de almacenamiento
+Windows already cleans temporary files and old Recycle Bin items by itself.	Windows ya limpia por sí solo los archivos temporales y los elementos antiguos de la Papelera de reciclaje.
+Turns on Windows' own automatic clean-up: every week it removes temporary files and Recycle Bin items older than 30 days. Your own files are not touched.	Activa la limpieza automática de Windows: cada semana elimina los archivos temporales y los elementos de la Papelera de reciclaje con más de 30 días. Tus propios archivos no se tocan.
+Paging file	Archivo de paginación
+Windows' overflow for memory. Leave it to Windows - shrinking it can make programs crash when memory fills up. If it is large, more memory is the real fix (see the Upgrades page).	El desbordamiento de memoria de Windows. Déjalo en manos de Windows: reducirlo puede hacer que los programas se bloqueen cuando se llena la memoria. Si es grande, la verdadera solución es más memoria (mira la página Mejoras).
+Extra Windows languages	Idiomas adicionales de Windows
+Each extra language with its speech and handwriting add-ons takes a few hundred MB. Remove ones you don't use in Settings > Time & language > Language & region.	Cada idioma adicional con sus complementos de voz y escritura a mano ocupa unos cientos de MB. Quita los que no uses en Configuración > Hora e idioma > Idioma y región.
+Check one or more savers first (grey rows are only information).	Primero marca una o más opciones (las filas grises son solo informativas).
+These need administrator rights - click "Restart as admin" first: {0}	Estas requieren permisos de administrador; haz clic antes en "Reiniciar como admin": {0}
+Apply these space savers?	¿Aplicar estas opciones de ahorro de espacio?
+See the right-hand column for what each one gives up.	Mira la columna de la derecha para ver qué pierdes con cada una.
+Compressing Windows files takes 10-20 minutes.	Comprimir los archivos de Windows tarda 10-20 minutos.
+turned on (weekly)	activado (semanal)
+Storage Sense is on.	El Sensor de almacenamiento está activado.
+Applying space savers	Aplicando ahorro de espacio
+Space savers:	Ahorro de espacio:
+ - {0}: done	 - {0}: hecho
+ - {0}: failed {1}	 - {0}: falló {1}
+OneDrive frees its copies over the next minutes. Undo the others from the History page.	OneDrive libera sus copias en los próximos minutos. Las demás se pueden deshacer desde la página Historial.
+Space	Espacio
+done, about {0}	hecho, aprox. {0}
+done, about {0} ({1})	hecho, aprox. {0} ({1})
+put back as it was	devuelto a como estaba
+Needs administrator rights - click 'Restart as admin'.	Requiere permisos de administrador: haz clic en 'Reiniciar como admin'.
+Error log	Registro de errores
+No problems inside PC Tune-Up have been recorded.	No se ha registrado ningún problema interno de PC Tune-Up.
+Problems inside PC Tune-Up (last 14 days)	Problemas internos de PC Tune-Up (últimos 14 días)
+None recorded.	Ninguno registrado.
+Notify me when something is new (recommended)	Avisarme cuando haya algo nuevo (recomendado)
+Notify me after every run	Avisarme tras cada ejecución
+Never notify me	No avisarme nunca
+New since last time: {0}	Nuevo desde la última vez: {0}
+and {0} more	y {0} más
+New browser extension: {0} ({1})	Nueva extensión del navegador: {0} ({1})
+Security: {0} - {1}	Seguridad: {0} - {1}
+Device problem: {0}	Problema de dispositivo: {0}
+More often: {0} (+{1})	Más a menudo: {0} (+{1})
+freed {0}, {1} new thing(s)	liberado {0}, {1} cosa(s) nueva(s)
+freed {0}, nothing new	liberado {0}, nada nuevo
+Gaming	Juegos
+Start your game, then click Check again: which graphics card it really uses, what else is busy, and the Windows settings that cost frames. Recommended fixes are pre-checked and can be undone from History.	Inicia el juego y haz clic en Comprobar de nuevo: qué tarjeta gráfica usa realmente, qué más está ocupado y los ajustes de Windows que cuestan fotogramas. Los arreglos recomendados vienen marcados y se pueden deshacer desde Historial.
+Apply checked fixes	Aplicar arreglos marcados
+Graphics settings	Configuración de gráficos
+Game Mode settings	Configuración del Modo de juego
+Checking for gaming	Comprobando para juegos
+Measuring (about 5 seconds)...	Midiendo (unos 5 segundos)...
+measuring graphics and processor use	midiendo el uso de gráficos y procesador
+Game	Juego
+No game running right now	No hay ningún juego en ejecución
+Start your game, switch back here (Alt+Tab) and click "Check again" to see which graphics card it uses and what else is busy. The Windows settings below are checked either way.	Inicia el juego, vuelve aquí (Alt+Tab) y haz clic en "Comprobar de nuevo" para ver qué tarjeta gráfica usa y qué más está ocupado. Los ajustes de Windows de abajo se comprueban en cualquier caso.
+Game: {0}	Juego: {0}
+runs, but not drawing anything at the moment	en ejecución, pero ahora mismo no está dibujando nada
+Switch to the game for a moment (so it draws), then come back and click "Check again".	Cambia un momento al juego (para que dibuje), vuelve y haz clic en "Comprobar de nuevo".
+runs on {0} - the slower, built-in graphics	usa {0}, los gráficos integrados más lentos
+Set it to use the fast graphics card (fix below), then restart the game. Same as Settings > System > Display > Graphics > (the game) > High performance.	Configúralo para usar la tarjeta gráfica rápida (arreglo abajo) y reinicia el juego. Es lo mismo que Configuración > Sistema > Pantalla > Gráficos > (el juego) > Alto rendimiento.
+runs on {0} ({1}% busy)	usa {0} ({1}% ocupada)
+The graphics card is the limit (fully busy) - lower the graphics settings or the resolution in the game for more frames.	La tarjeta gráfica es el límite (totalmente ocupada): baja los ajustes gráficos o la resolución del juego para tener más fotogramas.
+Busy: {0}	Ocupado: {0}
+uses {0}% of the processor	usa el {0}% del procesador
+uses {0}% of {1}	usa el {0}% de {1}
+a graphics card	una tarjeta gráfica
+Close {0} while you play, if you don't need it. (It may also be Windows doing updates or a virus scan - those finish by themselves.)	Cierra {0} mientras juegas, si no lo necesitas. (También puede ser Windows instalando actualizaciones o un análisis antivirus; eso termina solo.)
+Close {0} (videos, animated wallpapers and browser tabs use the graphics card too) while you play.	Cierra {0} mientras juegas (los vídeos, los fondos animados y las pestañas del navegador también usan la tarjeta gráfica).
+on battery	con batería
+Plug in the charger: on battery, laptops slow the processor and graphics card down a lot.	Conecta el cargador: con batería, los portátiles ralentizan mucho el procesador y la tarjeta gráfica.
+Power mode	Modo de energía
+Set Power mode to "Best performance" while gaming (Settings > System > Power & battery) - the button opens it.	Pon el modo de energía en "Mejor rendimiento" mientras juegas (Configuración > Sistema > Energía y batería); el botón lo abre.
+plugged in	enchufado
+plugged in, {0}	enchufado, {0}
+only {0}% free	solo {0}% libre
+Close browsers and other big programs before playing - when memory is full, games stutter.	Cierra los navegadores y otros programas grandes antes de jugar: cuando la memoria está llena, los juegos dan tirones.
+Game Mode	Modo de juego
+Game Mode gives the game priority and pauses Windows Update installs while you play. Turn it on (fix below).	El Modo de juego da prioridad al juego y pausa las instalaciones de Windows Update mientras juegas. Actívalo (arreglo abajo).
+Background recording	Grabación en segundo plano
+on ("Record what happened")	activada ("Grabar lo que ha pasado")
+Windows keeps recording the last minutes of every game, which costs frames. Turn it off (fix below); you can still record by hand with Win+Alt+R.	Windows graba continuamente los últimos minutos de cada juego, lo que cuesta fotogramas. Desactívalo (arreglo abajo); puedes seguir grabando a mano con Win+Alt+R.
+Optimizations for windowed games	Optimizaciones para juegos en ventana
+Lowers delay and allows Auto HDR / variable refresh rate for games in a window or borderless window. Turn it on (fix below).	Reduce el retraso y permite Auto HDR / frecuencia de actualización variable en juegos en ventana o en ventana sin bordes. Actívalo (arreglo abajo).
+Hardware-accelerated GPU scheduling	Programación de GPU acelerada por hardware
+Windows default	Predeterminado de Windows
+Lets the graphics card schedule its own work - often a little smoother, and needed for DLSS frame generation. Needs administrator and a restart (fix below). If games stutter afterwards, undo it.	Permite que la tarjeta gráfica programe su propio trabajo: a menudo algo más fluido, y necesario para la generación de fotogramas DLSS. Requiere administrador y un reinicio (arreglo abajo). Si los juegos dan tirones después, deshazlo.
+Overlays	Overlays
+Overlays draw on top of the game. Usually fine; if a game stutters or crashes, switch its overlay off first.	Los overlays se dibujan encima del juego. Normalmente no pasa nada; si un juego da tirones o se bloquea, desactiva primero su overlay.
+Graphics driver	Controlador gráfico
+Check one or more rows that have a fix first.	Primero marca una o más filas que tengan arreglo.
+Hardware-accelerated GPU scheduling needs administrator rights - click "Restart as admin" first, or uncheck it.	La programación de GPU acelerada por hardware requiere permisos de administrador: haz clic antes en "Reiniciar como admin" o desmárcala.
+Couldn't change {0}: {1}	No se pudo cambiar {0}: {1}
+Done: {0}. Restart the PC for GPU scheduling to take effect. Restart the game to feel the difference. Undo from the History page.	Hecho: {0}. Reinicia el PC para que se aplique la programación de GPU. Reinicia el juego para notar la diferencia. Se puede deshacer desde la página Historial.
+Done: {0}. Restart the game to feel the difference. Undo from the History page.	Hecho: {0}. Reinicia el juego para notar la diferencia. Se puede deshacer desde la página Historial.
+turned on	activado
+set to use the fast graphics card	configurado para usar la tarjeta gráfica rápida
+turned on (after a restart)	activado (tras un reinicio)
+Search  (Ctrl+F)	Buscar  (Ctrl+F)
+Everything that matches, on every page. Double-click a result (or select it and press Enter) to go there.	Todo lo que coincide, en todas las páginas. Haz doble clic en un resultado (o selecciónalo y pulsa Entrar) para ir allí.
+Found	Encontrado
+Page	Página
+{0} result(s) for "{1}".	{0} resultado(s) para "{1}".
+Nothing found for "{0}". Pages still loading are searched once they are ready.	No se encontró nada para "{0}". Las páginas que aún se están cargando se buscan cuando estén listas.
+Deutsch	Deutsch
+Français	Français
+PC Tune-Up settings	Opciones de PC Tune-Up
+This opens GitHub with a new problem report, filled in with:	Esto abre GitHub con un nuevo informe de problema, rellenado con:
+  Version: {0}	  Versión: {0}
+  Windows: {0}	  Windows: {0}
+  Recent errors: {0}	  Errores recientes: {0}
+{0} line(s) (your name, folders and PC name are blanked out)	{0} línea(s) (tu nombre, carpetas y nombre del PC se ocultan)
+none	ninguno
+You can read and change everything there before you press Submit. You need a free GitHub account.	Puedes leer y cambiar todo allí antes de pulsar Submit. Necesitas una cuenta gratuita de GitHub.
+Saved: {0}	Guardado: {0}
+It holds your settings, keep list ({0}), privacy choices ({1}), switched-off scheduled tasks ({2}), startup apps ({3}) and services ({4}). No files, passwords or personal data. On the other PC: Settings > Move to another PC > Import.	Contiene tus opciones, la lista de conservar ({0}), las opciones de privacidad ({1}), las tareas programadas desactivadas ({2}), las aplicaciones de inicio ({3}) y los servicios ({4}). Sin archivos, contraseñas ni datos personales. En el otro PC: Opciones > Pasar a otro PC > Importar.
+That is not a PC Tune-Up settings file.	No es un archivo de opciones de PC Tune-Up.
+ - Settings: language, theme, updates, restore points, notifications	 - Opciones: idioma, tema, actualizaciones, puntos de restauración, notificaciones
+ - Keep list: add {0} program(s)	 - Lista de conservar: añadir {0} programa(s)
+ - Privacy: turn off {0} setting(s)	 - Privacidad: desactivar {0} ajuste(s)
+ - Scheduled tasks: switch off {0}	 - Tareas programadas: desactivar {0}
+ - Startup: stop {0} app(s) starting with Windows	 - Inicio: impedir que {0} aplicación(es) se inicien con Windows
+ - Services: change {0}	 - Servicios: cambiar {0}
+ - Services: {0} skipped (needs administrator)	 - Servicios: {0} omitido(s) (requiere administrador)
+Import from {0}?	¿Importar desde {0}?
+Only what exists on this PC is changed. Everything can be undone from the History page.	Solo se cambia lo que existe en este PC. Todo se puede deshacer desde la página Historial.
+turned off (imported)	desactivado (importado)
+switched off (imported)	desactivada (importado)
+Imported. Language and theme take effect when PC Tune-Up restarts.	Importado. El idioma y el tema se aplican cuando PC Tune-Up se reinicia.
+Welcome to PC Tune-Up	Te damos la bienvenida a PC Tune-Up
+PC Tune-Up checks this PC and explains in plain language what slows it down. The "Start here" box on the Health page always shows the three most useful things to do right now. "Fix my PC" runs all the safe fixes in one go.	PC Tune-Up revisa este PC y explica con palabras sencillas qué lo ralentiza. El cuadro "Empieza aquí" de la página Estado muestra siempre las tres cosas más útiles que puedes hacer ahora mismo. "Arreglar mi PC" aplica todas las correcciones seguras de una vez.
+Nothing changes without you	Nada cambia sin ti
+PC Tune-Up asks first and shows exactly what it will do. Every change is listed on the History page, and almost everything can be undone with one click. Security software, VPNs and drivers are never touched, and you can add your own programs to the keep list.	PC Tune-Up pregunta primero y muestra exactamente lo que va a hacer. Cada cambio aparece en la página Historial y casi todo se puede deshacer con un clic. El software de seguridad, las VPN y los controladores nunca se tocan, y puedes añadir tus propios programas a la lista de conservar.
+A few handy things	Algunas cosas útiles
+Some fixes need administrator rights - click "Restart as admin" at the bottom left. Press Ctrl+F to search everything. In Settings you can switch on weekly maintenance, which cleans junk by itself and only tells you when something new turns up.	Algunas correcciones necesitan permisos de administrador: haz clic en "Reiniciar como admin" abajo a la izquierda. Pulsa Ctrl+F para buscar en todo. En Opciones puedes activar el mantenimiento semanal, que limpia la basura solo y solo te avisa cuando aparece algo nuevo.
+Step {0} of {1}	Paso {0} de {1}
+Next	Siguiente
+Back	Atrás
+Skip	Omitir
+Get started	Empezar
+Move to another PC	Pasar a otro PC
+Saves your choices to one file: settings, keep list, privacy settings you turned off, and the scheduled tasks, startup apps and services you switched off. Import it on another PC - only what exists there is changed, with undo.	Guarda tus elecciones en un archivo: opciones, lista de conservar, ajustes de privacidad que desactivaste y las tareas programadas, aplicaciones de inicio y servicios que desactivaste. Impórtalo en otro PC: solo se cambia lo que existe allí, con opción de deshacer.
+Export settings...	Exportar opciones...
+Import settings...	Importar opciones...
+Help and feedback	Ayuda y comentarios
+Something not working, or an idea? It opens a report on GitHub with the version, Windows and recent errors already filled in (your name, folders and PC name are blanked out) - you see everything before you send it.	¿Algo no funciona o tienes una idea? Se abre un informe en GitHub con la versión, Windows y los errores recientes ya rellenados (tu nombre, carpetas y nombre del PC se ocultan); lo ves todo antes de enviarlo.
+Report a problem...	Informar de un problema...
+Suggest an idea...	Sugerir una idea...
+Show the tour again	Ver la presentación otra vez
+Website	Sitio web
+Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the first nine pages      Ctrl+PageDown / Ctrl+PageUp  next / previous page      Space  check or uncheck a row      Enter  open a search result	Ctrl+F  buscar en todo      F5  recargar esta página      Ctrl+1 ... Ctrl+9  las nueve primeras páginas      Ctrl+PageDown / Ctrl+PageUp  página siguiente / anterior      Espacio  marcar o desmarcar una fila      Entrar  abrir un resultado de búsqueda
+Report this problem? (Opens GitHub with the details filled in - you see everything before you send it.)	¿Informar de este problema? (Abre GitHub con los detalles rellenados; lo ves todo antes de enviarlo.)
+on	activado
+off	desactivado
+Your PC's protection has a gap ({0} problem(s)). It is worth letting someone who knows computers take a look.	La protección de tu PC tiene un hueco ({0} problema(s)). Vale la pena que le eche un vistazo alguien que entienda de ordenadores.
+Your photos and documents are not backed up anywhere. If the PC breaks or is stolen, they are gone.	Tus fotos y documentos no tienen copia de seguridad en ningún sitio. Si el PC se avería o te lo roban, se pierden.
+Your web browser has add-ons that look like advertising software.	Tu navegador tiene complementos que parecen software publicitario.
+A part of your PC (a device) is not working properly.	Una parte de tu PC (un dispositivo) no funciona correctamente.
+Programs or Windows crashed several times recently.	Los programas o Windows se han bloqueado varias veces últimamente.
+Your PC is almost full - only {0} is left. That makes it slow.	Tu PC está casi lleno: solo quedan {0}. Eso lo hace lento.
+Your internet connection has a problem.	Tu conexión a internet tiene un problema.
+There are {0} of leftover files you don't need.	Hay {0} de archivos sobrantes que no necesitas.
+Windows keeps up to {0} for things you may not need.	Windows reserva hasta {0} para cosas que quizá no necesites.
+{0} app(s) start by themselves every time you turn on the PC, which makes starting slower.	{0} aplicación(es) se inician solas cada vez que enciendes el PC, lo que hace que arranque más lento.
+{0} program(s) have a newer version with fixes.	{0} programa(s) tienen una versión más nueva con correcciones.
+Windows shows you ads and tips, and shares more about you than needed ({0} settings).	Windows te muestra anuncios y consejos y comparte más datos tuyos de los necesarios ({0} ajustes).
+{0} helper program(s) from other companies run in the background by themselves.	{0} programa(s) auxiliar(es) de otras empresas se ejecutan solos en segundo plano.
+Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Tu batería está gastada y ya no dura tanto. Una batería nueva lo soluciona.
+Removed programs left old entries in your right-click menu.	Los programas eliminados han dejado entradas antiguas en tu menú contextual.
+Show all tools	Mostrar todas las herramientas
+Checking your PC...	Revisando tu PC...
+This takes about half a minute.	Tarda aproximadamente medio minuto.
+Make my PC faster	Acelerar mi PC
+Removes leftover files and stops apps you don't need	Quita archivos sobrantes y detiene las aplicaciones que no necesitas
+Check for problems	Buscar problemas
+Shows what could be better, in plain words	Muestra qué podría ir mejor, con palabras sencillas
+Get help	Pedir ayuda
+Send a report to someone who helps you	Envía un informe a alguien que te ayude
+What could be better	Qué podría ir mejor
+Nothing to do	Nada que hacer
+Everything looks fine. PC Tune-Up checks again next time you open it.	Todo parece estar bien. PC Tune-Up volverá a comprobarlo la próxima vez que lo abras.
+Fix this	Arreglar esto
+Show me	Enséñamelo
+Send a report about this PC to a family member or friend who helps you - by email, with the report attached.	Envía un informe sobre este PC a un familiar o amigo que te ayude, por correo electrónico y con el informe adjunto.
+Send by email	Enviar por correo
+Copy a short summary to paste into WhatsApp, a text message or a chat.	Copia un breve resumen para pegarlo en WhatsApp, un SMS o un chat.
+Copy summary	Copiar resumen
+Something in PC Tune-Up itself not working? Tell the people who make it.	¿Algo de PC Tune-Up no funciona? Díselo a quienes lo hacen.
+Report a problem	Informar de un problema
+See the short introduction again.	Vuelve a ver la breve introducción.
+Show the tour	Ver la presentación
+Something needs attention	Algo necesita atención
+{0} thing(s) could be better	{0} cosa(s) podrían ir mejor
+Click "Check for problems" to see them - most can be fixed with one click.	Haz clic en "Buscar problemas" para verlas; la mayoría se arreglan con un clic.
+Your PC is in good shape	Tu PC está en buena forma
+Nothing needs doing right now.	No hace falta hacer nada ahora mismo.
+(Still checking...)	(Todavía comprobando...)
+Stop these apps from starting by themselves?	¿Impedir que estas aplicaciones se inicien solas?
+They stay installed - you can still open them whenever you want. You can undo this on the History page.	Siguen instaladas: puedes abrirlas cuando quieras. Puedes deshacerlo en la página Historial.
+Done. Your PC will start a little faster next time.	Listo. Tu PC arrancará un poco más rápido la próxima vez.
+Turn off Windows ads, tips and extra data sharing?	¿Desactivar los anuncios, consejos y el envío de datos adicionales de Windows?
+Your files and programs are not touched. You can undo this on the History page.	Tus archivos y programas no se tocan. Puedes deshacerlo en la página Historial.
+Switch off helper programs from other companies that run in the background by themselves (updaters and data collection)?	¿Desactivar los programas auxiliares de otras empresas que se ejecutan solos en segundo plano (actualizadores y recopilación de datos)?
+The programs themselves keep working. You can undo this on the History page.	Los propios programas siguen funcionando. Puedes deshacerlo en la página Historial.
+PC Tune-Up report for {0}	Informe de PC Tune-Up de {0}
+Date: {0}	Fecha: {0}
+Memory: {0}% used, drive C: {1} free	Memoria: {0}% en uso, unidad C: {1} libre
+Could be better:	Podría ir mejor:
+Everything looks fine.	Todo parece estar bien.
+A short summary is copied. Paste it (Ctrl+V) into WhatsApp, a text message or an email to the person who helps you.	Se ha copiado un breve resumen. Pégalo (Ctrl+V) en WhatsApp, un SMS o un correo para la persona que te ayuda.
+Couldn't copy: {0}	No se pudo copiar: {0}
+This saves a report about this PC in Documents and starts an email to the person who helps you.	Esto guarda un informe sobre este PC en Documentos y empieza un correo para la persona que te ayuda.
+The report shows how the PC is doing, what it found and which programs are installed. It contains no passwords, no files and no browsing history.	El informe muestra cómo está el PC, qué se encontró y qué programas hay instalados. No contiene contraseñas, archivos ni historial de navegación.
+Couldn't save the report: {0}	No se pudo guardar el informe: {0}
+My PC - report from PC Tune-Up	Mi PC - informe de PC Tune-Up
+Hi, could you have a look at my PC? The report from PC Tune-Up is attached.	Hola, ¿podrías echar un vistazo a mi PC? Te adjunto el informe de PC Tune-Up.
+(The full report is the file "{0}" in my Documents folder - I will attach it.)	(El informe completo es el archivo "{0}" de mi carpeta Documentos; lo adjuntaré.)
+An email has been started, and the report is selected in File Explorer.	Se ha empezado un correo y el informe está seleccionado en el Explorador de archivos.
+Drag the file "{0}" into the email (or use the paperclip), then send it.	Arrastra el archivo "{0}" al correo (o usa el clip) y envíalo.
+Help	Ayuda
+Report	Informe
+saved to Documents for sending ({0})	guardado en Documentos para enviarlo ({0})
+Telemetry: information about how you use your PC that is sent to the maker.	Telemetría: información sobre cómo usas tu PC que se envía al fabricante.
+Scheduled task: a small job Windows starts by itself at set times, often an updater.	Tarea programada: un pequeño trabajo que Windows inicia solo a horas fijas, a menudo un actualizador.
+Service: a program that runs in the background without a window.	Servicio: un programa que se ejecuta en segundo plano sin ventana.
+DNS: the internet's phone book - it turns website names into addresses.	DNS: la guía telefónica de internet; convierte los nombres de las webs en direcciones.
+Hibernation file: a hidden file where Windows saves everything when the PC goes into deep sleep.	Archivo de hibernación: un archivo oculto donde Windows guarda todo cuando el PC entra en suspensión profunda.
+Paging file: space on the drive that Windows uses when the memory is full.	Archivo de paginación: espacio en la unidad que Windows usa cuando la memoria está llena.
+BIOS: the built-in software that starts the PC before Windows.	BIOS: el software integrado que arranca el PC antes que Windows.
+Driver: the small program that lets Windows talk to a part of the PC, such as the screen or Wi-Fi.	Controlador: el pequeño programa que permite a Windows comunicarse con una parte del PC, como la pantalla o la Wi-Fi.
+Restore point: a snapshot of Windows' settings you can go back to if something goes wrong.	Punto de restauración: una instantánea de la configuración de Windows a la que puedes volver si algo sale mal.
+Reserved storage: disk space Windows keeps free so updates always have room.	Almacenamiento reservado: espacio en disco que Windows deja libre para que las actualizaciones siempre tengan sitio.
+Storage Sense: Windows' own automatic clean-up.	Sensor de almacenamiento: la limpieza automática propia de Windows.
+winget: Windows' built-in tool for installing and updating programs.	winget: la herramienta integrada de Windows para instalar y actualizar programas.
+Policy: a setting that is forced on the PC, normally by a company's IT department.	Directiva: un ajuste impuesto en el PC, normalmente por el departamento de TI de una empresa.
+Extension: an add-on for a web browser.	Extensión: un complemento para un navegador web.
+Fast startup: Windows saves part of itself when you shut down, so it starts quicker.	Inicio rápido: Windows guarda parte de sí mismo al apagar, así arranca más rápido.
+Bloatware: programs the PC maker installed that most people never use.	Bloatware: programas que instaló el fabricante del PC y que la mayoría de la gente nunca usa.
+Cache: copies a program keeps to work faster. Safe to delete - they come back when needed.	Caché: copias que guarda un programa para funcionar más rápido. Se pueden borrar sin problema; vuelven cuando hacen falta.
+Crash dump: a record saved when a program crashed, only useful to its makers.	Volcado de bloqueo: un registro que se guarda cuando un programa se bloquea; solo les sirve a sus creadores.
+GPU: the graphics card - the part that draws everything on the screen.	GPU: la tarjeta gráfica, la pieza que dibuja todo lo que ves en pantalla.
+Adware: software that shows you advertisements or changes your browser to make money.	Adware: software que te muestra anuncios o cambia tu navegador para ganar dinero.
+Firmware: software built into a part of the PC, such as the BIOS or the drive.	Firmware: software integrado en una pieza del PC, como la BIOS o la unidad.
+PC Tune-Up will now:	PC Tune-Up va a:
+ - delete leftover files that Windows and apps make again by themselves	 - borrar archivos sobrantes que Windows y las aplicaciones vuelven a crear solos
+ - stop {0} app(s) from starting by themselves (they stay installed)	 - impedir que {0} aplicación(es) se inicien solas (siguen instaladas)
+ - switch off background programs from the PC maker that are not needed	 - desactivar programas en segundo plano del fabricante del PC que no hacen falta
+Your documents, photos and programs are not touched. You can undo the other changes on the History page.	Tus documentos, fotos y programas no se tocan. Puedes deshacer los demás cambios en la página Historial.
+Done! {0} of leftover files removed.	¡Listo! Se quitaron {0} de archivos sobrantes.
+Your PC will start a little faster next time.	Tu PC arrancará un poco más rápido la próxima vez.
+Your PC is tidier now.	Tu PC está más ordenado ahora.
+Your documents, photos and programs are not touched.	Tus documentos, fotos y programas no se tocan.
+View	Vista
+Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. All tools shows every page.	La vista simple muestra una pantalla tranquila con tres botones grandes y solo arreglos seguros: lo mejor para la mayoría. Todas las herramientas muestra todas las páginas.
+Simple view	Vista simple
+All tools	Todas las herramientas
+Send a report to someone who helps you...	Enviar un informe a alguien que te ayude...
+Copy a short summary	Copiar un breve resumen
+Show the programs using the most memory	Mostrar los programas que más memoria usan
+Back to the readings	Volver a las lecturas
+Advanced view	Vista avanzada
+Show every page and tool. You can come back to this simple view at any time.	Muestra todas las páginas y herramientas. Puedes volver a esta vista simple cuando quieras.
+Most can be fixed with one click - see the list below.	La mayoría se arreglan con un clic: mira la lista de abajo.
+Checking your PC - the list appears here in a moment.	Revisando tu PC: la lista aparecerá aquí en un momento.
+Back to the simple view	Volver a la vista simple
+Simple view shows one calm screen with three big buttons and only safe fixes - best for most people. Advanced view shows every page.	La vista simple muestra una pantalla tranquila con tres botones grandes y solo arreglos seguros: lo mejor para la mayoría. La vista avanzada muestra todas las páginas.
+Select a row in the list first, then click the button again.	Primero selecciona una fila de la lista y vuelve a hacer clic en el botón.
+There is no setting to open for this row - see "What to do" below the list.	No hay ningún ajuste que abrir para esta fila; mira "Qué hacer" debajo de la lista.
+...and {0} more	...y {0} más
+Switch off these {0} scheduled task(s)?	¿Desactivar estas {0} tarea(s) programada(s)?
+Turn off these {0} Windows setting(s)?	¿Desactivar estos {0} ajuste(s) de Windows?
+Apply these {0} fix(es)?	¿Aplicar estos {0} arreglo(s)?
+You can undo this on the History page.	Puedes deshacerlo en la página Historial.
+Right now	Ahora mismo
+What is slowing the PC down at this moment: the programs using the most memory, processor and disk. Updates every few seconds while this page is open. Select a program and click End task to close it.	Qué está ralentizando el PC en este momento: los programas que más memoria, procesador y disco usan. Se actualiza cada pocos segundos mientras esta página está abierta. Selecciona un programa y haz clic en Finalizar tarea para cerrarlo.
+End task	Finalizar tarea
+Pause	Pausar
+Resume	Reanudar
+Task Manager	Administrador de tareas
+Measuring...	Midiendo...
+{0} cores	{0} núcleos
+{0} of {1} in use	{0} de {1} en uso
+{0} per second	{0} por segundo
+Every open tab and extension uses memory. Close tabs you don't need; Shift+Esc in the browser shows which tab uses the most.	Cada pestaña y extensión abierta usa memoria. Cierra las pestañas que no necesites; Shift+Esc en el navegador muestra qué pestaña usa más.
+Windows Security checking for viruses. It finishes by itself - leave it running.	Seguridad de Windows buscando virus. Termina solo: déjalo funcionar.
+Windows Update installing updates. Let it finish, and restart when Windows asks.	Windows Update instalando actualizaciones. Deja que termine y reinicia cuando Windows lo pida.
+Windows Search indexing your files so searching is quick. It slows down by itself while you use the PC.	Windows Search indexando tus archivos para que las búsquedas sean rápidas. Se ralentiza solo mientras usas el PC.
+Syncing files with the cloud. It calms down when syncing is finished.	Sincronizando archivos con la nube. Se calma cuando termina la sincronización.
+A chat app that keeps running in the background. Quit it from its icon next to the clock when you don't need it.	Una aplicación de chat que sigue funcionando en segundo plano. Ciérrala desde su icono junto al reloj cuando no la necesites.
+A game launcher. It downloads updates in the background; quit it when you are not playing.	Un launcher de juegos. Descarga actualizaciones en segundo plano; ciérralo cuando no estés jugando.
+Windows squeezing memory to make room - a sign that memory is nearly full. Closing programs helps.	Windows comprimiendo memoria para hacer sitio: señal de que la memoria está casi llena. Cerrar programas ayuda.
+Windows drawing the screen. Busier with animations, videos and extra screens.	Windows dibujando la pantalla. Trabaja más con animaciones, vídeos y pantallas adicionales.
+Windows answering questions about the PC (PC Tune-Up asks it too, while this page is open).	Windows respondiendo preguntas sobre el PC (PC Tune-Up también le pregunta mientras esta página está abierta).
+Part of Windows. Leave it running; if it stays busy for a long time, a restart usually helps.	Parte de Windows. Déjalo funcionar; si sigue ocupado mucho tiempo, un reinicio suele ayudar.
+A background service (part of Windows or of another program). Leave it running; the Services page shows which ones you can switch off.	Un servicio en segundo plano (parte de Windows o de otro programa). Déjalo funcionar; la página Servicios muestra cuáles puedes desactivar.
+Uses a lot of memory. Close it when you don't need it.	Usa mucha memoria. Ciérralo cuando no lo necesites.
+Keeps the processor busy. If you aren't using it, close it.	Mantiene ocupado el procesador. Si no lo estás usando, ciérralo.
+Reading or writing a lot on the disk right now.	Leyendo o escribiendo mucho en el disco ahora mismo.
+Memory is nearly full ({0}% in use) - that slows everything down. {1} uses the most ({2}).	La memoria está casi llena ({0}% en uso) y eso ralentiza todo. {1} es lo que más usa ({2}).
+The processor is very busy ({0}%). {1} uses the most ({2}%).	El procesador está muy ocupado ({0}%). {1} es lo que más usa ({2}%).
+The disk is very busy ({0}%). {1} reads and writes the most.	El disco está muy ocupado ({0}%). {1} es lo que más lee y escribe.
+Memory is getting full ({0}% in use). Closing programs you don't use keeps the PC quick.	La memoria se está llenando ({0}% en uso). Cerrar los programas que no usas mantiene el PC rápido.
+Nothing is slowing the PC down right now.	Ahora mismo nada está ralentizando el PC.
+{0} process(es) - memory {1}, processor {2}%, disk {3}	{0} proceso(s) - memoria {1}, procesador {2}%, disco {3}
+{0} is part of Windows or runs as a background service, so PC Tune-Up doesn't end it.	{0} forma parte de Windows o se ejecuta como servicio en segundo plano, así que PC Tune-Up no lo finaliza.
+End {0}?	¿Finalizar {0}?
+It closes straight away ({0} process(es)). Anything not saved in it is lost - save your work first.	Se cierra al momento ({0} proceso(s)). Lo que no esté guardado se pierde: guarda antes tu trabajo.
+Couldn't end {0} - it may need administrator rights, or it already closed.	No se pudo finalizar {0}: puede que requiera permisos de administrador o que ya se haya cerrado.
+ended	finalizado
+See what is using the processor and memory right now	Ver qué está usando el procesador y la memoria ahora mismo
+Memory is {0}% full - see what is using it	La memoria está al {0}%: mira qué la está usando
+The PC's memory is almost full, which makes everything slow. Closing programs you don't use helps.	La memoria del PC está casi llena, lo que hace que todo vaya lento. Cerrar los programas que no usas ayuda.
+Measuring the result	Midiendo el resultado
+Last fix	Último arreglo
+{0} - Fix my PC freed {1}	{0} - Arreglar mi PC liberó {1}
+{0} s now, {1} s before Fix my PC	{0} s ahora, {1} s antes de Arreglar mi PC
+same	igual
+{0} fewer	{0} menos
+{0} more	{0} más
+Junk files removed	Archivos basura eliminados
+Free space on {0}	Espacio libre en {0}
+Apps that start with Windows	Aplicaciones que se inician con Windows
+Background services trimmed	Servicios en segundo plano recortados
+Things worth a look	Cosas que merecen un vistazo
+after the next restart	tras el próximo reinicio
+Fix my PC: before and after	Arreglar mi PC: antes y después
+Stopped early - this is what changed so far	Se detuvo antes de tiempo; esto es lo que ha cambiado hasta ahora
+Done! This is what changed	¡Listo! Esto es lo que ha cambiado
+Before	Antes
+After	Después
+Start-up changes take effect next time you sign in. Undo anything from the History page.	Los cambios de inicio surten efecto la próxima vez que inicies sesión. Puedes deshacer cualquier cosa desde la página Historial.
+Open History	Abrir Historial
+PC Tune-Up itself.	El propio PC Tune-Up.
+How the PC uses power: plugged in it should be quick, on battery it should last and go to sleep by itself. Recommended fixes are pre-checked; every change can be undone from History.	Cómo usa la energía el PC: enchufado debería ir rápido y con batería debería durar y suspenderse solo. Los arreglos recomendados vienen marcados; todos los cambios se pueden deshacer desde Historial.
+Power settings	Configuración de energía
+Power plans	Planes de energía
+custom	personalizado
+Ultimate Performance	Máximo rendimiento
+Power mode on battery	Modo de energía con batería
+Power plan	Plan de energía
+Maximum processor speed	Velocidad máxima del procesador
+Turn off the screen after	Apagar la pantalla después de
+Sleep after	Suspender después de
+When I close the lid	Al cerrar la tapa
+Hibernate after	Hibernar después de
+USB power saving	Ahorro de energía USB
+never	nunca
+{0} min	{0} min
+{0} h	{0} h
+do nothing	no hacer nada
+sleep	suspender
+hibernate	hibernar
+shut down	apagar
+Plugged in, the PC is set to save energy, which makes it slower. Best performance makes it quick (the fan may run a little more).	Enchufado, el PC está configurado para ahorrar energía, lo que lo hace más lento. Mejor rendimiento lo hace rápido (puede que el ventilador funcione un poco más).
+Fine. For the most speed when plugged in, choose Best performance (fix below) - the fan may run a little more.	Bien. Para la máxima velocidad enchufado, elige Mejor rendimiento (arreglo abajo); puede que el ventilador funcione un poco más.
+Best performance on battery empties it much faster. Balanced keeps the PC quick enough and lasts longer.	Mejor rendimiento con batería la agota mucho más rápido. Equilibrado mantiene el PC suficientemente rápido y dura más.
+Power saver slows the PC down all the time, also when plugged in. Balanced adjusts itself and lets you use the power mode slider.	Economizador ralentiza el PC todo el tiempo, también enchufado. Equilibrado se ajusta solo y te deja usar el control deslizante del modo de energía.
+Keeps the processor at full speed even on battery, which empties it faster, and switches off the power mode slider. Balanced with Best performance when plugged in is usually just as quick.	Mantiene el procesador a toda velocidad incluso con batería, lo que la agota más rápido, y desactiva el control deslizante del modo de energía. Equilibrado con Mejor rendimiento al estar enchufado suele ser igual de rápido.
+Plugged in, the processor may only run at {0}% of its speed. Set it back to 100% (fix below).	Enchufado, el procesador solo puede funcionar al {0}% de su velocidad. Vuelve a ponerlo al 100% (arreglo abajo).
+Lower on battery - that saves battery. Fine.	Más bajo con batería: así ahorra batería. Bien.
+On battery the screen is the biggest power user. Turning it off after 5 minutes without use makes the battery last longer.	Con batería, la pantalla es lo que más energía gasta. Apagarla tras 5 minutos sin uso hace que la batería dure más.
+The screen never turns off by itself when plugged in. That uses power and can wear the screen; 10 minutes is a good choice (fix below).	Enchufado, la pantalla nunca se apaga sola. Eso gasta energía y puede desgastar la pantalla; 10 minutos es una buena opción (arreglo abajo).
+On battery the PC stays awake for a long time when you leave it, which empties the battery. Going to sleep after 15 minutes saves it - your work stays open.	Con batería, el PC se queda despierto mucho tiempo cuando lo dejas, lo que agota la batería. Suspenderse tras 15 minutos la ahorra; tu trabajo sigue abierto.
+The PC never sleeps by itself. Fine if it has to stay on (downloads, sharing); otherwise sleeping after 30 minutes saves power (fix below).	El PC nunca se suspende solo. Bien si tiene que estar encendido (descargas, uso compartido); si no, suspenderse tras 30 minutos ahorra energía (arreglo abajo).
+On battery the laptop keeps running with the lid closed - in a bag it gets hot and the battery runs flat. Sleep is safer (fix below).	Con batería, el portátil sigue funcionando con la tapa cerrada: en una mochila se calienta y la batería se agota. Suspender es más seguro (arreglo abajo).
+Plugged in it keeps running (handy with a separate screen). Nothing to do.	Enchufado sigue funcionando (práctico con una pantalla aparte). No hay nada que hacer.
+Asleep on battery, the laptop slowly uses its charge. Hibernating after 3 hours of sleep keeps your work safe if you forget it for days (fix below).	Suspendido con batería, el portátil va gastando su carga poco a poco. Hibernar tras 3 horas de suspensión mantiene tu trabajo a salvo si lo olvidas durante días (arreglo abajo).
+Windows may switch off USB devices that seem idle. If a mouse, headset or drive disconnects by itself, switch this off for plugged in (fix below).	Windows puede apagar los dispositivos USB que parecen inactivos. Si un ratón, unos auriculares o una unidad se desconectan solos, desactiva esto para enchufado (arreglo abajo).
+Shut down is then not a full restart - when something tells you to restart, use Restart. If the PC has problems after starting up (devices, updates), switching it off helps; starting takes a few seconds longer. Needs administrator.	Entonces Apagar no es un reinicio completo: cuando algo te pida reiniciar, usa Reiniciar. Si el PC tiene problemas después de arrancar (dispositivos, actualizaciones), desactivarlo ayuda; arrancar tarda unos segundos más. Requiere administrador.
+Every start is a full start. Nothing to do.	Cada arranque es completo. No hay nada que hacer.
+Checking power settings	Comprobando la configuración de energía
+Plug in the charger first (or click "Restart as admin"), then try again.	Conecta antes el cargador (o haz clic en "Reiniciar como admin") y vuelve a intentarlo.
+Unplug the charger first (or click "Restart as admin"), then try again.	Desconecta antes el cargador (o haz clic en "Reiniciar como admin") y vuelve a intentarlo.
+Windows refused the power mode (error {0})	Windows rechazó el modo de energía (error {0})
+These need administrator rights - click "Restart as admin" first, or uncheck them: {0}	Estas requieren permisos de administrador; haz clic antes en "Reiniciar como admin" o desmárcalas: {0}
+Done: {0}. Undo from the History page.	Hecho: {0}. Se puede deshacer desde la página Historial.
+Not changed:	Sin cambios:
+{0} (plugged in)	{0} (enchufado)
+{0} (on battery)	{0} (con batería)
+set to {0}	cambiado a {0}
+set to Balanced	cambiado a Equilibrado
+changed	cambiado
+Fix {0} power setting(s)	Arreglar {0} ajuste(s) de energía
+{0} power setting(s) make the PC slower or empty the battery faster than needed.	{0} ajuste(s) de energía hacen el PC más lento o agotan la batería más rápido de lo necesario.
+Plugged in	Enchufado
+On battery	Con batería
+Best power efficiency	Mejor eficiencia energética
+Better performance	Más rendimiento
+Best performance	Mejor rendimiento
+Fast startup	Inicio rápido
+Remove checked	Quitar lo marcado
+That row is about Windows itself (every browser). Select a row of a browser first.	Esa fila trata de Windows en sí (todos los navegadores). Primero selecciona una fila de un navegador.
+Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").	Primero marca una o más filas de directivas, archivo hosts o proxy (las extensiones se quitan en el propio navegador: usa "Abrir página de extensiones").
+Removing browser policies and hosts file lines needs administrator rights - click "Restart as admin" first, or check only proxy rows.	Quitar directivas del navegador y líneas del archivo hosts requiere permisos de administrador: haz clic antes en "Reiniciar como admin" o marca solo filas de proxy.
+Remove these?	¿Quitar esto?
+{0} line(s) removed	{0} línea(s) quitada(s)
+Windows: hosts file	Windows: archivo hosts
+Windows: {0}	Windows: {0}
+Couldn't change the hosts file: {0}	No se pudo cambiar el archivo hosts: {0}
+{0} item(s) removed. Restart the browser to see the change.	{0} elemento(s) quitado(s). Reinicia el navegador para ver el cambio.
+Some of these changes need administrator rights to undo - use "Restart as administrator" first.	Algunos de estos cambios requieren permisos de administrador para deshacerse: usa antes "Reiniciar como administrador".
+Hosts file moved	Archivo hosts movido
+Hosts file	Archivo hosts
+Windows reads its hosts file from {0} instead of {1}	Windows lee su archivo hosts desde {0} en lugar de {1}
+Programs have no reason to move it - malware does this to hide its own hosts file. Have the PC scanned (Windows Security > Virus & threat protection > Scan options > Microsoft Defender Offline scan).	Los programas no tienen motivo para moverlo: el malware lo hace para ocultar su propio archivo hosts. Haz analizar el PC (Seguridad de Windows > Protección antivirus y contra amenazas > Opciones de examen > Examen de Microsoft Defender sin conexión).
+Hosts file blocks {0}	El archivo hosts bloquea {0}
+hosts file line: {0}	línea del archivo hosts: {0}
+Malware blocks security and update sites so it can't be removed. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator), then have the PC scanned.	El malware bloquea sitios de seguridad y de actualizaciones para que no se pueda eliminar. Salvo que la añadieras tú, quita la línea (márcala y haz clic en "Quitar lo marcado"; requiere administrador) y después haz analizar el PC.
+Hosts file: {0} -> {1}	Archivo hosts: {0} -> {1}
+Points a name at a device in your own network (a NAS, printer or server). Fine if you set it up.	Dirige un nombre a un dispositivo de tu propia red (un NAS, una impresora o un servidor). Bien si lo configuraste tú.
+Sends a well-known website to a different server - the way hijackers show fake pages or ads. Unless you added this yourself, remove the line (check it and click "Remove checked" - needs administrator).	Envía una web conocida a otro servidor: así es como los secuestradores muestran páginas falsas o anuncios. Salvo que la añadieras tú, quita la línea (márcala y haz clic en "Quitar lo marcado"; requiere administrador).
+Sends this name to a fixed address. Developers and some programs do this on purpose; if you don't know why it is there, remove the line (needs administrator).	Envía este nombre a una dirección fija. Los desarrolladores y algunos programas lo hacen a propósito; si no sabes por qué está ahí, quita la línea (requiere administrador).
+Hosts file blocks {0} site(s)	El archivo hosts bloquea {0} sitio(s)
+in the file {0}	en el archivo {0}
+Usually an ad or tracking blocker you installed. If websites or programs fail to connect, look here first.	Normalmente un bloqueador de anuncios o rastreo que instalaste. Si las webs o los programas no consiguen conectarse, mira aquí primero.
+no redirects or blocks	sin redirecciones ni bloqueos
+Proxy: {0}	Proxy: {0}
+every website goes through a program on this PC first	todas las webs pasan primero por un programa de este PC
+every website goes through this server first	todas las webs pasan primero por este servidor
+Fine for tools like Fiddler or some security programs. Otherwise it is often adware reading or changing your web pages: switch it off (check it and click "Remove checked").	Normal en herramientas como Fiddler o algunos programas de seguridad. Si no, suele ser adware que lee o cambia tus páginas web: desactívalo (márcalo y haz clic en "Quitar lo marcado").
+Fine if your school, work or VPN set it up. Otherwise someone can see and change everything you browse: switch it off (check it and click "Remove checked").	Normal si lo configuró tu centro de estudios, tu trabajo o tu VPN. Si no, alguien puede ver y cambiar todo lo que navegas: desactívalo (márcalo y haz clic en "Quitar lo marcado").
+Proxy script: {0}	Script de proxy: {0}
+a script decides which server each website goes through	un script decide por qué servidor pasa cada web
+Normal at work or school. On a home PC adware uses this to send your browsing through its own server: remove it (check it and click "Remove checked").	Normal en el trabajo o en un centro de estudios. En un PC doméstico, el adware lo usa para enviar tu navegación por su propio servidor: quítalo (márcalo y haz clic en "Quitar lo marcado").
+none - the PC connects directly	ninguno: el PC se conecta directamente
+Proxy	Proxy
+Certificate: {0}	Certificado: {0}
+Certificate	Certificado
+a trusted root certificate known from adware (store {0})	un certificado raíz de confianza conocido por ser de adware (almacén {0})
+It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.	Permite que el adware lea y cambie webs seguras (https). Desinstala el programa con el que vino (página Programas) y luego quita el certificado: Inicio > "Administrar certificados de equipo" > Entidades de certificación raíz de confianza.
+Later	Más tarde
+Restart	Reiniciar
+Open Windows Update	Abrir Windows Update
+Windows has been waiting {0} day(s) for a restart to finish updates	Windows lleva {0} día(s) esperando un reinicio para terminar las actualizaciones
+Windows has been waiting {0} day(s) for a restart to finish installing updates. Save your work and restart.	Windows lleva {0} día(s) esperando un reinicio para terminar de instalar actualizaciones. Guarda tu trabajo y reinicia.
+The PC hasn't restarted in {0} days	El PC no se ha reiniciado en {0} días
+Your PC hasn't been restarted in {0} days. A restart clears out a lot of slowness.	Tu PC no se ha reiniciado en {0} días. Un reinicio elimina mucha lentitud.
+Windows hasn't installed updates in {0} days	Windows no ha instalado actualizaciones en {0} días
+Windows hasn't updated itself in {0} days. Open Windows Update and let it check.	Windows no se ha actualizado en {0} días. Abre Windows Update y deja que busque.
+Last clean-up was {0} days ago ({1} of junk now)	La última limpieza fue hace {0} días ({1} de basura ahora)
+It has been {0} days since the last clean-up; {1} of leftover files have piled up.	Han pasado {0} días desde la última limpieza; se han acumulado {1} de archivos sobrantes.
+{0} program update(s) have been waiting for {1} days	{0} actualización(es) de programas llevan {1} días esperando
+{0} program(s) have had a newer version waiting for {1} days - updates fix security holes.	{0} programa(s) llevan {1} días con una versión más nueva esperando: las actualizaciones corrigen agujeros de seguridad.
+Restart the PC now?	¿Reiniciar el PC ahora?
+Save your work first: open programs are closed, and programs with unsaved work will ask you first.	Guarda antes tu trabajo: los programas abiertos se cierran, y los que tengan trabajo sin guardar te preguntarán antes.
+Earlier	Antes
+On average	De media
+At most	Como máximo
+Among the top 5	Entre los 5 primeros
+{0}% of the time	{0}% del tiempo
+Memory in use, last 7 days	Memoria en uso, últimos 7 días
+Memory in use	Memoria en uso
+Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.	Aún no hay suficiente historial: PC Tune-Up anota el uso de memoria cada 10 minutos mientras está abierto.
+Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}% in use).	En los últimos {0} día(s), la memoria estuvo casi llena el {1}% del tiempo ({2}% en uso de media).
+{0} used the most.	{0} fue lo que más usó.
+Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	En los últimos {0} día(s), la memoria estuvo casi llena el {1}% del tiempo: más memoria marcaría una diferencia real.
+Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	En los últimos {0} día(s), la memoria rara vez estuvo casi llena ({1}% del tiempo): apenas se notaría más memoria.
+Over the last {0} day(s) memory was nearly full {1}% of the time.	En los últimos {0} día(s), la memoria estuvo casi llena el {1}% del tiempo.
+It started right after a Windows update ({0}, installed {1}). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates.	Empezó justo después de una actualización de Windows ({0}, instalada el {1}). Si sigue pasando, desinstala esa actualización: Configuración > Windows Update > Historial de actualizaciones > Desinstalar actualizaciones.
+Open the update history (to uninstall the update)	Abrir el historial de actualizaciones (para desinstalar la actualización)
+Also: {0}	Además: {0}
+Slows start-up	Ralentiza el arranque
+Drive wear	Desgaste de la unidad
+{0}: {1}% used, about {2}% a year more	{0}: {1}% usado, aprox. un {2}% más al año
+{0}: {1}% used, no change in {2} days	{0}: {1}% usado, sin cambios en {2} días
+Drive {0} is wearing fast - at this rate it is worn out in about {1} year(s). Keep your backups up to date and plan a replacement.	La unidad {0} se está desgastando rápido: a este ritmo estará gastada en aproximadamente {1} año(s). Mantén tus copias de seguridad al día y planea sustituirla.
+Drive {0} got hot ({1} C) in the last 30 days - heat shortens its life. Keep the vents free and the PC off soft surfaces.	La unidad {0} se calentó ({1} C) en los últimos 30 días: el calor acorta su vida. Mantén libres las rejillas de ventilación y no pongas el PC sobre superficies blandas.
+Drive {0} reported new read or write errors - back up your files now and check the drive.	La unidad {0} informó de nuevos errores de lectura o escritura: haz ya una copia de tus archivos y revisa la unidad.
+Español	Español
+Italiano	Italiano
+Polski	Polski

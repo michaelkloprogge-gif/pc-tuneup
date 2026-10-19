@@ -2,7 +2,7 @@
 # saves a report, and fails when something is wrong: an error inside the app, a page that never finishes loading,
 # a long freeze, or a report section that is missing. Uses its own empty data folder; changes nothing on the PC.
 # Usage: powershell -STA -File .\tests\Test-Pages.ps1 [-Language en|nl] [-TimeoutSec 360] [-MaxFreezeMs 3000]
-param([ValidateSet('en', 'nl', 'de', 'fr')][string]$Language = 'en', [int]$TimeoutSec = 360, [int]$MaxFreezeMs = 3000, [string]$App)
+param([ValidateSet('en', 'nl', 'de', 'fr', 'es', 'it', 'pl')][string]$Language = 'en', [int]$TimeoutSec = 360, [int]$MaxFreezeMs = 3000, [string]$App)
 # ($PSScriptRoot is empty in parameter defaults of advanced scripts on Windows PowerShell 5.1.)
 if (-not $App) { $App = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\pc-tuneup.ps1' }
 $src = [IO.File]::ReadAllText($App)

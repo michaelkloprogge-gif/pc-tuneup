@@ -4,7 +4,7 @@
 # service commands, scheduled tasks, files outside the test's data folder, starting programs, background jobs and
 # file dialogs. Questions are answered "No". So a button can be clicked safely - it just has to show it does something.
 # Usage: powershell -STA -File .\tests\Test-Buttons.ps1 [-Language en|nl|de|fr] [-TimeoutSec 360]
-param([ValidateSet('en', 'nl', 'de', 'fr')][string]$Language = 'en', [int]$TimeoutSec = 360, [string]$App)
+param([ValidateSet('en', 'nl', 'de', 'fr', 'es', 'it', 'pl')][string]$Language = 'en', [int]$TimeoutSec = 360, [string]$App)
 # ($PSScriptRoot is empty in parameter defaults of advanced scripts on Windows PowerShell 5.1.)
 if (-not $App) { $App = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\pc-tuneup.ps1' }
 $src = [IO.File]::ReadAllText($App)

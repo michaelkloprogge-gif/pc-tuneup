@@ -74,6 +74,15 @@ PC-TuneUp.exe /install | /uninstall  install or remove for the current user
 
 Use `start /wait PC-TuneUp.exe /report` in a command prompt so it waits for the result.
 
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+- Every release is built from the public source code in this repository by GitHub Actions and published only from there.
+- Committers and reviewers: [Michael Kloprogge](https://github.com/michaelkloprogge-gif) (project owner).
+- Approver of each signed release: Michael Kloprogge.
+- Privacy: PC Tune-Up does not send any information about your PC to other systems. The only network connections are the update check (GitHub), the speed test you start yourself (Cloudflare) and winget's program list - see [Privacy](#privacy).
+
 ## Privacy
 
 Everything runs on your PC. PC Tune-Up only goes online to check for its own updates (GitHub), for

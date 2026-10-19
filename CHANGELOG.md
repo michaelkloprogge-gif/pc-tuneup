@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0
+
+- New page **Power** (under Check): the power mode, power plan, when the screen turns off and the PC goes to sleep, what closing the lid does, the highest processor speed allowed, USB power saving, hibernate and Fast startup - each for plugged in and on battery, with what to do. The aim: quick when plugged in, lasting on battery. Recommended fixes are pre-checked, and every change can be undone from History. The power mode for the power source the PC is on now can be changed without administrator rights.
+- The sidebar fits 25 pages: the "Restart as admin" box is smaller, and History and Settings no longer get cut off in Dutch, German and French (a slightly smaller font, or just the Settings icon when even that is too wide).
+- Button texts in other languages are no longer cut off with "..." when they are long.
+- Website: the new pages and the before-and-after overview, with new screenshots in all four languages.
 ## 1.17.0
 
 - New page **Right now** (under Health): what is slowing the PC down at this moment. Three meters (processor, memory, disk), one plain sentence about the biggest cause ("Memory is nearly full - Chrome uses the most"), and the programs using the most, each with what to do about it. It refreshes every few seconds while the page is open (Pause stops it), and **End task** closes the selected program after asking - Windows itself and background services are never ended. The Health page's memory link and "Start here" now lead there when memory is nearly full.

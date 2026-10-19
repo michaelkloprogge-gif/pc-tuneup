@@ -8,7 +8,7 @@ $tmp = Join-Path $env:TEMP "pctuneup-site-$PID"
 New-Item -ItemType Directory -Force $tmp | Out-Null
 $env:PCTUNEUP_LANGDIR = Join-Path $root 'lang'   # the patched copies live in $tmp, so tell them where German and French are
 # Light: these pages (plus the simple view). Dark: Health and the simple view.
-$pick = @{ 'Health' = 'health.png'; 'Space savers' = 'space-savers.png'; 'Privacy' = 'privacy.png'; 'Battery' = 'battery.png'; 'Simple view' = 'simple.png' }
+$pick = @{ 'Health' = 'health.png'; 'Space savers' = 'space-savers.png'; 'Privacy' = 'privacy.png'; 'Battery' = 'battery.png'; 'Power' = 'power.png'; 'Right now' = 'right-now.png'; 'Simple view' = 'simple.png' }
 $pickDark = @{ 'Health' = 'health-dark.png'; 'Simple view' = 'simple-dark.png' }
 foreach ($lang in $Languages) {
     $out = if ($lang -eq 'en') { Join-Path $root 'docs\screenshots' } else { Join-Path $root "docs\screenshots\$lang" }

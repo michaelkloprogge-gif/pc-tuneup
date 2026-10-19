@@ -16,7 +16,8 @@ you can undo.
 
 | Page | |
 |---|---|
-| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once - plus **Start here** (the three most useful next steps) and a health score over time |
+| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once and then shows what changed, before and after - plus **Start here** (the three most useful next steps) and a health score over time |
+| **Right now** | what is slowing the PC down at this moment: processor, memory and disk meters, one plain sentence about the biggest cause, the programs using the most with what to do about each, and **End task** (never Windows itself) |
 | **Clean** | temp files, crash dumps, browser caches (Chrome, Edge, Brave, Firefox), Windows Update leftovers, old drivers, Windows.old |
 | **Startup** | stop apps from launching with Windows, and see how long Windows takes to start (graph) and what slows it down |
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |
@@ -35,6 +36,7 @@ you can undo.
 | **Network** | Wi-Fi signal and band, delays to the router and the internet, DNS speed, dropped connections, flush DNS and network reset |
 | **Gaming** | which graphics card a running game really uses, what else is busy, power mode, Game Mode, background recording and GPU settings - with one-click fixes |
 | **Battery** | (laptops) how much charge the battery still holds, a graph of its wear over the years, runtime, and where your PC maker hides the 80% charge limit |
+| **Power** | power mode, power plan, screen and sleep timers, the lid, maximum processor speed, USB power saving, hibernate and Fast startup - plugged in and on battery, with one-click fixes that can be undone |
 | **Backup** | are Desktop, Documents and Pictures in OneDrive/Dropbox/iCloud, File History, backup programs and restore points - warns when nothing backs up your files |
 | **Upgrades** | which memory, drive and battery upgrades fit, the exact specification to buy, and whether it is worth it |
 | **History** | every change, with Undo |

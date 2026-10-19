@@ -41,7 +41,7 @@ function Test-Sandboxed($Path) { $s = "$Path"; $s -and ($s.StartsWith($DataDir, 
 foreach ($c in 'Set-ItemProperty', 'New-ItemProperty', 'Remove-ItemProperty', 'Rename-ItemProperty', 'Set-Service', 'Stop-Service', 'Start-Service', 'Restart-Service',
                'Stop-Process', 'Restart-Computer', 'Stop-Computer', 'Checkpoint-Computer', 'Enable-ScheduledTask', 'Disable-ScheduledTask', 'Register-ScheduledTask',
                'Unregister-ScheduledTask', 'Set-ScheduledTask', 'Start-ScheduledTask', 'Start-Process', 'Invoke-Item', 'Clear-RecycleBin', 'Clear-DnsClientCache',
-               'Set-DnsClientServerAddress', 'Optimize-Volume', 'Invoke-WebRequest', 'Invoke-RestMethod', 'Start-Bg', 'Start-WithRestorePoint', 'Set-StartupEntry',
+               'Set-DnsClientServerAddress', 'Optimize-Volume', 'Invoke-WebRequest', 'Invoke-RestMethod', 'Start-Bg', 'Start-WithRestorePoint', 'Set-StartupEntry', 'Set-PowerOverlay',
                'winget', 'schtasks', 'powercfg', 'cleanmgr', 'sfc', 'dism', 'DISM.exe', 'chkdsk', 'netsh', 'ipconfig', 'bcdedit', 'reg', 'reg.exe', 'sc', 'sc.exe', 'compact',
                'vssadmin', 'wevtutil', 'rundll32', 'explorer', 'explorer.exe', 'notepad', 'notepad.exe', 'control', 'msiexec', 'cmd', 'cmd.exe', 'wsreset', 'taskkill', 'shutdown',
                'defrag', 'manage-bde', 'powershell', 'powershell.exe', 'pnputil', 'msdt') {

@@ -1636,3 +1636,60 @@ After	Nachher
 Start-up changes take effect next time you sign in. Undo anything from the History page.	Änderungen beim Start wirken ab der nächsten Anmeldung. Alles lässt sich auf der Seite Verlauf rückgängig machen.
 Open History	Verlauf öffnen
 PC Tune-Up itself.	PC Tune-Up selbst.
+How the PC uses power: plugged in it should be quick, on battery it should last and go to sleep by itself. Recommended fixes are pre-checked; every change can be undone from History.	Wie der PC mit Energie umgeht: am Netz soll er schnell sein, im Akkubetrieb lange durchhalten und von selbst in den Energiesparmodus gehen. Empfohlene Korrekturen sind vorausgewählt; jede Änderung lässt sich im Verlauf rückgängig machen.
+Power settings	Energieeinstellungen
+Power plans	Energiesparpläne
+custom	benutzerdefiniert
+Ultimate Performance	Ultimative Leistung
+Power mode on battery	Energiemodus im Akkubetrieb
+Power plan	Energiesparplan
+Maximum processor speed	Maximale Prozessorleistung
+Turn off the screen after	Bildschirm ausschalten nach
+Sleep after	Energiesparmodus nach
+When I close the lid	Beim Zuklappen
+Hibernate after	Ruhezustand nach
+USB power saving	USB-Energiesparen
+never	nie
+{0} min	{0} Min.
+{0} h	{0} Std.
+do nothing	nichts unternehmen
+sleep	Energiesparmodus
+hibernate	Ruhezustand
+shut down	herunterfahren
+Plugged in, the PC is set to save energy, which makes it slower. Best performance makes it quick (the fan may run a little more).	Am Netz ist der PC auf Energiesparen eingestellt, dadurch ist er langsamer. Beste Leistung macht ihn schnell (der Lüfter läuft vielleicht etwas öfter).
+Fine. For the most speed when plugged in, choose Best performance (fix below) - the fan may run a little more.	In Ordnung. Für die meiste Geschwindigkeit am Netz wählen Sie Beste Leistung (Korrektur unten) - der Lüfter läuft vielleicht etwas öfter.
+Best performance on battery empties it much faster. Balanced keeps the PC quick enough and lasts longer.	Beste Leistung im Akkubetrieb leert den Akku viel schneller. Ausbalanciert hält den PC schnell genug und hält länger durch.
+Power saver slows the PC down all the time, also when plugged in. Balanced adjusts itself and lets you use the power mode slider.	Energiesparmodus bremst den PC immer aus, auch am Netz. Ausbalanciert passt sich an und lässt Sie den Regler für den Energiemodus benutzen.
+Keeps the processor at full speed even on battery, which empties it faster, and switches off the power mode slider. Balanced with Best performance when plugged in is usually just as quick.	Hält den Prozessor auch im Akkubetrieb auf voller Leistung, was den Akku schneller leert, und schaltet den Regler für den Energiemodus ab. Ausbalanciert mit Beste Leistung am Netz ist meist genauso schnell.
+Plugged in, the processor may only run at {0}% of its speed. Set it back to 100% (fix below).	Am Netz darf der Prozessor nur mit {0}% seiner Leistung laufen. Setzen Sie es wieder auf 100% (Korrektur unten).
+Lower on battery - that saves battery. Fine.	Im Akkubetrieb niedriger - das schont den Akku. In Ordnung.
+On battery the screen is the biggest power user. Turning it off after 5 minutes without use makes the battery last longer.	Im Akkubetrieb braucht der Bildschirm am meisten Strom. Ihn nach 5 Minuten ohne Benutzung auszuschalten, lässt den Akku länger halten.
+The screen never turns off by itself when plugged in. That uses power and can wear the screen; 10 minutes is a good choice (fix below).	Am Netz schaltet sich der Bildschirm nie von selbst aus. Das kostet Strom und kann den Bildschirm abnutzen; 10 Minuten sind eine gute Wahl (Korrektur unten).
+On battery the PC stays awake for a long time when you leave it, which empties the battery. Going to sleep after 15 minutes saves it - your work stays open.	Im Akkubetrieb bleibt der PC lange wach, wenn Sie weggehen, und leert den Akku. Nach 15 Minuten in den Energiesparmodus zu gehen schont ihn - Ihre Arbeit bleibt offen.
+The PC never sleeps by itself. Fine if it has to stay on (downloads, sharing); otherwise sleeping after 30 minutes saves power (fix below).	Der PC geht nie von selbst in den Energiesparmodus. In Ordnung, wenn er an bleiben muss (Downloads, Freigaben); sonst spart der Energiesparmodus nach 30 Minuten Strom (Korrektur unten).
+On battery the laptop keeps running with the lid closed - in a bag it gets hot and the battery runs flat. Sleep is safer (fix below).	Im Akkubetrieb läuft der Laptop zugeklappt weiter - in einer Tasche wird er heiß und der Akku leer. Der Energiesparmodus ist sicherer (Korrektur unten).
+Plugged in it keeps running (handy with a separate screen). Nothing to do.	Am Netz läuft er weiter (praktisch mit einem separaten Bildschirm). Nichts zu tun.
+Asleep on battery, the laptop slowly uses its charge. Hibernating after 3 hours of sleep keeps your work safe if you forget it for days (fix below).	Im Energiesparmodus verbraucht der Laptop im Akkubetrieb langsam seine Ladung. Nach 3 Stunden in den Ruhezustand zu wechseln, schützt Ihre Arbeit, wenn Sie ihn tagelang vergessen (Korrektur unten).
+Windows may switch off USB devices that seem idle. If a mouse, headset or drive disconnects by itself, switch this off for plugged in (fix below).	Windows kann USB-Geräte abschalten, die untätig wirken. Wenn eine Maus, ein Headset oder ein Laufwerk von selbst die Verbindung verliert, schalten Sie dies für den Netzbetrieb ab (Korrektur unten).
+Shut down is then not a full restart - when something tells you to restart, use Restart. If the PC has problems after starting up (devices, updates), switching it off helps; starting takes a few seconds longer. Needs administrator.	Herunterfahren ist dann kein vollständiger Neustart - wenn etwas einen Neustart verlangt, nutzen Sie Neu starten. Hat der PC nach dem Start Probleme (Geräte, Updates), hilft das Abschalten; der Start dauert dann ein paar Sekunden länger. Administrator nötig.
+Every start is a full start. Nothing to do.	Jeder Start ist ein vollständiger Start. Nichts zu tun.
+Checking power settings	Energieeinstellungen werden geprüft
+Plug in the charger first (or click "Restart as admin"), then try again.	Schließen Sie zuerst das Ladegerät an (oder klicken Sie auf "Als Admin neu starten") und versuchen Sie es dann erneut.
+Unplug the charger first (or click "Restart as admin"), then try again.	Ziehen Sie zuerst das Ladegerät ab (oder klicken Sie auf "Als Admin neu starten") und versuchen Sie es dann erneut.
+Windows refused the power mode (error {0})	Windows hat den Energiemodus abgelehnt (Fehler {0})
+These need administrator rights - click "Restart as admin" first, or uncheck them: {0}	Dafür sind Administratorrechte nötig - klicken Sie zuerst auf "Als Admin neu starten" oder entfernen Sie die Häkchen: {0}
+Done: {0}. Undo from the History page.	Fertig: {0}. Rückgängig machen auf der Seite Verlauf.
+Not changed:	Nicht geändert:
+{0} (plugged in)	{0} (am Netz)
+{0} (on battery)	{0} (im Akkubetrieb)
+set to {0}	auf {0} gesetzt
+set to Balanced	auf Ausbalanciert gesetzt
+changed	geändert
+Fix {0} power setting(s)	{0} Energieeinstellung(en) korrigieren
+{0} power setting(s) make the PC slower or empty the battery faster than needed.	{0} Energieeinstellung(en) machen den PC langsamer oder leeren den Akku schneller als nötig.
+Plugged in	Am Netz
+On battery	Im Akkubetrieb
+Best power efficiency	Beste Energieeffizienz
+Better performance	Bessere Leistung
+Best performance	Beste Leistung
+Fast startup	Schnellstart

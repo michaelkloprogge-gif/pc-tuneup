@@ -1636,3 +1636,60 @@ After	Après
 Start-up changes take effect next time you sign in. Undo anything from the History page.	Les changements au démarrage s'appliquent à la prochaine connexion. Tout peut être annulé depuis la page Historique.
 Open History	Ouvrir l'historique
 PC Tune-Up itself.	PC Tune-Up lui-même.
+How the PC uses power: plugged in it should be quick, on battery it should last and go to sleep by itself. Recommended fixes are pre-checked; every change can be undone from History.	Comment le PC utilise l'énergie : branché, il doit être rapide ; sur batterie, il doit durer et se mettre en veille tout seul. Les corrections recommandées sont pré-cochées ; chaque changement peut être annulé depuis l'Historique.
+Power settings	Paramètres d'alimentation
+Power plans	Options d'alimentation
+custom	personnalisé
+Ultimate Performance	Performances ultimes
+Power mode on battery	Mode d'alimentation sur batterie
+Power plan	Mode de gestion de l'alimentation
+Maximum processor speed	Vitesse maximale du processeur
+Turn off the screen after	Éteindre l'écran après
+Sleep after	Mise en veille après
+When I close the lid	Quand je ferme le capot
+Hibernate after	Mise en veille prolongée après
+USB power saving	Économie d'énergie USB
+never	jamais
+{0} min	{0} min
+{0} h	{0} h
+do nothing	ne rien faire
+sleep	veille
+hibernate	veille prolongée
+shut down	arrêter
+Plugged in, the PC is set to save energy, which makes it slower. Best performance makes it quick (the fan may run a little more).	Branché, le PC est réglé pour économiser l'énergie, ce qui le ralentit. Performances optimales le rend rapide (le ventilateur peut tourner un peu plus).
+Fine. For the most speed when plugged in, choose Best performance (fix below) - the fan may run a little more.	Bien. Pour la vitesse maximale une fois branché, choisissez Performances optimales (correction ci-dessous) - le ventilateur peut tourner un peu plus.
+Best performance on battery empties it much faster. Balanced keeps the PC quick enough and lasts longer.	Performances optimales sur batterie la vide beaucoup plus vite. Équilibré garde le PC assez rapide et dure plus longtemps.
+Power saver slows the PC down all the time, also when plugged in. Balanced adjusts itself and lets you use the power mode slider.	Économie d'énergie ralentit le PC tout le temps, même branché. Équilibré s'adapte et vous permet d'utiliser le curseur du mode d'alimentation.
+Keeps the processor at full speed even on battery, which empties it faster, and switches off the power mode slider. Balanced with Best performance when plugged in is usually just as quick.	Garde le processeur à pleine vitesse même sur batterie, ce qui la vide plus vite, et désactive le curseur du mode d'alimentation. Équilibré avec Performances optimales une fois branché est généralement aussi rapide.
+Plugged in, the processor may only run at {0}% of its speed. Set it back to 100% (fix below).	Branché, le processeur ne peut tourner qu'à {0} % de sa vitesse. Remettez-le à 100 % (correction ci-dessous).
+Lower on battery - that saves battery. Fine.	Plus bas sur batterie - cela économise la batterie. Bien.
+On battery the screen is the biggest power user. Turning it off after 5 minutes without use makes the battery last longer.	Sur batterie, l'écran est le plus gros consommateur. L'éteindre après 5 minutes sans utilisation fait durer la batterie plus longtemps.
+The screen never turns off by itself when plugged in. That uses power and can wear the screen; 10 minutes is a good choice (fix below).	Branché, l'écran ne s'éteint jamais tout seul. Cela consomme de l'énergie et peut user l'écran ; 10 minutes est un bon choix (correction ci-dessous).
+On battery the PC stays awake for a long time when you leave it, which empties the battery. Going to sleep after 15 minutes saves it - your work stays open.	Sur batterie, le PC reste éveillé longtemps quand vous le laissez, ce qui vide la batterie. Se mettre en veille après 15 minutes l'économise - votre travail reste ouvert.
+The PC never sleeps by itself. Fine if it has to stay on (downloads, sharing); otherwise sleeping after 30 minutes saves power (fix below).	Le PC ne se met jamais en veille tout seul. Bien s'il doit rester allumé (téléchargements, partage) ; sinon la veille après 30 minutes économise de l'énergie (correction ci-dessous).
+On battery the laptop keeps running with the lid closed - in a bag it gets hot and the battery runs flat. Sleep is safer (fix below).	Sur batterie, le portable continue de tourner capot fermé - dans un sac il chauffe et la batterie se vide. La veille est plus sûre (correction ci-dessous).
+Plugged in it keeps running (handy with a separate screen). Nothing to do.	Branché, il continue de tourner (pratique avec un écran séparé). Rien à faire.
+Asleep on battery, the laptop slowly uses its charge. Hibernating after 3 hours of sleep keeps your work safe if you forget it for days (fix below).	En veille sur batterie, le portable consomme lentement sa charge. Passer en veille prolongée après 3 heures protège votre travail si vous l'oubliez plusieurs jours (correction ci-dessous).
+Windows may switch off USB devices that seem idle. If a mouse, headset or drive disconnects by itself, switch this off for plugged in (fix below).	Windows peut couper les périphériques USB qui semblent inactifs. Si une souris, un casque ou un disque se déconnecte tout seul, désactivez ceci pour le mode branché (correction ci-dessous).
+Shut down is then not a full restart - when something tells you to restart, use Restart. If the PC has problems after starting up (devices, updates), switching it off helps; starting takes a few seconds longer. Needs administrator.	Arrêter n'est alors pas un redémarrage complet - quand on vous demande de redémarrer, utilisez Redémarrer. Si le PC a des problèmes après le démarrage (périphériques, mises à jour), le désactiver aide ; le démarrage prend quelques secondes de plus. Administrateur nécessaire.
+Every start is a full start. Nothing to do.	Chaque démarrage est un démarrage complet. Rien à faire.
+Checking power settings	Vérification des paramètres d'alimentation
+Plug in the charger first (or click "Restart as admin"), then try again.	Branchez d'abord le chargeur (ou cliquez sur "Relancer en admin"), puis réessayez.
+Unplug the charger first (or click "Restart as admin"), then try again.	Débranchez d'abord le chargeur (ou cliquez sur "Relancer en admin"), puis réessayez.
+Windows refused the power mode (error {0})	Windows a refusé le mode d'alimentation (erreur {0})
+These need administrator rights - click "Restart as admin" first, or uncheck them: {0}	Ceux-ci nécessitent des droits d'administrateur - cliquez d'abord sur "Relancer en admin", ou décochez-les : {0}
+Done: {0}. Undo from the History page.	Terminé : {0}. Annulez depuis la page Historique.
+Not changed:	Non modifié :
+{0} (plugged in)	{0} (branché)
+{0} (on battery)	{0} (sur batterie)
+set to {0}	réglé sur {0}
+set to Balanced	réglé sur Équilibré
+changed	modifié
+Fix {0} power setting(s)	Corriger {0} paramètre(s) d'alimentation
+{0} power setting(s) make the PC slower or empty the battery faster than needed.	{0} paramètre(s) d'alimentation ralentissent le PC ou vident la batterie plus vite que nécessaire.
+Plugged in	Branché
+On battery	Sur batterie
+Best power efficiency	Meilleure efficacité énergétique
+Better performance	Meilleures performances
+Best performance	Performances optimales
+Fast startup	Démarrage rapide

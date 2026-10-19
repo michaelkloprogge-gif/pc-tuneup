@@ -70,7 +70,7 @@ Test-Layout 'after switching back from simple view'
 $rep = Join-Path $DataDir 'test-report.html'
 try { [void](Save-ReportNow -Path $rep -NoOpen) } catch { Fail "report: $($_.Exception.Message)" }
 $html = if (Test-Path $rep) { [IO.File]::ReadAllText($rep) } else { '' }
-foreach ($h in 'Health', 'Junk files that can be cleaned', 'Bloatware found', 'Background services', 'Space savers', 'Right now', 'Browsers', 'Network', 'Programs', 'Right-click menu', 'Drivers', 'Privacy',
+foreach ($h in 'Health', 'Junk files that can be cleaned', 'Bloatware found', 'Background services', 'Space savers', 'Right now', 'Power settings', 'Browsers', 'Network', 'Programs', 'Right-click menu', 'Drivers', 'Privacy',
                'Backup', 'Scheduled tasks', 'Security', 'Stability (last 30 days)', 'Program updates available', 'Upgrade options', 'Changes made by PC Tune-Up', 'Problems inside PC Tune-Up (last 14 days)') {
     if (-not $html.Contains("<h2>$(T $h)</h2>")) { Fail "report has no '$(T $h)' section" }
 }

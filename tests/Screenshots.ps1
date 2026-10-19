@@ -16,6 +16,8 @@ $form.StartPosition = 'Manual'; $form.Location = New-Object Drawing.Point(-4000,
 Start-Everything; foreach ($n in @($script:LoadQueue)) { Invoke-PageLoader $n }
 $deadline = (Get-Date).AddSeconds(__TIMEOUT__)
 do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while (($script:Jobs.Count -gt 0 -or $script:LoadQueue.Count -gt 0) -and (Get-Date) -lt $deadline)
+# Right now only measures while it is open: take one measurement first, so its screenshot has numbers.
+if ($script:PageLoaders -and $script:PageLoaders.ContainsKey('Right now')) { Invoke-PageLoader 'Right now'; do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while ($script:Jobs.Count -gt 0 -and (Get-Date) -lt $deadline) }
 $pages = if (Get-Command Show-Page -ErrorAction SilentlyContinue) { $script:Pages } else { @($tabs.TabPages) }
 $i = 0
 foreach ($p in $pages) {

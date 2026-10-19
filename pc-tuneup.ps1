@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.17.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.18.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,63 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Plugged in	Aangesloten
+On battery	Op de accu
+Best power efficiency	Beste energie-efficiëntie
+Better performance	Betere prestaties
+Best performance	Beste prestaties
+Fast startup	Snel opstarten
+How the PC uses power: plugged in it should be quick, on battery it should last and go to sleep by itself. Recommended fixes are pre-checked; every change can be undone from History.	Hoe de pc met energie omgaat: aangesloten moet hij snel zijn, op de accu moet hij lang meegaan en vanzelf in slaap gaan. Aanbevolen oplossingen zijn al aangevinkt; elke wijziging is ongedaan te maken via Geschiedenis.
+Power settings	Energie-instellingen
+Power plans	Energiebeheerschema's
+custom	aangepast
+Ultimate Performance	Ultieme prestaties
+Power mode on battery	Energiestand op de accu
+Power plan	Energiebeheerschema
+Maximum processor speed	Maximale processorsnelheid
+Turn off the screen after	Scherm uitzetten na
+Sleep after	Slaapstand na
+When I close the lid	Als ik de klep sluit
+Hibernate after	Sluimerstand na
+USB power saving	USB-energiebesparing
+never	nooit
+{0} min	{0} min
+{0} h	{0} u
+do nothing	niets doen
+sleep	slaapstand
+hibernate	sluimerstand
+shut down	afsluiten
+Plugged in, the PC is set to save energy, which makes it slower. Best performance makes it quick (the fan may run a little more).	Aangesloten staat de pc op energie besparen, waardoor hij trager is. Beste prestaties maakt hem snel (de ventilator draait misschien wat vaker).
+Fine. For the most speed when plugged in, choose Best performance (fix below) - the fan may run a little more.	Prima. Voor de meeste snelheid als hij is aangesloten kies je Beste prestaties (oplossing hieronder) - de ventilator draait misschien wat vaker.
+Best performance on battery empties it much faster. Balanced keeps the PC quick enough and lasts longer.	Beste prestaties op de accu maakt hem veel sneller leeg. Gebalanceerd houdt de pc snel genoeg en gaat langer mee.
+Power saver slows the PC down all the time, also when plugged in. Balanced adjusts itself and lets you use the power mode slider.	Energiebesparing maakt de pc altijd trager, ook als hij is aangesloten. Gebalanceerd past zich aan en laat je de schuifregelaar voor de energiestand gebruiken.
+Keeps the processor at full speed even on battery, which empties it faster, and switches off the power mode slider. Balanced with Best performance when plugged in is usually just as quick.	Houdt de processor ook op de accu op volle snelheid, waardoor die sneller leeg is, en schakelt de schuifregelaar voor de energiestand uit. Gebalanceerd met Beste prestaties als hij is aangesloten is meestal net zo snel.
+Plugged in, the processor may only run at {0}% of its speed. Set it back to 100% (fix below).	Aangesloten mag de processor maar op {0}% van zijn snelheid draaien. Zet dit terug op 100% (oplossing hieronder).
+Lower on battery - that saves battery. Fine.	Lager op de accu - dat spaart de accu. Prima.
+On battery the screen is the biggest power user. Turning it off after 5 minutes without use makes the battery last longer.	Op de accu verbruikt het scherm het meest. Het na 5 minuten zonder gebruik uitzetten laat de accu langer meegaan.
+The screen never turns off by itself when plugged in. That uses power and can wear the screen; 10 minutes is a good choice (fix below).	Het scherm gaat nooit vanzelf uit als de pc is aangesloten. Dat kost energie en kan het scherm slijten; 10 minuten is een goede keuze (oplossing hieronder).
+On battery the PC stays awake for a long time when you leave it, which empties the battery. Going to sleep after 15 minutes saves it - your work stays open.	Op de accu blijft de pc lang wakker als je wegloopt, waardoor de accu leegloopt. Na 15 minuten in slaapstand gaan spaart hem - je werk blijft open.
+The PC never sleeps by itself. Fine if it has to stay on (downloads, sharing); otherwise sleeping after 30 minutes saves power (fix below).	De pc gaat nooit vanzelf in slaapstand. Prima als hij aan moet blijven (downloads, delen); anders spaart slaapstand na 30 minuten energie (oplossing hieronder).
+On battery the laptop keeps running with the lid closed - in a bag it gets hot and the battery runs flat. Sleep is safer (fix below).	Op de accu blijft de laptop draaien met de klep dicht - in een tas wordt hij heet en loopt de accu leeg. Slaapstand is veiliger (oplossing hieronder).
+Plugged in it keeps running (handy with a separate screen). Nothing to do.	Aangesloten blijft hij draaien (handig met een apart scherm). Niets te doen.
+Asleep on battery, the laptop slowly uses its charge. Hibernating after 3 hours of sleep keeps your work safe if you forget it for days (fix below).	In slaapstand op de accu verbruikt de laptop langzaam zijn lading. Na 3 uur slaap in sluimerstand gaan houdt je werk veilig als je hem dagen vergeet (oplossing hieronder).
+Windows may switch off USB devices that seem idle. If a mouse, headset or drive disconnects by itself, switch this off for plugged in (fix below).	Windows kan USB-apparaten uitzetten die niets lijken te doen. Valt een muis, headset of schijf vanzelf weg, zet dit dan uit voor aangesloten (oplossing hieronder).
+Shut down is then not a full restart - when something tells you to restart, use Restart. If the PC has problems after starting up (devices, updates), switching it off helps; starting takes a few seconds longer. Needs administrator.	Afsluiten is dan geen volledige herstart - als iets vraagt om opnieuw op te starten, gebruik dan Opnieuw opstarten. Heeft de pc problemen na het opstarten (apparaten, updates), dan helpt uitzetten; opstarten duurt dan een paar seconden langer. Beheerder nodig.
+Every start is a full start. Nothing to do.	Elke start is een volledige start. Niets te doen.
+Checking power settings	Energie-instellingen controleren
+Plug in the charger first (or click "Restart as admin"), then try again.	Sluit eerst de oplader aan (of klik op "Opnieuw als beheerder"), en probeer het dan opnieuw.
+Unplug the charger first (or click "Restart as admin"), then try again.	Koppel eerst de oplader los (of klik op "Opnieuw als beheerder"), en probeer het dan opnieuw.
+Windows refused the power mode (error {0})	Windows weigerde de energiestand (fout {0})
+These need administrator rights - click "Restart as admin" first, or uncheck them: {0}	Hiervoor zijn beheerdersrechten nodig - klik eerst op "Opnieuw als beheerder", of vink ze uit: {0}
+Done: {0}. Undo from the History page.	Klaar: {0}. Ongedaan maken via de pagina Geschiedenis.
+Not changed:	Niet gewijzigd:
+{0} (plugged in)	{0} (aangesloten)
+{0} (on battery)	{0} (op de accu)
+set to {0}	ingesteld op {0}
+set to Balanced	ingesteld op Gebalanceerd
+changed	gewijzigd
+Fix {0} power setting(s)	{0} energie-instelling(en) verbeteren
+{0} power setting(s) make the PC slower or empty the battery faster than needed.	{0} energie-instelling(en) maken de pc trager of de accu sneller leeg dan nodig.
 PC Tune-Up itself.	PC Tune-Up zelf.
 Right now	Nu bezig
 What is slowing the PC down at this moment: the programs using the most memory, processor and disk. Updates every few seconds while this page is open. Select a program and click End task to close it.	Wat de pc op dit moment vertraagt: de programma's die het meeste geheugen, de processor en de schijf gebruiken. Wordt elke paar seconden bijgewerkt zolang deze pagina open is. Selecteer een programma en klik op Taak beëindigen om het te sluiten.
@@ -2132,7 +2189,9 @@ function Draw-Button($B, $G) {
     if ($B.TextAlign -in 'MiddleLeft', 'TopLeft', 'BottomLeft') { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::Left } else { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::HorizontalCenter }
     if ($B.Text -match "`n") { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::WordBreak }
     if (-not $B.UseMnemonic) { $flags = $flags -bor [Windows.Forms.TextFormatFlags]::NoPrefix }
-    $r = New-Object Drawing.Rectangle($B.Padding.Left, 0, ($B.Width - $B.Padding.Horizontal), $B.Height)
+    # Centred text may use the padding too: Windows sizes the button a little too narrow for long (translated) texts.
+    $r = if ($flags -band [Windows.Forms.TextFormatFlags]::HorizontalCenter) { New-Object Drawing.Rectangle(2, 0, ($B.Width - 4), $B.Height) }
+         else { New-Object Drawing.Rectangle($B.Padding.Left, 0, ($B.Width - $B.Padding.Horizontal), $B.Height) }
     [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $B.Font, $r, $(if ($B.Enabled) { $B.ForeColor } else { $Theme.Muted }), $flags)
     if ($B.Focused -and $B.ShowFocusCues) {
         $fp = New-RoundRect 2.5 2.5 ($B.Width - 5.5) ($B.Height - 5.5) (Px 4)
@@ -4656,6 +4715,191 @@ $btnBattBuy.Add_Click({ Start-Process ('https://www.bing.com/search?q=' + [uri]:
 $btnBattReload.Add_Click({ Update-Battery })
 
 # ===========================================================================
+# Power: the power mode, plan and timers - fast when plugged in, sparing on battery. Every change can be undone from History.
+# ===========================================================================
+$pgPower = New-Page 'Power' 'How the PC uses power: plugged in it should be quick, on battery it should last and go to sleep by itself. Recommended fixes are pre-checked; every change can be undone from History.'
+$btnPowerFix = New-Button 'Apply checked fixes'
+$btnPowerReload = New-Button 'Check again'
+$btnPowerSet = New-Button 'Power settings'
+$btnPowerPlans = New-Button 'Power plans'
+$lvPower = New-ListView $true @('Setting', 230, 'Plugged in', 170, 'On battery', 170, 'What to do', 520)
+$txtPower = New-DetailBox 104
+Set-PageLayout $pgPower $lvPower @((New-ButtonBar @($btnPowerFix, $btnPowerReload, $btnPowerSet, $btnPowerPlans))) $txtPower
+$PowerModeKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes'
+$PowerModes = [ordered]@{ '961cc777-2547-4f9d-8174-7d86181b8a7a' = 'Best power efficiency'; '00000000-0000-0000-0000-000000000000' = 'Balanced'
+                          '3af9b8d9-7c97-431d-ad78-34a8bfea439f' = 'Better performance'; 'ded574b5-45a0-4f42-8737-46345c09c238' = 'Best performance' }
+$PowerWork = {
+    param($cfg)
+    $pc = "$env:windir\System32\powercfg.exe"
+    $rows = New-Object System.Collections.ArrayList
+    function Add-P($Name, $Ac, $Dc, $Level, $Todo, $Fix = $null, $Rec = $false, $Admin = $false) {
+        [void]$rows.Add([pscustomobject]@{ Name = $Name; Ac = $Ac; Dc = $Dc; Level = $Level; Todo = $Todo; Fix = $Fix; Rec = $Rec; Admin = $Admin }) }
+    # A setting's plugged-in and battery values: the last two hex numbers powercfg prints (the same in every Windows language).
+    function Get-Idx($Sub, $Set) {
+        $o = (& $pc /qh SCHEME_CURRENT $Sub $Set 2>$null) -join "`n"
+        $m = [regex]::Matches($o, '0x[0-9a-fA-F]{8}')
+        if ($m.Count -ge 2) { @([Convert]::ToInt64($m[$m.Count - 2].Value, 16), [Convert]::ToInt64($m[$m.Count - 1].Value, 16)) }
+    }
+    function Format-Secs([int64]$S) { if ($S -le 0 -or $S -ge 0x7FFFFFFF) { 'never' } elseif ($S -lt 3600) { "$([int]($S / 60)) min" } else { "$([Math]::Round($S / 3600, 1)) h" } }
+    $bat = $cfg.Battery
+    $scheme = if ("$(& $pc /getactivescheme 2>$null)" -match '([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})') { $Matches[1] } else { '' }
+    # Power mode (the Windows 11 slider), separately for plugged in and on battery
+    $ps = Get-ItemProperty $cfg.ModeKey -ErrorAction SilentlyContinue
+    $acM = "$($ps.ActiveOverlayAcPowerScheme)"; if (-not $acM) { $acM = '00000000-0000-0000-0000-000000000000' }
+    $dcM = "$($ps.ActiveOverlayDcPowerScheme)"; if (-not $dcM) { $dcM = '00000000-0000-0000-0000-000000000000' }
+    $name = { param($g) if ($cfg.Modes.Contains($g)) { $cfg.Modes[$g] } else { 'custom' } }
+    $plans = @{ '381b4222-f694-41f0-9685-ff5bb260df2e' = 'Balanced'; '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c' = 'High performance'; 'a1841308-3541-4fab-bc81-f71556f20b4a' = 'Power saver'; 'e9a42b02-d5df-448d-aa00-03f14749eb61' = 'Ultimate Performance' }
+    $planName = if ($plans.ContainsKey($scheme)) { $plans[$scheme] } elseif ("$(& $pc /getactivescheme 2>$null)" -match '\(([^)]+)\)') { $Matches[1] } else { 'unknown' }
+    if ($scheme -eq '381b4222-f694-41f0-9685-ff5bb260df2e') {   # the slider only works on the Balanced plan
+        if ($acM -eq '961cc777-2547-4f9d-8174-7d86181b8a7a') {
+            Add-P 'Power mode' (& $name $acM) $(if ($bat) { & $name $dcM } else { '' }) 'Warning' 'Plugged in, the PC is set to save energy, which makes it slower. Best performance makes it quick (the fan may run a little more).' 'mode|ac|ded574b5-45a0-4f42-8737-46345c09c238' $true
+        } elseif ($acM -ne 'ded574b5-45a0-4f42-8737-46345c09c238') {
+            Add-P 'Power mode' (& $name $acM) $(if ($bat) { & $name $dcM } else { '' }) 'Info' 'Fine. For the most speed when plugged in, choose Best performance (fix below) - the fan may run a little more.' 'mode|ac|ded574b5-45a0-4f42-8737-46345c09c238'
+        }
+        if ($bat -and $dcM -eq 'ded574b5-45a0-4f42-8737-46345c09c238') {
+            Add-P 'Power mode on battery' (& $name $acM) (& $name $dcM) 'Warning' 'Best performance on battery empties it much faster. Balanced keeps the PC quick enough and lasts longer.' 'mode|dc|00000000-0000-0000-0000-000000000000' $true
+        }
+        if (-not @($rows | Where-Object { $_.Name -like 'Power mode*' })) { Add-P 'Power mode' (& $name $acM) $(if ($bat) { & $name $dcM } else { '' }) 'OK' 'Nothing to do.' }
+    }
+    # Power plan
+    if ($scheme -eq 'a1841308-3541-4fab-bc81-f71556f20b4a') { Add-P 'Power plan' $planName $planName 'Warning' 'Power saver slows the PC down all the time, also when plugged in. Balanced adjusts itself and lets you use the power mode slider.' 'plan|381b4222-f694-41f0-9685-ff5bb260df2e' $true }
+    elseif ($scheme -in '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c', 'e9a42b02-d5df-448d-aa00-03f14749eb61' -and $bat) { Add-P 'Power plan' $planName $planName 'Info' 'Keeps the processor at full speed even on battery, which empties it faster, and switches off the power mode slider. Balanced with Best performance when plugged in is usually just as quick.' 'plan|381b4222-f694-41f0-9685-ff5bb260df2e' }
+    else { Add-P 'Power plan' $planName $planName 'OK' 'Nothing to do.' }
+    # Highest processor speed allowed
+    $v = Get-Idx 'SUB_PROCESSOR' 'PROCTHROTTLEMAX'
+    if ($v) {
+        if ($v[0] -lt 100) { Add-P 'Maximum processor speed' "$($v[0])%" $(if ($bat) { "$($v[1])%" } else { '' }) 'Problem' "Plugged in, the processor may only run at $($v[0])% of its speed. Set it back to 100% (fix below)." "idx|ac|SUB_PROCESSOR|PROCTHROTTLEMAX|100|$($v[0])|$scheme|100%" $true }
+        else { Add-P 'Maximum processor speed' "$($v[0])%" $(if ($bat) { "$($v[1])%" } else { '' }) $(if ($bat -and $v[1] -lt 100) { 'Info' } else { 'OK' }) $(if ($bat -and $v[1] -lt 100) { 'Lower on battery - that saves battery. Fine.' } else { 'Nothing to do.' }) }
+    }
+    # Screen off and sleep
+    $v = Get-Idx 'SUB_VIDEO' 'VIDEOIDLE'
+    if ($v) {
+        if ($bat -and ($v[1] -le 0 -or $v[1] -gt 900)) { Add-P 'Turn off the screen after' (Format-Secs $v[0]) (Format-Secs $v[1]) 'Warning' 'On battery the screen is the biggest power user. Turning it off after 5 minutes without use makes the battery last longer.' "idx|dc|SUB_VIDEO|VIDEOIDLE|300|$($v[1])|$scheme|5 min" $true }
+        elseif ($v[0] -le 0) { Add-P 'Turn off the screen after' (Format-Secs $v[0]) $(if ($bat) { Format-Secs $v[1] } else { '' }) 'Info' 'The screen never turns off by itself when plugged in. That uses power and can wear the screen; 10 minutes is a good choice (fix below).' "idx|ac|SUB_VIDEO|VIDEOIDLE|600|$($v[0])|$scheme|10 min" }
+        else { Add-P 'Turn off the screen after' (Format-Secs $v[0]) $(if ($bat) { Format-Secs $v[1] } else { '' }) 'OK' 'Nothing to do.' }
+    }
+    $v = Get-Idx 'SUB_SLEEP' 'STANDBYIDLE'
+    if ($v) {
+        if ($bat -and ($v[1] -le 0 -or $v[1] -gt 3600)) { Add-P 'Sleep after' (Format-Secs $v[0]) (Format-Secs $v[1]) 'Warning' 'On battery the PC stays awake for a long time when you leave it, which empties the battery. Going to sleep after 15 minutes saves it - your work stays open.' "idx|dc|SUB_SLEEP|STANDBYIDLE|900|$($v[1])|$scheme|15 min" $true }
+        elseif (-not $bat -and $v[0] -le 0) { Add-P 'Sleep after' (Format-Secs $v[0]) '' 'Info' 'The PC never sleeps by itself. Fine if it has to stay on (downloads, sharing); otherwise sleeping after 30 minutes saves power (fix below).' "idx|ac|SUB_SLEEP|STANDBYIDLE|1800|$($v[0])|$scheme|30 min" }
+        else { Add-P 'Sleep after' (Format-Secs $v[0]) $(if ($bat) { Format-Secs $v[1] } else { '' }) 'OK' 'Nothing to do.' }
+    }
+    # Closing the lid (laptops)
+    if ($bat) {
+        $v = Get-Idx 'SUB_BUTTONS' 'LIDACTION'
+        $lid = @{ 0 = 'do nothing'; 1 = 'sleep'; 2 = 'hibernate'; 3 = 'shut down' }
+        if ($v) {
+            if ($v[1] -eq 0) { Add-P 'When I close the lid' $lid[[int]$v[0]] $lid[[int]$v[1]] 'Warning' 'On battery the laptop keeps running with the lid closed - in a bag it gets hot and the battery runs flat. Sleep is safer (fix below).' "idx|dc|SUB_BUTTONS|LIDACTION|1|$($v[1])|$scheme|sleep" $true }
+            else { Add-P 'When I close the lid' $lid[[int]$v[0]] $lid[[int]$v[1]] 'OK' $(if ($v[0] -eq 0) { 'Plugged in it keeps running (handy with a separate screen). Nothing to do.' } else { 'Nothing to do.' }) }
+        }
+        # Hibernate after a long sleep, so the battery can't run flat with unsaved work
+        if ($cfg.Hiber) {
+            $v = Get-Idx 'SUB_SLEEP' 'HIBERNATEIDLE'
+            if ($v -and ($v[1] -le 0 -or $v[1] -ge 86400)) { Add-P 'Hibernate after' (Format-Secs $v[0]) (Format-Secs $v[1]) 'Info' 'Asleep on battery, the laptop slowly uses its charge. Hibernating after 3 hours of sleep keeps your work safe if you forget it for days (fix below).' "idx|dc|SUB_SLEEP|HIBERNATEIDLE|10800|$($v[1])|$scheme|3 h" }
+        }
+    }
+    # USB devices being switched off to save power
+    $v = Get-Idx '2a737441-1930-4402-8d77-b2bebba308a3' '48e6b7a6-50f5-4782-a5d4-53bb8f07e226'
+    if ($v) {
+        $on = @{ 0 = 'off'; 1 = 'on' }
+        if ($v[0] -eq 1) { Add-P 'USB power saving' $on[[int]$v[0]] $(if ($bat) { $on[[int]$v[1]] } else { '' }) 'Info' 'Windows may switch off USB devices that seem idle. If a mouse, headset or drive disconnects by itself, switch this off for plugged in (fix below).' "idx|ac|2a737441-1930-4402-8d77-b2bebba308a3|48e6b7a6-50f5-4782-a5d4-53bb8f07e226|0|$($v[0])|$scheme|off" }
+        else { Add-P 'USB power saving' $on[[int]$v[0]] $(if ($bat) { $on[[int]$v[1]] } else { '' }) 'OK' 'Nothing to do.' }
+    }
+    # Fast startup
+    $fast = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power' -ErrorAction SilentlyContinue).HiberbootEnabled
+    if ($fast -eq 1) { Add-P 'Fast startup' 'on' 'on' 'Info' 'Shut down is then not a full restart - when something tells you to restart, use Restart. If the PC has problems after starting up (devices, updates), switching it off helps; starting takes a few seconds longer. Needs administrator.' 'faststart' $false $true }
+    elseif ($null -ne $fast) { Add-P 'Fast startup' 'off' 'off' 'OK' 'Every start is a full start. Nothing to do.' }
+    [pscustomobject]@{ Rows = $rows; Scheme = $scheme }
+}
+function Update-Power {
+    $btnPowerReload.Enabled = $false
+    $txtPower.Text = 'Checking...'
+    Start-Bg -Label 'Checking power settings' $PowerWork @{ Battery = $HasBattery; ModeKey = $PowerModeKey; Modes = $PowerModes; Hiber = [IO.File]::Exists("$env:SystemDrive\hiberfil.sys") } {
+        param($r)
+        $btnPowerReload.Enabled = $true
+        $r = @($r)[0]
+        $lvPower.BeginUpdate(); $lvPower.Items.Clear()
+        foreach ($p in @($r.Rows) | Sort-Object { $SecLevels[$_.Level] }) {
+            $it = Add-Row $lvPower @($p.Name, $p.Ac, $(if ($HasBattery) { $p.Dc } else { '-' }), $p.Todo) $p ($p.Rec -and $p.Fix)
+            Set-RowStatus $it 0 $(switch ($p.Level) { 'Problem' { $Theme.Bad } 'Warning' { $Theme.Warn } 'OK' { $Theme.Good } default { $Theme.AccentText } })
+            if ($p.Admin -and -not $IsAdmin) { $it.ForeColor = $Theme.Muted }
+        }
+        $lvPower.EndUpdate()
+        $script:PowerIssues = @($r.Rows | Where-Object { $_.Level -in 'Problem', 'Warning' }).Count
+        if ($lvPower.Items.Count) { $lvPower.Items[0].Selected = $true }
+        if ($script:NavButtons) { Update-NavBadges }
+    }
+}
+$lvPower.Add_SelectedIndexChanged({
+    if (-not $lvPower.SelectedItems.Count) { return }
+    $p = $lvPower.SelectedItems[0].Tag
+    $txtPower.Text = "$(T $p.Name):  $(T $p.Ac)$(if ($HasBattery -and $p.Dc) { ' / ' + (T $p.Dc) })`r`n`r`n$((T 'What to do: {0}').Replace('{0}', (T $p.Todo)))$(if ($p.Admin -and -not $IsAdmin) { "`r`n`r`n" + (T 'Needs administrator rights - click ''Restart as admin''.') })"
+})
+# The power mode for the power source the PC is on now goes through Windows (no administrator needed); the other one is a
+# setting in the registry that only administrators can change.
+function Set-PowerOverlay([string]$Guid) {
+    if (-not ('PcTuneUpPower.Overlay' -as [type])) { Add-Type -Namespace PcTuneUpPower -Name Overlay -MemberDefinition '[DllImport("powrprof.dll")] public static extern uint PowerSetActiveOverlayScheme(System.Guid g);' }
+    $r = [PcTuneUpPower.Overlay]::PowerSetActiveOverlayScheme([guid]$Guid)
+    if ($r) { throw "Windows refused the power mode (error $r)" }
+}
+function Set-PowerMode([bool]$Ac, [string]$Guid) {
+    $onAc = [Windows.Forms.SystemInformation]::PowerStatus.PowerLineStatus -ne 'Offline'
+    if ($onAc -eq $Ac) { Set-PowerOverlay $Guid; return }
+    if (-not $IsAdmin) { throw (T $(if ($Ac) { 'Plug in the charger first (or click "Restart as admin"), then try again.' } else { 'Unplug the charger first (or click "Restart as admin"), then try again.' })) }
+    Set-RegValue $PowerModeKey $(if ($Ac) { 'ActiveOverlayAcPowerScheme' } else { 'ActiveOverlayDcPowerScheme' }) $Guid 'String'
+}
+function Invoke-PowerCfg([string]$Arguments) {
+    $pr = Start-Process "$env:windir\System32\powercfg.exe" -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+    if ($pr.ExitCode) { throw "powercfg $Arguments`: exit code $($pr.ExitCode)" }
+}
+$btnPowerFix.Add_Click({
+    $picked = @($lvPower.CheckedItems | ForEach-Object { $_.Tag } | Where-Object Fix)
+    if (-not $picked) { Show-Msg 'Check one or more rows that have a fix first.' | Out-Null; return }
+    $locked = @($picked | Where-Object { $_.Admin -and -not $IsAdmin })
+    if ($locked) { Show-Msg "These need administrator rights - click ""Restart as admin"" first, or uncheck them: $(($locked | ForEach-Object { T $_.Name }) -join ', ')" 'OK' 'Warning' | Out-Null; return }
+    if (-not (Confirm-Checked 'Apply these {0} fix(es)?' @($picked | ForEach-Object { T $_.Name }) 'You can undo this on the History page.')) { return }
+    $done = @(); $failed = @()
+    foreach ($p in $picked) {
+        try {
+            $f = $p.Fix -split '\|'
+            switch ($f[0]) {
+                'mode' {
+                    $ac = $f[1] -eq 'ac'
+                    $old = "$(Get-RegValue $PowerModeKey $(if ($ac) { 'ActiveOverlayAcPowerScheme' } else { 'ActiveOverlayDcPowerScheme' }))"
+                    if (-not $old) { $old = '00000000-0000-0000-0000-000000000000' }
+                    Set-PowerMode $ac $f[2]
+                    Add-History 'Power' "$($p.Name) ($(if ($ac) { 'plugged in' } else { 'on battery' }))" "set to $($PowerModes[$f[2]])" @{ Type = 'PowerMode'; Ac = $ac; Old = $old }
+                }
+                'plan' {
+                    $old = if ("$(powercfg /getactivescheme)" -match '([0-9a-f]{8}-[0-9a-f-]{27})') { $Matches[1] }
+                    Invoke-PowerCfg "/setactive $($f[1])"
+                    Add-History 'Power' 'Power plan' 'set to Balanced' $(if ($old) { @{ Type = 'Power'; Cmds = @("/setactive $old") } })
+                }
+                'idx' {
+                    # idx|ac or dc|subgroup|setting|new value|old value|plan|new value as shown
+                    $which = if ($f[1] -eq 'ac') { '/setacvalueindex' } else { '/setdcvalueindex' }
+                    Invoke-PowerCfg "$which $($f[6]) $($f[2]) $($f[3]) $($f[4])"
+                    Invoke-PowerCfg "/setactive $($f[6])"
+                    Add-History 'Power' "$($p.Name) ($(if ($f[1] -eq 'ac') { 'plugged in' } else { 'on battery' }))" "set to $($f[7])" @{ Type = 'Power'; Cmds = @("$which $($f[6]) $($f[2]) $($f[3]) $($f[5])", "/setactive $($f[6])") }
+                }
+                'faststart' {
+                    $k = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power'; $old = Get-RegValue $k 'HiberbootEnabled'; Set-RegValue $k 'HiberbootEnabled' 0
+                    Add-History 'Power' 'Fast startup' 'turned off' @{ Type = 'Reg'; Values = @(@{ P = $k; N = 'HiberbootEnabled'; Old = $old; T = 'DWord' }) }
+                }
+            }
+            $done += T $p.Name
+        } catch { $failed += "$(T $p.Name): $($_.Exception.Message)" }
+    }
+    Update-History; Update-Power
+    $msg = if ($done) { "Done: $($done -join ', '). Undo from the History page." } else { '' }
+    if ($failed) { $msg += "`n`nNot changed:`n$($failed -join "`n")" }
+    Show-Msg $msg.Trim() $(if ($failed) { 'OK' } else { 'OK' }) $(if ($failed) { 'Warning' } else { 'Information' }) | Out-Null
+})
+$btnPowerReload.Add_Click({ Update-Power })
+$btnPowerSet.Add_Click({ Start-Process 'ms-settings:powersleep' })
+$btnPowerPlans.Add_Click({ Start-Process control.exe '/name Microsoft.PowerOptions' })
+
+# ===========================================================================
 # Browsers: extensions, search engine, home page, and settings forced by "policies"
 # ===========================================================================
 $pgBrw = New-Page 'Browsers' 'Extensions in Chrome, Edge, Brave, Vivaldi and Firefox, plus the search engine, home page and start-up pages. Adware hides here: extensions that weren''t installed from a store, and settings forced through browser "policies" on a home PC.'
@@ -6313,6 +6557,14 @@ $btnHistUndo.Add_Click({
                     else { [void](Disable-ScheduledTask -TaskPath $u.Path -TaskName $u.Name -ErrorAction Stop) }
                     $logs += , @('Undo', $e.Item, $(if ($u.Enable) { 'scheduled task switched back on' } else { 'scheduled task switched off again' }))
                 }
+                'Power' {
+                    foreach ($a in @($u.Cmds)) { Invoke-PowerCfg $a }
+                    $logs += , @('Undo', $e.Item, 'put back as it was')
+                }
+                'PowerMode' {
+                    Set-PowerMode ([bool]$u.Ac) $u.Old
+                    $logs += , @('Undo', $e.Item, 'put back as it was')
+                }
                 'Cmd' {
                     $p = Start-Process $u.Exe -ArgumentList $u.Args -Wait -PassThru -WindowStyle Hidden
                     if ($p.ExitCode) { throw "$($u.Exe) $($u.Args): exit code $($p.ExitCode)" }
@@ -6746,6 +6998,7 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
 <h2>$(T 'Space savers')</h2>$(ConvertTo-HtmlRows @('Saver', 'Can free', 'Now', 'What it does - and what you give up') $lvSpace.Items @(0, 1, 2, 3))
 <h2>$(T 'Right now')</h2>$(ConvertTo-HtmlRows @('Program', 'Memory', 'Processor', 'Disk', 'What to do') $lvNow.Items @(0, 1, 2, 3, 4))
+<h2>$(T 'Power settings')</h2>$(ConvertTo-HtmlRows @('Setting', 'Plugged in', 'On battery', 'What to do') $lvPower.Items @(0, 1, 2, 3))
 <h2>$(T 'Gaming')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvGame.Items @(0, 1, 2, 3))
 <h2>$(T 'Browsers')</h2>$(ConvertTo-HtmlRows @('Item', 'Browser', 'Kind', 'Status', 'Details') $lvBrw.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Network')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvNet.Items @(0, 1, 2, 3))
@@ -7050,7 +7303,7 @@ $OldExeCleanupWork = {
 $NavGroups = @(
     @{ Title = $null;      Pages = @('Health', 'Right now') }
     @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk', 'Space savers') }
-    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', 'Gaming', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
+    @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', 'Gaming', $(if ($HasBattery) { 'Battery' }), 'Power', 'Backup', 'Upgrades') }
     @{ Title = $null;      Pages = @('History', 'Settings'); Bottom = $true }   # pinned under the list, side by side, so they never scroll away
 )
 $script:NavButtons = @{}
@@ -7101,6 +7354,7 @@ function Update-NavBadges {
     Set-NavBadge 'Network' $script:NetProblems
     Set-NavBadge 'Right-click' $script:CtxLeftovers
     Set-NavBadge 'Battery' $script:BatteryWorn
+    Set-NavBadge 'Power' $script:PowerIssues
     Update-StartHere
 }
 
@@ -7168,7 +7422,7 @@ $IconFontName = if ((New-Object Drawing.Text.InstalledFontCollection).Families.N
 $IconFont = New-Object Drawing.Font($IconFontName, 11)
 $NavIcons = @{ Health = 0xE95E; 'Right now' = 0xEC4A; Clean = 0xEA99; Startup = 0xE7E8; Bloatware = 0xE74D; Programs = 0xE71D; Services = 0xE9F5; Tasks = 0xE823
                'Right-click' = 0xE7C9; Privacy = 0xE890; Disk = 0xEDA2; 'Space savers' = 0xF012; Updates = 0xE895; Drivers = 0xE950
-               Security = 0xEA18; Browsers = 0xE774; Stability = 0xE9D9; Network = 0xE701; Gaming = 0xE7FC; Battery = 0xE83F
+               Security = 0xEA18; Browsers = 0xE774; Stability = 0xE9D9; Network = 0xE701; Gaming = 0xE7FC; Battery = 0xE83F; Power = 0xE945
                Backup = 0xE753; Upgrades = 0xEEA0; History = 0xE81C; Settings = 0xE713 }
 function Draw-NavButton($B, $G) {
     $G.SmoothingMode = 'AntiAlias'
@@ -7191,7 +7445,8 @@ function Draw-NavButton($B, $G) {
         $x += if ($small) { Px 22 } else { Px 30 }
     }
     $tr = New-Object Drawing.Rectangle($x, 0, ($B.Width - $x - (Px 4)), $B.Height)
-    [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $B.Font, $tr, $B.ForeColor, 'VerticalCenter, Left, EndEllipsis, NoPrefix')
+    $f = if ($small -and $script:NavBottomFont) { $script:NavBottomFont[[int]$on] } else { $B.Font }
+    if ($script:NavIconOnly -ne $B) { [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $f, $tr, $B.ForeColor, 'VerticalCenter, Left, EndEllipsis, NoPrefix') }
     if ($B.Focused -and $B.ShowFocusCues) { $fp = New-RoundRect 1.5 1.5 ($B.Width - 3.5) ($B.Height - 3.5) (Px 4); $pen = New-Object Drawing.Pen($Theme.Accent); $pen.DashStyle = 'Dot'; $G.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose() }
 }
 $navBottom = New-Object Windows.Forms.FlowLayoutPanel
@@ -7224,21 +7479,30 @@ foreach ($g in $NavGroups) {
 $sidebar.Controls.Add($nav)
 $sidebar.Controls.Add($navBottom)
 # History and Settings: as wide as icon + (translated) text, measured once the texts are final
+# If both don't fit (long words in some languages), they use a slightly smaller font; if even that is too wide,
+# Settings shows only its icon, with its name as a tooltip.
+$NavSmallFonts = @((New-Object Drawing.Font('Segoe UI', 9)), (New-Object Drawing.Font('Segoe UI Semibold', 9)))
+$navBottomTip = New-Object Windows.Forms.ToolTip
 function Resize-NavBottom {
-    foreach ($b in $navBottom.Controls) {
-        # Measured in screen pixels, but the whole window is scaled for the display afterwards - so undo the scaling here.
-        $b.Width = [int]([Windows.Forms.TextRenderer]::MeasureText((T $b.Text), $FontBold).Width / $DpiScale) + 28; $b.Height = 24
-    }
+    $btns = @($navBottom.Controls)
+    $avail = $sidebar.Width - $navBottom.Padding.Horizontal - 2 * $btns.Count
+    # Measured in screen pixels, but the whole window is scaled for the display afterwards - so undo the scaling here.
+    $measure = { param($f) @(foreach ($b in $btns) { [int]([Windows.Forms.TextRenderer]::MeasureText((T $b.Text), $f).Width / $DpiScale) + 28 }) }
+    $script:NavBottomFont = $null; $script:NavIconOnly = $null
+    $w = & $measure $FontBold
+    if (($w | Measure-Object -Sum).Sum -gt $avail) { $script:NavBottomFont = $NavSmallFonts; $w = & $measure $NavSmallFonts[1] }
+    if (($w | Measure-Object -Sum).Sum -gt $avail -and $btns) { $script:NavIconOnly = $btns[-1]; $w[-1] = 28; $navBottomTip.SetToolTip($btns[-1], (T $btns[-1].Text)) }
+    for ($i = 0; $i -lt $btns.Count; $i++) { $btns[$i].Width = $w[$i]; $btns[$i].Height = 24 }
 }
 if (-not $IsAdmin) {
     $adm = New-Object Windows.Forms.Panel
     # Kept small: with 20+ pages the sidebar needs the room.
-    $adm.Dock = 'Bottom'; $adm.Height = 66; $adm.Padding = New-Object Windows.Forms.Padding(16, 4, 14, 10)
-    $admT = New-Object Windows.Forms.Label
-    $admT.Text = 'Limited mode'; $admT.ForeColor = $Theme.Dim; $admT.Dock = 'Top'; $admT.Height = 22; $admT.Font = $FontSmall; $admT.AutoEllipsis = $true
-    (New-Object Windows.Forms.ToolTip).SetToolTip($admT, (T 'Some fixes need administrator rights.'))
+    # Just the button (the explanation is its tooltip): with 25 pages the sidebar needs every pixel.
+    $adm.Dock = 'Bottom'; $adm.Height = 44; $adm.Padding = New-Object Windows.Forms.Padding(16, 6, 14, 6)
     $admB = New-Button 'Restart as admin'
-    $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 34
+    $admB.AutoSize = $false; $admB.Dock = 'Bottom'; $admB.Height = 32
+    $admB.Add_MouseEnter({ $admTip.SetToolTip($this, (T 'Some fixes need administrator rights.')) })
+    $admTip = New-Object Windows.Forms.ToolTip
     $admB.Add_Click({
         try {
             if ($RunningAsExe) { Start-Process $SelfExe -Verb RunAs }
@@ -7246,11 +7510,11 @@ if (-not $IsAdmin) {
             $form.Close()
         } catch { }   # user said no to the UAC prompt
     })
-    $adm.Controls.Add($admB); $adm.Controls.Add($admT)
+    $adm.Controls.Add($admB)
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply, $btnGameFix, $btnNowEnd)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply, $btnGameFix, $btnNowEnd, $btnPowerFix)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -7304,7 +7568,7 @@ $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-St
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
                          Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy }
                          Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context }
-                         Startup = { Update-Boot }; 'Space savers' = { Update-Space }; Gaming = { Update-Gaming }; 'Right now' = { Update-Now } }
+                         Startup = { Update-Boot }; 'Space savers' = { Update-Space }; Gaming = { Update-Gaming }; 'Right now' = { Update-Now }; Power = { Update-Power } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -7316,7 +7580,7 @@ function Start-Everything {
     Update-Health; Update-Startup; Update-History
     $script:EverythingStarted = $true
     # Slowest first (hardware ~4 s, winget, logs), so the last one doesn't hold everything up; Security/Stability feed Health.
-    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Gaming', 'Clean'))
+    [void]$script:LoadQueue.AddRange(@('Security', 'Stability', 'Upgrades', 'Drivers', 'Network', 'Updates', 'Programs', 'Browsers', 'Backup', 'Services', 'Bloatware', 'Tasks', 'Right-click', 'Privacy', 'Space savers', 'Startup', 'Gaming', 'Power', 'Clean'))
     if ($HasBattery) { [void]$script:LoadQueue.Insert(5, 'Battery') }
 }
 # ===========================================================================
@@ -7348,6 +7612,7 @@ function Get-NextSteps {
     $n = @($lvUpd.Items).Count
     if ($n) { & $add 55 "$n program update(s) available" 'Update' $pgUpd "$n program(s) have a newer version with fixes." 'updates' }
     if ($script:PrivacyOn) { & $add 60 "Turn off $($script:PrivacyOn) Windows ads, tips and tracking settings" 'Turn off' $pgPriv "Windows shows you ads and tips, and shares more about you than needed ($($script:PrivacyOn) settings)." 'privacy' }
+    if ($script:PowerIssues) { & $add 62 "Fix $($script:PowerIssues) power setting(s)" 'Review' $pgPower "$($script:PowerIssues) power setting(s) make the PC slower or empty the battery faster than needed." $null }
     if ($script:TasksActive) { & $add 65 "Switch off $($script:TasksActive) junk scheduled task(s)" 'Review' $pgTasks "$($script:TasksActive) helper program(s) from other companies run in the background by themselves." 'tasks' }
     if ($script:BatteryWorn) { & $add 70 'The battery is worn out - see how to replace it' 'See' $pgBatt "Your battery is worn out and doesn't last as long any more. A new battery fixes that." $null }
     if ($script:CtxLeftovers) { & $add 75 "Hide $($script:CtxLeftovers) leftover right-click menu entr(y/ies)" 'Review' $pgCtx 'Removed programs left old entries in your right-click menu.' 'context' }

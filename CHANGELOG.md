@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.22.1
+
+- Fixed: program updates that had installed fine kept showing up on the Updates page (for example Windows Terminal and Visual Studio Code). Some programs only switch to the new version when they are closed and opened again; PC Tune-Up now recognises an update it already installed and shows "already updated - finishes when you close and reopen it" instead of offering it again. Those don't count as waiting updates any more (sidebar count, Start here, reminders).
 ## 1.22.0
 
 - **Three more languages: Spanish, Italian and Polish** (Settings > Language, or automatically when Windows uses one of them).

@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.22.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.22.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,9 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+already updated - finishes when you close and reopen it	al bijgewerkt - wordt afgerond als je het sluit en opnieuw opent
+Everything is updated - some programs finish their update when you close and reopen them.	Alles is bijgewerkt - sommige programma's ronden hun update af als je ze sluit en opnieuw opent.
+A program that was open while it updated finishes when you close and reopen it - until then it still shows its old version.	Een programma dat open was tijdens de update wordt afgerond als je het sluit en opnieuw opent - tot die tijd toont het nog de oude versie.
 It started right after a Windows update ({0}, installed {1}). If it keeps happening, uninstall that update: Settings > Windows Update > Update history > Uninstall updates.	Het begon direct na een Windows-update ({0}, geïnstalleerd op {1}). Blijft het gebeuren, verwijder die update dan: Instellingen > Windows Update > Updategeschiedenis > Updates verwijderen.
 Open the update history (to uninstall the update)	De updategeschiedenis openen (om de update te verwijderen)
 Also: {0}	Ook: {0}
@@ -3723,11 +3726,17 @@ function Start-UpdScan {
         }
         $userKeep = Get-UserKeep
         $script:UpdScanned = [bool]$r -and -not $r.Error
+        # Updates PC Tune-Up already installed (same versions) that still show up: the program finishes them when it is
+        # closed and opened again (Store apps, VS Code and others stage the new version while the old one runs).
+        $done = @{}; foreach ($h in @(Get-History | Where-Object { $_.Kind -eq 'Update' -and $_.Change -match ': updated$' })) { $done["$($h.Item)|$($h.Change -replace ': updated$', '')"] = 1 }
         $lvUpd.BeginUpdate(); $lvUpd.Items.Clear()
         foreach ($u in $r.Rows) {
             $text = "$($u.Name) $($u.Id)"
             $on = $false
-            $note = if (($userKeep -and $text -match $userKeep) -or $text -match $KeepBuiltIn) { 'on the keep list - update it yourself if you want' }
+            $pending = $done.ContainsKey("$($u.Name)|$($u.Version) -> $($u.Available)")
+            $u | Add-Member -NotePropertyName Pending -NotePropertyValue $pending -Force
+            $note = if ($pending) { 'already updated - finishes when you close and reopen it' }
+                    elseif (($userKeep -and $text -match $userKeep) -or $text -match $KeepBuiltIn) { 'on the keep list - update it yourself if you want' }
                     elseif ($u.Id -match $SelfUpdating) { 'updates itself - just restart it' }
                     elseif ($u.Id -match $HeavyUpdates) { 'very large update - run it when you have time' }
                     elseif ($u.Id -match [char]0x2026) { 'name cut off by winget - update it from the program itself' }
@@ -3737,8 +3746,9 @@ function Start-UpdScan {
             if (-not $on) { $it.ForeColor = $Theme.Muted }
         }
         $lvUpd.EndUpdate()
-        $n = $r.Rows.Count
-        $lblUpd.Text = if ($r.Error) { $r.Error } elseif ($n) { "$n program(s) can be updated, $($lvUpd.CheckedItems.Count) pre-checked." } else { 'Everything winget knows about is up to date.' }
+        $n = @($r.Rows | Where-Object { -not $_.Pending }).Count
+        $script:UpdWaiting = $n
+        $lblUpd.Text = if ($r.Error) { $r.Error } elseif ($n) { "$n program(s) can be updated, $($lvUpd.CheckedItems.Count) pre-checked." } elseif ($r.Rows.Count) { 'Everything is updated - some programs finish their update when you close and reopen them.' } else { 'Everything winget knows about is up to date.' }
         if ($n) { $script:ExtraAdvice['Updates'] = "$n program update(s) available - see the Updates tab." } else { $script:ExtraAdvice.Remove('Updates') }
         Update-Health -Quick
     }
@@ -3764,6 +3774,7 @@ function Start-ProgramUpdates {
         }
         $msg = "$(@($results | Where-Object Ok).Count) of $($results.Count) program(s) updated."
         if ($bad) { $msg += "`n`nNot updated (often because the program was open - close it and try again):`n" + ($bad -join "`n") }
+        if (@($results | Where-Object Ok)) { $msg += "`n`nA program that was open while it updated finishes when you close and reopen it - until then it still shows its old version." }
         Show-Msg $msg | Out-Null
         Update-History; Start-UpdScan
     }
@@ -7712,7 +7723,7 @@ function Update-StartHere {
 }
 # Counts next to page names: things waiting for attention.
 function Update-NavBadges {
-    Set-NavBadge 'Updates' @($lvUpd.Items).Count
+    Set-NavBadge 'Updates' $script:UpdWaiting
     Set-NavBadge 'Security' @($lvSec.Items | Where-Object { $_.Tag.Level -in 'Problem', 'Warning' }).Count
     Set-NavBadge 'Stability' @($lvStab.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count
     Set-NavBadge 'Bloatware' @($lvBloat.Items).Count
@@ -8030,7 +8041,7 @@ function Get-Reminders {
         if ($d -ge 30) { & $add 'cleanup' 52 "Last clean-up was $d days ago ($(Format-Size $script:JunkBytes) of junk now)" "It has been $d days since the last clean-up; $(Format-Size $script:JunkBytes) of leftover files have piled up." 'Clean' 'clean' $pgClean 7 }
     }
     # Program updates left waiting
-    $n = @($lvUpd.Items).Count
+    $n = [int]$script:UpdWaiting
     $age = if ($script:UpdScanned) { Get-ReminderAge 'updates' ([bool]$n) }   # (not before winget has answered: an empty list then means "not checked yet")
     if ($n -and $age -ge 14) { & $add 'updates' 50 "$n program update(s) have been waiting for $age days" "$n program(s) have had a newer version waiting for $age days - updates fix security holes." 'Update' 'updates' $pgUpd 7 }
     @($r)
@@ -8077,7 +8088,7 @@ function Get-NextStepsNow {
     if ($script:SpaceFree -gt 3GB) { & $add 48 "Free up to $(Format-Size $script:SpaceFree) with space savers" 'Review' $pgSpace "Windows keeps up to $(Format-Size $script:SpaceFree) for things you may not need." $null }
     $n = @($lvStart.Items | Where-Object { $_.Tag.On -and $_.Tag.Advice -eq 'safe to turn off' }).Count
     if ($n) { & $add 50 "Stop $n app(s) starting with Windows" 'Review' $pgStartup "$n app(s) start by themselves every time you turn on the PC, which makes starting slower." 'startup' }
-    $n = @($lvUpd.Items).Count
+    $n = [int]$script:UpdWaiting
     if ($n) { & $add 55 "$n program update(s) available" 'Update' $pgUpd "$n program(s) have a newer version with fixes." 'updates' }
     if ($script:PrivacyOn) { & $add 60 "Turn off $($script:PrivacyOn) Windows ads, tips and tracking settings" 'Turn off' $pgPriv "Windows shows you ads and tips, and shares more about you than needed ($($script:PrivacyOn) settings)." 'privacy' }
     if ($script:PowerIssues) { & $add 62 "Fix $($script:PowerIssues) power setting(s)" 'Review' $pgPower "$($script:PowerIssues) power setting(s) make the PC slower or empty the battery faster than needed." $null }

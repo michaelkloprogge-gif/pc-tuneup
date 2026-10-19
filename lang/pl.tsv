@@ -1774,3 +1774,6 @@ Drive {0} reported new read or write errors - back up your files now and check t
 Español	Español
 Italiano	Italiano
 Polski	Polski
+already updated - finishes when you close and reopen it	już zaktualizowano – zakończy się po zamknięciu i ponownym otwarciu
+Everything is updated - some programs finish their update when you close and reopen them.	Wszystko jest zaktualizowane – niektóre programy kończą aktualizację po zamknięciu i ponownym otwarciu.
+A program that was open while it updated finishes when you close and reopen it - until then it still shows its old version.	Program, który był otwarty podczas aktualizacji, zakończy ją po zamknięciu i ponownym otwarciu – do tego czasu pokazuje starą wersję.

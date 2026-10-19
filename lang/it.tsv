@@ -1774,3 +1774,6 @@ Drive {0} reported new read or write errors - back up your files now and check t
 Español	Español
 Italiano	Italiano
 Polski	Polski
+already updated - finishes when you close and reopen it	già aggiornato: si completa quando lo chiudi e lo riapri
+Everything is updated - some programs finish their update when you close and reopen them.	È tutto aggiornato: alcuni programmi completano l'aggiornamento quando li chiudi e li riapri.
+A program that was open while it updated finishes when you close and reopen it - until then it still shows its old version.	Un programma aperto durante l'aggiornamento lo completa quando lo chiudi e lo riapri: fino ad allora mostra ancora la versione precedente.

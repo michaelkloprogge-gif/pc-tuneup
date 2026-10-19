@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.19.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.20.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,21 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Later	Later
+Restart	Opnieuw opstarten
+Open Windows Update	Windows Update openen
+Windows has been waiting {0} day(s) for a restart to finish updates	Windows wacht al {0} dag(en) op een herstart om updates af te maken
+Windows has been waiting {0} day(s) for a restart to finish installing updates. Save your work and restart.	Windows wacht al {0} dag(en) op een herstart om de updates af te maken. Sla je werk op en start opnieuw op.
+The PC hasn't restarted in {0} days	De pc is al {0} dagen niet opnieuw opgestart
+Your PC hasn't been restarted in {0} days. A restart clears out a lot of slowness.	Je pc is al {0} dagen niet opnieuw opgestart. Een herstart haalt veel traagheid weg.
+Windows hasn't installed updates in {0} days	Windows heeft al {0} dagen geen updates geïnstalleerd
+Windows hasn't updated itself in {0} days. Open Windows Update and let it check.	Windows heeft zichzelf al {0} dagen niet bijgewerkt. Open Windows Update en laat het controleren.
+Last clean-up was {0} days ago ({1} of junk now)	De laatste opruimbeurt was {0} dagen geleden (nu {1} aan rommel)
+It has been {0} days since the last clean-up; {1} of leftover files have piled up.	Het is {0} dagen geleden dat er is opgeruimd; er is {1} aan overbodige bestanden bijgekomen.
+{0} program update(s) have been waiting for {1} days	{0} programma-update(s) wachten al {1} dagen
+{0} program(s) have had a newer version waiting for {1} days - updates fix security holes.	Voor {0} programma('s) staat al {1} dagen een nieuwere versie klaar - updates dichten beveiligingslekken.
+Restart the PC now?	De pc nu opnieuw opstarten?
+Save your work first: open programs are closed, and programs with unsaved work will ask you first.	Sla eerst je werk op: open programma's worden gesloten, en programma's met niet-opgeslagen werk vragen het je eerst.
 Remove checked	Aangevinkte verwijderen
 That row is about Windows itself (every browser). Select a row of a browser first.	Die rij gaat over Windows zelf (alle browsers). Selecteer eerst een rij van een browser.
 Check one or more policy, hosts file or proxy rows first (extensions are removed in the browser itself - use "Open extensions page").	Vink eerst een of meer rijen met een beleid, het hosts-bestand of een proxy aan (extensies verwijder je in de browser zelf - gebruik "Extensiepagina openen").
@@ -2451,21 +2466,25 @@ $gridHealth.Dock = 'Fill'   # use the whole column, so readings don't wrap early
 $healthTop.Controls.Add($gridHealth, 0, 0); $healthTop.Controls.Add($chartScore, 1, 0)
 # "Start here": the three most useful next steps from all pages, each with a button that opens the right page.
 $startHere = New-Object Windows.Forms.TableLayoutPanel
-$startHere.Dock = 'Top'; $startHere.AutoSize = $true; $startHere.AutoSizeMode = 'GrowAndShrink'; $startHere.ColumnCount = 2; $startHere.BackColor = $Theme.AccentSoft
+$startHere.Dock = 'Top'; $startHere.AutoSize = $true; $startHere.AutoSizeMode = 'GrowAndShrink'; $startHere.ColumnCount = 3; $startHere.BackColor = $Theme.AccentSoft
 $startHere.Padding = New-Object Windows.Forms.Padding(14, 6, 10, 6); $startHere.Margin = New-Object Windows.Forms.Padding(0)
 [void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('Percent', 100)))
 [void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('AutoSize')))
+[void]$startHere.ColumnStyles.Add((New-Object Windows.Forms.ColumnStyle('AutoSize')))
 $shTitle = New-Object Windows.Forms.Label
 $shTitle.Text = 'Start here'; $shTitle.Font = $FontBold; $shTitle.AutoSize = $true; $shTitle.Margin = New-Object Windows.Forms.Padding(0, 2, 0, 2)
-$startHere.Controls.Add($shTitle, 0, 0); $startHere.SetColumnSpan($shTitle, 2)
+$startHere.Controls.Add($shTitle, 0, 0); $startHere.SetColumnSpan($shTitle, 3)
 $script:StartRows = @(foreach ($n in 1..3) {
     $l = New-Object Windows.Forms.Label
     $l.AutoSize = $true; $l.Anchor = 'Left'; $l.Margin = New-Object Windows.Forms.Padding(0, 1, 8, 1); $l.Text = ''
     $b = New-Button 'Open'; $b.MinimumSize = New-Object Drawing.Size(110, 28); $b.Height = 28; $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
-    $b.Add_Click({ if ($this.Tag) { Show-Page $this.Tag } })
-    $startHere.Controls.Add($l, 0, $n); $startHere.Controls.Add($b, 1, $n)
-    $l.Visible = $false; $b.Visible = $false
-    @{ Label = $l; Button = $b }
+    $b.Add_Click({ $st = $this.Tag; if ($st -and $st.Remind) { Invoke-Reminder $st } elseif ($st -and $st.Page) { Show-Page $st.Page } })
+    # Reminders can be put off for a few days.
+    $lt = New-Button 'Later'; $lt.MinimumSize = New-Object Drawing.Size(80, 28); $lt.Height = 28; $lt.Margin = New-Object Windows.Forms.Padding(6, 1, 0, 1); $lt.Enabled = $false
+    $lt.Add_Click({ if ($this.Tag -and $this.Tag.Remind) { Set-ReminderLater $this.Tag.Id $this.Tag.Later } })
+    $startHere.Controls.Add($l, 0, $n); $startHere.Controls.Add($b, 1, $n); $startHere.Controls.Add($lt, 2, $n)
+    $l.Visible = $false; $b.Visible = $false; $lt.Visible = $false
+    @{ Label = $l; Button = $b; Later = $lt }
 })
 $shGap = New-Object Windows.Forms.Panel; $shGap.Dock = 'Top'; $shGap.Height = 10
 Set-PageLayout $pgHealth $lvProc @((New-ButtonBar @($btnFix, $btnRefresh, $btnSpeed, $btnWU, $btnReport, $btnLog, $btnKeep)), $startHere, $shGap, $healthTop, $lblAdvice, $lblSpeed, $lblProcCap)
@@ -2552,7 +2571,7 @@ $HealthDeepWork = {
             Sort-Object Date -Descending | Select-Object -First 1
         if ($last) {
             $days = [int]((Get-Date) - $last.Date.ToLocalTime()).TotalDays
-            $upd = "Updates:   last Windows update $days day(s) ago"
+            $upd = "Updates:   last Windows update $days day(s) ago"; $wuDays = $days
             if ($days -gt 45) { $advice += "Windows hasn't installed an update in $days days - click Windows Update and check for updates." }
         }
     } catch { }
@@ -2562,7 +2581,7 @@ $HealthDeepWork = {
         $advice += 'Windows is waiting for a restart to finish installing updates - restart when you can.'
     }
     $lines += $upd
-    [pscustomobject]@{ Lines = $lines; Advice = $advice }
+    [pscustomobject]@{ Lines = $lines; Advice = $advice; WuDays = $wuDays }
 }
 
 # The everyday readings (CPU, memory, disks, power, top programs). Gathered in the background: reading
@@ -3621,6 +3640,7 @@ function Start-UpdScan {
             $script:ExtraAdvice.Remove('Updates'); return
         }
         $userKeep = Get-UserKeep
+        $script:UpdScanned = [bool]$r -and -not $r.Error
         $lvUpd.BeginUpdate(); $lvUpd.Items.Clear()
         foreach ($u in $r.Rows) {
             $text = "$($u.Name) $($u.Id)"
@@ -6651,6 +6671,7 @@ function Update-History {
         if ($status -eq 'undone' -or $status -eq '-') { $it.ForeColor = $Theme.Muted }
     }
     $lvHist.EndUpdate()
+    $script:LastClean = @($entries | Where-Object { $_.Kind -in 'Clean', 'Maintenance' } | ForEach-Object { [datetime]$_.Time } | Sort-Object -Descending)[0]   # for the clean-up reminder
     $n = @($entries | Where-Object { (Get-UndoStatus $_) -eq 'can undo' }).Count
     $lblHist.Text = if ($entries.Count) { "$($entries.Count) change(s) recorded, $n can be undone." } else { 'No changes yet. (Changes from before this version are in the text log.)' }
 }
@@ -7467,7 +7488,8 @@ function Update-StartHere {
     $startHere.SuspendLayout()
     for ($i = 0; $i -lt 3; $i++) {
         $row = $script:StartRows[$i]
-        if ($i -lt $top.Count) { $row.Label.Text = "$($i + 1).  $($top[$i].Text)"; $row.Button.Text = $top[$i].Btn; $row.Button.Tag = $top[$i].Page; $row.Label.Visible = $true; $row.Button.Visible = $true }
+        $row.Later.Visible = $i -lt $top.Count -and [bool]$top[$i].Remind; $row.Later.Tag = $(if ($i -lt $top.Count -and $top[$i].Remind) { $top[$i] }); $row.Later.Enabled = [bool]$row.Later.Tag
+        if ($i -lt $top.Count) { $row.Label.Text = "$($i + 1).  $($top[$i].Text)"; $row.Button.Text = $top[$i].Btn; $row.Button.Tag = $top[$i]; $row.Label.Visible = $true; $row.Button.Visible = $true }
         elseif ($i -eq 0) { $row.Label.Text = 'Nothing urgent - this PC looks good.'; $row.Label.Visible = $true; $row.Button.Visible = $false }
         else { $row.Label.Visible = $false; $row.Button.Visible = $false }
     }
@@ -7720,6 +7742,77 @@ function Start-Everything {
 # Simple mode: one calm screen for people who don't want 23 pages - a status in plain words, three big buttons,
 # and only safe fixes that can be undone. "Advanced view" switches to the full app (the house icon next to the name switches back).
 # ===========================================================================
+# ---------------------------------------------------------------------------
+# Reminders: things that matter more the longer they wait (a pending restart, a long-ago clean-up, updates left lying).
+# They join "Start here" and the simple view, and the weekly maintenance notifies when one first appears.
+# "Later" hides one for a few days. reminders.json remembers when each was first seen and what was put off.
+# ---------------------------------------------------------------------------
+$ReminderFile = Join-Path $DataDir 'reminders.json'
+$script:ReminderState = @{ Seen = @{}; Later = @{} }
+if (Test-Path $ReminderFile) {
+    try {
+        $j = Get-Content $ReminderFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        foreach ($p in @($j.Seen.PSObject.Properties)) { $script:ReminderState.Seen[$p.Name] = "$($p.Value)" }
+        foreach ($p in @($j.Later.PSObject.Properties)) { $script:ReminderState.Later[$p.Name] = "$($p.Value)" }
+    } catch { }
+}
+function Save-ReminderState { try { $script:ReminderState | ConvertTo-Json -Compress | Set-Content -Path $ReminderFile -Encoding UTF8 } catch { } }
+# Days since this reminder's condition was first seen (0 the first time); forgets it when the condition is gone.
+function Get-ReminderAge([string]$Id, [bool]$Now) {
+    $seen = $script:ReminderState.Seen
+    if (-not $Now) { if ($seen.ContainsKey($Id)) { $seen.Remove($Id); Save-ReminderState }; return $null }
+    if (-not $seen.ContainsKey($Id)) { $seen[$Id] = (Get-Date).ToString('s'); Save-ReminderState }
+    [int]((Get-Date) - [datetime]$seen[$Id]).TotalDays
+}
+function Test-ReminderLater([string]$Id) {
+    $l = $script:ReminderState.Later[$Id]
+    $l -and [datetime]$l -gt (Get-Date)
+}
+function Set-ReminderLater([string]$Id, [int]$Days) {
+    $script:ReminderState.Later[$Id] = (Get-Date).AddDays($Days).ToString('s'); Save-ReminderState
+    $script:StartDrawn = $null; $script:SimpleSig = $null
+    Update-StartHere; Update-SimpleView
+}
+# Each: Id, P (priority, as in Get-NextSteps), Text, Plain, Btn, Fix, Page, Later (days to hide).
+function Get-Reminders {
+    $r = New-Object System.Collections.ArrayList
+    $add = { param($id, $p, $text, $plain, $btn, $fix, $page, $later) if (-not (Test-ReminderLater $id)) { [void]$r.Add([pscustomobject]@{ Id = $id; P = $p; Text = $text; Plain = $plain; Btn = $btn; Fix = $fix; Page = $page; Later = $later; Remind = $true }) } }
+    # A restart Windows is waiting for, to finish installing updates
+    $pending = (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired') -or (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending')
+    $age = Get-ReminderAge 'restart-updates' $pending
+    if ($pending -and $age -ge 2) { & $add 'restart-updates' 32 "Windows has been waiting $age day(s) for a restart to finish updates" "Windows has been waiting $age day(s) for a restart to finish installing updates. Save your work and restart." 'Restart' 'restart' $pgHealth 1 }
+    # No restart for a long time
+    $q = $script:HealthQuick
+    if ($q -and $q.Boot -and -not ($pending -and $age -ge 2)) {
+        $up = [int]((Get-Date) - $q.Boot).TotalDays
+        if ($up -ge 7) { & $add 'restart' 58 "The PC hasn't restarted in $up days" "Your PC hasn't been restarted in $up days. A restart clears out a lot of slowness." 'Restart' 'restart' $pgHealth 3 }
+    }
+    # Windows Update hasn't installed anything for a long time
+    if ($script:HealthDeep -and $script:HealthDeep.WuDays -ge 45) { & $add 'winupdate' 40 "Windows hasn't installed updates in $($script:HealthDeep.WuDays) days" "Windows hasn't updated itself in $($script:HealthDeep.WuDays) days. Open Windows Update and let it check." 'Open Windows Update' 'winupdate' $pgHealth 7 }
+    # The last clean-up was long ago (only when there is something to clean, and the bigger "junk" step isn't showing already)
+    if ($script:LastClean -and $script:JunkBytes -ge 300MB -and $script:JunkBytes -le 1GB) {
+        $d = [int]((Get-Date) - $script:LastClean).TotalDays
+        if ($d -ge 30) { & $add 'cleanup' 52 "Last clean-up was $d days ago ($(Format-Size $script:JunkBytes) of junk now)" "It has been $d days since the last clean-up; $(Format-Size $script:JunkBytes) of leftover files have piled up." 'Clean' 'clean' $pgClean 7 }
+    }
+    # Program updates left waiting
+    $n = @($lvUpd.Items).Count
+    $age = if ($script:UpdScanned) { Get-ReminderAge 'updates' ([bool]$n) }   # (not before winget has answered: an empty list then means "not checked yet")
+    if ($n -and $age -ge 14) { & $add 'updates' 50 "$n program update(s) have been waiting for $age days" "$n program(s) have had a newer version waiting for $age days - updates fix security holes." 'Update' 'updates' $pgUpd 7 }
+    @($r)
+}
+# What a reminder's button does. Every action asks first.
+function Invoke-Reminder($Step) {
+    switch ($Step.Fix) {
+        'restart' {
+            if ((Show-Msg "Restart the PC now?`n`nSave your work first: open programs are closed, and programs with unsaved work will ask you first." 'YesNo' 'Question') -ne 'Yes') { return }
+            Start-Process shutdown.exe '/r /t 0'
+        }
+        'winupdate' { Start-Process 'ms-settings:windowsupdate' }
+        'clean' { Invoke-FixMyPc }
+        'updates' { Start-ProgramUpdates }
+    }
+}
+
 # Everything worth doing, most urgent first, for both "Start here" (full view) and simple mode.
 # Plain = one everyday sentence; Fix = a safe change with undo that simple mode may offer as "Fix this".
 function Get-NextSteps {
@@ -7749,6 +7842,10 @@ function Get-NextSteps {
     if ($script:TasksActive) { & $add 65 "Switch off $($script:TasksActive) junk scheduled task(s)" 'Review' $pgTasks "$($script:TasksActive) helper program(s) from other companies run in the background by themselves." 'tasks' }
     if ($script:BatteryWorn) { & $add 70 'The battery is worn out - see how to replace it' 'See' $pgBatt "Your battery is worn out and doesn't last as long any more. A new battery fixes that." $null }
     if ($script:CtxLeftovers) { & $add 75 "Hide $($script:CtxLeftovers) leftover right-click menu entr(y/ies)" 'Review' $pgCtx 'Removed programs left old entries in your right-click menu.' 'context' }
+    $rem = @(Get-Reminders)
+    foreach ($x in $rem) { [void]$c.Add($x) }
+    # A reminder about waiting updates replaces the plain "updates available" step.
+    if ($rem | Where-Object Fix -eq 'updates') { $c = @($c | Where-Object { $_.Remind -or $_.Fix -ne 'updates' }) }
     @($c | Sort-Object P)
 }
 
@@ -7959,7 +8056,7 @@ $form.Controls.Add($simple); $simple.BringToFront()
 
 # One row in the list: an icon, a sentence and (maybe) a button. Made at run time, so texts are translated here.
 # Tone picks the icon's colour: Accent (can be fixed), Bad (needs attention), Good, or Muted.
-function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $Tag, [int]$Icon = 0xE946, [string]$Tone = 'Accent') {
+function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $Tag, [int]$Icon = 0xE946, [string]$Tone = 'Accent', [scriptblock]$Later) {
     $row = New-Object Windows.Forms.Panel
     $row.Width = $sClip.ClientSize.Width - (Px 18); $row.Height = (Px 70); $row.Margin = New-Object Windows.Forms.Padding(0, 0, 0, (Px 8)); $row.BackColor = $Theme.Soft
     $row.Padding = New-Object Windows.Forms.Padding((Px 14), (Px 13), (Px 14), (Px 13))
@@ -7975,14 +8072,20 @@ function Add-SimpleRow([string]$Text, [string]$Button, [scriptblock]$OnClick, $T
         # As wide as the (translated) text needs, at least 150 - measured in bold, as "Fix this" is a primary button.
         $b.Width = [Math]::Max((Px 150), [Windows.Forms.TextRenderer]::MeasureText($b.Text, $FontBold).Width + (Px 36))
         $b.Add_Click($OnClick); $row.Controls.Add($b)
-        if ($Button -eq 'Fix this') { Set-Primary $b }
+        if ($Button -eq 'Fix this' -or $Tag.Remind) { Set-Primary $b }
+    }
+    if ($Later) {   # a smaller "Later" button left of the main one (not made as wide as the others)
+        $gap = New-Object Windows.Forms.Panel; $gap.Dock = 'Right'; $gap.Width = (Px 8); $gap.BackColor = $Theme.Soft
+        $lb = New-Button (T 'Later'); $lb.Dock = 'Right'; $lb.AutoSize = $false; $lb.Margin = New-Object Windows.Forms.Padding(0); $lb.Tag = $Tag; $lb.AccessibleDescription = 'later'
+        $lb.Width = [Windows.Forms.TextRenderer]::MeasureText($lb.Text, $Font).Width + (Px 36)
+        $lb.Add_Click($Later); $row.Controls.Add($gap); $row.Controls.Add($lb)
     }
     $row.Controls.Add($ic); $row.Controls.Add($l); $l.BringToFront()
     $sList.Controls.Add($row)
 }
 # All buttons in the list as wide as the widest, so they line up.
 function Set-SimpleButtonWidths {
-    $btns = @($sList.Controls | ForEach-Object { $_.Controls } | Where-Object { $_ -is [Windows.Forms.Button] })
+    $btns = @($sList.Controls | ForEach-Object { $_.Controls } | Where-Object { $_ -is [Windows.Forms.Button] -and $_.AccessibleDescription -ne 'later' })
     if ($btns) { $w = ($btns | Measure-Object Width -Maximum).Maximum; foreach ($b in $btns) { $b.Width = $w } }
 }
 function Set-SimpleTab([string]$Tab) {
@@ -8005,7 +8108,8 @@ function Show-SimpleProblems {
     foreach ($s in $steps) {
         $glyph = if ($s.Page -and $NavIcons[$s.Page.Name]) { $NavIcons[$s.Page.Name] } else { 0xE946 }
         $tone = if ($s.P -le 35) { 'Bad' } else { 'Accent' }
-        if ($s.Fix) { Add-SimpleRow $s.Plain 'Fix this' { Invoke-SimpleFix $this.Tag } $s $glyph $tone }
+        if ($s.Remind) { Add-SimpleRow $s.Plain $s.Btn { Invoke-SimpleFix $this.Tag } $s $glyph $tone { Set-ReminderLater $this.Tag.Id $this.Tag.Later } }
+        elseif ($s.Fix) { Add-SimpleRow $s.Plain 'Fix this' { Invoke-SimpleFix $this.Tag } $s $glyph $tone }
         else { Add-SimpleRow $s.Plain 'Show me' { Set-ViewMode 'full'; Show-Page $this.Tag.Page } $s $glyph $tone }
     }
     Set-SimpleButtonWidths; $sList.ResumeLayout()
@@ -8041,6 +8145,8 @@ function Invoke-SimpleFix($Step) {
     $script:SimpleRun = $true
     try {
         switch ($Step.Fix) {
+            'restart' { Invoke-Reminder $Step }
+            'winupdate' { Invoke-Reminder $Step }
             'clean' { Invoke-FixMyPc }
             'updates' { Start-ProgramUpdates }
             'startup' {
@@ -8176,6 +8282,7 @@ function Get-WatchFacts {
     }
     foreach ($it in $lvSec.Items) { if ($it.Tag.Level -eq 'Problem') { $f["sec|$($it.Tag.Check)"] = @{ Text = "Security: $($it.Tag.Check) - $($it.Tag.Result)"; Count = 0 } } }
     foreach ($it in $lvDrv.Items) { if ($it.Tag.Level -eq 'Problem') { $f["drv|$($it.Tag.Device)"] = @{ Text = "Device problem: $($it.Tag.Device)"; Count = 0 } } }
+    foreach ($r in @(Get-Reminders)) { $f["remind|$($r.Id)"] = @{ Text = $r.Text; Count = 0 } }
     $f
 }
 # Compares with the last run and remembers this one. Returns the lines worth a notification ($null on the very first run).

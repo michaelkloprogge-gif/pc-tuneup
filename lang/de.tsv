@@ -1733,3 +1733,18 @@ Certificate: {0}	Zertifikat: {0}
 Certificate	Zertifikat
 a trusted root certificate known from adware (store {0})	ein vertrauenswürdiges Stammzertifikat, das von Adware bekannt ist (Speicher {0})
 It lets adware read and change secure (https) websites. Uninstall the program that came with it (Programs page), then remove the certificate: Start > "Manage computer certificates" > Trusted Root Certification Authorities.	Damit kann Adware sichere (https) Websites lesen und ändern. Deinstallieren Sie das Programm, das es mitgebracht hat (Seite Programme), und entfernen Sie dann das Zertifikat: Start > "Computerzertifikate verwalten" > Vertrauenswürdige Stammzertifizierungsstellen.
+Later	Später
+Restart	Neu starten
+Open Windows Update	Windows Update öffnen
+Windows has been waiting {0} day(s) for a restart to finish updates	Windows wartet seit {0} Tag(en) auf einen Neustart, um Updates abzuschließen
+Windows has been waiting {0} day(s) for a restart to finish installing updates. Save your work and restart.	Windows wartet seit {0} Tag(en) auf einen Neustart, um Updates fertig zu installieren. Speichern Sie Ihre Arbeit und starten Sie neu.
+The PC hasn't restarted in {0} days	Der PC wurde seit {0} Tagen nicht neu gestartet
+Your PC hasn't been restarted in {0} days. A restart clears out a lot of slowness.	Ihr PC wurde seit {0} Tagen nicht neu gestartet. Ein Neustart beseitigt viel Langsamkeit.
+Windows hasn't installed updates in {0} days	Windows hat seit {0} Tagen keine Updates installiert
+Windows hasn't updated itself in {0} days. Open Windows Update and let it check.	Windows hat sich seit {0} Tagen nicht aktualisiert. Öffnen Sie Windows Update und lassen Sie es suchen.
+Last clean-up was {0} days ago ({1} of junk now)	Die letzte Bereinigung ist {0} Tage her (jetzt {1} Datenmüll)
+It has been {0} days since the last clean-up; {1} of leftover files have piled up.	Die letzte Bereinigung ist {0} Tage her; {1} an überflüssigen Dateien haben sich angesammelt.
+{0} program update(s) have been waiting for {1} days	{0} Programm-Update(s) warten seit {1} Tagen
+{0} program(s) have had a newer version waiting for {1} days - updates fix security holes.	Für {0} Programm(e) wartet seit {1} Tagen eine neuere Version - Updates schließen Sicherheitslücken.
+Restart the PC now?	Den PC jetzt neu starten?
+Save your work first: open programs are closed, and programs with unsaved work will ask you first.	Speichern Sie zuerst Ihre Arbeit: offene Programme werden geschlossen, und Programme mit ungespeicherter Arbeit fragen Sie vorher.

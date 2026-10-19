@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.20.0
+
+- **Reminders** for things that matter more the longer they wait: Windows waiting days for a restart to finish updates, no restart for a week or more, Windows not updating itself for 45 days, the last clean-up a month ago with junk piling up again, and program updates left waiting for two weeks.
+- They show up in **Start here** and in the simple view with a one-click action (Restart, Clean, Update, Open Windows Update - each asks first) and a **Later** button that hides the reminder for a few days.
+- The weekly automatic maintenance sends a notification when a reminder first appears.
 ## 1.19.0
 
 - The **Browsers** page now also checks Windows itself, for every browser at once:

@@ -1748,3 +1748,16 @@ It has been {0} days since the last clean-up; {1} of leftover files have piled u
 {0} program(s) have had a newer version waiting for {1} days - updates fix security holes.	Für {0} Programm(e) wartet seit {1} Tagen eine neuere Version - Updates schließen Sicherheitslücken.
 Restart the PC now?	Den PC jetzt neu starten?
 Save your work first: open programs are closed, and programs with unsaved work will ask you first.	Speichern Sie zuerst Ihre Arbeit: offene Programme werden geschlossen, und Programme mit ungespeicherter Arbeit fragen Sie vorher.
+Earlier	Früher
+On average	Im Schnitt
+At most	Höchstens
+Among the top 5	Unter den Top 5
+{0}% of the time	{0}% der Zeit
+Memory in use, last 7 days	Belegter Arbeitsspeicher, letzte 7 Tage
+Memory in use	Belegter Arbeitsspeicher
+Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.	Noch nicht genug Verlauf - PC Tune-Up notiert alle 10 Minuten die Speichernutzung, solange es geöffnet ist.
+Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}% in use).	In den letzten {0} Tag(en) war der Arbeitsspeicher {1}% der Zeit fast voll (im Schnitt {2}% belegt).
+{0} used the most.	{0} hat am meisten gebraucht.
+Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	In den letzten {0} Tag(en) war der Arbeitsspeicher {1}% der Zeit fast voll - mehr Arbeitsspeicher würde spürbar helfen.
+Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	In den letzten {0} Tag(en) war der Arbeitsspeicher selten fast voll ({1}% der Zeit) - mehr Arbeitsspeicher würde man kaum merken.
+Over the last {0} day(s) memory was nearly full {1}% of the time.	In den letzten {0} Tag(en) war der Arbeitsspeicher {1}% der Zeit fast voll.

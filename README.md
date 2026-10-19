@@ -16,8 +16,8 @@ you can undo.
 
 | Page | |
 |---|---|
-| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once and then shows what changed, before and after - plus **Start here** (the three most useful next steps) and a health score over time |
-| **Right now** | what is slowing the PC down at this moment: processor, memory and disk meters, one plain sentence about the biggest cause, the programs using the most with what to do about each, and **End task** (never Windows itself) |
+| **Health** | CPU, memory, disk, drive health, battery wear, Windows Update status, power mode, internet speed - and **Fix my PC**, which runs all the safe fixes at once and then shows what changed, before and after - plus **Start here** (the three most useful next steps, including reminders for things left waiting too long) and a health score over time |
+| **Right now** | what is slowing the PC down at this moment: processor, memory and disk meters, one plain sentence about the biggest cause, the programs using the most with what to do about each, and **End task** (never Windows itself) - plus **Earlier**: how full memory was over the last 7 days and which programs used the most |
 | **Clean** | temp files, crash dumps, browser caches (Chrome, Edge, Brave, Firefox), Windows Update leftovers, old drivers, Windows.old |
 | **Startup** | stop apps from launching with Windows, and see how long Windows takes to start (graph) and what slows it down |
 | **Bloatware** | find and remove pre-installed junk, trial antivirus and PC-maker extras (Dell, HP, Lenovo, ASUS, Acer, MSI...) |

@@ -1748,3 +1748,16 @@ It has been {0} days since the last clean-up; {1} of leftover files have piled u
 {0} program(s) have had a newer version waiting for {1} days - updates fix security holes.	{0} programme(s) ont une version plus récente qui attend depuis {1} jours - les mises à jour corrigent des failles de sécurité.
 Restart the PC now?	Redémarrer le PC maintenant ?
 Save your work first: open programs are closed, and programs with unsaved work will ask you first.	Enregistrez d'abord votre travail : les programmes ouverts seront fermés, et ceux qui ont du travail non enregistré vous le demanderont d'abord.
+Earlier	Plus tôt
+On average	En moyenne
+At most	Au maximum
+Among the top 5	Parmi les 5 premiers
+{0}% of the time	{0} % du temps
+Memory in use, last 7 days	Mémoire utilisée, 7 derniers jours
+Memory in use	Mémoire utilisée
+Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.	Pas encore assez d'historique - PC Tune-Up note l'utilisation de la mémoire toutes les 10 minutes tant qu'il est ouvert.
+Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}% in use).	Au cours des {0} dernier(s) jour(s), la mémoire était presque pleine {1} % du temps (en moyenne {2} % utilisée).
+{0} used the most.	{0} en a utilisé le plus.
+Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	Au cours des {0} dernier(s) jour(s), la mémoire était presque pleine {1} % du temps - plus de mémoire ferait une vraie différence.
+Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	Au cours des {0} dernier(s) jour(s), la mémoire était rarement presque pleine ({1} % du temps) - plus de mémoire se remarquerait à peine.
+Over the last {0} day(s) memory was nearly full {1}% of the time.	Au cours des {0} dernier(s) jour(s), la mémoire était presque pleine {1} % du temps.

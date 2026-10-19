@@ -80,7 +80,7 @@ function Get-Snapshot {
     $sb.ToString()
 }
 function Get-Where($b) { $p = $b.Parent; while ($p -and -not ($script:Pages -contains $p) -and $p -ne $simple -and $p -ne $sidebar) { $p = $p.Parent }; $p }
-$skip = @('Restart as admin')   # closes the window to start again as administrator
+$skip = @('Restart as admin', (T 'Restart as admin'))   # closes the window to start again as administrator (in every language)
 $skipButtons = @($actCancel)   # the activity bar's Cancel: only shown while a job runs (and jobs don't run here)
 $buttons = @(Get-Buttons $form)
 $n = 0; $dead = 0

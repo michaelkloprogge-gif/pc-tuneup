@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.20.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.21.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,19 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+Earlier	Eerder
+On average	Gemiddeld
+At most	Hoogstens
+Among the top 5	Bij de top 5
+{0}% of the time	{0}% van de tijd
+Memory in use, last 7 days	Geheugen in gebruik, laatste 7 dagen
+Memory in use	Geheugen in gebruik
+Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.	Nog niet genoeg geschiedenis - PC Tune-Up noteert elke 10 minuten het geheugengebruik zolang het open is.
+Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}% in use).	De afgelopen {0} dag(en) was het geheugen {1}% van de tijd bijna vol (gemiddeld {2}% in gebruik).
+{0} used the most.	{0} gebruikte het meeste.
+Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.	De afgelopen {0} dag(en) was het geheugen {1}% van de tijd bijna vol - meer geheugen zou echt verschil maken.
+Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.	De afgelopen {0} dag(en) was het geheugen zelden bijna vol ({1}% van de tijd) - meer geheugen zou je nauwelijks merken.
+Over the last {0} day(s) memory was nearly full {1}% of the time.	De afgelopen {0} dag(en) was het geheugen {1}% van de tijd bijna vol.
 Later	Later
 Restart	Opnieuw opstarten
 Open Windows Update	Windows Update openen
@@ -6217,6 +6230,7 @@ function Render-Now {
     $n = $script:Now
     if (-not $n) { return }
     $nowMeters.Invalidate()
+    if ($script:NowEarlier) { return }   # the history is showing; only the meters stay live
     $v = Get-NowVerdict $n
     $lblNow.Text = $v[1]
     $lblNow.BackColor = if ($v[0] -eq 'Good') { $Theme.Soft } else { $Theme.WarnBg }
@@ -6284,6 +6298,105 @@ function Stop-NowProgram {
 }
 $btnNowEnd.Add_Click({ Stop-NowProgram })
 $lvNow.Add_KeyDown({ if ($_.KeyCode -eq 'Delete') { Stop-NowProgram; $_.SuppressKeyPress = $true } })
+
+# --- Memory over time: every 10 minutes while PC Tune-Up is open (and once per automatic maintenance) it notes how full
+# memory is and the five programs using the most. Kept for 14 days in memory.jsonl. "Earlier" on this page shows it;
+# the Upgrades page uses it to say whether more memory would help.
+$MemFile = Join-Path $DataDir 'memory.jsonl'
+$script:MemHistory = $null
+# Read once, when first needed (one JSON parse for the whole file - per line would take a second); older than 14 days is dropped.
+function Get-MemHistory {
+    if ($null -ne $script:MemHistory) { return , $script:MemHistory }
+    $script:MemHistory = New-Object System.Collections.ArrayList
+    if (Test-Path $MemFile) {
+        $lines = @(Get-Content $MemFile -Encoding UTF8 -ErrorAction SilentlyContinue | Where-Object { $_.Trim().StartsWith('{') })
+        # (ConvertFrom-Json returns a JSON array as ONE object in Windows PowerShell - foreach below unrolls it)
+        $all = try { "[$($lines -join ',')]" | ConvertFrom-Json } catch { foreach ($l in $lines) { try { $l | ConvertFrom-Json } catch { } } }
+        $cut = (Get-Date).AddDays(-14)
+        foreach ($o in $all) { try { if ([datetime]$o.T -gt $cut) { [void]$script:MemHistory.Add($o) } } catch { } }
+        if ($script:MemHistory.Count -lt $lines.Count) { try { Set-Content -Path $MemFile -Value @($script:MemHistory | ForEach-Object { $_ | ConvertTo-Json -Compress -Depth 4 }) -Encoding UTF8 } catch { } }
+    }
+    , $script:MemHistory
+}
+$MemSampleWork = {
+    $os = Get-CimInstance Win32_OperatingSystem -Property FreePhysicalMemory, TotalVisibleMemorySize -OperationTimeoutSec 15 -ErrorAction SilentlyContinue
+    if (-not $os -or -not $os.TotalVisibleMemorySize) { return }
+    $by = @{}
+    foreach ($p in @(Get-CimInstance Win32_PerfRawData_PerfProc_Process -Property Name, IDProcess, WorkingSetPrivate -OperationTimeoutSec 15 -ErrorAction SilentlyContinue)) {
+        if ($p.Name -in '_Total', 'Idle') { continue }
+        $n = "$($p.Name)" -replace '#\d+$', ''
+        if (-not $by.ContainsKey($n)) { $by[$n] = @{ MB = 0.0; Id = [int]$p.IDProcess } }
+        $by[$n].MB += [double]$p.WorkingSetPrivate / 1MB
+    }
+    $top = @($by.Keys | Sort-Object { - $by[$_].MB } | Select-Object -First 5 | ForEach-Object {
+        $name = $_
+        $path = try { "$((Get-Process -Id $by[$_].Id -ErrorAction Stop).Path)" } catch { '' }
+        if ($path) { $d = try { "$([Diagnostics.FileVersionInfo]::GetVersionInfo($path).FileDescription)".Trim() } catch { '' }; if ($d) { $name = $d } }
+        , @($name, [int]$by[$_].MB) })
+    [pscustomobject]@{ T = (Get-Date).ToString('s'); P = [int](100 - 100 * [double]$os.FreePhysicalMemory / [double]$os.TotalVisibleMemorySize); Top = $top }
+}
+function Save-MemSample {
+    Start-Bg $MemSampleWork $null {
+        param($r)
+        $s = @($r)[0]
+        if (-not $s) { return }
+        [void](Get-MemHistory).Add($s)
+        try { Add-Content -Path $MemFile -Value ($s | ConvertTo-Json -Compress -Depth 4) -Encoding UTF8 } catch { }
+        if ($script:NowEarlier) { Render-NowEarlier }
+    }
+}
+# Over the last N days: how many samples, how often memory was nearly full (85%+), and the programs that used the most.
+function Get-MemStats([int]$Days = 7) {
+    $cut = (Get-Date).AddDays(-$Days)
+    $s = @((Get-MemHistory) | Where-Object { [datetime]$_.T -gt $cut })
+    if (-not $s) { return $null }
+    $progs = @{}
+    foreach ($x in $s) { foreach ($t in @($x.Top)) { $n = "$($t[0])"; if (-not $progs.ContainsKey($n)) { $progs[$n] = New-Object System.Collections.ArrayList }; [void]$progs[$n].Add([double]$t[1]) } }
+    $rows = @($progs.Keys | ForEach-Object { $v = $progs[$_]; [pscustomobject]@{ Name = $_; Avg = ($v | Measure-Object -Average).Average; Max = ($v | Measure-Object -Maximum).Maximum; Share = [int](100 * $v.Count / $s.Count) } } |
+              Where-Object { $_.Name -notin 'Memory Compression', 'System', 'Registry', 'Secure System' } | Sort-Object { - $_.Avg * $_.Share } | Select-Object -First 10)
+    $first = @($s | ForEach-Object { [datetime]$_.T } | Sort-Object)[0]
+    [pscustomobject]@{ Samples = $s.Count; FullPct = [int](100 * @($s | Where-Object { $_.P -ge 85 }).Count / $s.Count); AvgPct = [int]($s | Measure-Object P -Average).Average
+                       Days = [Math]::Max(1, [int][Math]::Ceiling(((Get-Date) - $first).TotalDays)); Rows = $rows; Points = @($s | ForEach-Object { [pscustomobject]@{ X = [datetime]$_.T; Y = [double]$_.P } }) }
+}
+# "Earlier": a chart of the last 7 days and the programs that used the most memory, in place of the live list.
+$btnNowEarlier = New-Button 'Earlier'
+$btnNowPause.Parent.Controls.Add($btnNowEarlier); $btnNowPause.Parent.Controls.SetChildIndex($btnNowEarlier, 2)
+$nowHist = New-Object Windows.Forms.Panel
+$nowHist.Dock = 'Fill'; $nowHist.Visible = $false; $nowHist.BackColor = $Theme.Bg
+$chartMem = New-Chart 170
+$chartMem.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 8)
+$lvMemHist = New-ListView $false @('Program', 300, 'On average', 120, 'At most', 120, 'Among the top 5', 560)
+$nowHist.Controls.Add($lvMemHist); $nowHist.Controls.Add($chartMem)
+$pgNow.Controls.Add($nowHist)
+$script:NowEarlier = $false
+function Render-NowEarlier {
+    $m = Get-MemStats 7
+    if (-not $m -or $m.Samples -lt 6) {
+        Set-Chart $chartMem @() 100 '%' 'Memory in use, last 7 days' 'Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.'
+        $lvMemHist.Items.Clear()
+        $lblNow.Text = T 'Not enough history yet - PC Tune-Up notes memory use every 10 minutes while it is open.'
+        $lblNow.BackColor = $Theme.Soft; $lblNow.ForeColor = $Theme.Text
+        return
+    }
+    Set-Chart $chartMem @(@{ Name = 'Memory in use'; Color = $Theme.Accent; Points = $m.Points }) 100 '%' 'Memory in use, last 7 days'
+    $lvMemHist.BeginUpdate(); $lvMemHist.Items.Clear()
+    foreach ($r in $m.Rows) { [void](Add-Row $lvMemHist @($r.Name, (Format-Size ($r.Avg * 1MB)), (Format-Size ($r.Max * 1MB)), ((T '{0}% of the time').Replace('{0}', "$($r.Share)"))) $r) }
+    $lvMemHist.EndUpdate()
+    $top = @($m.Rows)[0]
+    $lblNow.Text = (T 'Over the last {0} day(s) memory was nearly full {1}% of the time (on average {2}% in use).').Replace('{0}', "$($m.Days)").Replace('{1}', "$($m.FullPct)").Replace('{2}', "$($m.AvgPct)") +
+                   $(if ($top) { '  ' + (T '{0} used the most.').Replace('{0}', $top.Name) })
+    $lblNow.BackColor = if ($m.FullPct -ge 20) { $Theme.WarnBg } else { $Theme.Soft }; $lblNow.ForeColor = if ($m.FullPct -ge 20) { $Theme.WarnText } else { $Theme.Text }
+}
+$btnNowEarlier.Add_Click({
+    $script:NowEarlier = -not $script:NowEarlier
+    $this.Text = if ($script:NowEarlier) { 'Now' } else { 'Earlier' }
+    $nowHist.Visible = $script:NowEarlier; $lvNow.Visible = -not $script:NowEarlier; $txtNow.Parent.Visible = -not $script:NowEarlier
+    if ($script:NowEarlier) { $nowHist.BringToFront(); Render-NowEarlier } else { $lvNow.BringToFront(); Render-Now }
+})
+# Every 10 minutes, the first time a minute after the start.
+$memTimer = New-Object Windows.Forms.Timer; $memTimer.Interval = 60000
+$memTimer.Add_Tick({ $memTimer.Interval = 600000; if (-not $CliMode) { Save-MemSample } })
+$memTimer.Start()
 
 # ===========================================================================
 # Search: finds pages, settings and rows on every page (Ctrl+F)
@@ -6615,7 +6728,15 @@ function Update-Upgrades {
         $btnUpgSupport.Enabled = [bool]$script:UpgInfo.Url
         $btnUpgManual.Text = if ($script:UpgInfo.Custom) { 'Find motherboard manual' } else { 'Find service manual' }
         $lvUpg.BeginUpdate(); $lvUpg.Items.Clear()
+        $ms = Get-MemStats 14
         foreach ($u in (Get-UpgradeRows $script:UpgHw)) {
+            # What memory use has been like (from PC Tune-Up's own notes, once there are enough of them).
+            if ($u.Part -eq 'Memory' -and $ms -and $ms.Samples -ge 36 -and $ms.Days -ge 2) {
+                $line = if ($ms.FullPct -ge 20) { 'Over the last {0} day(s) memory was nearly full {1}% of the time - more memory would make a real difference.' }
+                        elseif ($ms.FullPct -lt 5) { 'Over the last {0} day(s) memory was rarely nearly full ({1}% of the time) - more memory would hardly be noticed.' }
+                        else { 'Over the last {0} day(s) memory was nearly full {1}% of the time.' }
+                $u.Why = (($u.Why, (T $line).Replace('{0}', "$($ms.Days)").Replace('{1}', "$($ms.FullPct)")) | Where-Object { $_ }) -join "`r`n"
+            }
             $it = Add-Row $lvUpg @($u.Part, $u.Now, $u.Option, $u.Worth, $u.Spec) $u
             if ($u.Worth -like 'Strongly*' -or $u.Worth -like 'Recommended*') { $it.ForeColor = $Theme.Bad }
             elseif ($u.Worth -in 'n/a', 'Not needed') { $it.ForeColor = $Theme.Muted }
@@ -7489,6 +7610,8 @@ function Update-StartHere {
     for ($i = 0; $i -lt 3; $i++) {
         $row = $script:StartRows[$i]
         $row.Later.Visible = $i -lt $top.Count -and [bool]$top[$i].Remind; $row.Later.Tag = $(if ($i -lt $top.Count -and $top[$i].Remind) { $top[$i] }); $row.Later.Enabled = [bool]$row.Later.Tag
+        # Without a Later button, the button takes both columns, so all buttons line up on the right.
+        $startHere.SetColumnSpan($row.Button, $(if ($row.Later.Tag) { 1 } else { 2 })); $row.Button.Anchor = 'Right'
         if ($i -lt $top.Count) { $row.Label.Text = "$($i + 1).  $($top[$i].Text)"; $row.Button.Text = $top[$i].Btn; $row.Button.Tag = $top[$i]; $row.Label.Visible = $true; $row.Button.Visible = $true }
         elseif ($i -eq 0) { $row.Label.Text = 'Nothing urgent - this PC looks good.'; $row.Label.Visible = $true; $row.Button.Visible = $false }
         else { $row.Label.Visible = $false; $row.Button.Visible = $false }
@@ -7599,9 +7722,21 @@ function Draw-NavButton($B, $G) {
         [Windows.Forms.TextRenderer]::DrawText($G, [string][char]$code, $IconFont, $ir, $(if ($on) { $Theme.AccentText } else { $Theme.Dim }), 'VerticalCenter, HorizontalCenter, NoPrefix')
         $x += if ($small) { Px 22 } else { Px 30 }
     }
-    $tr = New-Object Drawing.Rectangle($x, 0, ($B.Width - $x - (Px 4)), $B.Height)
     $f = if ($small -and $script:NavBottomFont) { $script:NavBottomFont[[int]$on] } else { $B.Font }
-    if ($script:NavIconOnly -ne $B) { [Windows.Forms.TextRenderer]::DrawText($G, $B.Text, $f, $tr, $B.ForeColor, 'VerticalCenter, Left, EndEllipsis, NoPrefix') }
+    $text = $B.Text; $right = $B.Width - (Px 4)
+    # A count ("Updates  (14)") is drawn as a small pill on the right, so a long (translated) name keeps its room.
+    if ($text -match '^(.*?)\s+\((\d+)\)$') {
+        $text = $Matches[1]; $count = $Matches[2]
+        $pw = [Windows.Forms.TextRenderer]::MeasureText($count, $FontSmall).Width + (Px 8); $ph = Px 17
+        $px = $B.Width - (Px 6) - $pw; $py = [int](($B.Height - $ph) / 2)
+        $pill = New-RoundRect $px $py $pw $ph ($ph / 2)
+        $br = New-Object Drawing.SolidBrush($(if ($on) { $Theme.Bg } else { $Theme.Hover })); $G.FillPath($br, $pill); $br.Dispose(); $pill.Dispose()
+        [Windows.Forms.TextRenderer]::DrawText($G, $count, $FontSmall, (New-Object Drawing.Rectangle($px, $py, $pw, $ph)), $(if ($on) { $Theme.AccentText } else { $Theme.Dim }), 'VerticalCenter, HorizontalCenter, NoPrefix')
+        $right = $px - (Px 4)
+    }
+    $tr = New-Object Drawing.Rectangle($x, 0, ($right - $x), $B.Height)
+    if ($NavSmallFonts -and [Windows.Forms.TextRenderer]::MeasureText($text, $f).Width -gt $tr.Width) { $f = $NavSmallFonts[[int]$on] }   # a long name: a size smaller rather than cut off
+    if ($script:NavIconOnly -ne $B) { [Windows.Forms.TextRenderer]::DrawText($G, $text, $f, $tr, $B.ForeColor, 'VerticalCenter, Left, EndEllipsis, NoPrefix') }
     if ($B.Focused -and $B.ShowFocusCues) { $fp = New-RoundRect 1.5 1.5 ($B.Width - 3.5) ($B.Height - 3.5) (Px 4); $pen = New-Object Drawing.Pen($Theme.Accent); $pen.DashStyle = 'Dot'; $G.DrawPath($pen, $fp); $pen.Dispose(); $fp.Dispose() }
 }
 $navBottom = New-Object Windows.Forms.FlowLayoutPanel
@@ -8305,7 +8440,7 @@ if ($Cli.Auto) {
     function Show-Msg([string]$Text, [string]$Buttons = 'OK', [string]$Icon = 'Information') { if ($Buttons -eq 'YesNo') { 'Yes' } else { 'OK' } }
     $deadline = (Get-Date).AddMinutes(20)
     function Wait-Idle { do { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 } while (($script:Jobs.Count -or $script:LoadQueue.Count) -and (Get-Date) -lt $deadline) }
-    Start-Everything; Wait-Idle
+    Start-Everything; Save-MemSample; Wait-Idle
     $script:FixFreed = 0
     Invoke-FixMyPc; Wait-Idle
     Update-Health -Quick; Wait-Idle

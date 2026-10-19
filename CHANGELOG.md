@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.21.0
+
+- **Memory over time:** while PC Tune-Up is open it notes every 10 minutes how full memory is and which five programs use the most (kept for 14 days, on this PC only). **Earlier** on the Right now page shows a chart of the last 7 days and the programs that used the most. The Upgrades page now says whether memory was often full - and so whether more memory would really help.
+- Sidebar: counts are small pills on the right, and long page names use a slightly smaller font instead of being cut off ("Stuurprogramma's" in Dutch).
+- Start here: the buttons line up on the right again when a reminder with a Later button is in the list.
+- Website: reminders and the memory history, and fixed accented letters (ü, é, ë...) that showed up garbled in the German, French and Dutch pages since 1.18.0.
 ## 1.20.0
 
 - **Reminders** for things that matter more the longer they wait: Windows waiting days for a restart to finish updates, no restart for a week or more, Windows not updating itself for 45 days, the last clean-up a month ago with junk piling up again, and program updates left waiting for two weeks.

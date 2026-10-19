@@ -53,7 +53,7 @@ PackageUrl: https://github.com/$repo
 License: MIT
 LicenseUrl: https://github.com/$repo/blob/main/LICENSE
 ShortDescription: Check, clean and speed up any Windows PC with one click, and undo anything.
-Description: Clears junk, stops apps starting with Windows, removes bloatware and unused programs, updates programs and drivers, turns off Windows ads and tracking, checks browsers for adware, and explains crashes, security, backups, battery wear, the network and upgrade options in plain language. Every change can be undone. English and Dutch.
+Description: Clears junk, stops apps starting with Windows, removes bloatware and unused programs, updates programs and drivers, turns off Windows ads and tracking, checks browsers for adware, shows what is slowing the PC down right now, sets power options, and explains crashes (including ones that started after an update), security, backups, battery and drive wear, the network and upgrade options in plain language. Every change can be undone. In English, Dutch, German, French, Spanish, Italian and Polish.
 Tags:
 - cleanup
 - bloatware

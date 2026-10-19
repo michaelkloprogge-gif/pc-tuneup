@@ -1,7 +1,8 @@
 ﻿# Makes the screenshots for the website (docs/screenshots): runs tests\Screenshots.ps1 in every language, light and dark,
 # and copies the chosen pages. English goes in docs/screenshots, the others in docs/screenshots/<language>.
-# Usage: powershell -STA -File .\tools\Update-SiteScreenshots.ps1 [-Languages en,nl,de,fr]   (takes a while; changes nothing on the PC)
-param([string[]]$Languages = @('en', 'nl', 'de', 'fr'))
+# Usage: powershell -STA -File .\tools\Update-SiteScreenshots.ps1 [-Languages en,nl,de,fr,es,it,pl]   (takes a while; changes nothing on the PC)
+param([string[]]$Languages = @('en', 'nl', 'de', 'fr', 'es', 'it', 'pl'))
+$Languages = @($Languages -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })   # 'powershell -File ... -Languages es,it,pl' passes one string
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $tmp = Join-Path $env:TEMP "pctuneup-site-$PID"

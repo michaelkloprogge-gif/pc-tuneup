@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC Tune-Up</title>
+<link rel="alternate" hreflang="en" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
+<link rel="alternate" hreflang="nl" href="https://michaelkloprogge-gif.github.io/pc-tuneup/nl/">
+<link rel="alternate" hreflang="de" href="https://michaelkloprogge-gif.github.io/pc-tuneup/de/">
+<link rel="alternate" hreflang="fr" href="https://michaelkloprogge-gif.github.io/pc-tuneup/fr/">
+<link rel="alternate" hreflang="es" href="https://michaelkloprogge-gif.github.io/pc-tuneup/es/">
+<link rel="alternate" hreflang="it" href="https://michaelkloprogge-gif.github.io/pc-tuneup/it/">
+<link rel="alternate" hreflang="pl" href="https://michaelkloprogge-gif.github.io/pc-tuneup/pl/">
+<link rel="alternate" hreflang="x-default" href="https://michaelkloprogge-gif.github.io/pc-tuneup/">
+<meta name="description" content="Programa gratuito y de código abierto que revisa, limpia y acelera cualquier PC con Windows, y puede deshacer cada cambio.">
+<style>
+  :root {
+    --bg: #ffffff; --soft: #f4f6f9; --text: #1f2328; --dim: #5b6270; --border: #d9dde3;
+    --accent: #0067c0; --accent-dark: #00539c; --accent-soft: #e3effb; --good: #13783a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #1e1f22; --soft: #2a2c30; --text: #ececec; --dim: #a7acb5; --border: #3d4046;
+            --accent: #3d9bff; --accent-dark: #6cb3ff; --accent-soft: #23364d; --good: #6ecd87; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 "Segoe UI", system-ui, -apple-system, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 18px 0; border-bottom: 1px solid var(--border); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--text); text-decoration: none; }
+  .brand svg { width: 30px; height: 30px; flex: none; }
+  .right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  nav a { margin-left: 18px; color: var(--dim); text-decoration: none; font-size: 15px; }
+  nav a:hover { color: var(--accent); }
+  .langs { display: flex; gap: 2px; }
+  .langs a { padding: 4px 8px; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--dim); text-decoration: none; }
+  .langs a:hover { color: var(--accent); }
+  .langs a[aria-current] { background: var(--accent-soft); color: var(--accent); }
+  .hero { padding: 56px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; }
+  h1 { font-size: 42px; line-height: 1.15; margin: 0 0 16px; letter-spacing: -0.5px; }
+  .lead { font-size: 19px; color: var(--dim); margin: 0 0 26px; }
+  .buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1px solid var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+  .small { font-size: 14px; color: var(--dim); }
+  .hero img, .shots img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 8px 28px rgba(0,0,0,.12); display: block; }
+  section { padding: 44px 0; }
+  section.alt { background: var(--soft); }
+  h2 { font-size: 28px; margin: 0 0 8px; }
+  .sub { color: var(--dim); margin: 0 0 26px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 14px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--dim); font-size: 15px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--dim); font-size: 14px; margin-top: 8px; }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .steps li { counter-increment: s; padding-left: 44px; position: relative; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; display: grid; place-items: center; }
+  code { background: var(--soft); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 14px; }
+  pre { background: var(--soft); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-size: 14px; }
+  .note { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0 0; }
+  .check { color: var(--good); font-weight: 700; margin-right: 6px; }
+  ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  footer { padding: 28px 0 40px; border-top: 1px solid var(--border); color: var(--dim); font-size: 14px; }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 36px; }
+    h1 { font-size: 34px; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .shots { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { h1 { font-size: 28px; } h2 { font-size: 24px; } .lead { font-size: 17px; } }
+  h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0067c0"/><path d="M8.5 21.5a8.5 8.5 0 1 1 15 0" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M16 17l4.6-4.1" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><circle cx="16" cy="17" r="2.3" fill="#fff"/></svg>
+      PC Tune-Up
+    </a>
+    <div class="right">
+      <nav><a href="#funciones">Funciones</a><a href="#capturas">Capturas</a><a href="#instalar">Instalar</a><a href="#privacidad">Privacidad</a><a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a></nav>
+      <div class="langs" aria-label="Idioma"><a href="../" lang="en" hreflang="en" title="English">EN</a><a href="../nl/" lang="nl" hreflang="nl" title="Nederlands">NL</a><a href="../de/" lang="de" hreflang="de" title="Deutsch">DE</a><a href="../fr/" lang="fr" hreflang="fr" title="Français">FR</a><a href="./" lang="es" hreflang="es" aria-current="page" title="Español">ES</a><a href="../it/" lang="it" hreflang="it" title="Italiano">IT</a><a href="../pl/" lang="pl" hreflang="pl" title="Polski">PL</a></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>Revisa, limpia y acelera cualquier PC con Windows.</h1>
+      <p class="lead">PC Tune-Up encuentra lo que ralentiza tu PC, te lo explica con palabras sencillas y lo arregla con un clic. Y cada cambio se puede deshacer.</p>
+      <div class="buttons">
+        <a class="btn primary" href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Descargar para Windows</a>
+        <a class="btn" href="https://github.com/michaelkloprogge-gif/pc-tuneup">Ver el código fuente</a>
+      </div>
+      <p class="small">Gratis y de código abierto (MIT). Windows 10 y 11. En español, inglés, neerlandés, alemán, francés, italiano y polaco. Sin cuenta y sin anuncios.</p>
+    </div>
+    <img src="../screenshots/es/health.png" alt="La página Estado de PC Tune-Up: mediciones, una puntuación a lo largo del tiempo y los tres próximos pasos más útiles" width="1440" height="972">
+  </div>
+
+  <section class="alt" id="funciones">
+    <div class="wrap">
+      <h2>Todo en un solo lugar</h2>
+      <p class="sub">Lo que revisaría un técnico de PC, en 25 páginas en las que puedes buscar con Ctrl+F, y un recuadro "Empieza aquí" que te dice cuáles son las tres cosas más importantes ahora mismo.</p>
+      <div class="grid">
+        <div class="card"><span class="tag">Limpieza</span><h3>Archivos basura y espacio</h3><p>Archivos temporales, volcados de bloqueo, cachés del navegador y restos de Windows. Archivos grandes y duplicados. Ahorro de espacio, como el archivo de hibernación y las copias de OneDrive.</p></div>
+        <div class="card"><span class="tag">Limpieza</span><h3>Inicio y bloatware</h3><p>Apps que se inician con Windows, basura preinstalada de cualquier fabricante, programas que no usas, servicios en segundo plano y tareas programadas.</p></div>
+        <div class="card"><span class="tag">Limpieza</span><h3>Privacidad y menús</h3><p>Anuncios, consejos y seguimiento de Windows desactivados uno a uno. Entradas sobrantes del menú del clic derecho, ocultas.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Ahora mismo</h3><p>Qué está ralentizando el PC en este preciso momento: procesador, memoria y disco, los programas que los usan explicados con palabras sencillas, y Finalizar tarea para cerrar uno. Además, lo llena que ha estado la memoria en los últimos 7 días.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Actualizaciones y controladores</h3><p>Programas desactualizados que se actualizan con winget, dispositivos con problemas de controladores y la antigüedad de los controladores importantes.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Seguridad y navegadores</h3><p>Soporte de Windows, antivirus, firewall, cifrado, Secure Boot, y también extensiones del navegador, configuraciones forzadas, archivo hosts y trucos de proxy que parecen adware.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Bloqueos y estabilidad</h3><p>Bloqueos, cuelgues y pantallas azules de los últimos 30 días, agrupados según su causa real, con soluciones de un clic.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Red y juegos</h3><p>Señal wifi, retrasos, velocidad de DNS y cortes. Qué tarjeta gráfica usa de verdad tu juego y qué más lo está frenando.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Batería y energía</h3><p>Lo desgastada que está la batería y dónde esconde el fabricante de tu PC el límite de carga del 80%. Modo de energía, suspensión, pantalla y tapa: rápido cuando está enchufado, duradero con batería.</p></div>
+        <div class="card"><span class="tag">Revisión</span><h3>Copia de seguridad y mejoras</h3><p>Si tus archivos sobrevivirían a un PC averiado o robado. Qué mejoras de memoria, disco y batería encajan en este PC concreto, y si merecen la pena.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Cuidadoso por diseño</h2>
+      <p class="sub">Un programa para poner a punto tu PC nunca debería empeorar las cosas.</p>
+      <ul class="plain">
+        <li><span class="check">&#10003;</span>Cada cambio aparece en la página Historial, y casi todos se pueden deshacer con un clic.</li>
+        <li><span class="check">&#10003;</span>Primero te pregunta y te muestra exactamente lo que va a hacer. Nada importante viene marcado de antemano.</li>
+        <li><span class="check">&#10003;</span>Una vista simple para quien no quiere ver los detalles: una sola pantalla tranquila, un estado con palabras sencillas, tres botones grandes y solo arreglos seguros, además de un botón para enviar un informe al familiar que suele echarte una mano. Un clic en <strong>Vista avanzada</strong> muestra todas las herramientas.</li>
+        <li><span class="check">&#10003;</span>Nunca toca el software de seguridad, las VPN, los controladores ni las bases de datos, y puedes añadir tus propios programas a una lista de conservar.</li>
+        <li><span class="check">&#10003;</span>Como administrador, crea un punto de restauración de Windows antes de los cambios más grandes.</li>
+        <li><span class="check">&#10003;</span>El mantenimiento semanal opcional limpia la basura por sí solo y solo te avisa cuando aparece algo nuevo.</li>
+        <li><span class="check">&#10003;</span>Cuando <strong>Arreglar mi PC</strong> termina, te muestra qué ha cambiado (espacio libre, apps que se inician con Windows, la puntuación): antes y después.</li>
+        <li><span class="check">&#10003;</span>Recordatorios de cosas que llevan demasiado tiempo esperando (un reinicio que Windows está esperando, actualizaciones pendientes, una limpieza de hace mucho), cada uno con un botón <strong>Más tarde</strong>.</li>
+        <li><span class="check">&#10003;</span>Cada versión nueva se prueba automáticamente en un PC con Windows recién instalado, en los siete idiomas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="alt" id="capturas">
+    <div class="wrap">
+      <h2>Capturas de pantalla</h2>
+      <p class="sub">Claro y oscuro, según tu configuración de Windows.</p>
+      <div class="shots">
+        <figure><img src="../screenshots/es/simple.png" alt="La vista simple: un estado, tres botones grandes y una lista de lo que se puede mejorar" loading="lazy" width="1440" height="972"><figcaption>Vista simple: lo que se puede mejorar, con palabras sencillas, y casi todo se arregla con un clic.</figcaption></figure>
+        <figure><img src="../screenshots/es/simple-dark.png" alt="La vista simple con el tema oscuro" loading="lazy" width="1440" height="972"><figcaption>La vista simple con el tema oscuro.</figcaption></figure>
+        <figure><img src="../screenshots/es/right-now.png" alt="La página Ahora mismo: indicadores de procesador, memoria y disco y los programas que los usan" loading="lazy" width="1440" height="972"><figcaption>Ahora mismo: qué está ralentizando el PC en este momento y qué puedes hacer.</figcaption></figure>
+        <figure><img src="../screenshots/es/space-savers.png" alt="La página Ahorro de espacio" loading="lazy" width="1440" height="972"><figcaption>Ahorro de espacio: grandes trozos de espacio en disco, cada uno con lo que pierdes a cambio.</figcaption></figure>
+        <figure><img src="../screenshots/es/privacy.png" alt="La página Privacidad" loading="lazy" width="1440" height="972"><figcaption>Privacidad: anuncios, consejos y seguimiento de Windows, con los recomendados ya marcados.</figcaption></figure>
+        <figure><img src="../screenshots/es/battery.png" alt="La página Batería con un gráfico del desgaste" loading="lazy" width="1440" height="972"><figcaption>Batería: cuánta carga aguanta todavía y lo rápido que se desgasta.</figcaption></figure>
+        <figure><img src="../screenshots/es/power.png" alt="La página Energía: modo de energía, plan y temporizadores, enchufado y con batería" loading="lazy" width="1440" height="972"><figcaption>Energía: rápido cuando está enchufado, duradero con batería. Cada cambio se puede deshacer.</figcaption></figure>
+        <figure><img src="../screenshots/es/health-dark.png" alt="La página Estado con el tema oscuro" loading="lazy" width="1440" height="972"><figcaption>La página Estado con el tema oscuro.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="instalar">
+    <div class="wrap">
+      <h2>Instalar</h2>
+      <ol class="steps">
+        <li><a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases/latest/download/PC-TuneUp.exe">Descarga PC-TuneUp.exe</a> y ábrelo. Te ofrece instalarse por sí solo (sin permisos de administrador) y se mantiene actualizado.</li>
+        <li>La primera vez, Windows puede decir <em>"Windows protegió su PC"</em>, porque el programa todavía no tiene firma digital. Haz clic en <strong>Más información &gt; Ejecutar de todas formas</strong>.</li>
+        <li>Se abre en la vista simple: haz clic en <strong>Acelerar mi PC</strong> o arregla los puntos de la lista uno a uno. Para ver todas las herramientas, haz clic en <strong>Vista avanzada</strong> y empieza con <strong>Arreglar mi PC</strong> en la página Estado. Usa <strong>Reiniciar como admin</strong> para incluir también los archivos y la configuración propios de Windows.</li>
+      </ol>
+      <p class="note">Pronto también en winget: <code>winget install MichaelKloprogge.PCTuneUp</code></p>
+      <h3 style="margin-top:30px">Para IT y scripts</h3>
+<pre>PC-TuneUp.exe /report[:archivo.html]  revisarlo todo y guardar un informe
+PC-TuneUp.exe /fix                    ejecutar los pasos seguros de Arreglar mi PC sin preguntar
+PC-TuneUp.exe /auto                   el mantenimiento automático (limpiar, revisar, avisar)
+PC-TuneUp.exe /install | /uninstall   instalar o quitar para el usuario actual</pre>
+    </div>
+  </section>
+
+  <section class="alt" id="privacidad">
+    <div class="wrap">
+      <h2>Privacidad</h2>
+      <p>Todo se ejecuta en tu propio PC. PC Tune-Up no tiene cuenta, ni seguimiento, ni analíticas, y no se envía nada sobre tu PC a ningún sitio. Solo usa internet para buscar actualizaciones (GitHub), para la prueba de velocidad opcional (Cloudflare) y para la lista de programas de winget.</p>
+      <p>Todo el código fuente está en <a href="https://github.com/michaelkloprogge-gif/pc-tuneup">GitHub</a>, así que cualquiera puede comprobar lo que hace.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">PC Tune-Up es software libre con licencia MIT. &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/releases">Todas las versiones</a> &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/blob/main/CHANGELOG.md">Novedades</a> &middot; <a href="https://github.com/michaelkloprogge-gif/pc-tuneup/issues">Informar de un problema</a></div>
+</footer>
+</body>
+</html>

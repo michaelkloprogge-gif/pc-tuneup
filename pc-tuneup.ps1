@@ -7997,6 +7997,7 @@ function Test-ReminderLater([string]$Id) {
 }
 function Set-ReminderLater([string]$Id, [int]$Days) {
     $script:ReminderState.Later[$Id] = (Get-Date).AddDays($Days).ToString('s'); Save-ReminderState
+    $script:StepsCache = $null
     $script:StartDrawn = $null; $script:SimpleSig = $null
     Update-StartHere; Update-SimpleView
 }
@@ -8005,7 +8006,14 @@ function Get-Reminders {
     $r = New-Object System.Collections.ArrayList
     $add = { param($id, $p, $text, $plain, $btn, $fix, $page, $later) if (-not (Test-ReminderLater $id)) { [void]$r.Add([pscustomobject]@{ Id = $id; P = $p; Text = $text; Plain = $plain; Btn = $btn; Fix = $fix; Page = $page; Later = $later; Remind = $true }) } }
     # A restart Windows is waiting for, to finish installing updates
-    $pending = (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired') -or (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending')
+    # Checked at most once a minute, straight through .NET (Test-Path on HKLM takes ~20 ms, and this runs on every redraw).
+    if (-not $script:PendingAt -or ((Get-Date) - $script:PendingAt).TotalSeconds -gt 60) {
+        $lm = [Microsoft.Win32.Registry]::LocalMachine
+        $script:Pending = [bool]((@('SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired', 'SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending') |
+            Where-Object { $k = $lm.OpenSubKey($_); if ($k) { $k.Dispose(); $true } }))
+        $script:PendingAt = Get-Date
+    }
+    $pending = $script:Pending
     $age = Get-ReminderAge 'restart-updates' $pending
     if ($pending -and $age -ge 2) { & $add 'restart-updates' 32 "Windows has been waiting $age day(s) for a restart to finish updates" "Windows has been waiting $age day(s) for a restart to finish installing updates. Save your work and restart." 'Restart' 'restart' $pgHealth 1 }
     # No restart for a long time
@@ -8043,6 +8051,13 @@ function Invoke-Reminder($Step) {
 # Everything worth doing, most urgent first, for both "Start here" (full view) and simple mode.
 # Plain = one everyday sentence; Fix = a safe change with undo that simple mode may offer as "Fix this".
 function Get-NextSteps {
+    # One redraw asks for this several times (readings, sidebar counts, Start here, simple view): reuse it for a moment.
+    if ($script:StepsCache -and ((Get-Date) - $script:StepsCacheAt).TotalMilliseconds -lt 250) { return $script:StepsCache }
+    $r = @(Get-NextStepsNow)
+    $script:StepsCache = $r; $script:StepsCacheAt = Get-Date
+    $r
+}
+function Get-NextStepsNow {
     $c = New-Object System.Collections.ArrayList
     $add = { param($p, $text, $btn, $page, $plain, $fix) [void]$c.Add([pscustomobject]@{ P = $p; Text = $text; Btn = $btn; Page = $page; Plain = $plain; Fix = $fix }) }
     $n = @($lvSec.Items | Where-Object { $_.Tag.Level -eq 'Problem' }).Count

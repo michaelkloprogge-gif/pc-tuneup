@@ -7,6 +7,7 @@
 - **Start-up delay per app:** the Startup page has a new column, "Slows start-up", with how many seconds each app added to a start in the last 90 days (Windows' own measurement; administrator only).
 - **Drive health over time:** as administrator, PC Tune-Up notes each drive's wear, temperature and errors once a day. After a month the Health page shows how fast the drive wears, and it warns when a drive will be worn out within two years, got hot, or reports new read or write errors.
 - The Right now page refreshes every 15 seconds instead of 3 while another window is in front, so leaving it open costs next to nothing.
+- Faster: since 1.20 every finished check made the window pause for up to a second while it redrew Start here, the simple view and the sidebar (two slow registry checks for the restart reminder ran many times per redraw). Redrawing now takes a few hundredths of a second.
 ## 1.21.0
 
 - **Memory over time:** while PC Tune-Up is open it notes every 10 minutes how full memory is and which five programs use the most (kept for 14 days, on this PC only). **Earlier** on the Right now page shows a chart of the last 7 days and the programs that used the most. The Upgrades page now says whether memory was often full - and so whether more memory would really help.

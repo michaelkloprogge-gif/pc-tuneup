@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.16.3'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.17.0'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1618,6 +1618,66 @@ Windows shows you ads and tips, and shares more about you than needed ({0} setti
 Your battery is worn out and doesn't last as long any more. A new battery fixes that.	Je accu is versleten en houdt het niet meer zo lang vol. Een nieuwe accu lost dat op.
 Removed programs left old entries in your right-click menu.	Verwijderde programma's hebben oude items in je rechtsklikmenu achtergelaten.
 Show all tools	Alle hulpmiddelen tonen
+PC Tune-Up itself.	PC Tune-Up zelf.
+Right now	Nu bezig
+What is slowing the PC down at this moment: the programs using the most memory, processor and disk. Updates every few seconds while this page is open. Select a program and click End task to close it.	Wat de pc op dit moment vertraagt: de programma's die het meeste geheugen, de processor en de schijf gebruiken. Wordt elke paar seconden bijgewerkt zolang deze pagina open is. Selecteer een programma en klik op Taak beëindigen om het te sluiten.
+End task	Taak beëindigen
+Pause	Pauzeren
+Resume	Hervatten
+Task Manager	Taakbeheer
+Measuring...	Meten...
+{0} cores	{0} kernen
+{0} of {1} in use	{0} van {1} gebruikt
+{0} per second	{0} per seconde
+Every open tab and extension uses memory. Close tabs you don't need; Shift+Esc in the browser shows which tab uses the most.	Elk open tabblad en elke extensie gebruikt geheugen. Sluit tabbladen die je niet nodig hebt; Shift+Esc in de browser laat zien welk tabblad het meeste gebruikt.
+Windows Security checking for viruses. It finishes by itself - leave it running.	Windows-beveiliging controleert op virussen. Dat stopt vanzelf - laat het draaien.
+Windows Update installing updates. Let it finish, and restart when Windows asks.	Windows Update installeert updates. Laat het afmaken en start opnieuw op als Windows erom vraagt.
+Windows Search indexing your files so searching is quick. It slows down by itself while you use the PC.	Windows Zoeken indexeert je bestanden zodat zoeken snel gaat. Het remt vanzelf af terwijl je de pc gebruikt.
+Syncing files with the cloud. It calms down when syncing is finished.	Synchroniseert bestanden met de cloud. Het wordt rustiger als het synchroniseren klaar is.
+A chat app that keeps running in the background. Quit it from its icon next to the clock when you don't need it.	Een chat-app die op de achtergrond blijft draaien. Sluit hem af via zijn pictogram naast de klok als je hem niet nodig hebt.
+A game launcher. It downloads updates in the background; quit it when you are not playing.	Een game-launcher. Hij downloadt updates op de achtergrond; sluit hem af als je niet speelt.
+Windows squeezing memory to make room - a sign that memory is nearly full. Closing programs helps.	Windows perst het geheugen samen om ruimte te maken - een teken dat het geheugen bijna vol is. Programma's sluiten helpt.
+Windows drawing the screen. Busier with animations, videos and extra screens.	Windows tekent het scherm. Drukker bij animaties, video's en extra schermen.
+Windows answering questions about the PC (PC Tune-Up asks it too, while this page is open).	Windows beantwoordt vragen over de pc (PC Tune-Up vraagt ook dingen, zolang deze pagina open is).
+Part of Windows. Leave it running; if it stays busy for a long time, a restart usually helps.	Onderdeel van Windows. Laat het draaien; blijft het lang druk, dan helpt opnieuw opstarten meestal.
+A background service (part of Windows or of another program). Leave it running; the Services page shows which ones you can switch off.	Een achtergrondservice (van Windows of van een ander programma). Laat hem draaien; de pagina Services laat zien welke je kunt uitzetten.
+Uses a lot of memory. Close it when you don't need it.	Gebruikt veel geheugen. Sluit het als je het niet nodig hebt.
+Keeps the processor busy. If you aren't using it, close it.	Houdt de processor bezig. Gebruik je het niet, sluit het dan.
+Reading or writing a lot on the disk right now.	Leest of schrijft nu veel op de schijf.
+Memory is nearly full ({0}% in use) - that slows everything down. {1} uses the most ({2}).	Het geheugen is bijna vol ({0}% in gebruik) - dat maakt alles traag. {1} gebruikt het meeste ({2}).
+The processor is very busy ({0}%). {1} uses the most ({2}%).	De processor is erg druk ({0}%). {1} gebruikt het meeste ({2}%).
+The disk is very busy ({0}%). {1} reads and writes the most.	De schijf is erg druk ({0}%). {1} leest en schrijft het meeste.
+Memory is getting full ({0}% in use). Closing programs you don't use keeps the PC quick.	Het geheugen raakt vol ({0}% in gebruik). Programma's sluiten die je niet gebruikt houdt de pc snel.
+Nothing is slowing the PC down right now.	Er is nu niets dat de pc vertraagt.
+{0} process(es) - memory {1}, processor {2}%, disk {3}	{0} proces(sen) - geheugen {1}, processor {2}%, schijf {3}
+{0} is part of Windows or runs as a background service, so PC Tune-Up doesn't end it.	{0} is onderdeel van Windows of draait als achtergrondservice, dus PC Tune-Up beëindigt het niet.
+End {0}?	{0} beëindigen?
+It closes straight away ({0} process(es)). Anything not saved in it is lost - save your work first.	Het sluit meteen ({0} proces(sen)). Wat er niet in is opgeslagen gaat verloren - sla je werk eerst op.
+Couldn't end {0} - it may need administrator rights, or it already closed.	Kon {0} niet beëindigen - misschien zijn beheerdersrechten nodig, of het was al gesloten.
+ended	beëindigd
+See what is using the processor and memory right now	Bekijk wat de processor en het geheugen nu gebruikt
+Memory is {0}% full - see what is using it	Het geheugen is voor {0}% vol - bekijk wat het gebruikt
+The PC's memory is almost full, which makes everything slow. Closing programs you don't use helps.	Het geheugen van de pc is bijna vol, waardoor alles traag wordt. Programma's sluiten die je niet gebruikt helpt.
+Measuring the result	Het resultaat meten
+Last fix	Reparatie
+{0} - Fix my PC freed {1}	{0} - Pc repareren maakte {1} vrij
+{0} s now, {1} s before Fix my PC	nu {0} s, {1} s vóór Pc repareren
+same	gelijk
+{0} fewer	{0} minder
+{0} more	{0} meer
+Junk files removed	Rommelbestanden verwijderd
+Free space on {0}	Vrije ruimte op {0}
+Apps that start with Windows	Apps die met Windows starten
+Background services trimmed	Achtergrondservices beperkt
+Things worth a look	Dingen om naar te kijken
+after the next restart	na de volgende herstart
+Fix my PC: before and after	Pc repareren: voor en na
+Stopped early - this is what changed so far	Vroeg gestopt - dit is er tot nu toe veranderd
+Done! This is what changed	Klaar! Dit is er veranderd
+Before	Voor
+After	Na
+Start-up changes take effect next time you sign in. Undo anything from the History page.	Wijzigingen bij het opstarten gaan in de volgende keer dat je je aanmeldt. Alles is ongedaan te maken op de pagina Geschiedenis.
+Open History	Geschiedenis openen
 ...and {0} more	...en nog {0}
 Switch off these {0} scheduled task(s)?	Deze {0} geplande ta(a)k(en) uitzetten?
 Turn off these {0} Windows setting(s)?	Deze {0} Windows-instelling(en) uitzetten?
@@ -2278,12 +2338,8 @@ $lblSpeed.Text = 'Internet:  not tested yet - click Speed test'
 $lblProcCap = New-Object Windows.Forms.LinkLabel
 $lblProcCap.Dock = 'Top'; $lblProcCap.Height = 30; $lblProcCap.TextAlign = 'BottomLeft'
 $lblProcCap.LinkColor = $Theme.AccentText; $lblProcCap.ActiveLinkColor = $Theme.AccentText
-$lblProcCap.Text = 'Show the programs using the most memory'
-$lblProcCap.Add_LinkClicked({
-    $show = -not $lvProc.Visible
-    $lvProc.Visible = $show; $healthTop.Visible = -not $show; $lblAdvice.Visible = -not $show
-    $this.Text = if ($show) { 'Back to the readings' } else { 'Show the programs using the most memory' }
-})
+$lblProcCap.Text = 'See what is using the processor and memory right now'
+$lblProcCap.Add_LinkClicked({ Show-Page $pgNow })
 $lvProc = New-ListView $false @('Program', 300, 'Memory (MB)', 120, 'Processes', 100)
 # Readings on the left, "Health over time" chart on the right.
 $healthTop = New-Object Windows.Forms.TableLayoutPanel
@@ -2468,6 +2524,7 @@ function Render-Health {
     } else { $lines += "This PC:   $PcName"; $lines += 'Checking this PC...' }
     if ($script:HealthDeep) { $lines += $script:HealthDeep.Lines; $advice += $script:HealthDeep.Advice }
     else { $lines += 'Checking drive, battery and updates...' }
+    $lines += @(Get-FixLines)
     foreach ($k in 'Browsers', 'Network', 'Drivers', 'Backup', 'Security', 'Stability', 'Updates') { if ($script:ExtraAdvice[$k]) { $advice += $script:ExtraAdvice[$k] } }
     $key = ($lines + $advice) -join '|'
     if ($key -ne $script:HealthDrawn) {   # only rebuild what changed
@@ -2844,6 +2901,7 @@ function Update-Boot {
             $lblBoot.Text = $fastTxt; return
         }
         $b = @($r.Boots | Sort-Object X)
+        $script:BootList = $b; Update-FixBoot
         if (-not $b) { Set-Chart $chartBoot @() 60 ' s' 'Start-up time' 'No start-up times recorded yet.'; $lblBoot.Text = $fastTxt; return }
         $max = [Math]::Max(30, [Math]::Ceiling((($b | Measure-Object Y -Maximum).Maximum) / 30) * 30)
         $recent = @($b | Where-Object { $_.X -gt (Get-Date).AddDays(-30) })
@@ -5601,6 +5659,240 @@ $btnGameGfx.Add_Click({ Start-Process 'ms-settings:display-advancedgraphics' })
 $btnGameMode.Add_Click({ Start-Process 'ms-settings:gaming-gamemode' })
 
 # ===========================================================================
+# Right now: what is using the processor, memory and disk at this moment, in plain words. Refreshes every
+# few seconds while the page is open; "End task" closes a program (never Windows itself).
+# ===========================================================================
+$pgNow = New-Page 'Right now' 'What is slowing the PC down at this moment: the programs using the most memory, processor and disk. Updates every few seconds while this page is open. Select a program and click End task to close it.'
+$btnNowEnd = New-Button 'End task'
+$btnNowPause = New-Button 'Pause'
+$btnNowTM = New-Button 'Task Manager'
+# Three meters (processor, memory, disk) above a one-line verdict.
+$nowMeters = New-Object Windows.Forms.Panel
+$nowMeters.Dock = 'Top'; $nowMeters.Height = 78; $nowMeters.BackColor = $Theme.Bg
+try { $nowMeters.GetType().GetProperty('DoubleBuffered', [Reflection.BindingFlags]'NonPublic, Instance').SetValue($nowMeters, $true, $null) } catch { }
+$NowMeterFont = New-Object Drawing.Font('Segoe UI Semibold', 15)
+$nowMeters.Add_Paint({ param($s, $e)
+    $g = $e.Graphics; $g.SmoothingMode = 'AntiAlias'; $g.Clear($Theme.Bg)
+    $n = $script:Now
+    $gap = Px 12; $w = [int](($s.Width - 2 * $gap) / 3); $h = $s.Height - (Px 8)
+    $cells = @(
+        @{ Name = 'Processor'; Pct = $(if ($n) { $n.Cpu }); Sub = $(if ($n) { (T '{0} cores').Replace('{0}', "$([Environment]::ProcessorCount)") }) }
+        @{ Name = 'Memory'; Pct = $(if ($n) { 100 * $n.MemUsed / $n.MemTotal }); Sub = $(if ($n) { (T '{0} of {1} in use').Replace('{0}', (Format-Size $n.MemUsed)).Replace('{1}', (Format-Size $n.MemTotal)) }) }
+        @{ Name = 'Disk'; Pct = $(if ($n) { $n.Disk }); Sub = $(if ($n) { (T '{0} per second').Replace('{0}', (Format-Size $n.DiskBytes)) }) }
+    )
+    for ($i = 0; $i -lt 3; $i++) {
+        $c = $cells[$i]; $x = $i * ($w + $gap)
+        $p = New-RoundRect ($x + 0.5) 0.5 ($w - 1.5) ($h - 1.5) (Px 8)
+        $br = New-Object Drawing.SolidBrush($Theme.Soft); $g.FillPath($br, $p); $br.Dispose()
+        $pen = New-Object Drawing.Pen($Theme.Hover); $g.DrawPath($pen, $p); $pen.Dispose(); $p.Dispose()
+        $col = if ($null -eq $c.Pct) { $Theme.Muted } elseif ($c.Pct -ge 90) { $Theme.Bad } elseif ($c.Pct -ge 75) { $Theme.Warn } else { $Theme.Accent }
+        $pad = Px 12
+        [Windows.Forms.TextRenderer]::DrawText($g, (T $c.Name), $FontSmall, (New-Object Drawing.Rectangle(($x + $pad), (Px 8), ($w - 2 * $pad), (Px 18))), $Theme.Dim, 'Left, NoPrefix, EndEllipsis')
+        $big = if ($null -eq $c.Pct) { '...' } else { '{0:N0}%' -f [Math]::Min([double]100, [double]$c.Pct) }
+        [Windows.Forms.TextRenderer]::DrawText($g, $big, $NowMeterFont, (New-Object Drawing.Rectangle(($x + $pad), (Px 24), (Px 66), (Px 30))), $Theme.Text, 'Left, VerticalCenter, NoPrefix')
+        if ($c.Sub) { [Windows.Forms.TextRenderer]::DrawText($g, $c.Sub, $Font, (New-Object Drawing.Rectangle(($x + $pad + (Px 68)), (Px 24), ($w - 2 * $pad - (Px 68)), (Px 30))), $Theme.Dim, 'Left, VerticalCenter, NoPrefix, EndEllipsis') }
+        # The bar along the bottom of the card
+        $by = [single]($h - (Px 16)); $bw = [single]($w - 2 * $pad); $bh = [single](Px 5)
+        $t = New-RoundRect ($x + $pad) $by $bw $bh ($bh / 2); $br = New-Object Drawing.SolidBrush($Theme.Border); $g.FillPath($br, $t); $br.Dispose(); $t.Dispose()
+        if ($null -ne $c.Pct -and $c.Pct -gt 0) {
+            $f = New-RoundRect ($x + $pad) $by ([single][Math]::Max([double]$bh, $bw * [Math]::Min([double]1, [double]$c.Pct / 100))) $bh ($bh / 2)
+            $br = New-Object Drawing.SolidBrush($col); $g.FillPath($br, $f); $br.Dispose(); $f.Dispose()
+        }
+    }
+})
+$nowMeters.Add_Resize({ $this.Invalidate() })
+$lblNow = New-Object Windows.Forms.Label
+$lblNow.Dock = 'Top'; $lblNow.Height = 40; $lblNow.TextAlign = 'MiddleLeft'; $lblNow.Padding = New-Object Windows.Forms.Padding(12, 0, 12, 0)
+$lblNow.BackColor = $Theme.Soft; $lblNow.Text = 'Measuring...'
+$nowGap = New-Object Windows.Forms.Panel; $nowGap.Dock = 'Top'; $nowGap.Height = 8
+$lvNow = New-ListView $false @('Program', 260, 'Memory', 110, 'Processor', 90, 'Disk', 100, 'What to do', 540)
+$txtNow = New-DetailBox 116
+Set-PageLayout $pgNow $lvNow @((New-ButtonBar @($btnNowEnd, $btnNowPause, $btnNowTM)), $nowMeters, $lblNow, $nowGap) $txtNow
+# Plain explanations for programs that are often busy. First match wins; anything else gets a general hint.
+$NowHints = @(
+    ,@('^(chrome|msedge|firefox|brave|opera|vivaldi|arc)$', 'Every open tab and extension uses memory. Close tabs you don''t need; Shift+Esc in the browser shows which tab uses the most.')
+    ,@('^(MsMpEng|MpDefenderCoreService|NisSrv|MpCopyAccelerator)$', 'Windows Security checking for viruses. It finishes by itself - leave it running.')
+    ,@('^(TiWorker|TrustedInstaller|wuauclt|MoUsoCoreWorker|usocoreworker|WaaSMedicAgent|SIHClient|UsoClient)$', 'Windows Update installing updates. Let it finish, and restart when Windows asks.')
+    ,@('^(SearchIndexer|SearchProtocolHost|SearchFilterHost)$', 'Windows Search indexing your files so searching is quick. It slows down by itself while you use the PC.')
+    ,@('^(OneDrive|Dropbox|GoogleDriveFS|iCloudDrive|iCloudServices)$', 'Syncing files with the cloud. It calms down when syncing is finished.')
+    ,@('^(Teams|ms-teams|Zoom|Slack|Discord|WhatsApp)$', 'A chat app that keeps running in the background. Quit it from its icon next to the clock when you don''t need it.')
+    ,@('^(steam|steamwebhelper|EpicGamesLauncher|EADesktop|Battle\.net|upc|UbisoftConnect)$', 'A game launcher. It downloads updates in the background; quit it when you are not playing.')
+    ,@('^Memory Compression$', 'Windows squeezing memory to make room - a sign that memory is nearly full. Closing programs helps.')
+    ,@('^dwm$', 'Windows drawing the screen. Busier with animations, videos and extra screens.')
+    ,@('^WmiPrvSE$', 'Windows answering questions about the PC (PC Tune-Up asks it too, while this page is open).')
+)
+$NowWork = {
+    param($cfg)
+    $cores = [Environment]::ProcessorCount
+    # Raw counters (the same on every Windows language): processor time and disk bytes so far, and private memory now.
+    $take = {
+        $s = @{ Procs = @{}; Ts = [int64]0; DiskIdle = $null; DiskTs = $null }
+        foreach ($p in @(Get-CimInstance Win32_PerfRawData_PerfProc_Process -Property Name, IDProcess, PercentProcessorTime, IODataBytesPersec, WorkingSetPrivate, Timestamp_Sys100NS -OperationTimeoutSec 15 -ErrorAction SilentlyContinue)) {
+            if ($p.Name -eq '_Total') { continue }
+            $s.Procs[[int]$p.IDProcess] = @([double]$p.PercentProcessorTime, [double]$p.IODataBytesPersec, [double]$p.WorkingSetPrivate, "$($p.Name)")
+            $s.Ts = [int64]$p.Timestamp_Sys100NS
+        }
+        $d = Get-CimInstance Win32_PerfRawData_PerfDisk_PhysicalDisk -Filter "Name='_Total'" -Property PercentIdleTime, Timestamp_Sys100NS -OperationTimeoutSec 15 -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($d) { $s.DiskIdle = [double]$d.PercentIdleTime; $s.DiskTs = [double]$d.Timestamp_Sys100NS }
+        $s
+    }
+    $prev = $cfg.Prev
+    if (-not $prev) { $prev = & $take; Start-Sleep -Milliseconds 1000 }   # the first time: two readings a second apart
+    $now = & $take
+    $dt = [double]($now.Ts - $prev.Ts); if ($dt -le 0) { $dt = 1e7 }
+    $info = @{}; foreach ($p in Get-Process -ErrorAction SilentlyContinue) { $info[$p.Id] = $p }
+    $win = $cfg.Win.TrimEnd('\').ToLower() + '\'
+    $groups = @{}; $idle = 0; $ioAll = 0
+    foreach ($id in @($now.Procs.Keys)) {
+        $c = $now.Procs[$id]; $o = $prev.Procs[$id]
+        $cpu = if ($o) { [Math]::Max([double]0, ($c[0] - $o[0]) / $dt * 100 / $cores) } else { 0 }
+        $io = if ($o) { [Math]::Max([double]0, ($c[1] - $o[1]) / ($dt / 1e7)) } else { 0 }
+        if ($id -eq 0) { $idle = $cpu; continue }
+        $ioAll += $io
+        $p = $info[$id]
+        $name = if ($p) { $p.ProcessName } else { $c[3] -replace '#\d+$', '' }
+        $g = $groups[$name]
+        if (-not $g) {
+            $g = [pscustomobject]@{ Name = $name; Display = $name; Path = ''; Mem = 0.0; Cpu = 0.0; Io = 0.0; Count = 0; Ids = New-Object System.Collections.ArrayList; Window = $false; Service = $false; Self = $false }
+            $groups[$name] = $g
+        }
+        $g.Mem += $c[2]; $g.Cpu += $cpu; $g.Io += $io; $g.Count++; [void]$g.Ids.Add($id)
+        if ($id -eq $cfg.Self) { $g.Self = $true }
+        if ($p) {
+            if ($p.MainWindowHandle -ne [IntPtr]::Zero) { $g.Window = $true }
+            if ($p.SessionId -eq 0) { $g.Service = $true }
+            if (-not $g.Path) { try { $g.Path = "$($p.Path)" } catch { } }
+        }
+    }
+    $rows = @(foreach ($g in $groups.Values) {
+        if ($g.Path) {
+            if (-not $cfg.Desc.ContainsKey($g.Path)) { $cfg.Desc[$g.Path] = try { "$([Diagnostics.FileVersionInfo]::GetVersionInfo($g.Path).FileDescription)".Trim() } catch { '' } }
+            if ($cfg.Desc[$g.Path]) { $g.Display = $cfg.Desc[$g.Path] }
+        }
+        # Windows' own parts, background services and PC Tune-Up itself are never ended from here.
+        $g | Add-Member -NotePropertyName Protected -NotePropertyValue ($g.Self -or $g.Service -or -not $g.Path -or $g.Path.ToLower().StartsWith($win)) -Force
+        $g
+    })
+    $os = Get-CimInstance Win32_OperatingSystem -Property FreePhysicalMemory, TotalVisibleMemorySize -OperationTimeoutSec 15 -ErrorAction SilentlyContinue
+    $total = [double]$os.TotalVisibleMemorySize * 1KB
+    $disk = if ($null -ne $now.DiskIdle -and $null -ne $prev.DiskIdle -and $now.DiskTs -gt $prev.DiskTs) {
+        [Math]::Max([double]0, [Math]::Min([double]100, 100 - 100 * ($now.DiskIdle - $prev.DiskIdle) / ($now.DiskTs - $prev.DiskTs))) } else { 0 }
+    # Most "weight" first: processor share, memory share and disk traffic together.
+    $top = @($rows | Sort-Object { - ($_.Cpu + 100 * $_.Mem / [Math]::Max([double]1, $total) + [Math]::Min([double]30, $_.Io / 1MB)) } | Select-Object -First 40)
+    [pscustomobject]@{ Sample = $now; Cpu = [Math]::Min([double]100, [Math]::Max([double]0, 100 - $idle)); MemTotal = $total
+                       MemUsed = $total - [double]$os.FreePhysicalMemory * 1KB; Disk = $disk; DiskBytes = $ioAll; Rows = $top }
+}
+# What to do about one program, in plain words.
+function Get-NowHint($G) {
+    foreach ($h in $NowHints) { if ($G.Name -match $h[0]) { return $h[1] } }
+    if ($G.Self) { return 'PC Tune-Up itself.' }
+    if ($G.Path -and $G.Path.ToLower().StartsWith($env:windir.ToLower().TrimEnd('\') + '\')) { return 'Part of Windows. Leave it running; if it stays busy for a long time, a restart usually helps.' }
+    if ($G.Protected) { return 'A background service (part of Windows or of another program). Leave it running; the Services page shows which ones you can switch off.' }
+    if ($G.Mem -ge 1.5GB) { return 'Uses a lot of memory. Close it when you don''t need it.' }
+    if ($G.Cpu -ge 25) { return 'Keeps the processor busy. If you aren''t using it, close it.' }
+    if ($G.Io -ge 20MB) { return 'Reading or writing a lot on the disk right now.' }
+    'Nothing to do.'
+}
+# The one sentence above the list: the biggest reason the PC is slow right now, or that nothing is.
+function Get-NowVerdict($N) {
+    $mem = [int](100 * $N.MemUsed / [Math]::Max([double]1, $N.MemTotal))
+    $pick = @($N.Rows | Where-Object { -not $_.Self -and $_.Name -notin 'WmiPrvSE', 'Idle', 'System', 'Memory Compression' })
+    if ($mem -ge 85) {
+        $t = $pick | Sort-Object Mem -Descending | Select-Object -First 1
+        return @('Bad', ((T 'Memory is nearly full ({0}% in use) - that slows everything down. {1} uses the most ({2}).').Replace('{0}', "$mem").Replace('{1}', $t.Display).Replace('{2}', (Format-Size $t.Mem))))
+    }
+    if ($N.Cpu -ge 80) {
+        $t = $pick | Sort-Object Cpu -Descending | Select-Object -First 1
+        return @('Bad', ((T 'The processor is very busy ({0}%). {1} uses the most ({2}%).').Replace('{0}', ('{0:N0}' -f $N.Cpu)).Replace('{1}', $t.Display).Replace('{2}', ('{0:N0}' -f $t.Cpu))))
+    }
+    if ($N.Disk -ge 80) {
+        $t = $pick | Sort-Object Io -Descending | Select-Object -First 1
+        return @('Warn', ((T 'The disk is very busy ({0}%). {1} reads and writes the most.').Replace('{0}', ('{0:N0}' -f $N.Disk)).Replace('{1}', $t.Display)))
+    }
+    if ($mem -ge 75) { return @('Warn', ((T 'Memory is getting full ({0}% in use). Closing programs you don''t use keeps the PC quick.').Replace('{0}', "$mem"))) }
+    @('Good', (T 'Nothing is slowing the PC down right now.'))
+}
+function Show-NowDetail {
+    if (-not $lvNow.SelectedItems.Count) { $txtNow.Text = ''; return }
+    $g = $lvNow.SelectedItems[0].Tag
+    $txtNow.Text = (@("$($g.Display)  ($($g.Name))",
+        (T '{0} process(es) - memory {1}, processor {2}%, disk {3}').Replace('{0}', "$($g.Count)").Replace('{1}', (Format-Size $g.Mem)).Replace('{2}', ('{0:N0}' -f $g.Cpu)).Replace('{3}', "$(Format-Size $g.Io)/s"),
+        $(if ($g.Path) { $g.Path }), '', (T 'What to do: {0}').Replace('{0}', (T (Get-NowHint $g)))) | Where-Object { $null -ne $_ }) -join "`r`n"
+}
+# Redraws the list in place, so the selected program stays selected while the numbers change.
+function Render-Now {
+    $n = $script:Now
+    if (-not $n) { return }
+    $nowMeters.Invalidate()
+    $v = Get-NowVerdict $n
+    $lblNow.Text = $v[1]
+    $lblNow.BackColor = if ($v[0] -eq 'Good') { $Theme.Soft } else { $Theme.WarnBg }
+    $lblNow.ForeColor = if ($v[0] -eq 'Good') { $Theme.Text } else { $Theme.WarnText }
+    $sel = if ($lvNow.SelectedItems.Count) { $lvNow.SelectedItems[0].Tag.Name }
+    $rows = @($n.Rows)
+    $lvNow.BeginUpdate()
+    while ($lvNow.Items.Count -gt $rows.Count) { $lvNow.Items.RemoveAt($lvNow.Items.Count - 1) }
+    for ($i = 0; $i -lt $rows.Count; $i++) {
+        $g = $rows[$i]
+        $cells = @($(if ($g.Count -gt 1) { "$($g.Display)  ($($g.Count))" } else { $g.Display }), (Format-Size $g.Mem), ('{0:N0}%' -f $g.Cpu), "$(Format-Size $g.Io)/s", (T (Get-NowHint $g)))
+        if ($i -ge $lvNow.Items.Count) { $it = Add-Row $lvNow @($cells[0], '', '', '', '') $g }
+        $it = $lvNow.Items[$i]
+        $it.Tag = $g; $it.UseItemStyleForSubItems = $false
+        for ($c = 0; $c -lt 5; $c++) { if ($it.SubItems[$c].Text -ne $cells[$c]) { $it.SubItems[$c].Text = $cells[$c] } }
+        $it.SubItems[0].ForeColor = if ($g.Protected) { $Theme.Dim } else { $Theme.Text }
+        $it.SubItems[1].ForeColor = if ($g.Mem -ge 0.25 * $n.MemTotal) { $Theme.Bad } elseif ($g.Mem -ge 1GB) { $Theme.Warn } else { $Theme.Text }
+        $it.SubItems[2].ForeColor = if ($g.Cpu -ge 50) { $Theme.Bad } elseif ($g.Cpu -ge 15) { $Theme.Warn } else { $Theme.Text }
+        $it.SubItems[3].ForeColor = if ($g.Io -ge 50MB) { $Theme.Bad } elseif ($g.Io -ge 10MB) { $Theme.Warn } else { $Theme.Text }
+        $it.SubItems[4].ForeColor = $Theme.Dim
+        $want = $g.Name -eq $sel
+        if ($it.Selected -ne $want) { $it.Selected = $want }
+    }
+    $lvNow.EndUpdate()
+    Show-NowDetail
+}
+$script:NowPrev = $null; $script:Now = $null; $script:NowDesc = @{}; $script:NowBusy = $false; $script:NowPaused = $false
+function Update-Now {
+    if ($script:NowBusy) { return }
+    $script:NowBusy = $true
+    Start-Bg $NowWork @{ Prev = $script:NowPrev; Desc = $script:NowDesc; Self = $PID; Win = $env:windir } {
+        param($r)
+        $script:NowBusy = $false
+        $r = @($r)[0]
+        if (-not $r) { return }
+        $script:NowPrev = $r.Sample; $script:Now = $r
+        Render-Now
+    }
+}
+# Every 3 seconds while the page is on screen (not while it's hidden, minimised or paused).
+$nowTimer = New-Object Windows.Forms.Timer; $nowTimer.Interval = 3000
+$nowTimer.Add_Tick({
+    if ($pgNow.Visible -and $form.Visible -and $form.WindowState -ne 'Minimized' -and -not $script:NowPaused -and -not ($simple -and $simple.Visible)) { Update-Now }
+})
+$nowTimer.Start()
+$lvNow.Add_SelectedIndexChanged({ Show-NowDetail })
+$btnNowPause.Add_Click({
+    $script:NowPaused = -not $script:NowPaused
+    $this.Text = if ($script:NowPaused) { 'Resume' } else { 'Pause' }
+    if (-not $script:NowPaused) { Update-Now }
+})
+$btnNowTM.Add_Click({ Start-Process taskmgr.exe })
+function Stop-NowProgram {
+    $g = Get-PickedRow $lvNow
+    if (-not $g) { return }
+    if ($g.Protected) { Show-Msg ((T '{0} is part of Windows or runs as a background service, so PC Tune-Up doesn''t end it.').Replace('{0}', $g.Display)) 'OK' 'Information' | Out-Null; return }
+    $q = (T 'End {0}?').Replace('{0}', $g.Display) + "`r`n`r`n" + (T 'It closes straight away ({0} process(es)). Anything not saved in it is lost - save your work first.').Replace('{0}', "$($g.Count)")
+    if ((Show-Msg $q 'YesNo' 'Question') -ne 'Yes') { return }
+    $failed = 0
+    foreach ($id in $g.Ids) { try { Stop-Process -Id $id -Force -ErrorAction Stop } catch { $failed++ } }
+    Add-History 'Right now' $g.Display 'ended'
+    Update-History
+    if ($failed -eq $g.Ids.Count) { Show-Msg ((T 'Couldn''t end {0} - it may need administrator rights, or it already closed.').Replace('{0}', $g.Display)) 'OK' 'Warning' | Out-Null }
+    Update-Now
+}
+$btnNowEnd.Add_Click({ Stop-NowProgram })
+$lvNow.Add_KeyDown({ if ($_.KeyCode -eq 'Delete') { Stop-NowProgram; $_.SuppressKeyPress = $true } })
+
+# ===========================================================================
 # Search: finds pages, settings and rows on every page (Ctrl+F)
 # ===========================================================================
 $pgFind = New-Page 'Search' 'Everything that matches, on every page. Double-click a result (or select it and press Enter) to go there.'
@@ -6453,6 +6745,7 @@ $(& $enc $lblSpeed.Text)</pre>
 <h2>$(T 'Bloatware found')</h2>$(ConvertTo-HtmlRows @('Name', 'Type', 'Category', 'Why', 'Size') $lvBloat.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Background services')</h2>$(ConvertTo-HtmlRows @('Service', 'What it is', 'Starts', 'Suggested') $svcTodo @(0, 1, 3, 5))
 <h2>$(T 'Space savers')</h2>$(ConvertTo-HtmlRows @('Saver', 'Can free', 'Now', 'What it does - and what you give up') $lvSpace.Items @(0, 1, 2, 3))
+<h2>$(T 'Right now')</h2>$(ConvertTo-HtmlRows @('Program', 'Memory', 'Processor', 'Disk', 'What to do') $lvNow.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Gaming')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvGame.Items @(0, 1, 2, 3))
 <h2>$(T 'Browsers')</h2>$(ConvertTo-HtmlRows @('Item', 'Browser', 'Kind', 'Status', 'Details') $lvBrw.Items @(0, 1, 2, 3, 4))
 <h2>$(T 'Network')</h2>$(ConvertTo-HtmlRows @('Check', 'Status', 'Result', 'What to do') $lvNet.Items @(0, 1, 2, 3))
@@ -6537,6 +6830,7 @@ function Invoke-FixMyPc {
     }
     if ((Show-Msg ($plan -join "`n") 'OKCancel' 'Question') -ne 'OK') { return }
     $script:FixPlan = @{ Clean = $clean; Startup = $startup; Svc = $svc }
+    $script:FixBefore = Get-FixSnapshot
     $btnFix.Enabled = $false; $btnFix.Text = 'Fixing...'
     Start-WithRestorePoint 'Fix my PC' { Invoke-FixApply }
 }
@@ -6564,9 +6858,105 @@ function Invoke-FixApply {
         $lines += '', 'Startup changes take effect next time you sign in. Undo anything from the History page.'
         if ($script:FixSimple) { $lines = @("Done! $(Format-Size $freed) of leftover files removed.", '', $(if ($script:FixCounts.Startup) { 'Your PC will start a little faster next time.' } else { 'Your PC is tidier now.' })) }
         $btnFix.Text = 'Fix my PC'; $btnFix.Enabled = $true
-        Update-Health; Start-CleanScan; Update-Startup; Update-Services; Update-History
-        Show-Msg ($lines -join "`n") | Out-Null
+        Start-CleanScan; Update-Startup; Update-Services; Update-History
+        if ($CliMode) { Update-Health; Show-Msg ($lines -join "`n") | Out-Null; return }
+        # Measure again (free space, score), then show what changed.
+        $script:FixStopped = [bool]$state.Cancel
+        Start-Bg -Label 'Measuring the result' $HealthQuickWork $null { param($r) if ($r) { $script:HealthQuick = $r[0] }; Render-Health; Complete-FixResult }
     }
+}
+# ---------------------------------------------------------------------------
+# Before and after: what Fix my PC changed. Shown when it finishes, remembered in fixes.jsonl for the Health page,
+# and the start-up time is compared after the next restart (Windows only shows those to administrators).
+# ---------------------------------------------------------------------------
+$FixFile = Join-Path $DataDir 'fixes.jsonl'
+$script:LastFix = $null
+if (Test-Path $FixFile) { try { $script:LastFix = Get-Content $FixFile -Encoding UTF8 | Where-Object { $_.Trim() } | Select-Object -Last 1 | ConvertFrom-Json } catch { } }
+function Get-FixSnapshot {
+    $c = try { New-Object IO.DriveInfo($env:SystemDrive) } catch { $null }
+    $boot = @($script:BootList | Where-Object { $_ })
+    [pscustomobject]@{ Free = $(if ($c) { [double]$c.AvailableFreeSpace } else { $null }); Startup = @($lvStart.Items | Where-Object { $_.Tag.On }).Count
+                       Score = $(if ($script:HealthQuick -and $script:HealthDeep) { Get-HealthScore } else { $null }); Advice = @($script:HealthAdvice).Count
+                       Boot = $(if ($boot) { [double]$boot[-1].Y } else { $null }) }   # (an empty $() would be saved as {})
+}
+function Complete-FixResult {
+    $b = $script:FixBefore; $a = Get-FixSnapshot
+    if (-not $b) { $b = $a }
+    $rec = [pscustomobject][ordered]@{ Time = (Get-Date).ToString('s'); Freed = [double]$script:FixFreed; Startup = $script:FixCounts.Startup; Services = $script:FixCounts.Services
+        FreeBefore = $b.Free; FreeAfter = $a.Free; StartBefore = $b.Startup; StartAfter = $a.Startup; ScoreBefore = $b.Score; ScoreAfter = $a.Score
+        AdviceBefore = $b.Advice; AdviceAfter = $a.Advice; BootBefore = $b.Boot; BootAfter = $null }
+    try { Add-Content -Path $FixFile -Value ($rec | ConvertTo-Json -Compress) -Encoding UTF8 } catch { }
+    $script:LastFix = $rec
+    Render-Health
+    Show-FixReport $rec $script:FixStopped
+}
+# The first full start after the last fix: its start-up time goes into the record (once).
+function Update-FixBoot {
+    $f = $script:LastFix
+    if (-not $f -or $f.BootAfter -or -not $f.BootBefore) { return }
+    $since = @($script:BootList | Where-Object { $_.X -gt [datetime]$f.Time }) | Select-Object -First 1
+    if (-not $since) { return }
+    $f.BootAfter = [double]$since.Y
+    try {
+        $all = @(Get-Content $FixFile -Encoding UTF8 | Where-Object { $_.Trim() })
+        $all[-1] = $f | ConvertTo-Json -Compress
+        Set-Content -Path $FixFile -Value $all -Encoding UTF8
+    } catch { }
+    Render-Health
+}
+# One line for the Health readings: when the last fix ran and what it did.
+function Get-FixLines {
+    $f = $script:LastFix
+    if (-not $f) { return @() }
+    $when = try { ([datetime]$f.Time).ToString('d MMM') } catch { '' }
+    $lines = @("Last fix:  $((T '{0} - Fix my PC freed {1}').Replace('{0}', $when).Replace('{1}', (Format-Size $f.Freed)))")
+    if ($f.BootAfter -and $f.BootBefore) { $lines += "Start-up:  $((T '{0} s now, {1} s before Fix my PC').Replace('{0}', ('{0:N0}' -f $f.BootAfter)).Replace('{1}', ('{0:N0}' -f $f.BootBefore)))" }
+    $lines
+}
+function Format-Change([double]$Diff, [string]$Unit, [switch]$Fewer) {
+    if ([Math]::Abs($Diff) -lt $(if ($Unit -eq 'size') { 1MB } else { 0.5 })) { return T 'same' }
+    if ($Fewer) { if ($Diff -lt 0) { return (T '{0} fewer').Replace('{0}', ('{0:N0}' -f -$Diff)) } else { return (T '{0} more').Replace('{0}', ('{0:N0}' -f $Diff)) } }
+    if ($Unit -eq 'size') { return $(if ($Diff -ge 0) { '+' } else { '-' }) + (Format-Size ([Math]::Abs($Diff))) }
+    $(if ($Diff -gt 0) { '+' }) + ('{0:N0}' -f $Diff)
+}
+function Show-FixReport($R, [bool]$Stopped) {
+    # Each row: what, before, after, change, and whether the change is good (up = better unless -Fewer is better).
+    $tone = { param([double]$Diff, [double]$Same, [bool]$UpIsGood) if ([Math]::Abs($Diff) -lt $Same) { 'same' } elseif (($Diff -gt 0) -eq $UpIsGood) { 'good' } else { 'bad' } }
+    $rows = @(,@('Junk files removed', '', (Format-Size $R.Freed), '', 'same'))
+    if ($null -ne $R.FreeBefore -and $null -ne $R.FreeAfter) { $d = $R.FreeAfter - $R.FreeBefore; $rows += ,@((T 'Free space on {0}').Replace('{0}', $env:SystemDrive), (Format-Size $R.FreeBefore), (Format-Size $R.FreeAfter), (Format-Change $d 'size'), (& $tone $d 1MB $true)) }
+    $d = $R.StartAfter - $R.StartBefore; $rows += ,@('Apps that start with Windows', "$($R.StartBefore)", "$($R.StartAfter)", (Format-Change $d -Fewer), (& $tone $d 0.5 $false))
+    if ($IsAdmin) { $rows += ,@('Background services trimmed', '', "$($R.Services)", '', 'same') }
+    if ($null -ne $R.ScoreBefore -and $null -ne $R.ScoreAfter) { $d = $R.ScoreAfter - $R.ScoreBefore; $rows += ,@('PC Tune-Up score', "$($R.ScoreBefore)/100", "$($R.ScoreAfter)/100", (Format-Change $d), (& $tone $d 0.5 $true)) }
+    $d = $R.AdviceAfter - $R.AdviceBefore; $rows += ,@('Things worth a look', "$($R.AdviceBefore)", "$($R.AdviceAfter)", (Format-Change $d -Fewer), (& $tone $d 0.5 $false))
+    if ($R.BootBefore) { $rows += ,@('Start-up time', "$('{0:N0}' -f $R.BootBefore) s", 'after the next restart', '', 'same') }
+    $dlg = New-Object Windows.Forms.Form
+    $dlg.Text = T 'Fix my PC: before and after'; $dlg.FormBorderStyle = 'FixedDialog'; $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false; $dlg.ShowInTaskbar = $false
+    $dlg.StartPosition = 'CenterParent'; $dlg.BackColor = $Theme.Bg; $dlg.ForeColor = $Theme.Text; $dlg.Font = $Font
+    $dlg.ClientSize = New-Object Drawing.Size((Px 620), (Px (180 + 29 * $rows.Count)))
+    $dlg.Padding = New-Object Windows.Forms.Padding((Px 20), (Px 14), (Px 20), (Px 14))
+    $dlg.Add_HandleCreated({ if ($Dark) { $on = 1; try { [void][PcTuneUp.Native]::DwmSetWindowAttribute($this.Handle, 20, [ref]$on, 4) } catch { } } })
+    $head = New-Object Windows.Forms.Label
+    $head.Dock = 'Top'; $head.Height = Px 34; $head.Font = New-Object Drawing.Font('Segoe UI Semibold', 13)
+    $head.Text = T $(if ($Stopped) { 'Stopped early - this is what changed so far' } else { 'Done! This is what changed' })
+    $lv = New-ListView $false @('What', 210, 'Before', 100, 'After', 170, 'Change', 110)
+    foreach ($c in $lv.Columns) { $c.Text = T $c.Text }
+    foreach ($r in $rows) {
+        $it = Add-Row $lv $r[0..3]; $it.UseItemStyleForSubItems = $false; $it.SubItems[0].ForeColor = $Theme.Dim
+        $it.SubItems[3].ForeColor = switch ($r[4]) { 'good' { $Theme.Good } 'bad' { $Theme.Warn } default { $Theme.Dim } }
+    }
+    $note = New-Object Windows.Forms.Label
+    $note.Dock = 'Bottom'; $note.Height = Px 40; $note.ForeColor = $Theme.Dim; $note.TextAlign = 'MiddleLeft'
+    $note.Text = T 'Start-up changes take effect next time you sign in. Undo anything from the History page.'
+    $bar = New-Object Windows.Forms.FlowLayoutPanel
+    $bar.Dock = 'Bottom'; $bar.Height = Px 40; $bar.FlowDirection = 'RightToLeft'; $bar.WrapContents = $false
+    $ok = New-Button 'OK'; $ok.Text = T 'OK'; $ok.MinimumSize = New-Object Drawing.Size((Px 96), (Px 34)); $ok.DialogResult = 'OK'; Set-Primary $ok
+    $hist = New-Button 'Open History'; $hist.Text = T 'Open History'; $hist.MinimumSize = New-Object Drawing.Size(0, (Px 34)); $hist.DialogResult = 'Retry'
+    $bar.Controls.Add($ok); if (-not $script:FixSimple) { $bar.Controls.Add($hist) }   # the simple view has no History page
+    $dlg.Controls.Add($lv); $dlg.Controls.Add($note); $dlg.Controls.Add($bar); $dlg.Controls.Add($head)
+    $dlg.AcceptButton = $ok; $dlg.CancelButton = $ok
+    $res = $dlg.ShowDialog($form)
+    $dlg.Dispose()
+    if ("$res" -eq 'Retry') { Show-Page $pgHist }
 }
 $btnFix.Add_Click({ Invoke-FixMyPc })
 # ===========================================================================
@@ -6658,7 +7048,7 @@ $OldExeCleanupWork = {
 # Sidebar: the page list (grouped), with counts, and the administrator notice
 # ===========================================================================
 $NavGroups = @(
-    @{ Title = $null;      Pages = @('Health') }
+    @{ Title = $null;      Pages = @('Health', 'Right now') }
     @{ Title = 'CLEAN UP'; Pages = @('Clean', 'Startup', 'Bloatware', 'Programs', 'Services', 'Tasks', 'Right-click', 'Privacy', 'Disk', 'Space savers') }
     @{ Title = 'CHECK';    Pages = @('Updates', 'Drivers', 'Security', 'Browsers', 'Stability', 'Network', 'Gaming', $(if ($HasBattery) { 'Battery' }), 'Backup', 'Upgrades') }
     @{ Title = $null;      Pages = @('History', 'Settings'); Bottom = $true }   # pinned under the list, side by side, so they never scroll away
@@ -6776,7 +7166,7 @@ $form.Add_KeyDown({
 # Icons from the font built into Windows 11 (Segoe Fluent Icons) or Windows 10 (Segoe MDL2 Assets).
 $IconFontName = if ((New-Object Drawing.Text.InstalledFontCollection).Families.Name -contains 'Segoe Fluent Icons') { 'Segoe Fluent Icons' } else { 'Segoe MDL2 Assets' }
 $IconFont = New-Object Drawing.Font($IconFontName, 11)
-$NavIcons = @{ Health = 0xE95E; Clean = 0xEA99; Startup = 0xE7E8; Bloatware = 0xE74D; Programs = 0xE71D; Services = 0xE9F5; Tasks = 0xE823
+$NavIcons = @{ Health = 0xE95E; 'Right now' = 0xEC4A; Clean = 0xEA99; Startup = 0xE7E8; Bloatware = 0xE74D; Programs = 0xE71D; Services = 0xE9F5; Tasks = 0xE823
                'Right-click' = 0xE7C9; Privacy = 0xE890; Disk = 0xEDA2; 'Space savers' = 0xF012; Updates = 0xE895; Drivers = 0xE950
                Security = 0xEA18; Browsers = 0xE774; Stability = 0xE9D9; Network = 0xE701; Gaming = 0xE7FC; Battery = 0xE83F
                Backup = 0xE753; Upgrades = 0xEEA0; History = 0xE81C; Settings = 0xE713 }
@@ -6819,7 +7209,7 @@ foreach ($g in $NavGroups) {
         $b = New-Object Windows.Forms.Button
         $b.Text = $name; $b.Tag = $page; $b.Width = 178; $b.Height = 23; $b.TextAlign = 'MiddleLeft'
         $b.FlatStyle = 'Flat'; $b.UseVisualStyleBackColor = $false; $b.FlatAppearance.BorderSize = 0; $b.FlatAppearance.MouseOverBackColor = $Theme.Hover
-        $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 1, 0, 1)
+        $b.BackColor = $Theme.Side; $b.Padding = New-Object Windows.Forms.Padding(10, 0, 0, 0); $b.Margin = New-Object Windows.Forms.Padding(0, 0, 0, 1)   # 24 pages only fit with 1 px between them
         $b.Cursor = [Windows.Forms.Cursors]::Hand
         $b.Add_Click({ Show-Page $this.Tag })
         $b.AccessibleName = $name
@@ -6860,7 +7250,7 @@ if (-not $IsAdmin) {
     $sidebar.Controls.Add($adm)
 }
 # Each page's main action stands out.
-foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply, $btnGameFix)) { Set-Primary $b }
+foreach ($b in @($btnClean, $btnStartApply, $btnBloatRemove, $btnSvcApply, $btnDiskScan, $btnUpdRun, $btnSecOpen, $btnUpgCopy, $btnHistUndo, $btnStabFix, $btnTaskOff, $btnBkOpen, $btnPrivOff, $btnDrvGet, $btnBattUsage, $btnBrwExt, $btnProgUn, $btnNetScan, $btnCtxHide, $btnSpaceApply, $btnGameFix, $btnNowEnd)) { Set-Primary $b }
 
 # ---------------------------------------------------------------------------
 # Activity bar: what is running in the background, its progress, and Cancel
@@ -6914,7 +7304,7 @@ $script:PageLoaders = @{ Security = { Update-Security }; Stability = { Update-St
                          Clean = { Start-CleanScan }; Updates = { Start-UpdScan }; Upgrades = { Update-Upgrades }
                          Tasks = { Update-Tasks }; Backup = { Update-Backup }; Drivers = { Update-Drivers }; Privacy = { Update-Privacy }
                          Programs = { Update-Programs }; Browsers = { Update-Browsers }; Network = { Update-Network }; Battery = { Update-Battery }; 'Right-click' = { Update-Context }
-                         Startup = { Update-Boot }; 'Space savers' = { Update-Space }; Gaming = { Update-Gaming } }
+                         Startup = { Update-Boot }; 'Space savers' = { Update-Space }; Gaming = { Update-Gaming }; 'Right now' = { Update-Now } }
 $script:Loaded = @{}
 function Invoke-PageLoader([string]$Name) {
     if ($script:Loaded[$Name] -or -not $script:PageLoaders.ContainsKey($Name)) { return }
@@ -6948,6 +7338,8 @@ function Get-NextSteps {
     if ($n) { & $add 30 "$n kind(s) of crashes or errors keep happening" 'See fixes' $pgStab 'Programs or Windows crashed several times recently.' $null }
     $c0 = @($script:HealthQuick.Disks | Where-Object { $_.Id -eq 'C:' })[0]
     if ($c0 -and $c0.Size -and $c0.Free / $c0.Size -lt 0.1) { & $add 35 "Drive C: is almost full ($(Format-Size $c0.Free) free)" 'Free up space' $pgSpace "Your PC is almost full - only $(Format-Size $c0.Free) is left. That makes it slow." 'clean' }
+    $q0 = $script:HealthQuick
+    if ($q0 -and $q0.TotalKB -and $q0.FreeKB / $q0.TotalKB -lt 0.15) { & $add 38 "Memory is $([int](100 - 100 * $q0.FreeKB / $q0.TotalKB))% full - see what is using it" 'See' $pgNow 'The PC''s memory is almost full, which makes everything slow. Closing programs you don''t use helps.' $null }
     if ($script:NetProblems) { & $add 40 'The network has a problem' 'Check' $pgNet 'Your internet connection has a problem.' $null }
     if ($script:JunkBytes -gt 1GB) { & $add 45 "Clean up $(Format-Size $script:JunkBytes) of junk files" 'Clean' $pgClean "There are $(Format-Size $script:JunkBytes) of leftover files you don't need." 'clean' }
     if ($script:SpaceFree -gt 3GB) { & $add 48 "Free up to $(Format-Size $script:SpaceFree) with space savers" 'Review' $pgSpace "Windows keeps up to $(Format-Size $script:SpaceFree) for things you may not need." $null }

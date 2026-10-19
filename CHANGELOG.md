@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.17.0
+
+- New page **Right now** (under Health): what is slowing the PC down at this moment. Three meters (processor, memory, disk), one plain sentence about the biggest cause ("Memory is nearly full - Chrome uses the most"), and the programs using the most, each with what to do about it. It refreshes every few seconds while the page is open (Pause stops it), and **End task** closes the selected program after asking - Windows itself and background services are never ended. The Health page's memory link and "Start here" now lead there when memory is nearly full.
+- **Fix my PC** now ends with a before-and-after overview: junk removed, free space, apps that start with Windows, the PC Tune-Up score and the things worth a look - before, after and the change. The Health page remembers the last fix, and (as administrator) compares the start-up time after the next restart with the one before.
+
 ## 1.16.3
 
 - **Turn off checked** (Tasks and Privacy) and **Apply checked fixes** (Gaming) now ask first and list what they will change, like the other pages do. Everything stays undoable from the History page.

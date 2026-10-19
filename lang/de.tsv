@@ -1576,3 +1576,63 @@ Switch off these {0} scheduled task(s)?	Diese {0} geplante(n) Aufgabe(n) ausscha
 Turn off these {0} Windows setting(s)?	Diese {0} Windows-Einstellung(en) ausschalten?
 Apply these {0} fix(es)?	Diese {0} Korrektur(en) anwenden?
 You can undo this on the History page.	Rückgängig machen können Sie das auf der Seite Verlauf.
+Right now	Gerade aktiv
+What is slowing the PC down at this moment: the programs using the most memory, processor and disk. Updates every few seconds while this page is open. Select a program and click End task to close it.	Was den PC gerade ausbremst: die Programme, die am meisten Arbeitsspeicher, Prozessor und Datenträger nutzen. Wird alle paar Sekunden aktualisiert, solange diese Seite offen ist. Wählen Sie ein Programm aus und klicken Sie auf Task beenden, um es zu schließen.
+End task	Task beenden
+Pause	Anhalten
+Resume	Fortsetzen
+Task Manager	Task-Manager
+Measuring...	Wird gemessen...
+{0} cores	{0} Kerne
+{0} of {1} in use	{0} von {1} belegt
+{0} per second	{0} pro Sekunde
+Every open tab and extension uses memory. Close tabs you don't need; Shift+Esc in the browser shows which tab uses the most.	Jeder offene Tab und jede Erweiterung braucht Arbeitsspeicher. Schließen Sie Tabs, die Sie nicht brauchen; Umschalt+Esc im Browser zeigt, welcher Tab am meisten braucht.
+Windows Security checking for viruses. It finishes by itself - leave it running.	Windows-Sicherheit sucht nach Viren. Das endet von selbst - einfach laufen lassen.
+Windows Update installing updates. Let it finish, and restart when Windows asks.	Windows Update installiert Updates. Lassen Sie es fertig werden und starten Sie neu, wenn Windows darum bittet.
+Windows Search indexing your files so searching is quick. It slows down by itself while you use the PC.	Die Windows-Suche indiziert Ihre Dateien, damit die Suche schnell ist. Sie bremst sich selbst, während Sie den PC benutzen.
+Syncing files with the cloud. It calms down when syncing is finished.	Synchronisiert Dateien mit der Cloud. Es wird ruhiger, wenn die Synchronisierung fertig ist.
+A chat app that keeps running in the background. Quit it from its icon next to the clock when you don't need it.	Eine Chat-App, die im Hintergrund weiterläuft. Beenden Sie sie über ihr Symbol neben der Uhr, wenn Sie sie nicht brauchen.
+A game launcher. It downloads updates in the background; quit it when you are not playing.	Ein Spiele-Launcher. Er lädt im Hintergrund Updates herunter; beenden Sie ihn, wenn Sie nicht spielen.
+Windows squeezing memory to make room - a sign that memory is nearly full. Closing programs helps.	Windows komprimiert den Arbeitsspeicher, um Platz zu schaffen - ein Zeichen, dass er fast voll ist. Programme schließen hilft.
+Windows drawing the screen. Busier with animations, videos and extra screens.	Windows zeichnet den Bildschirm. Mehr zu tun bei Animationen, Videos und zusätzlichen Bildschirmen.
+Windows answering questions about the PC (PC Tune-Up asks it too, while this page is open).	Windows beantwortet Fragen zum PC (PC Tune-Up fragt auch, solange diese Seite offen ist).
+Part of Windows. Leave it running; if it stays busy for a long time, a restart usually helps.	Teil von Windows. Laufen lassen; bleibt es lange beschäftigt, hilft meist ein Neustart.
+A background service (part of Windows or of another program). Leave it running; the Services page shows which ones you can switch off.	Ein Hintergrunddienst (von Windows oder einem anderen Programm). Laufen lassen; die Seite Dienste zeigt, welche Sie abschalten können.
+Uses a lot of memory. Close it when you don't need it.	Braucht viel Arbeitsspeicher. Schließen Sie es, wenn Sie es nicht brauchen.
+Keeps the processor busy. If you aren't using it, close it.	Hält den Prozessor beschäftigt. Wenn Sie es nicht benutzen, schließen Sie es.
+Reading or writing a lot on the disk right now.	Liest oder schreibt gerade viel auf dem Datenträger.
+Memory is nearly full ({0}% in use) - that slows everything down. {1} uses the most ({2}).	Der Arbeitsspeicher ist fast voll ({0}% belegt) - das bremst alles aus. {1} braucht am meisten ({2}).
+The processor is very busy ({0}%). {1} uses the most ({2}%).	Der Prozessor ist stark ausgelastet ({0}%). {1} braucht am meisten ({2}%).
+The disk is very busy ({0}%). {1} reads and writes the most.	Der Datenträger ist stark ausgelastet ({0}%). {1} liest und schreibt am meisten.
+Memory is getting full ({0}% in use). Closing programs you don't use keeps the PC quick.	Der Arbeitsspeicher wird voll ({0}% belegt). Programme schließen, die Sie nicht nutzen, hält den PC schnell.
+Nothing is slowing the PC down right now.	Gerade bremst nichts den PC aus.
+{0} process(es) - memory {1}, processor {2}%, disk {3}	{0} Prozess(e) - Arbeitsspeicher {1}, Prozessor {2}%, Datenträger {3}
+{0} is part of Windows or runs as a background service, so PC Tune-Up doesn't end it.	{0} gehört zu Windows oder läuft als Hintergrunddienst, deshalb beendet PC Tune-Up es nicht.
+End {0}?	{0} beenden?
+It closes straight away ({0} process(es)). Anything not saved in it is lost - save your work first.	Es wird sofort geschlossen ({0} Prozess(e)). Nicht Gespeichertes geht verloren - speichern Sie zuerst Ihre Arbeit.
+Couldn't end {0} - it may need administrator rights, or it already closed.	{0} konnte nicht beendet werden - vielleicht sind Administratorrechte nötig, oder es wurde schon geschlossen.
+ended	beendet
+See what is using the processor and memory right now	Ansehen, was Prozessor und Arbeitsspeicher gerade nutzt
+Memory is {0}% full - see what is using it	Der Arbeitsspeicher ist zu {0}% voll - ansehen, was ihn nutzt
+The PC's memory is almost full, which makes everything slow. Closing programs you don't use helps.	Der Arbeitsspeicher des PCs ist fast voll, deshalb ist alles langsam. Programme schließen, die Sie nicht nutzen, hilft.
+Measuring the result	Ergebnis wird gemessen
+Last fix	Reparatur
+{0} - Fix my PC freed {1}	{0} - PC reparieren hat {1} freigegeben
+{0} s now, {1} s before Fix my PC	jetzt {0} s, {1} s vor PC reparieren
+same	gleich
+{0} fewer	{0} weniger
+{0} more	{0} mehr
+Junk files removed	Datenmüll entfernt
+Free space on {0}	Freier Platz auf {0}
+Apps that start with Windows	Apps, die mit Windows starten
+Background services trimmed	Hintergrunddienste reduziert
+Things worth a look	Punkte zum Ansehen
+after the next restart	nach dem nächsten Neustart
+Fix my PC: before and after	PC reparieren: vorher und nachher
+Stopped early - this is what changed so far	Vorzeitig gestoppt - das hat sich bisher geändert
+Done! This is what changed	Fertig! Das hat sich geändert
+Before	Vorher
+After	Nachher
+Start-up changes take effect next time you sign in. Undo anything from the History page.	Änderungen beim Start wirken ab der nächsten Anmeldung. Alles lässt sich auf der Seite Verlauf rückgängig machen.
+Open History	Verlauf öffnen
+PC Tune-Up itself.	PC Tune-Up selbst.

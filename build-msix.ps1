@@ -10,7 +10,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $App = @{ Title = 'PC Tune-Up'; Exe = 'PC-TuneUp.exe'; Script = 'pc-tuneup.ps1'; Alias = 'pc-tuneup.exe'; Id = 'PCTuneUp'
-          Description = 'Check, clean and speed up your PC, and undo anything.'; Unvirtualized = $true }
+          Description = 'Check, clean and speed up your PC, and undo anything.'; Unvirtualized = $true
+          StoreName = 'PC Tune-Up - Clean & Undo' }   # "PC Tune-Up" was taken in the Store
 Add-Type -AssemblyName System.Drawing
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $exe = Join-Path $here "dist\$($App.Exe)"
@@ -20,6 +21,8 @@ $version = "$($Matches[1]).0"   # the Store wants the last number to be 0
 $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\makeappx.exe" -ErrorAction SilentlyContinue | Sort-Object FullName | Select-Object -Last 1
 if (-not $sdk) { throw 'makeappx.exe not found - install the Windows SDK' }
 
+# The name reserved in Partner Center; the package must use exactly that name.
+$storeName = [Security.SecurityElement]::Escape($(if ($App.StoreName) { $App.StoreName } else { $App.Title }))
 $layout = Join-Path $here 'dist\msix'
 if (Test-Path $layout) {
     if ($Register) { Get-AppxPackage -Name $Name | Remove-AppxPackage }
@@ -51,7 +54,7 @@ Set-Content -Path (Join-Path $layout 'AppxManifest.xml') -Encoding UTF8 -Value @
   IgnorableNamespaces="uap uap3 desktop desktop6 rescap">
   <Identity Name="$Name" Publisher="$Publisher" Version="$version" ProcessorArchitecture="x64" />
   <Properties>
-    <DisplayName>$($App.Title)</DisplayName>
+    <DisplayName>$storeName</DisplayName>
     <PublisherDisplayName>$PublisherName</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>$novirt
   </Properties>
@@ -64,7 +67,7 @@ Set-Content -Path (Join-Path $layout 'AppxManifest.xml') -Encoding UTF8 -Value @
   </Resources>
   <Applications>
     <Application Id="$($App.Id)" Executable="$($App.Exe)" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="$($App.Title)" Description="$($App.Description)"
+      <uap:VisualElements DisplayName="$storeName" Description="$($App.Description)"
         BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" />
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias">

@@ -95,7 +95,7 @@ foreach ($a in $CliArgs) {
 }
 $CliMode = $Cli.Help -or $Cli.Fix -or $Cli.Auto -or ($null -ne $Cli.Report)
 
-$AppVersion = '1.22.1'                 # bump for every release; publish-release.ps1 tags it as v<version>
+$AppVersion = '1.22.2'                 # bump for every release; publish-release.ps1 tags it as v<version>
 $UpdateRepo = 'michaelkloprogge-gif/pc-tuneup'       # GitHub repo whose latest release the app updates from
 
 # Inside PC-TuneUp.exe the script is hosted in-process, so restart/icon use the exe.
@@ -1380,7 +1380,7 @@ No history yet.	Nog geen geschiedenis.
 PC-TuneUp.exe /auto                 the automatic maintenance run (clean, check, notify)	PC-TuneUp.exe /auto                 het automatische onderhoud (opruimen, controleren, melden)
 {0} programs, {1} in total. {2} with no sign of use for 6 months or more.  Use is recorded since {3}.	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  Gebruik wordt bijgehouden sinds {3}.
 {0} programs, {1} in total. {2} with no sign of use for 6 months or more.  (Windows is set not to record program use: Settings > Privacy > General.)	{0} programma's, samen {1}. {2} al 6 maanden of langer niet gebruikt.  (Windows houdt programmagebruik niet bij: Instellingen > Privacy > Algemeen.)
-{0}; {1}	{0}; {1}
+{0}; {1}	{0}; {1}
 Start here	Begin hier
 1.  {0}	1.  {0}
 2.  {0}	2.  {0}

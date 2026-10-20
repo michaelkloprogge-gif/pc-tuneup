@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22.2
+
+- Ready for the Microsoft Store, as "PC Tune-Up - Clean & Undo": the Store version leaves installing and updating to the Store, and automatic maintenance and "Restart as admin" start it the Store way.
+
 ## 1.22.1
 
 - Fixed: program updates that had installed fine kept showing up on the Updates page (for example Windows Terminal and Visual Studio Code). Some programs only switch to the new version when they are closed and opened again; PC Tune-Up now recognises an update it already installed and shows "already updated - finishes when you close and reopen it" instead of offering it again. Those don't count as waiting updates any more (sidebar count, Start here, reminders).

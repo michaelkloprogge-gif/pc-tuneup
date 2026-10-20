@@ -13,9 +13,9 @@ hardware token or in a cloud signing service, so a plain `.pfx` file is no longe
 
 | Option | Cost | Notes |
 |---|---|---|
-| **SignPath Foundation** (recommended) | free for open-source projects | Apply at <https://signpath.org/>. They check that the project is open source (MIT is fine) and built by CI from public code - this repo already is. Signing then runs as a step in GitHub Actions; the certificate is issued to SignPath Foundation, with this project named. |
-| **Azure Artifact Signing** (formerly Trusted Signing) | about USD 10 a month | Microsoft's cloud signing. Needs an Azure account and identity validation; check on the Azure page whether individuals in your country are eligible. Has a ready-made GitHub action. |
-| **Certum Open Source Code Signing** | about EUR 50-70 a year, plus a card reader | A classic certificate on a smart card, issued to you personally. Signing then happens on your own PC (not in GitHub Actions), because the card has to be plugged in. |
+| **Certum Open Source Code Signing** (recommended now) | about EUR 50-70 a year, plus a card reader | A classic certificate on a smart card, issued to you personally as an open-source developer. Signing then happens on your own PC (not in GitHub Actions), because the card has to be plugged in. Certum also sells a cloud version (SimplySign) that works without a card. |
+| **SignPath Foundation** | free for open-source projects | Applied in October 2026 and declined: the Foundation only signs for projects that already show public visibility (stars, forks, contributors, articles, discussions). They invite a new application once the project is better known. Paid SignPath plans are possible meanwhile. |
+| **Azure Artifact Signing** (formerly Trusted Signing) | about USD 10 a month | Microsoft's cloud signing. Not available here: individual developers must live in the United States or Canada (organisations in the EU are eligible). |
 
 ## What is already in place
 

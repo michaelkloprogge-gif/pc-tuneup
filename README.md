@@ -76,8 +76,6 @@ Use `start /wait PC-TuneUp.exe /report` in a command prompt so it waits for the 
 
 ## Code signing policy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
-
 - Every release is built from the public source code in this repository by GitHub Actions and published only from there.
 - Committers and reviewers: [Michael Kloprogge](https://github.com/michaelkloprogge-gif) (project owner).
 - Approver of each signed release: Michael Kloprogge.

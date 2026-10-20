@@ -3,8 +3,8 @@
 # (needs Developer Mode, no signing).
 # Identity values come from Partner Center > the app > Product identity.
 param(
-    [string]$Name = 'MichaelKloprogge.PCTuneUp',
-    [string]$Publisher = 'CN=Michael Kloprogge',
+    [string]$Name = 'MichaelKloprogge.PCTune-Up-CleanUndo',
+    [string]$Publisher = 'CN=22C69B52-58BA-4988-A156-9BB1FEABF928',
     [string]$PublisherName = 'Michael Kloprogge',
     [switch]$Register
 )

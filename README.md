@@ -94,6 +94,7 @@ with the .NET Framework compiler that ships with Windows - nothing to install to
 
 ```powershell
 .\build-exe.ps1                       # -> dist\PC-TuneUp.exe
+.\build-msix.ps1                      # -> dist\PC-TuneUp.msix for the Microsoft Store (-Register: try it here, Developer Mode)
 .\tests\Test-Upgrades.ps1 -Check      # upgrade advice on made-up PCs
 .\tests\Test-Translation.ps1          # Dutch translation
 .\tests\Run-Headless.ps1              # run every check on this PC without showing the window

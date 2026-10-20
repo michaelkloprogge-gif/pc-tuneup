@@ -1598,6 +1598,8 @@ Help and feedback	Hulp en feedback
 Something not working, or an idea? It opens a report on GitHub with the version, Windows and recent errors already filled in (your name, folders and PC name are blanked out) - you see everything before you send it.	Werkt er iets niet, of heb je een idee? Er opent een melding op GitHub met de versie, Windows en recente fouten al ingevuld (je naam, mappen en pc-naam zijn weggelaten) - je ziet alles voordat je het verstuurt.
 Report a problem...	Probleem melden...
 Suggest an idea...	Idee voorstellen...
+PC Tune-Up came from the Microsoft Store, which keeps it up to date.	PC Tune-Up komt uit de Microsoft Store, die het up-to-date houdt.
+PC Tune-Up came from the Microsoft Store: it is in the Start menu, and you can uninstall it in Settings > Apps.	PC Tune-Up komt uit de Microsoft Store: het staat in het Startmenu en je kunt het verwijderen via Instellingen > Apps.
 Show the tour again	Rondleiding opnieuw tonen
 Website	Website
 Ctrl+F  search everything      F5  reload this page      Ctrl+1 ... Ctrl+9  the first nine pages      Ctrl+PageDown / Ctrl+PageUp  next / previous page      Space  check or uncheck a row      Enter  open a search result	Ctrl+F  alles doorzoeken      F5  deze pagina opnieuw laden      Ctrl+1 ... Ctrl+9  de eerste negen pagina's      Ctrl+PageDown / Ctrl+PageUp  volgende / vorige pagina      Spatie  rij aan- of uitvinken      Enter  zoekresultaat openen
@@ -1993,6 +1995,9 @@ $InstalledExe = Join-Path $InstallDir 'PC-TuneUp.exe'
 $IsInstalled = $RunningAsExe -and ($SelfExe -eq $InstalledExe)
 # Installed with winget ("winget install MichaelKloprogge.PCTuneUp"): winget owns the file, so it also does the updates.
 $FromWinget = $RunningAsExe -and $SelfExe -match '\\Microsoft\\WinGet\\(Packages|Links)\\'
+# From the Microsoft Store (an MSIX package): the Store installs and updates it, and starts it through its alias.
+$FromStore = $RunningAsExe -and (Test-Path -LiteralPath (Join-Path (Split-Path $SelfExe) 'AppxManifest.xml'))
+$StartExe = if ($FromStore) { Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\pc-tuneup.exe' } else { $SelfExe }
 
 function Write-Log([string]$Msg) {
     Add-Content -Path $LogFile -Value ('{0:yyyy-MM-dd HH:mm:ss}  {1}' -f (Get-Date), $Msg) -Encoding UTF8
@@ -7014,7 +7019,7 @@ function New-Check([string]$Text, [bool]$Checked) {
     $c
 }
 function Restart-App {
-    if ($RunningAsExe) { Start-Process $SelfExe } else { Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
+    if ($RunningAsExe) { Start-Process $StartExe } else { Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
     $form.Close()
 }
 
@@ -7037,7 +7042,7 @@ Add-SetRow @($cmbTheme, $btnThemeRestart)
 $cmbTheme.Add_SelectedIndexChanged({ $Settings.Theme = $this.Tag[$this.SelectedIndex]; Save-Settings })
 $btnThemeRestart.Add_Click({ Restart-App })
 
-Add-SetSection 'Updates' "You have version $AppVersion. New versions come from github.com/$UpdateRepo and are checked against GitHub's checksum before they are installed."
+Add-SetSection 'Updates' $(if ($FromStore) { 'PC Tune-Up came from the Microsoft Store, which keeps it up to date.' } else { "You have version $AppVersion. New versions come from github.com/$UpdateRepo and are checked against GitHub's checksum before they are installed." })
 $chkUpd = New-Check 'Check for updates when PC Tune-Up starts' ([bool]$Settings.CheckUpdates)
 $chkUpd.Add_CheckedChanged({ $Settings.CheckUpdates = $this.Checked; Save-Settings })
 $btnUpdate = New-Button 'Check for updates now'
@@ -7065,7 +7070,7 @@ $MaintTaskName = 'PC Tune-Up maintenance'
 function Set-MaintenanceTask([string]$Mode) {
     if ($Mode -eq 'off') { Unregister-ScheduledTask -TaskName $MaintTaskName -Confirm:$false -ErrorAction SilentlyContinue; return $true }
     if ($IsInstalled) { $exe = $InstalledExe; $arg = '/auto' }
-    elseif ($FromWinget) { $exe = $SelfExe; $arg = '/auto' }
+    elseif ($FromWinget -or $FromStore) { $exe = $StartExe; $arg = '/auto' }
     elseif (-not $RunningAsExe) { $exe = 'powershell.exe'; $arg = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }   # developer mode
     else { Show-Msg 'Install PC Tune-Up first (Settings > Installation): the automatic run needs it in a fixed place.' 'OK' 'Warning' | Out-Null; return $false }
     try {
@@ -7090,16 +7095,17 @@ $cmbAuto.Add_SelectedIndexChanged({
     } else { $this.SelectedIndex = [array]::IndexOf($this.Tag, $Settings.AutoMaintenance) }
 })
 $btnAutoNow.Add_Click({
-    if ($RunningAsExe) { Start-Process $SelfExe '/auto' } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }
+    if ($RunningAsExe) { Start-Process $StartExe '/auto' } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`" /auto" }
     Show-Msg 'The maintenance run has started in the background. A notification appears when it is done (in a minute or two).' | Out-Null
 })
 
-Add-SetSection 'Installation' $(if ($FromWinget) { 'Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).' }
+Add-SetSection 'Installation' $(if ($FromStore) { 'PC Tune-Up came from the Microsoft Store: it is in the Start menu, and you can uninstall it in Settings > Apps.' }
+                                 elseif ($FromWinget) { 'Installed with winget - update or remove it with winget (winget upgrade / winget uninstall MichaelKloprogge.PCTuneUp).' }
                                  elseif ($IsInstalled) { "Installed for you in $InstallDir - it appears in the Start menu and in Settings > Apps." }
                                  elseif ($RunningAsExe) { "Running from $SelfExe without installing. Install to get a Start-menu entry and uninstall it like any other app (no administrator needed)." }
                                  else { 'Running as a PowerShell script (developer mode) - install from PC-TuneUp.exe instead.' })
 $btnInstall = New-Button $(if ($IsInstalled) { 'Uninstall PC Tune-Up' } else { 'Install on this PC' })
-$btnInstall.Enabled = $RunningAsExe -and -not $FromWinget
+$btnInstall.Enabled = $RunningAsExe -and -not $FromWinget -and -not $FromStore
 Add-SetRow @($btnInstall)
 $btnInstall.Add_Click({ if ($IsInstalled) { Uninstall-App } else { Install-App -Launch } })
 
@@ -7128,7 +7134,7 @@ function Get-ProblemInfo {
     $cv = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -ErrorAction SilentlyContinue
     $build = "$($cv.CurrentBuild).$($cv.UBR)"
     $prod = if ([int]$cv.CurrentBuild -ge 22000) { "$($cv.ProductName)" -replace 'Windows 10', 'Windows 11' } else { "$($cv.ProductName)" }
-    $how = if ($FromWinget) { 'winget' } elseif ($IsInstalled) { 'installed' } elseif ($RunningAsExe) { 'exe, not installed' } else { 'script' }
+    $how = if ($FromStore) { 'Microsoft Store' } elseif ($FromWinget) { 'winget' } elseif ($IsInstalled) { 'installed' } elseif ($RunningAsExe) { 'exe, not installed' } else { 'script' }
     # Longest first: the PC name often contains the user name.
     $clean = { param($t) $t = "$t"; foreach ($p in @($env:USERPROFILE, $env:COMPUTERNAME, $env:USERNAME) | Where-Object { $_ -and $_.Length -ge 3 } | Sort-Object Length -Descending) { $t = $t -ireplace [regex]::Escape($p), '<hidden>' }; $t }
     [pscustomobject]@{
@@ -7617,6 +7623,7 @@ $UpdateDownloadWork = {
     } catch { [pscustomobject]@{ File = $null; Error = $_.Exception.Message } }
 }
 function Start-UpdateCheck([switch]$Silent) {
+    if ($FromStore) { if (-not $Silent) { Show-Msg 'PC Tune-Up came from the Microsoft Store, which keeps it up to date.' | Out-Null }; return }
     if ($UpdateRepo -like 'OWNER/*') { if (-not $Silent) { Show-Msg 'Updates are not set up in this build.' | Out-Null }; return }
     $btnUpdate.Enabled = $false
     $script:UpdateSilent = [bool]$Silent
@@ -7659,7 +7666,7 @@ function Start-UpdateCheck([switch]$Silent) {
                 return
             }
             Write-Log "Updated PC Tune-Up $AppVersion -> $($script:UpdateInfo.Version)"
-            Start-Process $SelfExe
+            Start-Process $StartExe
             $form.Close()
         }
     }
@@ -7898,7 +7905,7 @@ if (-not $IsAdmin) {
     $admTip = New-Object Windows.Forms.ToolTip
     $admB.Add_Click({
         try {
-            if ($RunningAsExe) { Start-Process $SelfExe -Verb RunAs }
+            if ($RunningAsExe) { Start-Process $StartExe -Verb RunAs }
             else { Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" }
             $form.Close()
         } catch { }   # user said no to the UAC prompt
@@ -8589,7 +8596,7 @@ if ($Cli.Auto) {
     $until = (Get-Date).AddSeconds(20)
     while ((Get-Date) -lt $until -and -not $script:AutoOpen) { [Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 }
     $tray.Visible = $false; $tray.Dispose()
-    if ($script:AutoOpen) { if ($RunningAsExe) { Start-Process $SelfExe } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" } }
+    if ($script:AutoOpen) { if ($RunningAsExe) { Start-Process $StartExe } else { Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$PSCommandPath`"" } }
     $JobTimer.Stop()
     return
 }
@@ -8629,7 +8636,7 @@ $form.Add_Shown({
     $oldExe = [IO.Path]::ChangeExtension($SelfExe, '.old.exe')
     if ($RunningAsExe -and (Test-Path -LiteralPath $oldExe)) { Start-Bg $OldExeCleanupWork $oldExe { } }
     # First start from a downloaded file: offer to install (once).
-    if ($RunningAsExe -and -not $IsInstalled -and -not $FromWinget -and -not $Settings.AskedInstall) {
+    if ($RunningAsExe -and -not $IsInstalled -and -not $FromWinget -and -not $FromStore -and -not $Settings.AskedInstall) {
         $Settings.AskedInstall = $true; Save-Settings
         $q = "Install PC Tune-Up on this PC?`n`nIt adds PC Tune-Up to the Start menu and to Settings > Apps (so it can be uninstalled like any app), and it keeps itself up to date. No administrator rights needed.`n`nYou can also do this later in Settings."
         if ((Show-Msg $q 'YesNo' 'Question') -eq 'Yes') { Install-App -Launch }
